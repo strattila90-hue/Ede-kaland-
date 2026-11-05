@@ -19,6 +19,14 @@ Az egész játék **egyetlen `index.html` fájl** – nincs szükség telepíté
 
 Minden állomás végén képeslap készül az úti célról.
 
+## 🚐 A családi autó
+
+Saját tervezésű, hétüléses egyterű tetőboxszal és krómkeretes ablakokkal. A lámpák LED-es fénycsíkok, a felni hatküllős.
+A címképernyőn az autó körbefordul, és öt nézetből látható: bal és jobb oldal, elöl, hátul, felülről.
+Közben nyílnak az ajtók, forognak a kerekek, villog az irányjelző, felvillan a féklámpa, mennek az ablaktörlők.
+A színe a főmenüben választható: kékesszürke, pezsgőarany, piros, fehér, éjkék vagy fekete.
+Minden állomáson megérkezéskor kinyílnak az ajtók, a család kiszáll és integet a táblánál.
+
 ## 🎮 Irányítás
 
 | Billentyű | Mobil gomb | Funkció |
