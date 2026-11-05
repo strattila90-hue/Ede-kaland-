@@ -27,15 +27,23 @@ Közben nyílnak az ajtók, forognak a kerekek, villog az irányjelző, felvilla
 A színe a főmenüben választható: kékesszürke, pezsgőarany, piros, fehér, éjkék vagy fekete.
 Minden állomáson megérkezéskor kinyílnak az ajtók, a család kiszáll és integet a táblánál.
 
+**Autós funkciók:**
+- **Lámpák:** fényszóró (L), első és hátsó ködlámpa (F), féklámpa, irányjelző sávváltáskor, vészvillogó megálláskor.
+- **Ablaktörlő:** esőben és hóban magától jár.
+- **Tankolás:** minden állomás felénél benzinkút van. Állj meg a felső sávban a kútnál: kinyílik a tanksapka, apa kiszáll és teletankol.
+- **Defekt:** kátyúba vagy kőbe hajtva kidurranhat a kerék. Az autó ilyenkor lassabban megy és dübörög. Fékezz le teljesen, és apa emelővel kicseréli a kereket.
+
 ## 🎮 Irányítás
 
 | Billentyű | Mobil gomb | Funkció |
 |-----------|-----------|---------|
 | → / D | GÁZ | gyorsítás |
-| ← / A | FÉK | fékezés |
+| ← / A | FÉK | fékezés, megállás |
 | ↑ ↓ / W S | ▲ ▼ | sávváltás |
 | Space | UGRÁS | ugrás (bóják, kátyúk, magasan lebegő tárgyak) |
 | H | DUDA | dudálás – az állatok elszaladnak, az autók félreállnak |
+| L | 💡 | fényszóró be/ki |
+| F | KÖD | ködlámpa be/ki |
 | P / Esc | II | szünet |
 | M | ♪ | zene be/ki |
 
