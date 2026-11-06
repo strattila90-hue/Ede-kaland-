@@ -2,13 +2,13 @@
 /* =========================================================
    TÉRKÉP – földrajzilag pontos Európa (Natural Earth), útvonal, pozíció
    ========================================================= */
-const MAPVIEW={lat0:40.6,lat1:54.2,lon0:-0.8,lon1:21.2};
+const MAPVIEW={lat0:36.4,lat1:57.6,lon0:-10.2,lon1:25.2};
 function mapProj(v,r){const c=Math.cos((v.lat0+v.lat1)/2*Math.PI/180),sx=r[2]/((v.lon1-v.lon0)*c),sy=r[3]/(v.lat1-v.lat0),k=Math.min(sx,sy);
  const ox=r[0]+(r[2]-(v.lon1-v.lon0)*c*k)/2,oy=r[1]+(r[3]-(v.lat1-v.lat0)*k)/2;return (lat,lon)=>[ox+(lon-v.lon0)*c*k,oy+(v.lat1-lat)*k];}
 const MAPCACHE={};
-function landImage(r,v,key){const ck=key+'|'+SC;if(MAPCACHE[ck])return MAPCACHE[ck];const [c,g]=mk(r[2],r[3],SC);const pr=mapProj(v,[0,0,r[2],r[3]]);
+function landImage(r,v,key){const hd=typeof GEOHD!=='undefined',src=hd?GEOHD:GEO,qq=hd?100:20;const ck=key+'|'+SC+'|'+hd;if(MAPCACHE[ck])return MAPCACHE[ck];const [c,g]=mk(r[2],r[3],SC);const pr=mapProj(v,[0,0,r[2],r[3]]);
  g.fillStyle=lg(g,0,0,0,r[3],[[0,'#2f6fb8'],[1,'#24599a']]);g.fillRect(0,0,r[2],r[3]);
- for(const pl of GEO){g.beginPath();for(let i=0;i<pl.length;i+=2){const p=pr(pl[i+1]/20,pl[i]/20);i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]);}g.closePath();
+ for(const pl of src){g.beginPath();for(let i=0;i<pl.length;i+=2){const p=pr(pl[i+1]/qq,pl[i]/qq);i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]);}g.closePath();
   g.fillStyle='#86c070';g.fill();g.strokeStyle='rgba(60,90,50,0.75)';g.lineWidth=Math.max(0.3,r[2]/500);g.stroke();}
  // Alpok
  g.fillStyle='rgba(235,240,245,0.55)';for(const [la,lo,rr] of [[46.6,8.2,0.9],[47.1,11.2,0.9],[46.9,13.4,0.7],[45.9,7.0,0.6]]){const p=pr(la,lo),q=pr(la,lo+rr);g.beginPath();g.ellipse(p[0],p[1],q[0]-p[0],(q[0]-p[0])*0.45,0,0,TAU);g.fill();}
@@ -29,7 +29,12 @@ function drawMiniMap(g,r,leg,frac,t){const v=MAPVIEW;g.save();rrect(g,r[0],r[1],
 function drawBigMap(g,leg,frac,t,anim){const r=[8,22,W-16,H-82],v=MAPVIEW;frr(g,'#0b0f17',0,0,W,H,0);g.save();rrect(g,r[0],r[1],r[2],r[3],8);g.clip();g.drawImage(landImage(r,v,'big'),r[0],r[1],r[2],r[3]);
  const pr=mapProj(v,r);drawRoute(g,pr,leg,frac,1.6);
  const names=['Komárom'].concat(LEGS.map(L=>L.to.split(' (')[0]));
- for(let i=0;i<=LEGS.length;i++){const c=LIVE_XY[i],q=pr(c[0],c[1]);disc(g,i<=leg?'#ff4d4d':'#ffffff',q[0],q[1],2);if(i<LEGS.length||i===0){const nm=names[i];frr(g,'rgba(10,13,22,0.55)',q[0]+3,q[1]-5,textW(nm)+4,9,2);text(g,nm,q[0]+5,q[1]-4,'#ffffff',1,'left',null);}}
+ for(let i=0;i<=LEGS.length;i++){const c=LIVE_XY[i],q=pr(c[0],c[1]);disc(g,i<=leg?'#ff4d4d':'#ffffff',q[0],q[1],2);}
+ // feliratok: előbb az aktuális szakasz két vége, a többi csak ha nem takar
+ const occ=[],ord=[leg,leg+1];for(let i=0;i<LEGS.length;i++)if(i!==leg&&i!==leg+1)ord.push(i);
+ for(const i of ord){if(i>=LEGS.length)continue;const nm=names[i].toUpperCase(),c=LIVE_XY[i],q=pr(c[0],c[1]),w=textW(nm)+4;
+  let ok=false,x=0;for(const cand of [q[0]+3,q[0]-3-w]){x=cand;if(!occ.some(o=>x<o[0]+o[2]&&x+w>o[0]&&q[1]-5<o[1]+o[3]&&q[1]+4>o[1])){ok=true;break;}}
+  if(!ok)continue;occ.push([x,q[1]-5,w,9]);const cur=i===leg||i===leg+1;frr(g,cur?'rgba(255,216,74,0.85)':'rgba(10,13,22,0.55)',x,q[1]-5,w,9,2);text(g,names[i],x+2,q[1]-4,cur?'#1a1a1a':'#ffffff',1,'left',null);}
  const cur=legPos(leg,frac),q=pr(cur[0],cur[1]);g.save();g.translate(q[0]-9,q[1]-10);g.scale(0.16,0.16);drawCarSide(g,0,0,0,{t:t,ang:t*0.1,pos:true},null);g.restore();
  g.restore();g.strokeStyle='rgba(255,255,255,0.3)';g.lineWidth=1;rrect(g,r[0],r[1],r[2],r[3],8);g.stroke();
  text(g,'Útiterv - Európa körút',W/2,8,'#ffd84a',1.4,'center');}

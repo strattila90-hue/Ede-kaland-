@@ -12,7 +12,7 @@ function goHome(){if(G.state!=='play')return;if(MG)endMini();if(P)save(P.dist);G
  toast('Játékállás elmentve: '+fmt(G.trip.km,1)+' km, '+fmt(G.trip.money)+' Ft. A Folytatás gombbal innen indulsz tovább.',3600);}
 function autoSave(){try{if(G.state==='play'&&P)save(P.dist);}catch(e){}}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)autoSave();});window.addEventListener('pagehide',autoSave);
-tapBtn('bHome',goHome);
+tapBtn('bHome',goHome);tapBtn('bGps',()=>{if(typeof openGPS==='function')openGPS();});
 {const el=$('bCruise');let tm=null,long=false;const down=e=>{e.preventDefault();e.stopPropagation();initAudio();long=false;el.classList.add('on');tm=setTimeout(()=>{long=true;haptic(25);const b=$('cruiseBar');b.style.display=b.style.display==='flex'?'none':'flex';},450);};
  const up=e=>{e.preventDefault();clearTimeout(tm);el.classList.remove('on');if(!long){haptic(12);K.cruiseTap=true;$('cruiseBar').style.display='none';}};
  el.addEventListener('touchstart',down,{passive:false});el.addEventListener('touchend',up,{passive:false});el.addEventListener('mousedown',down);el.addEventListener('mouseup',up);}
@@ -98,8 +98,8 @@ window.addEventListener('offline',()=>toast('Offline mód: a játék internet n�
 setTimeout(checkUpdate,1500);
 /* menük */
 function titleAct(a){const opts=titleOpts();const i=opts.findIndex(o=>o.a===a);if(i>=0){G.menu=i;K.enterP=true;}}
-function menuDef(){const s=G.state;if(G.ledger)return null;
- if(G.paused&&s==='play')return {cls:'center',title:'Szünet',items:[{a:'resume',l:'Folytatás',ic:'▶',c:'primary'},{a:'log',l:'Költségnapló: '+fmt(G.trip.money)+' Ft',ic:'📒'},{a:'radio',l:'Rádió: '+(radio.on?STATIONS[radio.idx].name:'ki'),ic:'📻'},{a:'quit',l:'Mentés és kilépés a főmenübe',ic:'⌂'},{a:'update',l:updLabel,ic:'⟳',fill:1}]};
+function menuDef(){const s=G.state;if(G.ledger||G.gps)return null;
+ if(G.paused&&s==='play')return {cls:'center',title:'Szünet',items:[{a:'resume',l:'Folytatás',ic:'▶',c:'primary'},{a:'gps',l:'GPS térkép',ic:'🧭'},{a:'log',l:'Költségnapló: '+fmt(G.trip.money)+' Ft',ic:'📒'},{a:'radio',l:'Rádió: '+(radio.on?STATIONS[radio.idx].name:'ki'),ic:'📻'},{a:'quit',l:'Mentés és kilépés a főmenübe',ic:'⌂'},{a:'update',l:updLabel,ic:'⟳',fill:1}]};
  if(s==='title'){const it=[];if(G.save&&(G.save.leg>0||G.save.dist>0))it.push({a:'cont',l:titleOpts().find(o=>o.a==='cont').l,ic:'▶',c:'primary'});
   it.push({a:'new',l:'Új utazás Komáromból',ic:'🚐',c:it.length?'':'primary'},{a:'color',l:'Autó színe: '+carColor,ic:'🎨'},{a:'ts',l:'Utazás: '+(TS_OPTS.find(q=>q[0]===G.ts)||TS_OPTS[0])[1],ic:'⏱'},{a:'specs',l:'Az autó adatai',ic:'ℹ'});
   if(!isStandalone())it.push({a:'install',l:'Telepítés',ic:'⬇',c:deferredPrompt?'new':''});
@@ -154,7 +154,7 @@ function renderMenu(){const d=menuDef(),m=$('menu');const sig=d?JSON.stringify(d
  if(d.ver){const v=document.createElement('div');v.className='ver';v.textContent='Verzió: v'+APP_VERSION+(navigator.onLine?'':'  •  offline');m.appendChild(v);}}
 function menuAction(a){
  if(a==='resume'){G.paused=false;}else if(a==='quit'){goHome();}
- else if(a==='log'){openLedger(G.state==='play'?'pause':'menu');}else if(a==='radio'){radioNext();}else if(a==='install')doInstall();else if(a==='share')doShare();else if(a==='update')doUpdate();
+ else if(a==='gps'){if(typeof openGPS==='function')openGPS();}else if(a==='log'){openLedger(G.state==='play'?'pause':'menu');}else if(a==='radio'){radioNext();}else if(a==='install')doInstall();else if(a==='share')doShare();else if(a==='update')doUpdate();
  else if(a==='music'){toggleMusic();}else if(a==='home'){G.state='title';G.st=0;}
  else if(a==='go'){K.enterP=true;G.st=Math.max(G.st,99);}
  else titleAct(a);
@@ -164,7 +164,7 @@ const setC=(id,cls,on)=>{const el=$(id);if(el&&el.classList.contains(cls)!==!!on
 let touchShown=null;
 function appTick(){{const bl=G.state==='play'&&P&&!G.paused?Math.round(((G.drowsy||0)*0.6+(G.eyelid||0)*0.4)*4)/4:0,v=bl>0.05?'blur('+bl.toFixed(2)+'px)':'';if(appTick.f!==v){appTick.f=v;document.getElementById('c').style.filter=v;}}
 appTick.n=(appTick.n||0)+1;if(G.state==='title'&&(appTick.n%20===0||!G.menuR)){const m=$('menu');if(m.style.display!=='none'&&m.offsetWidth){const r=m.getBoundingClientRect(),c=document.getElementById('c').getBoundingClientRect();if(c.width)G.menuR=clamp((r.right-c.left)/c.width*W,0,W*0.6);}}
-{const tb=G.state==='play'&&!G.paused&&!MG&&!G.ledger&&!(P&&(P.sub==='pump'||P.sub==='shop'||P.sub==='wash'));const el=$('topbar');if(el.dataset.v!==String(tb)){el.dataset.v=tb;el.style.display=tb?'flex':'none';}}
+{const tb=G.state==='play'&&!G.paused&&!MG&&!G.ledger&&!G.gps&&!(P&&(P.sub==='pump'||P.sub==='shop'||P.sub==='wash'));const el=$('topbar');if(el.dataset.v!==String(tb)){el.dataset.v=tb;el.style.display=tb?'flex':'none';}}
  if(P&&G.state==='play'){const st=clamp((LANE[P.lane]-P.y)*2.2,-40,40);const v=st.toFixed(0)+'deg';if(appTick.st!==v){appTick.st=v;$('bHonk').style.setProperty('--steer',v);}}
 if(G.ledger&&G.ledger==='play'&&!G.paused)closeLedger();if(G.ledger&&G.state==='title')closeLedger();if(G.t%4===0||MENU_SIG==='?')renderMenu();
  const tch=isTouch&&G.state==='play'&&!G.paused&&!MG&&!(P&&(P.sub==='pump'||P.sub==='shop'||P.sub==='wash'));if(tch!==touchShown){touchShown=tch;$('touch').style.display=tch?'block':'none';if(!tch)$('cruiseBar').style.display='none';}

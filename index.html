@@ -137,6 +137,34 @@ html,body{margin:0;height:100%;height:100dvh;width:100%;position:fixed;inset:0;b
 #topbar{position:fixed;z-index:15;left:50%;transform:translateX(-50%);top:calc(6px + var(--st,0px));display:none;gap:6px}
 #topbar .ctl{position:relative;width:calc(var(--u)*.78);height:calc(var(--u)*.6);border-radius:12px}
 #topbar .ctl svg{width:52%;height:62%}
+#topbar .ctl small{position:absolute;bottom:1px;left:0;right:0;text-align:center;font:800 8px/1 var(--ff);color:#cfe0ff;letter-spacing:.06em}
+#topbar #bGps svg{height:52%;margin-top:-6px}
+/* teljes képernyős GPS */
+#gpsv{position:fixed;inset:0;z-index:38;display:none;background:#a9d3f5;touch-action:none;user-select:none;-webkit-user-select:none;color:#1d232b;font-family:var(--ff)}
+#gpsv.open{display:block;animation:gpsIn .18s ease-out}
+@keyframes gpsIn{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:none}}
+#gpsv canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+#gpsv .gb{pointer-events:auto;border:0;border-radius:14px;min-width:44px;height:44px;padding:0 12px;background:rgba(255,255,255,.95);color:#1d232b;font:800 20px/1 var(--ff);box-shadow:0 4px 16px rgba(0,0,0,.22);cursor:pointer}
+#gpsv .gb.wide{font-size:14px;padding:0 14px}
+#gpsv .gb.on{background:#2f7cf6;color:#fff}
+#gpsv .gb:active{transform:scale(.95)}
+#gpsv .gx{position:absolute;top:calc(10px + var(--st,0px));right:calc(10px + var(--sr,0px))}
+#gpsv .gx .gb{background:#1d232b;color:#fff}
+#gpsv .gz{position:absolute;right:calc(10px + var(--sr,0px));top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:8px}
+#gpsv .gm{position:absolute;bottom:calc(10px + var(--sb,0px));right:calc(10px + var(--sr,0px));display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;max-width:calc(100% - 20px)}
+#gpsv .gi{position:absolute;top:calc(10px + var(--st,0px));left:calc(10px + var(--sl,0px));width:min(300px,calc(100% - 84px));max-height:calc(100% - 84px - var(--st,0px) - var(--sb,0px));overflow:auto;background:rgba(255,255,255,.95);border-radius:16px;padding:10px 12px;box-shadow:0 6px 22px rgba(0,0,0,.22);font-size:13px;line-height:1.35}
+#gpsv.night{background:#0f2a44}
+#gpsv.night .gb:not(.on):not(.x),#gpsv.night .gi{background:rgba(24,28,36,.94);color:#e6ebf2}
+#gpsv .gi .rt{font-weight:800;font-size:15px;margin-bottom:2px}
+#gpsv .gi .bar{height:6px;border-radius:3px;background:rgba(127,140,160,.3);overflow:hidden;margin:6px 0}
+#gpsv .gi .bar i{display:block;height:100%;background:#2f7cf6;border-radius:3px}
+#gpsv .gi .row{display:flex;justify-content:space-between;gap:8px}
+#gpsv .gi .mut{opacity:.65;font-size:12px}
+#gpsv .gi .big{font-weight:800;color:#2f7cf6}
+#gpsv .gi ul{list-style:none;margin:6px 0 0;padding:0}
+#gpsv .gi li{display:flex;justify-content:space-between;gap:8px;padding:3px 0;border-top:1px solid rgba(127,140,160,.2)}
+#gpsv .gi .tg{display:none}
+@media (max-height:430px){#gpsv .gi{width:min(250px,calc(100% - 84px));font-size:12px;padding:8px 10px}#gpsv .gi ul{display:none}#gpsv .gi.full ul{display:block}#gpsv .gi .tg{display:block;margin-top:4px;font-weight:700;color:#2f7cf6}#gpsv .gb{height:40px;min-width:40px}#gpsv .gb.wide{font-size:13px;padding:0 11px}}
 /* filmes főmenü */
 #menu.cine{left:calc(16px + var(--sl));width:clamp(240px,33vw,330px);padding:14px;gap:9px;border-radius:20px;
  background:linear-gradient(160deg,rgba(14,16,24,.86),rgba(10,12,18,.66));border:1px solid rgba(255,255,255,.1);border-left:2px solid rgba(255,216,74,.55);box-shadow:0 30px 80px rgba(0,0,0,.55)}
@@ -213,8 +241,14 @@ body.tab #ctlrow{left:50%}
   <div class="ctl" id="bRadio"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="11" rx="2" fill="none" stroke="#fff" stroke-width="1.8"/><circle cx="15.5" cy="13.5" r="2.6" fill="#fff"/><path d="M6 11h5M6 14h5M6 17h5" stroke="#fff" stroke-width="1.4"/><path d="M5 8l11-4" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg><small>RÁDIÓ</small></div>
  </div>
 </div>
-<div id="topbar"><div class="ctl" id="bPause" title="Szünet (P)"><svg viewBox="0 0 24 24"><path d="M8 5v14M16 5v14" stroke="#fff" stroke-width="3.2" stroke-linecap="round"/></svg></div><div class="ctl" id="bHome" title="Mentés és főmenü"><svg viewBox="0 0 24 24"><path d="M4 11.5L12 5l8 6.5" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.5 10v9h11v-9" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/><path d="M10.5 19v-5h3v5" fill="#ffd84a"/></svg></div></div>
+<div id="topbar"><div class="ctl" id="bPause" title="Szünet (P)"><svg viewBox="0 0 24 24"><path d="M8 5v14M16 5v14" stroke="#fff" stroke-width="3.2" stroke-linecap="round"/></svg></div><div class="ctl" id="bHome" title="Mentés és főmenü"><svg viewBox="0 0 24 24"><path d="M4 11.5L12 5l8 6.5" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.5 10v9h11v-9" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/><path d="M10.5 19v-5h3v5" fill="#ffd84a"/></svg></div><div class="ctl" id="bGps" title="GPS térkép (G)"><svg viewBox="0 0 24 24"><path d="M12 3.5l6.5 16-6.5-3.6-6.5 3.6z" fill="#3b8bff" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/></svg><small>GPS</small></div></div>
 <div id="cruiseBar"><button data-v="50">50</button><button data-v="70">70</button><button data-v="90">90</button><button data-v="110">110</button><button data-v="130">130</button><button data-v="0">KI</button></div>
+<div id="gpsv"><canvas id="gpsc"></canvas>
+<div class="gi" id="gpsInfo"></div>
+<div class="gx"><button class="gb" id="gpsClose" aria-label="Bezárás">✕</button></div>
+<div class="gz"><button class="gb" id="gpsIn" aria-label="Nagyítás">+</button><button class="gb" id="gpsOut" aria-label="Kicsinyítés">−</button></div>
+<div class="gm"><button class="gb wide on" id="gpsFollow">⌖ Követés</button><button class="gb wide" id="gpsLeg">Szakasz</button><button class="gb wide" id="gpsAll">Teljes út</button></div>
+</div>
 <div id="menu"></div>
 <div id="ledger"><div class="sheet"><header><h3>Költségnapló</h3><button class="x" aria-label="Bezárás">✕</button></header><div class="body"></div></div></div>
 <div id="inst"><div class="box"><div class="top"><img src="icons/icon-192.png" alt=""><div><h3>Telepítsd a Családi Vakációt!</h3><p id="instSub">Egy érintés, és úgy fut, mint egy igazi alkalmazás.</p></div></div>
@@ -226,7 +260,7 @@ body.tab #ctlrow{left:50%}
 <div id="splash"><img src="icons/icon-192.png" alt=""><h1>Családi Vakáció</h1><div class="bar"><i id="splbar"></i></div><small id="spltxt">Betöltés... 0%</small></div>
 <script>
 /* betöltő: a játék fájljai sorban, valós százalékkal */
-(function(){const files=['js/core.js','js/radio.js','js/car.js','js/world.js','js/game.js','js/app.js'],later=['js/geo.js','js/map.js','js/minigames.js','js/shops.js'];let i=0;
+(function(){const files=['js/core.js','js/radio.js','js/car.js','js/world.js','js/game.js','js/app.js'],later=['js/geo.js','js/map.js','js/gps.js','js/geohd.js','js/minigames.js','js/shops.js'];let i=0;
  window.LAZY_DONE=false;function lazy(k){if(k>=later.length){window.LAZY_DONE=true;return;}const sc=document.createElement('script');sc.src=later[k];sc.async=false;sc.onload=()=>lazy(k+1);sc.onerror=()=>setTimeout(()=>lazy(k),1500);document.body.appendChild(sc);}
  const bar=document.getElementById('splbar'),txt=document.getElementById('spltxt');
  function next(){const p=Math.round(i/files.length*100);bar.style.width=p+'%';txt.textContent='Betöltés... '+p+'%';

@@ -15,8 +15,10 @@ function fixLog(T){T.money=Math.round(T.money);if(!T.log||!T.log.length){T.log=[
  const d=T.money-500000;if(d)T.log.push({a:d,c:'other',l:'Korábbi mentés összesítve (régi verzió)',b:T.money,km:Math.round(T.km*10)/10,leg:T.leg||0,d:''});}return T;}
 function ledgerTotals(T){const o={};let sum=0;for(const e of T.log||[]){sum+=e.a;if(e.c!=='start')o[e.c]=(o[e.c]||0)+e.a;}return {cats:o,sum:sum};}
 function newTrip(){return {log:[{a:500000,c:'start',l:'Kezdő keret',b:500000,km:0,leg:0,d:''}],km:0,fuel:38,fuelUsed:0,money:500000,vig:{},noVig:{},earned:0,food:85,baby:90,spare:true,mood:5,hp:100,airbag:0,spentFuel:0,spentShop:0,fines:0,photos:0};}
-function loadSave(){try{return JSON.parse(localStorage.getItem('csaladi-vakacio-v2')||'null');}catch(e){return null;}}
-function save(dist){try{if(G.trip)G.trip.savedAt=Date.now();localStorage.setItem('csaladi-vakacio-v2',JSON.stringify({leg:G.leg,trip:G.trip,dist:dist||0,ts:G.ts}));G.save=loadSave();}catch(e){}}
+function loadSave(){try{const sv=JSON.parse(localStorage.getItem('csaladi-vakacio-v2')||'null');if(sv&&!sv.routeV){// régi (12 szakaszos) mentés átállítása az új, egész Európát bejáró útvonalra
+  const OLD=['Komárom','Siófok','Keszthely','Bécs','Prága','Berlin','Amszterdam','Párizs','Barcelona','Nizza','Velence','Salzburg'],nf=OLD[sv.leg]||'Komárom';let k=LEGS.findIndex(L=>L.from.split(',')[0]===nf);if(k<0)k=LEGS.length-1;if(k!==sv.leg)sv.dist=0;sv.leg=k;sv.routeV=2;}
+  if(sv&&sv.leg>=LEGS.length)sv.leg=LEGS.length-1;return sv;}catch(e){return null;}}
+function save(dist){try{if(G.trip)G.trip.savedAt=Date.now();localStorage.setItem('csaladi-vakacio-v2',JSON.stringify({leg:G.leg,trip:G.trip,dist:dist||0,ts:G.ts,routeV:2}));G.save=loadSave();}catch(e){}}
 G.save=loadSave();G.ts=1;try{G.ts=+localStorage.getItem('csaladi-vakacio-ts')||1;}catch(e){}
 const TS_OPTS=[[1,'Valós idő (1x)'],[5,'Gyorsított (5x)'],[20,'Turbó (20x)']];
 const WHO=['apa','anya','anna','petra','atti'],WHO_X={apa:68,anya:63,anna:42,petra:33,atti:27};
@@ -197,7 +199,6 @@ function consumption(v,type,gas){if(v<3)return 0;let c=2.9+0.00033*v*v;if(type==
  const s=seg();if(s.q==='bad'||s.q==='cobble')c+=0.3;if(LEGS[G.leg].weather==='snow')c+=0.6;if(LEGS[G.leg].region==='alps')c+=0.4;return c;}
 
 /* ---------- frissítés ---------- */
-function mapRect(){return G.mapBig?[W-207,52,204,150]:[W-112,52,109,78];}
 const MONEY_R=[W-90,2,88,14];
 function stopTarget(p){return p.type==='fuel'?p.x+38.4:p.x+(p.type==='hiper'?66:30)-60;}
 function stopChips(){const out=[],seen={};if(!LEG||!P)return out;for(const p of LEG.pois){if(p.type==='veda'||seen[p.type])continue;const rem=stopTarget(p)-P.dist;const d=rem*LEG.kmPerPx;if(rem<8||d>2.5)continue;seen[p.type]=1;out.push({p:p,d:d});if(out.length>=3)break;}return out;}
@@ -207,7 +208,7 @@ function autoDrive(){const A=P.auto,L=LEGS[G.leg];const rem=A.tx-P.dist;let lim=
  for(const e of ents)if(e.kind==='traffic'&&!e.chase&&e.lane===0){const gap=e.x-(P.dist+118);if(gap>-4&&gap<A.tx-P.dist+40&&gap<90)lim=Math.min(lim,Math.max(0,(e.cur||0)-2+gap*0.08));}
  let stopAt=rem;for(const l of LEG.lights){const gap=l.x-(P.dist+114);const need=Math.pow(P.kmh*KPX,2)/(2*0.45*KPX)+2;if(gap>need*(lightState(l,G.t)==='yellow'?1:0.6)&&gap<rem&&lightState(l,G.t)!=='green')stopAt=Math.min(stopAt,gap);}
  const dec=0.32*KPX;const vd=Math.sqrt(2*dec*Math.max(0,stopAt))/KPX;return Math.min(lim,vd,stopAt<3?0:999);}
-function updPlay(){if(TAPD&&!G.paused&&!MG&&P&&P.sub==='drive'&&inRect(TAPD,mapRect())){G.mapBig=!G.mapBig;SFX.click();}
+function updPlay(){if(K.gpsP){K.gpsP=false;if(P&&!MG&&typeof openGPS==='function')openGPS();}
  if(P&&!G.paused&&!MG&&(K.logP||TAPD&&inRect(TAPD,MONEY_R))){K.logP=false;TAPD=null;if(typeof openLedger==='function')openLedger('play');return;}
  if(P&&!G.paused&&!MG&&P.sub==='drive'&&!P.arriving){if(TAPD){for(const c of (G.chips||[]))if(inRect(TAPD,c.r)){if(c.cancel){P.auto=null;flash('Megállás törölve.','#9fd8ff',80);}else if(!P.flat&&!P.rev)startAuto(c.p);TAPD=null;break;}}
   if(K.stopP){if(P.auto){P.auto=null;flash('Megállás törölve.','#9fd8ff',80);}else{const c=stopChips()[0];if(c)startAuto(c.p);}}}const L=LEGS[G.leg],t=G.t,T=G.trip;if(K.pauseP&&!MG)G.paused=!G.paused;if(G.paused)return;
@@ -356,8 +357,8 @@ function updPlay(){if(TAPD&&!G.paused&&!MG&&P&&P.sub==='drive'&&inRect(TAPD,mapR
   if(P.arriveT>=110&&P.walk.length<4&&(P.arriveT-110)%16===0){const w=['apa','anya','anna','petra'][P.walk.length];P.walk.push({w:w,x:PX+(w==='apa'||w==='anya'?60:36),y:P.y+4,tx:PX+150+P.walk.length*15,t:0,out:true});P.hide[w]=1;if(w==='anya')P.hide.atti=1;}
   for(const w of P.walk){w.t++;if(w.x<w.tx)w.x+=0.8;}
   if(P.arriveT===230)say('Juhééé! Itt vagyunk!','anna');if(P.arriveT>340){G.state='postcard';G.st=0;arriveRefill();}}}
-const VIG={HU:{price:6400,label:'Magyarország: heti e-matrica (D1)',fine:14875},AT:{price:5200,label:'Ausztria: 10 napos matrica (12,80 EUR)',fine:48000},CZ:{price:4300,label:'Csehország: 10 napos e-matrica (270 CZK)',fine:60000}};
-const TOLL={IT:32,FR:40};
+const VIG={SI:{price:6400,label:'Szlovénia: heti e-matrica (16 EUR)',fine:120000},HU:{price:6400,label:'Magyarország: heti e-matrica (D1)',fine:14875},AT:{price:5200,label:'Ausztria: 10 napos matrica (12,80 EUR)',fine:48000},CZ:{price:4300,label:'Csehország: 10 napos e-matrica (270 CZK)',fine:60000}};
+const TOLL={IT:32,FR:40,HR:35,ES:25,PT:40,PL:20};
 function segEnter(s){if(!s||s.type!=='motorway'||!s.cc)return;const T=G.trip,v=VIG[s.cc];
  if(v&&!T.vig[s.cc]&&!(T.noVig&&T.noVig[s.cc]))startMini('vignette',{cc:s.cc,price:v.price,label:v.label});
  if(TOLL[s.cc])flash('Fizetős autópálya ('+s.cc+'): az útdíjat a kapunál fizeted.','#7fd1ff');}
@@ -556,8 +557,8 @@ function drawHUD(g){const L=LEGS[G.leg],T=G.trip,s=seg(),t=G.t,blinkOn=(t%40)<20
  text(g,distStr(legKm())+' / '+fmt(L.km)+' km',rx+7,26,'#ffffff',1,'left',null);text(g,'Össz '+fmt(T.km,0)+' km',W-10,26,'#9fb0c2',1,'right',null);
  const bar=(x,lbl,v)=>{text(g,lbl,x,37,'#9fb0c2',1,'left',null);frr(g,'#1b212b',x+textW(lbl)+3,38,30,5,2);frr(g,v<20?'#ff6b6b':v<45?'#ffcf33':'#5bd06a',x+textW(lbl)+3,38,30*v/100,5,2);};
  bar(rx+7,'Kaja',T.food);bar(rx+70,'Baba',T.baby);bar(rx+133,'Autó',hpOf(T));
- // minitérkép (érintésre nagyobb)
- const mr=mapRect();frr(g,'rgba(8,11,18,0.85)',mr[0]-2,mr[1]-2,mr[2]+4,mr[3]+4,9);if(G.mapBig)drawMiniMap(g,mr,G.leg,Math.min(1,P.dist/LEG.len),t);else{drawGPSCached(g,mr,G.leg,Math.min(1,P.dist/LEG.len),t,L.time==='night'||L.time==='dusk',Math.abs(P.kmh),Math.max(0,L.km-legKm()));drawUpcoming(g,mr[0]-2,mr[1]+mr[3]+5,ROADT+4);}
+ // érkező dolgok listája jobb oldalt (a GPS külön gombbal nyílik)
+ const mr=[W-112,52,109,0];drawUpcoming(g,W-114,52,ROADT+4);
  // jelzések
  const cxp=(W-mr[2]-8)/2+2;let y=isTouch?94:54;const pill=(txt,col)=>{const w=textW(txt.toUpperCase())+10;frr(g,'rgba(8,11,18,0.72)',cxp-w/2,y-2,w,11,5);text(g,txt,cxp,y,col,1,'center',null);y+=13;};
  if(G.segInfo)pill(G.segInfo.txt,'#ffffff');if(G.msg)pill(G.msg.txt,G.msg.col);
@@ -622,11 +623,6 @@ function titleFX(){if(TFX&&TFX.sc===SC)return TFX.c;const [c,x]=mk(W,H,SC);
  x.fillStyle=lg(x,0,0,0,H,[[0,'rgba(0,95,150,0.16)'],[0.5,'rgba(0,0,0,0)'],[1,'rgba(255,140,60,0.14)']]);x.fillRect(0,0,W,H);
  x.fillStyle=rg(x,W*0.58,H*0.52,H*0.3,W*0.72,[[0,'rgba(0,0,0,0)'],[1,'rgba(0,0,0,0.62)']]);x.fillRect(0,0,W,H);TFX={c:c,sc:SC};return c;}
 function grainTile(){if(TGR)return TGR;const [c,x]=mk(W+16,H+16,1);for(let i=0;i<2600;i++){x.fillStyle=Math.random()>0.5?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.09)';x.fillRect(Math.random()*(W+16),Math.random()*(H+16),1,1);}TGR=c;return c;}
-/* GPS: offscreen képbe rajzolva, kb. 12-szer másodpercenként frissül */
-let GPSC=null;
-function drawGPSCached(g,r,leg,frac,t,night,kmh,rem){const w=r[2],h=r[3];if(!GPSC||GPSC.sc!==SC||GPSC.w!==w||t-GPSC.t>=5||t<GPSC.t){const [c,x]=GPSC&&GPSC.sc===SC&&GPSC.w===w?[GPSC.c,GPSC.x]:mk(w+2,h+2,SC);
-  x.setTransform(SC,0,0,SC,0,0);x.clearRect(0,0,w+2,h+2);x.save();x.translate(1-r[0],1-r[1]);drawGPS(x,r,leg,frac,t,night,kmh,rem);x.restore();GPSC={c:c,x:x,sc:SC,w:w,t:t};}
- g.drawImage(GPSC.c,r[0]-1,r[1]-1,w+2,h+2);}
 /* gyenge módban a kijelző csak minden 3. képkockán rajzolódik újra, közben a kész képe másolódik */
 let HUDC=null;
 function drawHUDc(g){if(!LOWQ){drawHUD(g);return;}if(!HUDC||HUDC.sc!==SC){const [c,x]=mk(W,H,SC);HUDC={c:c,x:x,sc:SC,t:-9};}
@@ -664,7 +660,7 @@ function drawPoster(g){const mR=Math.max(0,Math.min(W*0.6,G.menuR||W*0.36)),cx=M
  const room=W-mR-16,fw=textW('VAKÁCIÓ',1),ts=Math.min(3.6,room/fw);
  text(g,'A Komárom - Európa - Komárom kör',cx,10,'#ffd9b0',1,'center');
  text(g,'Családi',cx,22,'#ffd84a',ts*0.62,'center','#5a1d0c');text(g,'Vakáció',cx,22+ts*0.62*8+4,'#ffd84a',ts,'center','#5a1d0c');
- const ty=22+ts*0.62*8+4+ts*8+6;text(g,'Öt ember. Egy autó. 5 800 kilométer.',cx,ty,'#ffffff',1,'center');
+ const ty=22+ts*0.62*8+4+ts*8+6;text(g,'Öt ember. Egy autó. '+fmt(Math.round(LEGS.reduce((a,L)=>a+L.km,0)/100)*100)+' kilométer.',cx,ty,'#ffffff',1,'center');
  g.fillStyle=lg(g,0,250,0,H,[[0,'rgba(0,0,0,0)'],[1,'rgba(0,0,0,0.85)']]);g.fillRect(0,250,W,H-250);
  const cr='Apa · Anya · Anna · Petra · kis Atti';text(g,cr,cx,257,'#cfd6df',Math.min(1,(room+10)/textW(cr.toUpperCase())),'center',null);}
 let POSTER=null;
@@ -679,8 +675,26 @@ function drawMap(g){const t=G.st,i=G.leg,L=LEGS[i],T=G.trip;drawBigMap(g,i,G.res
  text(g,fmt(L.km)+' km  -  '+WNAME[L.weather]+TNAME[L.time]+(L.live?' (élő, '+fmt(L.temp,0)+' fok)':'')+'  -  95: '+L.price+' Ft/l',10,H-39,'#ffffff',1,'left');
  text(g,'Tank '+fmt(T.fuel,1)+' l   Pénz '+fmt(T.money)+' Ft',10,H-28,'#cfd6df',1,'left');text(g,'Kaja '+Math.round(T.food)+'%   Baba '+Math.round(T.baby)+'%   Eddig '+fmt(T.km,0)+' km',10,H-17,'#cfd6df',1,'left');
  if(!isTouch&&t>25&&((t>>4)&1))text(g,'Enter: indulás',W-10,H-52,'#9fb0c2',1,'right');}
-const LMK={'Siófok':0,'Keszthely':1,'Bécs':2,'Prága':8,'Berlin':9,'Amszterdam':10,'Párizs':5,'Barcelona':11,'Nizza':6,'Velence':4,'Salzburg (Alpok)':3,'Komárom (haza)':7};
-function drawLandmark(g,i,x,y,w,h){g.save();g.beginPath();g.rect(x,y,w,h);g.clip();g.translate(x,y);const night=i===5;
+const LMK={'Siófok':0,'Keszthely':1,'Bécs':2,'Prága':8,'Berlin':9,'Amszterdam':10,'Párizs':5,'Barcelona':11,'Nizza':6,'Velence':4,'Salzburg (Alpok)':3,'Komárom (haza)':7,
+ 'Zágráb':12,'Ljubljana':13,'Firenze':14,'Róma':15,'Madrid':16,'Lisszabon':17,'Bordeaux':18,'Hamburg':19,'Koppenhága':20,'Varsó':21,'Krakkó':22};
+/* új képeslap-látványosságok (12-22) egyszerű, saját rajzzal */
+function cityCard(g,i,w,h){const sun=[16,17,18].includes(i),gy=140;g.fillStyle=lg(g,0,0,0,h,sun?[[0,'#ff9a5a'],[0.6,'#ffd9a0'],[1,'#ffe9c0']]:[[0,'#6ab8ee'],[1,'#cdeeff']]);g.fillRect(0,0,w,h);
+ const ground=(c)=>{R(g,c,0,gy,w,h-gy);},water=()=>{g.fillStyle=lg(g,0,gy,0,h,[[0,'#4fa3e0'],[1,'#2a6db0']]);g.fillRect(0,gy,w,h-gy);for(let k=0;k<6;k++)R(g,'rgba(255,255,255,0.35)',10+k*24,gy+12+k%3*10,12,1);};
+ const roofs=(y,n,cols)=>{for(let k=0;k<n;k++){const x=k*w/n,ww=w/n-2,hh=16+hsh(k*7+i)*14;R(g,cols[k%cols.length],x,y-hh,ww,hh);g.fillStyle='#a8432e';g.beginPath();g.moveTo(x-1,y-hh);g.lineTo(x+ww/2,y-hh-8);g.lineTo(x+ww+1,y-hh);g.fill();for(let r=0;r<2;r++)R(g,'#3a4a5a',x+3,y-hh+4+r*7,3,4);}};
+ if(i===12){ground('#6aa35a');roofs(gy,6,['#f2e2b8','#e8d6c8','#f4efe2']);for(const tx of [62,86]){R(g,'#e9e1cf',tx,52,14,70);g.fillStyle='#8a8478';g.beginPath();g.moveTo(tx-1,52);g.lineTo(tx+7,14);g.lineTo(tx+15,52);g.fill();}R(g,'#e9e1cf',56,92,50,30);}
+ else if(i===13){ground('#5f9a5a');g.fillStyle='#6aa35a';g.beginPath();g.moveTo(10,gy);g.quadraticCurveTo(80,40,150,gy);g.fill();R(g,'#e9e1cf',66,58,32,24);R(g,'#e9e1cf',86,44,10,16);for(let k=0;k<5;k++)R(g,'#e9e1cf',66+k*7,54,4,4);water();R(g,'#d8d2c4',20,gy+6,116,5);for(const dx of [24,128])disc(g,'#5a9a4a',dx,gy+2,5);}
+ else if(i===14){ground('#c9a87a');roofs(gy,7,['#f0d6a8','#e3b98f','#f2e2b8']);g.fillStyle='#b5552f';g.beginPath();g.arc(78,86,28,Math.PI,TAU);g.fill();for(let k=-2;k<=2;k++)line(g,'#ffffff',78+k*9,86,78+k*5,58,0.8);R(g,'#ffffff',72,50,12,8);R(g,'#f4efe2',50,86,56,30);R(g,'#f4efe2',114,50,12,70);R(g,'#b5552f',112,46,16,6);}
+ else if(i===15){ground('#d8c39a');g.fillStyle='#d9b88a';g.beginPath();g.ellipse(78,100,62,46,0,Math.PI,TAU);g.fill();R(g,'#d9b88a',16,100,124,40);for(let r=0;r<3;r++)for(let k=0;k<10;k++)frr(g,'#7a5a3a',22+k*11.5,72+r*20,7,13,3);g.fillStyle='#ffd9a0';g.beginPath();g.moveTo(110,56);g.lineTo(140,70);g.lineTo(140,100);g.lineTo(118,100);g.closePath();g.fill();}
+ else if(i===16){ground('#d8c39a');R(g,'#f2e6c8',14,70,128,70);for(let k=0;k<9;k++)R(g,'#e3d3b0',20+k*14,80,6,60);R(g,'#c9b994',14,64,128,8);R(g,'#c62828',70,30,24,6);R(g,'#ffcc00',70,36,24,6);R(g,'#c62828',70,42,24,6);line(g,'#555',70,30,70,64,1);}
+ else if(i===17){water();g.strokeStyle='#c62828';g.lineWidth=3;for(const tx of [40,116]){line(g,'#c62828',tx,40,tx,gy+10,4);}g.beginPath();g.moveTo(0,70);g.quadraticCurveTo(40,40,78,96);g.quadraticCurveTo(116,40,156,70);g.stroke();line(g,'#c62828',0,96,156,96,3);
+  frr(g,'#ffcc00',24,118,46,18,3);for(let k=0;k<4;k++)R(g,'#3a4a5a',28+k*10,121,7,6);disc(g,'#333',32,137,3);disc(g,'#333',62,137,3);}
+ else if(i===18){ground('#7aa35a');for(let k=0;k<8;k++){g.strokeStyle='#4f7a3a';g.lineWidth=2;g.beginPath();g.moveTo(0,gy+6+k*6);g.lineTo(156,gy+2+k*7);g.stroke();}R(g,'#f2e6c8',46,80,64,50);g.fillStyle='#5a6a7a';g.beginPath();g.moveTo(42,80);g.lineTo(78,58);g.lineTo(114,80);g.fill();for(const tx of [46,104]){R(g,'#f2e6c8',tx-4,64,12,66);g.fillStyle='#5a6a7a';g.beginPath();g.moveTo(tx-6,64);g.lineTo(tx+2,48);g.lineTo(tx+10,64);g.fill();}}
+ else if(i===19){water();for(const [cx,cy] of [[30,60],[70,48],[120,66]]){line(g,'#e53935',cx,cy,cx,gy,3);line(g,'#e53935',cx-20,cy,cx+26,cy,3);line(g,'#555',cx+20,cy,cx+20,cy+30,0.8);}frr(g,'#1e4fb5',20,118,116,18,3);for(let k=0;k<7;k++)R(g,['#e53935','#ffcc00','#43a047','#ffffff'][k%4],26+k*15,104,13,14);}
+ else if(i===20){water();const cols=['#e53935','#ffcc00','#1e88e5','#43a047','#fb8c00','#f2e2b8','#8e24aa'];for(let k=0;k<7;k++){const x=k*22,hh=50+hsh(k*3)*24;R(g,cols[k],x,gy-hh,21,hh);g.fillStyle='#5a3d2a';g.beginPath();g.moveTo(x,gy-hh);g.lineTo(x+10.5,gy-hh-10);g.lineTo(x+21,gy-hh);g.fill();for(let r=0;r<3;r++)R(g,'#fff',x+4,gy-hh+8+r*14,5,7);}frr(g,'#8a5a2b',50,gy+10,50,8,3);line(g,'#8a5a2b',75,gy+10,75,gy-24,1.2);}
+ else if(i===21){ground('#6aa35a');roofs(gy,6,['#f2e2b8','#d7a3a0','#c9d8e8']);for(let k=0;k<5;k++)R(g,'#e9e1cf',58+k*4,40+k*14,40-k*8,100-k*14);g.fillStyle='#c9b994';g.beginPath();g.moveTo(74,40);g.lineTo(78,4);g.lineTo(82,40);g.fill();}
+ else{ground('#5f9a5a');g.fillStyle='#6aa35a';g.beginPath();g.moveTo(0,gy);g.quadraticCurveTo(70,70,156,gy);g.fill();R(g,'#f2e6c8',40,70,80,40);g.fillStyle='#a8432e';g.beginPath();g.moveTo(36,70);g.lineTo(80,52);g.lineTo(124,70);g.fill();R(g,'#f2e6c8',96,46,16,30);g.fillStyle='#b5852f';g.beginPath();g.arc(104,46,8,Math.PI,TAU);g.fill();water();}}
+function drawLandmark(g,i,x,y,w,h){if(i>=12){g.save();g.beginPath();g.rect(x,y,w,h);g.clip();g.translate(x,y);cityCard(g,i,w,h);g.restore();return;}
+ g.save();g.beginPath();g.rect(x,y,w,h);g.clip();g.translate(x,y);const night=i===5;
  g.fillStyle=lg(g,0,0,0,h,[[0,night?'#0e1440':'#6ab8ee'],[1,night?'#2a3a70':'#cdeeff']]);g.fillRect(0,0,w,h);if(night)for(let k=0;k<30;k++)R(g,'#fff',hsh(k)*w,hsh(k+5)*h*0.6,0.8,0.8);
  if(i===0||i===1){g.fillStyle='#6aa35a';g.beginPath();g.moveTo(0,110);g.quadraticCurveTo(60,80,156,96);g.lineTo(156,120);g.lineTo(0,120);g.fill();g.fillStyle=lg(g,0,115,0,h,[[0,'#4fa3e0'],[1,'#2a6db0']]);g.fillRect(0,115,w,h);
   poly(g,'#ffffff',[[70,142],[70,112],[90,142]]);frr(g,'#8a5a2b',62,142,34,4,2);glow(g,125,30,30,'rgba(255,240,180,0.7)');disc(g,'#fff3b0',125,30,10);if(i===1){frr(g,'#f2e6c8',8,72,50,30,1);g.fillStyle='#8a3a2a';g.beginPath();g.moveTo(4,72);g.lineTo(33,56);g.lineTo(62,72);g.fill();}}
@@ -724,7 +738,7 @@ function drawWin(g){const t=G.t,T=G.trip;drawSky(g,LEGS[LEGS.length-1],t);drawCl
 function restBreak(sec){const T=G.trip;if(!T||!(sec>=60))return;const before=T.driveS||0;T.driveS=Math.max(0,before-sec);
  if(sec>=600){T.driveS=0;if(P)P.cranky=false;T.mood=Math.min(5,Math.max(T.mood,3));if(typeof toast==='function')toast('Hosszú szünet ('+Math.round(sec/60)+' perc): a család kipihente magát.',3200);}
  else if(before>0&&typeof toast==='function')toast('Szünet: '+Math.round(sec/60)+' perc, Apa kicsit kipihente magát.',2600);}
-function pauseWatch(){const on=G.state==='play'&&(G.paused||document.hidden);if(on&&!G.pauseAt)G.pauseAt=Date.now();else if(!on&&G.pauseAt){const el=(Date.now()-G.pauseAt)/1000;G.pauseAt=0;restBreak(el);}}
+function pauseWatch(){const on=G.state==='play'&&((G.paused&&!G.gps)||document.hidden);if(on&&!G.pauseAt)G.pauseAt=Date.now();else if(!on&&G.pauseAt){const el=(Date.now()-G.pauseAt)/1000;G.pauseAt=0;restBreak(el);}}
 function update(){pauseWatch();if(!window.LAZY_DONE&&G.state!=='title'&&G.state!=='specs'){G.t++;return;}if(G.ledger&&G.state!=='play'){G.t++;K.upP=K.dnP=K.enterP=K.enterKey=K.pauseP=false;K.num=0;TAP=TAPD=null;return;}G.t++;G.st++;{const play=G.state==='play'&&!G.paused&&!MG;if(K.horn&&!G.hornPrev&&play)K.honkP=true;G.hornPrev=K.horn;hornSet(K.horn&&play);}updateMusic(G.paused||G.state==='play'||radio.on||G.state!=='title'&&G.state!=='map');if(G.state==='play'&&!G.paused)updRadio();if(radio.show>0)radio.show--;if(G.state!=='play'||G.paused)engine(0,0);
  if(G.state==='title'&&introT()<150&&(K.enterP||TAPD||TAP||K.upP||K.dnP)){G.st=150;G.introSeen=true;K.enterP=K.upP=K.dnP=false;TAPD=TAP=null;}
  if(G.state==='title'){const opts=titleOpts(),n=opts.length;if(G.menu>=n)G.menu=0;if(K.upP)G.menu=(G.menu+n-1)%n,SFX.click();if(K.dnP)G.menu=(G.menu+1)%n,SFX.click();
@@ -755,7 +769,7 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden){if(G.state
 const QTIERS=[3.5,3,2.5,2,1.6,1.35];let QT=null,QUP=0,RT=0,HALF=false,FRM=0,QCOOL=0;
 function wantSC(){const c=document.getElementById('c'),dpr=Math.min(window.devicePixelRatio||1,3);return Math.max(1,(c.clientWidth||W)*dpr/W);}
 function applyQ(force){const sc=Math.max(1.25,Math.min(QTIERS[QT],Math.round(wantSC()*4)/4));LOWQ=QT>=4;HALF=QT>=QTIERS.length-1&&QBAD>2;
- if(Math.abs(sc-SC)>(force?0.01:0.3)){setSC(sc);TFX=null;GPSC=null;HUDC=null;TITLE_DRAWN=null;try{render();}catch(e){}}}
+ if(Math.abs(sc-SC)>(force?0.01:0.3)){setSC(sc);TFX=null;HUDC=null;TITLE_DRAWN=null;try{render();}catch(e){}}}
 let QBAD=0;
 function qualityStep(avg,ra){if(document.hidden)return;
  if(QT===null){const touch=isTouch,cores=navigator.hardwareConcurrency||4;QT=touch?(cores>=8?2:3):(cores>=6?1:2);applyQ(true);return;}

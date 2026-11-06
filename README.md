@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.11.4
+# 🚐 Családi Vakáció – v2.12.0
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -23,21 +23,35 @@ A fogyasztás a sebességtől, a gyorsítástól, az út típusától, a hótól
 
 ## ⏱️ Valós távolság és idő
 
-A játék valós léptékű: 90 km/h-val 1 km pontosan 40 másodperc, így Komáromtól Bábolnáig kb. negyedóra, Komáromtól Siófokig közel két óra. A teljes út kb. 4 600 km.
+A játék valós léptékű: 90 km/h-val 1 km pontosan 40 másodperc, így Komáromtól Bábolnáig kb. negyedóra, Komáromtól Siófokig közel két óra. A teljes út kb. 9 600 km.
 
 A játék kétpercenként automatikusan menti az állást, így az út több napon át is folytatható. A főmenüben választható **Gyorsított (5x)** vagy **Turbó (20x)** utazás is, de alapból valós idővel megy.
 
-## 🌍 Európa körút (12 szakasz, kb. 5 800 km, 9 ország)
+## 🌍 Európa körút (22 szakasz, kb. 9 600 km, 14 ország)
 
-Komárom → Siófok → Keszthely → Bécs → Prága → Berlin → Amszterdam → Párizs → Barcelona → Nizza → Velence → Salzburg (Alpok) → haza, Komárom.
+Komárom → Siófok → Keszthely → Zágráb → Ljubljana → Velence → Firenze → Róma → Nizza (a Ligur-tenger partján) → Barcelona → Madrid → Lisszabon → Bordeaux → Párizs → Amszterdam → Hamburg → Koppenhága (a dán hidakon át) → Berlin → Varsó → Krakkó → Prága → Bécs → haza, Komárom.
 
-A jobb felső sarokban **GPS** mutatja az autó környékét: ráközelít a kocsira, menetirány szerint fordul, kék vonallal mutatja az utat, rajta a városok, tavak (Balaton, Fertő, Garda, Bodeni- és Genfi-tó), erdők és mellékutak. Alul a hátralévő km és a várható menetidő. Érintésre a teljes Európa-térkép jelenik meg.
+Országok: Magyarország, Horvátország, Szlovénia, Olaszország, Franciaország, Spanyolország, Portugália, Belgium, Hollandia, Németország, Dánia, Lengyelország, Csehország, Ausztria. Az útdíjak és matricák országonként valósághűek (pl. szlovén e-matrica, horvát, olasz, francia, spanyol, portugál és lengyel autópályadíj). Minden nagyvárosnak saját képeslapja van (Zágráb tornyai, Colosseum, Duomo, madridi palota, lisszaboni híd és villamos, bordeaux-i kastély, hamburgi daruk, Nyhavn, varsói Kultúrpalota, Wawel).
 
-**Mi közeledik:** a GPS alatt kis ikonok mutatják, mi jön, és hány méterre: benzinkút, bolt, trafik, újságos, sebességmérő, közlekedési lámpa (az aktuális színével), település, autópálya, kátyú, útépítés, baleset, dugó, állat, és a cél. A térkép földrajzilag pontos, [Natural Earth](https://www.naturalearthdata.com) közkincs adatokból készült.
+A régi (12 szakaszos) mentések automatikusan átállnak: a játék a legközelebbi új szakasztól folytatja.
+
+## 🧭 GPS
+
+A felső sávban lévő **GPS** gombbal (gépen a **G** billentyűvel, vagy a Szünet menüből) teljes képernyős, interaktív térkép nyílik:
+
+- **Követés:** az autó a térkép közepén, nyíl mutatja a menetirányt; a megtett út sárga, a hátralévő kék.
+- **Húzással** mozgatható, **két ujjal csippentve**, egérgörgővel vagy a **+ / −** gombokkal nagyítható, dupla koppintásra ráközelít.
+- **Szakasz** és **Teljes út:** egy érintéssel az aktuális szakaszra vagy az egész Európa körútra áll.
+- Közelről a városok, tavak, erdők, mellékutak és az út menti megállók (benzinkút, pihenő, gyorsétterem, szerviz, autómosó, boltok) ikonjai is látszanak.
+- **Kártya:** honnan hová, melyik úton és országban járunk, megtett és hátralévő km, sebesség, várható érkezés, az egész út állása, és a következő megállók távolsággal (érintésre a térkép odaugrik).
+
+Amíg a GPS nyitva van, a játék áll, de ez nem számít pihenőnek. A térkép a [Natural Earth](https://www.naturalearthdata.com) közkincs adataiból készült.
+
+**Mi közeledik:** a jobb felső sarokban kis ikonok mutatják, mi jön, és hány méterre: benzinkút, bolt, trafik, újságos, sebességmérő, közlekedési lámpa (az aktuális színével), település, autópálya, kátyú, útépítés, baleset, dugó, állat, és a cél.
 
 ## 🎬 Főmenü: filmplakát
 
-A főmenü egyetlen álló kép, családi road movie plakát: naplemente csíkos nappal, hegyek, a horizontba futó út, rajta hátulról a családi autó csomagokkal a tetőn, nagy „Családi Vakáció” cím, alcím („Öt ember. Egy autó. 5 800 kilométer.”) és alul a szereplők. A kép egyszer rajzolódik meg, utána a főmenüben a játék nem rajzol képkockákat, így a belépés gyors és sima.
+A főmenü egyetlen álló kép, családi road movie plakát: naplemente csíkos nappal, hegyek, a horizontba futó út, rajta hátulról a családi autó csomagokkal a tetőn, nagy „Családi Vakáció” cím, alcím („Öt ember. Egy autó. 9 600 kilométer.”) és alul a szereplők. A kép egyszer rajzolódik meg, utána a főmenüben a játék nem rajzol képkockákat, így a belépés gyors és sima.
 
 ## 📐 Minden kijelzőmérethez
 
@@ -187,7 +201,7 @@ A megállók előtt 200 és 90 méterrel festett felirat és kanyarodó nyíl je
 
 **Falusi rész:** a hosszabb országúti szakaszokon valódi falvak (pl. Balatonfenyves, Balatonmáriafürdő, Fenékpuszta, Jánosháza, Sárvár, Bucsu, Pohořelice, Rajhrad) gémeskúttal, baromfiudvarral, kapirgáló csirkékkel, tehénnel, szénaboglyával és veteményessel. Országúton tanyák is feltűnnek.
 
-Mezők (búza, napraforgó, repce, kukorica, szántás, levendula) szalmabálákkal, fasorok, nyárfák, nyírfák, bokrok, virágos fű, tanyák silóval, szélerőművek, Hollandiában szélmalmok, madarak, párás távoli dombok, és út menti kilométerkövek valós km-számmal.
+Mezők (búza, napraforgó, repce, kukorica, szántás, levendula) szalmabálákkal, fasorok, nyárfák, nyírfák, bokrok, virágos fű, tanyák silóval, szélerőművek, Hollandiában szélmalmok, Toszkánában napsütötte dombok és búzamezők, Spanyolországban és Portugáliában száraz, napégette táj, északon (Dánia, Észak-Németország) fenyvesek, madarak, párás távoli dombok, és út menti kilométerkövek valós km-számmal.
 
 ## 🚗 Az autó kezelése
 
@@ -229,6 +243,7 @@ Mezők (búza, napraforgó, repce, kukorica, szántás, levendula) szalmabálák
 | N | pénz | költségnapló |
 | B | KÉZI | kézifék |
 | Q | RÁDIÓ | rádió: következő állomás |
+| G | GPS | interaktív GPS térkép (húzás, csippentés, +/−, Esc = bezárás) |
 | P | II | szünet |
 | M | Zene (főmenü) | menüzene |
 | 1–5, Enter | érintés | menük és minijátékok |
@@ -283,7 +298,8 @@ Utána a játék itt érhető el: `https://strattila90-hue.github.io/Ede-kaland-
 | `js/world.js` | útvonal, útszakaszok, táj, utak, benzinkút |
 | `js/minigames.js` | minijátékok |
 | `js/shops.js` | boltok és tankolás |
-| `js/map.js`, `js/geo.js` | Európa-térkép és minitérkép |
+| `js/map.js`, `js/geo.js` | Európa-térkép (útiterv) |
+| `js/gps.js`, `js/geohd.js` | teljes képernyős, interaktív GPS és a részletes partvonalak |
 | `js/game.js` | játékmenet, fizika, fogyasztás, események, képernyők |
 | `js/app.js` | telepítés, megosztás, frissítés |
 | `sw.js`, `manifest.webmanifest`, `version.json`, `icons/` | az alkalmazás működéséhez szükséges fájlok |
