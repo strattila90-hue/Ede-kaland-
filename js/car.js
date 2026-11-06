@@ -131,6 +131,8 @@ function drawCarSide(g,x,by,wy,o,lights){
   g.lineWidth=0.9;g.strokeStyle='rgba(255,255,255,0.6)';g.beginPath();g.moveTo(5,28.6);g.bezierCurveTo(40,28.1,80,28.7,101,30.8);g.stroke();
   g.lineWidth=0.7;g.strokeStyle='rgba(0,0,0,0.25)';g.beginPath();g.moveTo(10,37.6);g.bezierCurveTo(40,36.5,75,36.3,104,37.3);g.stroke();
   g.strokeStyle='rgba(255,255,255,0.25)';g.beginPath();g.moveTo(10,38.5);g.bezierCurveTo(40,37.4,75,37.2,104,38.2);g.stroke();
+  if(o.dirt>0.05){const d=o.dirt;g.fillStyle=lg(g,0,10,0,49,[[0,'rgba(150,130,100,'+(0.12*d)+')'],[1,'rgba(110,85,55,'+(0.5*d)+')']]);g.fillRect(0,10,120,40);
+   for(let k=0;k<10;k++){const mx=6+hsh(k*11)*104,my=40+hsh(k*5)*7;g.fillStyle='rgba(95,70,45,'+(0.55*d*(0.5+hsh(k)))+')';g.beginPath();g.ellipse(mx,my,2+hsh(k*3)*4,1+hsh(k*7)*1.6,0,0,TAU);g.fill();}}
   // ajtóvonalak
   g.strokeStyle='rgba(18,22,28,0.6)';g.lineWidth=0.55;g.beginPath();g.moveTo(22.9,27);g.lineTo(22.7,31.6);g.moveTo(50.2,27);g.bezierCurveTo(50.4,36,50.4,40,50.2,43.6);
   g.moveTo(76.6,27.4);g.bezierCurveTo(77.4,32,77,35,75.4,37.2);g.moveTo(22.9,43.6);g.lineTo(75,43.6);g.stroke();

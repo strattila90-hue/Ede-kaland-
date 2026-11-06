@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.9.3
+# 🚐 Családi Vakáció – v2.10.0
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -99,6 +99,18 @@ Apa fárad: valós 30 perc folyamatos vezetés után elálmosodik (a szívek ala
 - **Kávé Apának:** 15 percet levesz a fáradtságból.
 - **Bármelyik megálló** (bolt, kút, étterem): 5 percet.
 - **Szállás** a szakasz végén: teljes pihenés.
+
+## 🫧 Forgókefés autómosó
+
+Az autó menet közben piszkolódik: porréteg és sárfoltok jelennek meg rajta, esőben, hóban és rossz úton gyorsabban, pocsolyán áthajtva egy adag sár is rákerül. Városokban és a kutak mellett **forgókefés automata autómosó** van (P gomb, „MOSÓ” útburkolati jel, közeledő ikon). A család bent marad, a mosókapu többször végigmegy az autón:
+
+| Program | Ár | Menet |
+|---|---|---|
+| Alap | 2 490 Ft | előmosás, forgókefés mosás, öblítés |
+| Prémium | 3 990 Ft | + aktív hab, meleg viasz (+1 kedv) |
+| Extra | 5 490 Ft | + alvázmosás, szárítás, polírozás (+1 kedv) |
+
+Látszik a vízsugár, a rózsaszín hab, a forgó oldalsó és felső kefe, a szárító fúvókák, a végén pedig csillog a tiszta autó. A piszkosság a mosóban látszik százalékban.
 
 ## 🍔 Burger Pont gyorsétterem
 

@@ -27,6 +27,9 @@ function itemIcon(g,k,x,y){g.save();g.translate(x,y);const s=(c,a,b,w,h,r)=>frr(
  case 'map':poly(g,'#cfe6c8',[[-9,-7],[-3,-9],[3,-7],[9,-9],[9,7],[3,9],[-3,7],[-9,9]]);line(g,'#d32f2f',-6,4,0,-2,1);line(g,'#d32f2f',0,-2,6,0,1);line(g,'#7a8a6a',-3,-9,-3,7,0.5);line(g,'#7a8a6a',3,-7,3,9,0.5);break;
  case 'postcard':s('#fff3d6',-9,-6,18,12,1);s('#4fc3f7',-8,-5,9,10,0.5);s('#d32f2f',4,-5,4,5,0.5);break;
  case 'tyre':disc(g,'#1b1f26',0,0,9);disc(g,'#9aa4ae',0,0,5);disc(g,'#5a636d',0,0,2);break;
+ case 'carwash':frr(g,'#1e88e5',-9,-9,3,17,1.5);frr(g,'#e53935',6,-9,3,17,1.5);for(let k=0;k<4;k++)R(g,'rgba(255,255,255,0.5)',-9,-7+k*4,3,1);
+  g.fillStyle='#cfd8e0';g.beginPath();g.moveTo(-6,6);g.lineTo(-6,1);g.quadraticCurveTo(-5,-3,0,-3);g.lineTo(3,-3);g.lineTo(6,1);g.lineTo(6,6);g.closePath();g.fill();R(g,'#7fb2d6',-3,-2,5,2.6);disc(g,'#1b1f26',-3.5,6.2,1.6);disc(g,'#1b1f26',3.5,6.2,1.6);
+  for(const [bx,by,r] of [[-2,-7,1.6],[2,-9,1.2],[4.5,-6,1]])disc(g,'rgba(200,235,255,0.95)',bx,by,r);break;
  case 'repair':g.save();g.rotate(-0.7);frr(g,'#9aa3ad',-1.6,-8,3.2,14,1.2);g.strokeStyle='#9aa3ad';g.lineWidth=2.6;g.beginPath();g.arc(0,-9,3.6,0.6,Math.PI*2-0.6+Math.PI);g.stroke();g.restore();disc(g,'#c62828',5,5,2.2);break;
  case 'wash':for(let k=0;k<6;k++)disc(g,'rgba(160,210,255,0.9)',-5+hsh(k)*10,-6+hsh(k*3)*12,1.6+hsh(k*5)*2);frr(g,'#3b8bff',-7,2,14,6,2);break;
  case 'oil':frr(g,'#1b1f26',-5,-4,10,12,2);frr(g,'#ffd84a',-3,-1,6,4,1);frr(g,'#1b1f26',-2,-7,4,3,1);break;
