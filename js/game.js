@@ -15,10 +15,19 @@ function fixLog(T){T.money=Math.round(T.money);if(!T.log||!T.log.length){T.log=[
  const d=T.money-500000;if(d)T.log.push({a:d,c:'other',l:'Korábbi mentés összesítve (régi verzió)',b:T.money,km:Math.round(T.km*10)/10,leg:T.leg||0,d:''});}return T;}
 function ledgerTotals(T){const o={};let sum=0;for(const e of T.log||[]){sum+=e.a;if(e.c!=='start')o[e.c]=(o[e.c]||0)+e.a;}return {cats:o,sum:sum};}
 function newTrip(){return {log:[{a:500000,c:'start',l:'Kezdő keret',b:500000,km:0,leg:0,d:''}],km:0,fuel:38,fuelUsed:0,money:500000,vig:{},noVig:{},earned:0,food:85,baby:90,spare:true,mood:5,hp:100,airbag:0,spentFuel:0,spentShop:0,fines:0,photos:0};}
-function loadSave(){try{const sv=JSON.parse(localStorage.getItem('csaladi-vakacio-v2')||'null');if(sv&&!sv.routeV){// régi (12 szakaszos) mentés átállítása az új, egész Európát bejáró útvonalra
+/* ---- mentési helyek (3) és profil (album, rekordok, beállítások helyenként) ---- */
+let SLOT=1;try{SLOT=Math.min(3,Math.max(1,+localStorage.getItem('cv-slot')||1));}catch(e){}
+function saveKey(n){n=n||SLOT;return n===1?'csaladi-vakacio-v2':'csaladi-vakacio-v2-s'+n;}
+function profKey(n){return 'cv-prof-'+(n||SLOT);}
+function loadProf(n){let p=null;try{p=JSON.parse(localStorage.getItem(profKey(n))||'null');}catch(e){}p=p||{};p.album=p.album||{};p.stats=p.stats||{};p.awards=p.awards||{};if(!p.name)p.name=(n||SLOT)+'. utazás';return p;}
+let PROF=loadProf();
+function saveProf(){try{localStorage.setItem(profKey(),JSON.stringify(PROF));}catch(e){}}
+function readSave(n){try{return JSON.parse(localStorage.getItem(saveKey(n))||'null');}catch(e){return null;}}
+function setSlot(n){SLOT=n;try{localStorage.setItem('cv-slot',String(n));}catch(e){}PROF=loadProf();G.save=loadSave();G.menu=0;}
+function loadSave(){try{const sv=JSON.parse(localStorage.getItem(saveKey())||'null');if(sv&&!sv.routeV){// régi (12 szakaszos) mentés átállítása az új, egész Európát bejáró útvonalra
   const OLD=['Komárom','Siófok','Keszthely','Bécs','Prága','Berlin','Amszterdam','Párizs','Barcelona','Nizza','Velence','Salzburg'],nf=OLD[sv.leg]||'Komárom';let k=LEGS.findIndex(L=>L.from.split(',')[0]===nf);if(k<0)k=LEGS.length-1;if(k!==sv.leg)sv.dist=0;sv.leg=k;sv.routeV=2;}
   if(sv&&sv.leg>=LEGS.length)sv.leg=LEGS.length-1;return sv;}catch(e){return null;}}
-function save(dist){try{if(G.trip)G.trip.savedAt=Date.now();localStorage.setItem('csaladi-vakacio-v2',JSON.stringify({leg:G.leg,trip:G.trip,dist:dist||0,ts:G.ts,routeV:2}));G.save=loadSave();}catch(e){}}
+function save(dist){try{if(G.trip)G.trip.savedAt=Date.now();localStorage.setItem(saveKey(),JSON.stringify({leg:G.leg,trip:G.trip,dist:dist||0,ts:G.ts,routeV:2}));G.save=loadSave();}catch(e){}}
 G.save=loadSave();G.ts=1;try{G.ts=+localStorage.getItem('csaladi-vakacio-ts')||1;}catch(e){}
 const TS_OPTS=[[1,'Valós idő (1x)'],[5,'Gyorsított (5x)'],[20,'Turbó (20x)']];
 const WHO=['apa','anya','anna','petra','atti'],WHO_X={apa:68,anya:63,anna:42,petra:33,atti:27};
@@ -850,7 +859,7 @@ function update(){pauseWatch();if(!window.LAZY_DONE&&G.state!=='title'&&G.state!
  else if(G.state==='map'){if(G.st===1)fetchWeather(G.leg);if(K.gpsP){K.gpsP=false;if(typeof openGPS==='function')openGPS();}if(G.gps){K.enterP=false;}if(K.enterP&&G.st>25){SFX.click();startLeg(G.leg,G.resume);G.resume=0;}}
  else if(G.state==='play')updPlay();
  else if(G.state==='postcard'){for(const p of parts){p.x+=p.vx;p.y+=p.vy;p.life--;}parts=parts.filter(p=>p.life>0);
-  if(K.enterP&&G.st>40){SFX.click();G.leg++;if(G.leg>=LEGS.length){G.state='win';G.st=0;SFX.win();try{localStorage.removeItem('csaladi-vakacio-v2');}catch(e){}G.save=null;}else{save(0);G.state='map';G.st=0;}}}
+  if(K.enterP&&G.st>40){SFX.click();G.leg++;if(G.leg>=LEGS.length){G.state='win';G.st=0;SFX.win();try{localStorage.removeItem(saveKey());}catch(e){}G.save=null;}else{save(0);G.state='map';G.st=0;}}}
  else if(G.state==='over'){if(K.enterP&&G.st>50){SFX.click();G.trip.mood=3;startLeg(G.leg);}}
  else if(G.state==='win'){if(K.enterP&&G.st>60){SFX.click();G.state='title';G.menu=0;}}
  K.upP=K.dnP=K.honkP=K.enterP=K.pauseP=K.lightP=K.fogP=K.hazP=K.doorP=K.revP=K.radioP=K.hbP=false;K.enterKey=false;K.cruiseP=false;K.stopP=false;K.logP=false;TAPD=null;K.num=0;TAP=null;}

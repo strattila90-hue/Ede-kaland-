@@ -20,7 +20,7 @@ SOAK=r"""
   // minden megállótípus meglátogatása autopilótával
   for(const tp of ['fuel','kis','hiper','trafik','ujsag','burger','rest','garage','wash']){const p=LEG.pois.find(q=>q.type===tp&&stopTarget(q)>P.dist+400);if(!p)continue;
    if(tp==='garage'){G.trip.hp=35;G.trip.airbag=1;}P.dist=stopTarget(p)-900;P.kmh=40;P.lane=1;P.y=LANE[1];ents=[];try{startAuto(p);}catch(e){rec('startAuto',e);}
-   step(1400,()=>{K.gas=false;K.brake=false;});if(P.sub!=='drive'){handleSub();}else st.visits['miss_'+tp]=(st.visits['miss_'+tp]||0)+1;}
+   let ent=null;step(1400,()=>{K.gas=false;K.brake=false;if(!ent&&P.sub!=='drive')ent=P.sub;});if(P.sub!=='drive'){handleSub();}else if(ent){st.visits[ent+'(magától véget ért)']=(st.visits[ent+'(magától véget ért)']||0)+1;}else st.visits['miss_'+tp]=(st.visits['miss_'+tp]||0)+1;}
   // véletlen vezetés eseményekkel, defekttel, ütközéssel, fáradással
   G.trip.driveS=2400;step(3000,i=>{K.gas=rnd()>0.15;K.brake=rnd()<0.04;if(rnd()<0.01)K.upP=true;if(rnd()<0.01)K.dnP=true;if(rnd()<0.004)K.honkP=true;if(rnd()<0.003)K.lightP=true;if(rnd()<0.002)K.fogP=true;if(rnd()<0.002)K.hazP=true;if(rnd()<0.003)K.cruiseTap=true;if(rnd()<0.001)K.revP=true;if(rnd()<0.001)K.hbP=true;if(rnd()<0.001)K.doorP=true;
     if(i===300&&P.sub==='drive')flatTire();if(i===1500&&P.sub==='drive'){const tp=pick(['truck','bus','hatch','moto','van']);ents.push({kind:'traffic',tp:tp,x:P.dist+150,lane:P.lane,y:P.y,ty:P.y,w:TW[tp],h:TH[tp],kmh:0,base:0,cur:0,col:'#888',parked:true});P.kmh=120;G.trip.hp=20;}

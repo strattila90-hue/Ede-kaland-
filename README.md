@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.19.0
+# 🚐 Családi Vakáció – v2.20.0
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -54,6 +54,9 @@ Amíg a GPS nyitva van, a játék áll, de ez nem számít pihenőnek. A térké
 **Lámpafigyelő:** 450 méterrel a jelzőlámpa előtt a jobb oldalon megjelenik egy kis lámpa: mutatja, melyik szín ég (világít), hány másodperc van hátra belőle (fogyó csíkkal), milyen messze van a lámpa, és a jelenlegi sebességed alapján tanácsot ad: **ÁTÉRSZ** (zöldben érsz oda), **LASSÍTS** (sárgában érnél oda), **FÉKEZZ** (pirosban érnél oda), **VÁRJ** (állsz a piros előtt), **ÁLLJ** (közvetlenül a lámpánál, nem zöld).
 
 ## 🎬 Főmenü: filmplakát
+
+**Mentések (💾 a főmenüben):** három külön utazás (például gyerekenként), mindegyik saját névvel, utazással, képeslap-albummal és rekordokkal. Bármelyik **fájlba menthető** vagy **elküldhető** (pl. Messengeren), és másik telefonon vagy tableten a **Betöltés fájlból** gombbal ott folytatható, ahol abbahagytátok. Így az sem baj, ha a telefon takarítója vagy egy böngészőtörlés kitörli a játék adatait.
+
 
 **Hibanapló (🩺 a főmenüben és a Szünet menüben):** a játék rögzíti a hibákat (melyik fájl, melyik sor, milyen állapotban: szakasz, sebesség, felbontás), a fontos eseményeket (indulás, szakasz, totálkár, frissítés, háttérbe kerülés, vissza-gesztus), és ha a játék váratlanul leállt (pl. a telefon kevés memória miatt bezárta), a következő indításkor beírja, mikor, mennyi játék után és milyen állapotban történt. A naplót a **Küldés** gombbal el lehet küldeni (pl. Messengeren), vagy **Másolás**sal kimásolni. Menet közbeni hiba sem állítja le a játékot: a hibát naplózza, és fut tovább.
 

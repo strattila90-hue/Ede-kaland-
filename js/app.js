@@ -111,7 +111,7 @@ window.addEventListener('offline',()=>toast('Offline mód: a játék internet n�
 setTimeout(checkUpdate,1500);
 /* menük */
 function titleAct(a){const opts=titleOpts();const i=opts.findIndex(o=>o.a===a);if(i>=0){G.menu=i;K.enterP=true;}}
-function menuDef(){const s=G.state;if(G.ledger||G.gps||G.elogOpen||G.keysOpen)return null;
+function menuDef(){const s=G.state;if(G.ledger||G.gps||G.elogOpen||G.keysOpen||G.savesOpen)return null;
  if(G.confirm==='new')return {cls:'center',title:'Teljesen új játék?',items:[{a:'newyes',l:'Igen, mindent elölről (a mentett út törlődik)',ic:'↺',c:'danger'},{a:'cancel',l:'Mégse',ic:'✕'}]};
  if(G.confirm==='exit')return {cls:'center',title:'Kilépsz a játékból?',items:[{a:'exityes',l:'Igen, mentés és kilépés',ic:'⏻',c:'danger'},{a:'cancel',l:'Mégse, játszom tovább',ic:'▶',c:'primary'}]};
  if(G.paused&&s==='play')return {cls:'center',title:'Szünet',items:[{a:'resume',l:'Folytatás',ic:'▶',c:'primary'},{a:'gps',l:'GPS térkép',ic:'🧭'},{a:'log',l:'Költségnapló: '+fmt(G.trip.money)+' Ft',ic:'📒'},{a:'radio',l:'Rádió: '+(radio.on?STATIONS[radio.idx].name:'ki'),ic:'📻'},{a:'perf',l:'Teljesítménymérő: '+(PERF.on?'be':'ki'),ic:'📊'},{a:'elog',l:'Hibanapló',ic:'🩺'},...(typeof FINE!=='undefined'&&FINE?[{a:'keys',l:'Billentyűzet és kiosztás',ic:'⌨'}]:[]),{a:'quit',l:'Mentés és vissza a főmenübe',ic:'⌂'},{a:'exit',l:'Kilépés a játékból',ic:'⏻',c:'danger'},{a:'update',l:updLabel,ic:'⟳',fill:1}]};
@@ -119,6 +119,7 @@ function menuDef(){const s=G.state;if(G.ledger||G.gps||G.elogOpen||G.keysOpen)re
   it.push({a:'new',l:it.length?'Új játék (teljes újrakezdés)':'Új utazás Komáromból',ic:'🚐',c:it.length?'':'primary'},{a:'color',l:'Autó színe: '+carColor,ic:'🎨'},{a:'ts',l:'Utazás: '+(TS_OPTS.find(q=>q[0]===G.ts)||TS_OPTS[0])[1],ic:'⏱'},{a:'specs',l:'Az autó adatai',ic:'ℹ'});
   if(!isStandalone())it.push({a:'install',l:'Telepítés',ic:'⬇',c:deferredPrompt?'new':''});
   it.push({a:'share',l:'Megosztás',ic:'↗'},{a:'update',l:updLabel,ic:'⟳',fill:1,c:newVer?'new':''},{a:'music',l:'Zene: '+(musicOn?'be':'ki'),ic:'♪'});
+  it.push({a:'saves',l:'Mentések: '+(typeof PROF!=='undefined'?PROF.name:''),ic:'💾'});
   if(typeof FINE!=='undefined'&&FINE)it.push({a:'keys',l:'Billentyűzet: '+(KEYMAP==='b'?'Autós':'Klasszikus'),ic:'⌨'});
   it.push({a:'elog',l:'Hibanapló: '+(ELOG.list.filter(e=>e.k!=='info').length||'nincs hiba'),ic:'🩺'});
   it.push({a:'exit',l:'Kilépés',ic:'⏻',c:'danger'});
@@ -172,12 +173,13 @@ function renderMenu(){const d=menuDef(),m=$('menu');const sig=d?JSON.stringify(d
  if(d.ver){const v=document.createElement('div');v.className='ver';let ready=false;try{ready=localStorage.getItem('cv-offline')===APP_VERSION;}catch(e){}v.textContent='Verzió: v'+APP_VERSION+(ready?'  •  ✓ teljes játék letöltve, offline is megy':(navigator.onLine?'  •  letöltés a háttérben…':'  •  offline'));m.appendChild(v);}}
 function menuAction(a){
  if(a==='new'&&G.state==='title'&&G.save&&(G.save.leg>0||G.save.dist>0)&&!G.confirm){G.confirm='new';MENU_SIG='?';return;}
- if(a==='newyes'){G.confirm=null;try{localStorage.removeItem('csaladi-vakacio-v2');}catch(e){}G.save=null;G.menu=0;MENU_SIG='?';titleAct('new');return;}
+ if(a==='newyes'){G.confirm=null;try{localStorage.removeItem(saveKey());}catch(e){}G.save=null;G.menu=0;MENU_SIG='?';titleAct('new');return;}
  if(a==='cancel'){G.confirm=null;MENU_SIG='?';return;}
  if(a==='exit'){G.confirm='exit';if(G.state==='play')G.paused=true;MENU_SIG='?';return;}
  if(a==='exityes'){G.confirm=null;exitGame();return;}
  if(a==='elog'){openElog();return;}
  if(a==='keys'){openKeys();return;}
+ if(a==='saves'){openSaves();return;}
  if(a==='resume'){G.paused=false;}else if(a==='quit'){goHome();}
  else if(a==='perf'){PERF.on=!PERF.on;try{localStorage.setItem('cv-perf',PERF.on?'1':'0');}catch(e){}MENU_SIG='?';}else if(a==='gps'){if(typeof openGPS==='function')openGPS();}else if(a==='log'){openLedger(G.state==='play'?'pause':'menu');}else if(a==='radio'){radioNext();}else if(a==='install')doInstall();else if(a==='share')doShare();else if(a==='update')doUpdate();
  else if(a==='music'){toggleMusic();}else if(a==='home'){G.state='title';G.st=0;}
@@ -239,4 +241,37 @@ $('keysClose').addEventListener('click',e=>{e.stopPropagation();closeKeys();});
 document.querySelectorAll('#keys .lay button').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();setKeymap(b.dataset.m);kPedals();renderKeys();MENU_SIG='?';}));
 ['pointerdown','touchstart'].forEach(ev=>$('keys').addEventListener(ev,e=>e.stopPropagation(),{passive:true}));
 const FINE=!isTouch||matchMedia('(any-pointer: fine)').matches;
+/* ---- mentések: 3 hely, fájlba mentés, küldés, betöltés fájlból ---- */
+function exportData(n){return {app:'csaladi-vakacio',ver:APP_VERSION,at:Date.now(),slot:n,save:readSave(n),prof:loadProf(n)};}
+function saveFileName(n){const pr=loadProf(n),d=new Date(),pad=x=>String(x).padStart(2,'0');return 'csaladi-vakacio-'+(pr.name||'mentes').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')+'-'+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'.json';}
+function saveBlob(n){return new Blob([JSON.stringify(exportData(n))],{type:'application/json'});}
+function downloadSave(n){if(n===SLOT&&G.state==='play'&&P)save(P.dist);const a=document.createElement('a');a.href=URL.createObjectURL(saveBlob(n));a.download=saveFileName(n);document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},2000);toast('Mentés letöltve: '+saveFileName(n),3500);elog('info','Mentés fájlba ('+n+'. hely)');}
+async function shareSave(n){if(n===SLOT&&G.state==='play'&&P)save(P.dist);const f=new File([saveBlob(n)],saveFileName(n),{type:'application/json'});
+ try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Családi Vakáció mentés',text:'Családi Vakáció mentés: '+loadProf(n).name});return;}}catch(e){if(e&&e.name==='AbortError')return;}
+ downloadSave(n);}
+let IMPORT_SLOT=1;
+function importSave(n){IMPORT_SLOT=n;const inp=$('saveFile');inp.value='';inp.click();}
+$('saveFile').addEventListener('change',async()=>{const f=$('saveFile').files[0];if(!f)return;const n=IMPORT_SLOT;
+ try{const d=JSON.parse(await f.text());if(!d||d.app!=='csaladi-vakacio'||!('save' in d))throw new Error('nem Családi Vakáció mentés');
+  if(d.save&&(typeof d.save.leg!=='number'||!d.save.trip))throw new Error('hibás mentés');
+  if(readSave(n)&&!confirm('A(z) '+n+'. helyen lévő utazás felülíródik. Folytatod?'))return;
+  if(d.save)localStorage.setItem(saveKey(n),JSON.stringify(d.save));else localStorage.removeItem(saveKey(n));
+  if(d.prof)localStorage.setItem(profKey(n),JSON.stringify(d.prof));
+  if(n===SLOT){PROF=loadProf();G.save=loadSave();}elog('info','Mentés betöltve fájlból ('+n+'. hely, v'+(d.ver||'?')+')');toast('Betöltve: '+loadProf(n).name,3000);renderSaves();MENU_SIG='?';}
+ catch(e){toast('Ez a fájl nem tölthető be ('+(e&&e.message||'hiba')+').',4000);}});
+function slotInfo(n){const sv=readSave(n);if(!sv)return 'Üres hely: új utazás Komáromból';const L=LEGS[Math.min(sv.leg,LEGS.length-1)],t=sv.trip||{},d=sv.trip&&sv.trip.savedAt?new Date(sv.trip.savedAt):null,pad=x=>String(x).padStart(2,'0');
+ return (sv.leg+1)+'/'+LEGS.length+'. szakasz: '+L.from.split(',')[0]+' > '+L.to.split(' (')[0]+' · '+fmt(Math.round(t.km||0))+' km · '+fmt(Math.round(t.money||0))+' Ft'+(d?' · '+pad(d.getMonth()+1)+'.'+pad(d.getDate())+'. '+pad(d.getHours())+':'+pad(d.getMinutes()):'');}
+function renderSaves(){const el=$('saves'),esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
+ el.querySelector('.list').innerHTML=[1,2,3].map(n=>{const pr=loadProf(n),on=n===SLOT,alb=Object.keys(pr.album||{}).length;
+  return '<div class="slot'+(on?' on':'')+'"><div class="top"><input data-n="'+n+'" class="nm" maxlength="24" value="'+esc(pr.name)+'" aria-label="Név">'+(on?'<span class="badge">ezt játsszátok</span>':'<button data-a="use" data-n="'+n+'" class="use">Ezt játsszuk</button>')+'</div>'
+  +'<div class="inf">'+esc(slotInfo(n))+(alb?' · 🖼 '+alb+' képeslap':'')+(pr.easy?' · könnyű mód':'')+'</div>'
+  +'<div class="bt"><button data-a="dl" data-n="'+n+'">💾 Mentés fájlba</button><button data-a="sh" data-n="'+n+'">↗ Küldés</button><button data-a="im" data-n="'+n+'">📂 Betöltés fájlból</button><button data-a="del" data-n="'+n+'" class="del">Törlés</button></div></div>';}).join('');
+ el.querySelectorAll('button[data-a]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();const n=+b.dataset.n,a=b.dataset.a;haptic(10);
+  if(a==='use'){setSlot(n);elog('info','Mentési hely: '+n);renderSaves();MENU_SIG='?';}else if(a==='dl')downloadSave(n);else if(a==='sh')shareSave(n);else if(a==='im')importSave(n);
+  else if(a==='del'){if(!confirm('Biztosan törlöd: '+loadProf(n).name+'? Az utazás, a képeslapok és a rekordok is törlődnek.'))return;try{localStorage.removeItem(saveKey(n));localStorage.removeItem(profKey(n));}catch(_){}if(n===SLOT){PROF=loadProf();G.save=loadSave();}renderSaves();MENU_SIG='?';}}));
+ el.querySelectorAll('input.nm').forEach(i=>i.addEventListener('change',()=>{const n=+i.dataset.n,pr=loadProf(n);pr.name=i.value.trim().slice(0,24)||(n+'. utazás');try{localStorage.setItem(profKey(n),JSON.stringify(pr));}catch(_){}if(n===SLOT)PROF=pr;MENU_SIG='?';}));}
+function openSaves(){if(G.state!=='title')return;G.savesOpen=true;renderSaves();$('saves').classList.add('open');MENU_SIG='?';}
+function closeSaves(){G.savesOpen=false;$('saves').classList.remove('open');MENU_SIG='?';}
+$('savesClose').addEventListener('click',e=>{e.stopPropagation();closeSaves();});
+['pointerdown','touchstart','keydown'].forEach(ev=>$('saves').addEventListener(ev,e=>e.stopPropagation(),{passive:true}));
 window.APP_OK=true;

@@ -258,6 +258,16 @@ body.touchui #topbar #bGps{display:none}
 #keys .r{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:5px 0;border-top:1px solid rgba(255,255,255,.07);font:600 13px/1.3 var(--ff);color:#dfe6ee}
 #keys .r b{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}#keys kbd{display:inline-block;min-width:22px;padding:2px 6px;border-radius:6px;background:#2b3242;border:1px solid rgba(255,255,255,.18);border-bottom-width:2px;font:800 12px var(--ff);color:#fff;text-align:center;white-space:nowrap}
 @media (max-width:700px){#keys .rows{grid-template-columns:1fr}}
+/* mentések */
+#saves{position:fixed;inset:0;z-index:42;display:none;align-items:center;justify-content:center;background:rgba(4,6,10,.6);padding:10px;font-family:var(--ff)}
+#saves.open{display:flex}#saves .sheet{width:min(760px,100%);max-height:100%;display:flex;flex-direction:column;border-radius:20px;overflow:hidden;background:rgba(16,20,30,.97);border:1px solid var(--line);color:#fff}
+#saves header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px 2px}#saves h3{margin:0;font:800 18px var(--ff)}#saves .x{width:40px;height:40px;border-radius:12px;border:0;background:#2a3040;color:#fff;font-size:18px;cursor:pointer}
+#saves .hint{margin:0;padding:2px 14px 8px;color:#9fb0c2;font:500 12.5px/1.4 var(--ff)}#saves .list{overflow:auto;padding:0 12px 12px;display:flex;flex-direction:column;gap:8px}
+#saves .slot{border:1px solid var(--line);border-radius:14px;padding:9px 10px;background:rgba(255,255,255,.03)}#saves .slot.on{border-color:#3b8bff;background:rgba(59,139,255,.1)}
+#saves .top{display:flex;gap:8px;align-items:center}#saves .nm{flex:1;min-width:0;height:36px;border-radius:10px;border:1px solid var(--line);background:#141924;color:#fff;font:800 15px var(--ff);padding:0 10px}
+#saves .badge{color:#9fd0ff;font:800 12px var(--ff);white-space:nowrap}#saves .inf{margin:6px 2px;color:#c9d3df;font:600 12.5px/1.35 var(--ff)}
+#saves .bt{display:flex;gap:6px;flex-wrap:wrap}#saves button{min-height:38px;padding:0 10px;border-radius:10px;border:1px solid var(--line);background:linear-gradient(180deg,#2b3242,#191d27);color:#fff;font:700 12.5px var(--ff);cursor:pointer}
+#saves button.use{background:linear-gradient(180deg,#3b7fe6,#2458b8)}#saves button.del{background:linear-gradient(180deg,#6b2a26,#3d1714);margin-left:auto}
 </style>
 </head>
 <body>
@@ -298,6 +308,7 @@ body.touchui #topbar #bGps{display:none}
 <div id="bye"><div><b>⏻</b><h3>Kiléptél a játékból</h3><p>Az utad el van mentve. Most már bezárhatod az alkalmazást (kezdőképernyő gomb vagy az alkalmazásváltó).</p><button id="byeBack">Vissza a játékba</button></div></div>
 <div id="elog"><div class="sheet"><header><h3>🩺 Hibanapló</h3><button class="x" id="elogClose" aria-label="Bezárás">✕</button></header><p class="sum"></p><div class="list"></div><div class="btns"><button id="elogShare">Küldés</button><button id="elogCopy">Másolás</button><button id="elogClear">Törlés</button></div></div></div>
 <div id="keys"><div class="sheet"><header><h3>⌨ Billentyűzet</h3><button class="x" id="keysClose" aria-label="Bezárás">✕</button></header><div class="lay"><span>Kiosztás:</span><button data-m="a">Klasszikus<small>→ gáz, ← fék, ↑↓ sáv</small></button><button data-m="b">Autós<small>↑ gáz, ↓ fék, ←→ sáv</small></button></div><div class="rows"></div></div></div>
+<div id="saves"><div class="sheet"><header><h3>💾 Mentések</h3><button class="x" id="savesClose" aria-label="Bezárás">✕</button></header><p class="hint">Három külön utazás (például gyerekenként). A mentést fájlba lehet tenni vagy elküldeni, és másik telefonon vagy tableten a „Betöltés fájlból” gombbal folytatható.</p><div class="list"></div></div><input type="file" id="saveFile" accept=".json,application/json" hidden></div>
 <div id="toast"></div>
 <div id="rot"><b>📱</b>Fordítsd el a készüléket fekvő helyzetbe</div>
 <div id="splash"><img src="icons/icon-192.png" alt=""><h1>Családi Vakáció</h1><div class="bar"><i id="splbar"></i></div><small id="spltxt">Betöltés... 0%</small></div>
