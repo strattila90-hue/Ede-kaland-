@@ -23,7 +23,8 @@ function gpsAnchors(i){const L=LEGS[i];if(L._anc)return L._anc;const n=L.path.le
  for(let m=1;m<n;m++)if(km[m]<km[m-1])km[m]=km[m-1];return L._anc=km;}
 function gpsPos(i,km){const L=LEGS[i],a=gpsAnchors(i);km=clamp(km,0,L.km);for(let k=1;k<a.length;k++)if(km<=a[k]||k===a.length-1){const u=a[k]>a[k-1]?clamp((km-a[k-1])/(a[k]-a[k-1]),0,1):1;
   return [lerp(L.pts[k-1][0],L.pts[k][0],u),lerp(L.pts[k-1][1],L.pts[k][1],u)];}return L.pts[L.pts.length-1];}
-function gpsKm(){return G.state==='play'&&P&&LEG?legKm():0;}
+function gpsLive(){return G.state==='play'&&P&&LEG;}
+function gpsKm(){if(gpsLive())return legKm();const L=LEGS[G.leg];return G.resume&&G.ts?Math.min(L.km,G.resume/(PXKM/G.ts)):0;}
 function gpsCar(){const km=gpsKm(),i=G.leg,p=gpsPos(i,km),a=gpsPos(i,km-1.5),b=gpsPos(i,km+1.5);let hd=Math.atan2((b[1]-a[1]),(MY(b[0])-MY(a[0])));if(!isFinite(hd)||(a[0]===b[0]&&a[1]===b[1]))hd=0;return {lat:p[0],lon:p[1],hd:hd};}
 function gpsCountry(i,km){let c='HU';for(let l=0;l<=i;l++){let acc=0;for(const q of LEGS[l].segs){if(l===i&&acc>km)break;if(q[4])c=q[4];acc+=q[3];}}return c;}
 function gpsSegName(i,km){let acc=0;for(const q of LEGS[i].segs){if(km<acc+q[3])return q[0]==='motorway'?q[1]+' autópálya':q[1]?q[1]:q[0]==='country'?'Országút':'';acc+=q[3];}return '';}
@@ -77,7 +78,7 @@ function gpsDraw(now){const cv2=$('gpsc'),g=cv2.getContext('2d'),w=GV.w,h=GV.h,d
   poly(pts,lw+3.4,C.ro);poly(done,lw+1,C.done);poly(ahead,lw+1.4,C.rt);if(z>=120)poly(ahead,1,'rgba(255,255,255,0.7)',[3,5]);}
  // megállók az aktuális szakaszon (közelről)
  const occ=[];const free=(x,y,ww,hh)=>{for(const o of occ)if(x<o[0]+o[2]&&x+ww>o[0]&&y<o[1]+o[3]&&y+hh>o[1])return false;occ.push([x,y,ww,hh]);return true;};
- if(z>=320&&LEG){const seen={};g.textAlign='center';g.textBaseline='middle';g.font='13px '+GV.ff;for(const p of LEG.pois){if(p.type==='veda'||!GPS_ICON[p.type])continue;const pk=p.x*LEG.kmPerPx;if(pk<km-0.3)continue;
+ if(z>=320&&gpsLive()){const seen={};g.textAlign='center';g.textBaseline='middle';g.font='13px '+GV.ff;for(const p of LEG.pois){if(p.type==='veda'||!GPS_ICON[p.type])continue;const pk=p.x*LEG.kmPerPx;if(pk<km-0.3)continue;
   const q=gpsPos(G.leg,pk),x=gpsX(q[1]),y=gpsY(MY(q[0]));if(x<-20||x>w+20||y<-20||y>h+20)continue;const key=Math.round(x/22)+'|'+Math.round(y/22);if(seen[key])continue;seen[key]=1;
   g.fillStyle='rgba(0,0,0,0.25)';g.beginPath();g.arc(x,y+1.5,10,0,TAU);g.fill();g.fillStyle='#ffffff';g.beginPath();g.arc(x,y,10,0,TAU);g.fill();g.strokeStyle=C.rt;g.lineWidth=1.6;g.stroke();g.fillStyle='#000';g.fillText(GPS_ICON[p.type],x,y+0.5);occ.push([x-10,y-10,20,20]);}}
  // városok
@@ -108,17 +109,17 @@ function gpsResize(){const el=$('gpsv'),c=$('gpsc');GV.w=el.clientWidth||innerWi
  const cs=getComputedStyle(document.documentElement);GV.sl=parseFloat(cs.getPropertyValue('--sl'))||0;GV.sb=parseFloat(cs.getPropertyValue('--sb'))||0;GV.ff=(cs.getPropertyValue('--ff')||'').trim()||'system-ui,sans-serif';GV.z=clamp(GV.z,gpsZMin(),GPS_ZMAX);}
 
 /* ---------- információs kártya ---------- */
-function gpsEta(rem){const v=Math.abs(P&&P.kmh||0),sp=v>=15?v:85,m=rem/sp*60;return (v<15?'kb. ':'')+(m>=60?Math.floor(m/60)+' ó '+Math.round(m%60)+' p':Math.max(1,Math.round(m))+' p');}
+function gpsEta(rem){const v=gpsLive()?Math.abs(P.kmh||0):0,sp=v>=15?v:85,m=rem/sp*60;return (v<15?'kb. ':'')+(m>=60?Math.floor(m/60)+' ó '+Math.round(m%60)+' p':Math.max(1,Math.round(m))+' p');}
 function gpsInfo(){const L=LEGS[G.leg],km=gpsKm(),rem=Math.max(0,L.km-km),tot=LEGS.reduce((a,l)=>a+l.km,0),done=LEGS.slice(0,G.leg).reduce((a,l)=>a+l.km,0)+km,esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
  const from=L.from.split(',')[0],to=L.to.split(' (')[0],cc=gpsCountry(G.leg,km),sn=gpsSegName(G.leg,km);
- const it=[];if(LEG&&P){const seen={},front=P.dist+112;for(const p of LEG.pois){if(p.type==='veda'||seen[p.type]||!GPS_ICON[p.type])continue;const d=(p.x-front)*LEG.kmPerPx;if(d<0.05)continue;seen[p.type]=1;it.push({i:GPS_ICON[p.type],n:POI_NAME[p.type],d:d,k:p.x*LEG.kmPerPx});}}
+ const it=[];if(gpsLive()){const seen={},front=P.dist+112;for(const p of LEG.pois){if(p.type==='veda'||seen[p.type]||!GPS_ICON[p.type])continue;const d=(p.x-front)*LEG.kmPerPx;if(d<0.05)continue;seen[p.type]=1;it.push({i:GPS_ICON[p.type],n:POI_NAME[p.type],d:d,k:p.x*LEG.kmPerPx});}}
  const a=gpsAnchors(G.leg);let nt=0;for(let k=1;k<L.path.length-1&&nt<2;k++)if(a[k]>km+0.2){it.push({i:GPS_ICON.town,n:L.path[k],d:a[k]-km,k:a[k]});nt++;}
  it.sort((x,y)=>x.d-y.d);const li=it.slice(0,6);li.push({i:GPS_ICON.flag,n:to,d:rem,k:L.km});
  const fd=d=>d<1?fmt(Math.round(d*1000/10)*10)+' m':fmt(d,d<10?1:0)+' km';
  $('gpsInfo').innerHTML='<div class="rt">'+esc(from)+' → '+esc(to)+'</div><div class="mut">'+esc((sn?sn+' · ':'')+(GPS_CC[cc]||cc))+'</div>'
   +'<div class="bar"><i style="width:'+(km/L.km*100).toFixed(1)+'%"></i></div>'
   +'<div class="row"><span>Megtett <b>'+fmt(km,km<100?1:0)+' km</b></span><span>Hátra <b class="big">'+fmt(rem,rem<100?1:0)+' km</b></span></div>'
-  +'<div class="row"><span>'+Math.round(Math.abs(P&&P.kmh||0))+' km/h</span><span>Érkezés: <b>'+gpsEta(rem)+'</b></span></div>'
+  +'<div class="row"><span>'+(gpsLive()?Math.round(Math.abs(P.kmh||0))+' km/h':'Indulásra kész')+'</span><span>Érkezés: <b>'+gpsEta(rem)+'</b></span></div>'
   +'<div class="row mut" style="margin-top:4px;white-space:nowrap"><span>'+(G.leg+1)+'/'+LEGS.length+'. szakasz</span><span>Össz: '+fmt(done)+' / '+fmt(tot)+' km</span></div>'
   +'<div class="bar" style="height:4px"><i style="width:'+(done/tot*100).toFixed(1)+'%;background:#e8a317"></i></div>'
   +'<div class="tg">Következő megállók ▾</div><ul>'+li.map((x,n)=>'<li data-k="'+x.k.toFixed(3)+'"><span>'+x.i+' '+esc(x.n)+'</span><b>'+fd(x.d)+'</b></li>').join('')+'</ul>';
@@ -126,12 +127,12 @@ function gpsInfo(){const L=LEGS[G.leg],km=gpsKm(),rem=Math.max(0,L.km-km),tot=LE
  const tg=$('gpsInfo').querySelector('.tg');tg.addEventListener('click',()=>{$('gpsInfo').classList.toggle('full');tg.textContent='Következő megállók '+($('gpsInfo').classList.contains('full')?'▴':'▾');});}
 
 /* ---------- megnyitás / bezárás ---------- */
-function openGPS(){if(GV.open||G.state!=='play'||!P||!LEG||typeof GEO==='undefined')return;GV.open=true;GV.wasPaused=!!G.paused;G.paused=true;G.gps=true;K.gas=K.brake=false;
+function openGPS(){if(GV.open||typeof GEO==='undefined'||!G.trip)return;if(G.state==='play'){if(!P||!LEG)return;GV.wasPaused=!!G.paused;G.paused=true;}else if(G.state!=='map')return;GV.open=true;G.gps=true;K.gas=K.brake=false;
  const el=$('gpsv'),L=LEGS[G.leg];el.classList.toggle('night',L.time==='night'||L.time==='dusk');el.classList.add('open');gpsResize();gpsInfo();
- GV.follow=true;gpsMode('follow');GV.anim=null;const c=gpsCar();GV.cx=c.lon-gpsOff()/GV.z;GV.cy=MY(c.lat);
+ if(G.state==='map'){gpsMode('leg');GV.anim=null;gpsFit(LEGS[G.leg].pts,false);}else{GV.follow=true;gpsMode('follow');GV.anim=null;const c=gpsCar();GV.cx=c.lon-gpsOff()/GV.z;GV.cy=MY(c.lat);}
  if(SFX&&SFX.click)SFX.click();haptic(12);MENU_SIG='?';GV.last=0;cancelAnimationFrame(GV.raf);GV.raf=requestAnimationFrame(gpsLoop);}
 function closeGPS(){if(!GV.open)return;GV.open=false;cancelAnimationFrame(GV.raf);$('gpsv').classList.remove('open');GV.ptrs={};GV.pinch=GV.drag=null;G.gps=false;
- if(!GV.wasPaused&&G.state==='play')G.paused=false;K.gas=K.brake=false;TAP=TAPD=HOLD=null;haptic(10);MENU_SIG='?';}
+ if(!GV.wasPaused&&G.state==='play')G.paused=false;GV.wasPaused=false;K.gas=K.brake=false;TAP=TAPD=HOLD=null;haptic(10);MENU_SIG='?';}
 {const el=$('gpsv'),c=$('gpsc');
  ['pointerdown','touchstart','mousedown'].forEach(ev=>el.addEventListener(ev,e=>e.stopPropagation(),{passive:true}));
  const pt=e=>{const r=c.getBoundingClientRect();return {x:e.clientX-r.left,y:e.clientY-r.top};};

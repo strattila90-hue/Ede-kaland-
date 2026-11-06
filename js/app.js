@@ -109,7 +109,7 @@ function menuDef(){const s=G.state;if(G.ledger||G.gps)return null;
   for(const x of it){if(x.a==='cont'||x.a==='new'){x.c=(x.c==='primary'?'hero':'hero2');const m=x.l.match(/^(.*?) \((.*)\)$/);if(m){x.l=m[1];x.sub=m[2];}else if(x.a==='new')x.sub='Komárom, Táncsics Mihály utca';}
    else{x.tile=1;const m=x.l.match(/^(.*?): (.*)$/);if(m){x.l=m[1];x.sub=m[2];}}}
   return {cls:'cine',title:'',items:it,ver:true};}
- if(s==='map')return {cls:'bottom',items:[{a:'go',l:'Indulás',ic:'▶',c:'primary'},{a:'log',l:'Napló',ic:'📒'},{a:'home',l:'Főmenü',ic:'⌂'}]};
+ if(s==='map')return {cls:'bottom',items:[{a:'go',l:'Indulás',ic:'▶',c:'primary'},{a:'gps',l:'GPS',ic:'🧭'},{a:'log',l:'Napló',ic:'📒'},{a:'home',l:'Főmenü',ic:'⌂'}]};
  if(s==='specs')return {cls:'bottom',items:[{a:'go',l:'Vissza',ic:'◀'}]};
  if(s==='postcard')return {cls:'bottom',items:[{a:'go',l:'Tovább',ic:'▶',c:'primary'}]};
  if(s==='over')return {cls:'bottom',items:[{a:'go',l:'Újrakezdés',ic:'⟳',c:'primary'},{a:'log',l:'Napló',ic:'📒'}]};

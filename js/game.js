@@ -670,11 +670,19 @@ function drawSpecs(g){R(g,'#141a26',0,0,W,H);g.save();g.translate(250,40);g.scal
   ['Fogyasztás városban',fmt(CAR.urban,1)+' l/100 km'],['Fogyasztás országúton',fmt(CAR.extra,1)+' l/100 km'],['Vegyes fogyasztás',fmt(CAR.comb,1)+' l/100 km'],['Tank',CAR.tank+' l'],['Saját tömeg',fmt(CAR.mass)+' kg'],['Hossz',fmt(CAR.len,2)+' m'],['Gumiméret',CAR.tyre],['Ülések',CAR.seats+' (3. sor: csomagok)']];
  rows.forEach((r,i)=>{text(g,r[0],20,44+i*14,'#9fb0c2');text(g,r[1],150,44+i*14,'#ffffff');});
  text(g,'Utasok: Apa, Anya, Anna (5), Petra (3), kis Atti (10 hónapos)',20,248,'#ffd84a');text(g,isTouch?'Érintsd meg: vissza':'Enter: vissza',W-10,258,'#6f7d8c',1,'right');}
-function drawMap(g){const t=G.st,i=G.leg,L=LEGS[i],T=G.trip;drawBigMap(g,i,G.resume?Math.min(1,G.resume/(PXKM/G.ts)/L.km):0,G.t,true);
- frr(g,'rgba(10,13,22,0.9)',0,H-58,W,58,0);text(g,(i+1)+'/'+LEGS.length+'. szakasz: '+L.from.split(',')[0]+' > '+L.to,10,H-52,'#ffd84a',1.1,'left');
- text(g,fmt(L.km)+' km  -  '+WNAME[L.weather]+TNAME[L.time]+(L.live?' (élő, '+fmt(L.temp,0)+' fok)':'')+'  -  95: '+L.price+' Ft/l',10,H-39,'#ffffff',1,'left');
- text(g,'Tank '+fmt(T.fuel,1)+' l   Pénz '+fmt(T.money)+' Ft',10,H-28,'#cfd6df',1,'left');text(g,'Kaja '+Math.round(T.food)+'%   Baba '+Math.round(T.baby)+'%   Eddig '+fmt(T.km,0)+' km',10,H-17,'#cfd6df',1,'left');
- if(!isTouch&&t>25&&((t>>4)&1))text(g,'Enter: indulás',W-10,H-52,'#9fb0c2',1,'right');}
+function drawMap(g){const t=G.st,i=G.leg,L=LEGS[i],T=G.trip,tt=G.t;
+ // indulás előtti kép: a szakasz tája, az autó, és a cél képeslapja (a térkép a GPS gombbal nyílik)
+ drawSky(g,L,tt);drawClouds(g,L,tt*0.4,tt);drawFar(g,L,TITLE_LEG.segs[0],tt*0.4,null);drawRoad(g,L,TITLE_LEG,0,tt);
+ drawCarSide(g,26,232-55.5,232-55.5,{t:tt,ang:0},null);
+ const to=L.to.split(' (')[0],from=L.from.split(',')[0],cw=108,ch=148,cx=W-cw-12,cy=12;frr(g,'rgba(0,0,0,0.35)',cx+3,cy+3,cw,ch,4);frr(g,'#f5ecd7',cx,cy,cw,ch,4);
+ g.save();g.translate(cx+5,cy+5);g.scale(0.629,0.629);drawLandmark(g,LMK[L.to]!==undefined?LMK[L.to]:0,0,0,156,188);g.restore();text(g,to,cx+cw/2,cy+ch-17,'#1b1f2a',to.length<=9?1.4:1,'center',null);
+ const rows=[[fmt(L.km)+' km  -  '+WNAME[L.weather]+TNAME[L.time]+(L.live?' ('+fmt(L.temp,0)+' fok)':''),'#ffffff'],['Benzin (95): '+L.price+' Ft/l','#cfd6df'],
+  ['Tank '+fmt(T.fuel,1)+' l   Pénz '+fmt(T.money)+' Ft','#cfd6df'],['Kaja '+Math.round(T.food)+'%   Baba '+Math.round(T.baby)+'%   Eddig '+fmt(T.km,0)+' km','#cfd6df']];
+ const tw=Math.max(textW(((i+1)+'/'+LEGS.length+'. szakasz - következő úti cél').toUpperCase()),textW((from+' > '+to).toUpperCase())*1.4,...rows.map(r=>textW(r[0].toUpperCase())))+18;
+ frr(g,'rgba(10,13,22,0.78)',10,12,Math.min(W-140,tw),40+rows.length*11,7);
+ text(g,(i+1)+'/'+LEGS.length+'. szakasz - következő úti cél',18,17,'#ffd84a',1,'left',null);text(g,from+' > '+to,18,29,'#ffffff',1.4,'left',null);
+ rows.forEach((r,k)=>text(g,r[0],18,47+k*11,r[1],1,'left',null));
+ if(!isTouch&&t>25&&((t>>4)&1))text(g,'Enter: indulás   G: GPS',W-10,H-12,'#ffffff',1,'right');}
 const LMK={'Siófok':0,'Keszthely':1,'Bécs':2,'Prága':8,'Berlin':9,'Amszterdam':10,'Párizs':5,'Barcelona':11,'Nizza':6,'Velence':4,'Salzburg (Alpok)':3,'Komárom (haza)':7,
  'Zágráb':12,'Ljubljana':13,'Firenze':14,'Róma':15,'Madrid':16,'Lisszabon':17,'Bordeaux':18,'Hamburg':19,'Koppenhága':20,'Varsó':21,'Krakkó':22};
 /* új képeslap-látványosságok (12-22) egyszerű, saját rajzzal */
@@ -748,7 +756,7 @@ function update(){pauseWatch();if(!window.LAZY_DONE&&G.state!=='title'&&G.state!
    else if(a==='specs'){G.state='specs';G.st=0;}
    else{if(a==='cont'){G.leg=G.save.leg;G.trip=fixLog(G.save.trip);if(G.trip.savedAt)restBreak((Date.now()-G.trip.savedAt)/1000);G.ts=G.save.ts||G.ts;G.resume=G.save.dist||0;}else{G.leg=0;G.trip=newTrip();G.resume=0;}G.state='map';G.st=0;}}}
  else if(G.state==='specs'){if(K.enterP&&G.st>10){G.state='title';SFX.click();}}
- else if(G.state==='map'){if(G.st===1)fetchWeather(G.leg);if(K.enterP&&G.st>25){SFX.click();startLeg(G.leg,G.resume);G.resume=0;}}
+ else if(G.state==='map'){if(G.st===1)fetchWeather(G.leg);if(K.gpsP){K.gpsP=false;if(typeof openGPS==='function')openGPS();}if(G.gps){K.enterP=false;}if(K.enterP&&G.st>25){SFX.click();startLeg(G.leg,G.resume);G.resume=0;}}
  else if(G.state==='play')updPlay();
  else if(G.state==='postcard'){for(const p of parts){p.x+=p.vx;p.y+=p.vy;p.life--;}parts=parts.filter(p=>p.life>0);
   if(K.enterP&&G.st>40){SFX.click();G.leg++;if(G.leg>=LEGS.length){G.state='win';G.st=0;SFX.win();try{localStorage.removeItem('csaladi-vakacio-v2');}catch(e){}G.save=null;}else{save(0);G.state='map';G.st=0;}}}

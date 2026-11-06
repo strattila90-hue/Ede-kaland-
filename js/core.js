@@ -2,7 +2,7 @@
 /* =========================================================
    CSALÁDI VAKÁCIÓ – alapok: vászon, rajzoló segédek, betűk, hang, bemenet
    ========================================================= */
-const APP_VERSION='2.12.0';
+const APP_VERSION='2.12.1';
 const W=480,H=270,PX=70,ROADT=194,ROADB=262,LANE=[212,232,252];
 const TAU=Math.PI*2;
 let SC=2,LOWQ=false;
@@ -129,7 +129,7 @@ window.addEventListener('keydown',e=>{initAudio();const k=e.key;
  else if(k===' '){K.pump=true;if(!e.repeat)K.brakeTap=true;}else if(k==='h'||k==='H'){if(!e.repeat){K.honkP=true;K.horn=true;}}
  else if(k==='Enter'){K.enterP=true;K.enterKey=true;}else if(k==='p'||k==='P'||k==='Escape'){K.pauseP=true;}else if(k==='m'||k==='M'){toggleMusic();}
  else if(k==='l'||k==='L'){K.lightP=true;}else if(k==='f'||k==='F'){K.fogP=true;}else if(k==='v'||k==='V'){K.hazP=true;}
- else if(k==='k'||k==='K'){K.flash=true;}else if(k==='o'||k==='O'){K.doorP=true;}else if(k==='b'||k==='B'){K.hbP=true;}else if(k==='t'||k==='T'){K.cruiseP=true;}else if(k==='e'||k==='E'){K.stopP=true;}else if(k==='n'||k==='N'){K.logP=true;}else if(k==='r'||k==='R'){K.revP=true;}else if(k==='g'||k==='G'){if(!e.repeat&&typeof G!=='undefined'&&G.state==='play')K.gpsP=true;}else if(k==='q'||k==='Q'||k==='c'||k==='C'){K.radioP=true;}
+ else if(k==='k'||k==='K'){K.flash=true;}else if(k==='o'||k==='O'){K.doorP=true;}else if(k==='b'||k==='B'){K.hbP=true;}else if(k==='t'||k==='T'){K.cruiseP=true;}else if(k==='e'||k==='E'){K.stopP=true;}else if(k==='n'||k==='N'){K.logP=true;}else if(k==='r'||k==='R'){K.revP=true;}else if(k==='g'||k==='G'){if(!e.repeat&&typeof G!=='undefined'&&(G.state==='play'||G.state==='map'))K.gpsP=true;}else if(k==='q'||k==='Q'||k==='c'||k==='C'){K.radioP=true;}
  else if(k>='1'&&k<='9'){K.num=+k;}
  if([' ','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(k))e.preventDefault();});
 window.addEventListener('keyup',e=>{const k=e.key;if(k==='ArrowRight'||k==='d'||k==='D')K.gas=false;else if(k==='ArrowLeft'||k==='a'||k==='A')K.brake=false;else if(k===' ')K.pump=false;else if(k==='k'||k==='K')K.flash=false;else if(k==='h'||k==='H')K.horn=false;});

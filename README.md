@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.12.0
+# 🚐 Családi Vakáció – v2.12.1
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -37,7 +37,7 @@ A régi (12 szakaszos) mentések automatikusan átállnak: a játék a legközel
 
 ## 🧭 GPS
 
-A felső sávban lévő **GPS** gombbal (gépen a **G** billentyűvel, vagy a Szünet menüből) teljes képernyős, interaktív térkép nyílik:
+Külön térképképernyő nincs: a térkép a **GPS** gomb mögött van. Út közben a felső sávban, indulás előtt az Indulás gomb mellett található (gépen a **G** billentyű, vagy a Szünet menü). Az indulás előtti képen a szakasz tája, a családi autó, a cél képeslapja és az út adatai látszanak. A GPS teljes képernyős, interaktív térképet nyit:
 
 - **Követés:** az autó a térkép közepén, nyíl mutatja a menetirányt; a megtett út sárga, a hátralévő kék.
 - **Húzással** mozgatható, **két ujjal csippentve**, egérgörgővel vagy a **+ / −** gombokkal nagyítható, dupla koppintásra ráközelít.
@@ -298,7 +298,7 @@ Utána a játék itt érhető el: `https://strattila90-hue.github.io/Ede-kaland-
 | `js/world.js` | útvonal, útszakaszok, táj, utak, benzinkút |
 | `js/minigames.js` | minijátékok |
 | `js/shops.js` | boltok és tankolás |
-| `js/map.js`, `js/geo.js` | Európa-térkép (útiterv) |
+| `js/map.js`, `js/geo.js` | térképrajzolás, alap partvonalak |
 | `js/gps.js`, `js/geohd.js` | teljes képernyős, interaktív GPS és a részletes partvonalak |
 | `js/game.js` | játékmenet, fizika, fogyasztás, események, képernyők |
 | `js/app.js` | telepítés, megosztás, frissítés |
