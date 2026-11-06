@@ -2,11 +2,32 @@
 /* =========================================================
    CSALÁDI VAKÁCIÓ – alapok: vászon, rajzoló segédek, betűk, hang, bemenet
    ========================================================= */
-const APP_VERSION='2.16.2';
+const APP_VERSION='2.17.0';
 const W=480,H=270,PX=70,ROADT=194,ROADB=262,LANE=[212,232,252];
 const TAU=Math.PI*2;
 let SC=2,LOWQ=false;
 try{if(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=2){SC=1.5;LOWQ=true;}}catch(e){}
+/* ---- HIBANAPLÓ: hibák, váratlan leállások, fontos események; a főmenüben megnézhető és elküldhető ---- */
+const ELOG={k:'cv-log',max:250,list:[]};try{ELOG.list=JSON.parse(localStorage.getItem(ELOG.k)||'[]')||[];}catch(e){ELOG.list=[];}
+function elogCtx(){try{const g=typeof G!=='undefined'?G:null,p=typeof P!=='undefined'?P:null;return (g?g.state:'?')+(g&&g.state==='play'?' sz'+(g.leg+1)+(p?' '+p.sub+' '+Math.round(p.kmh||0)+'km/h':''):'')+' SC'+SC+(typeof QT!=='undefined'&&QT!==null?' Q'+QT:'');}catch(e){return '?';}}
+let ELOG_T=0;function elogSave(){clearTimeout(ELOG_T);ELOG_T=setTimeout(()=>{try{localStorage.setItem(ELOG.k,JSON.stringify(ELOG.list.slice(-ELOG.max)));}catch(e){}},300);}
+function elog(kind,msg,now){const last=ELOG.list[ELOG.list.length-1];msg=String(msg).slice(0,400);
+ if(last&&last.m===msg&&last.k===kind&&Date.now()-last.t<60000){last.n=(last.n||1)+1;last.t=Date.now();}else ELOG.list.push({t:Date.now(),k:kind,m:msg,c:elogCtx(),v:APP_VERSION});
+ if(ELOG.list.length>ELOG.max)ELOG.list.splice(0,ELOG.list.length-ELOG.max);if(now){try{localStorage.setItem(ELOG.k,JSON.stringify(ELOG.list));}catch(e){}}else elogSave();}
+window.addEventListener('error',e=>{elog('hiba',(e.message||'ismeretlen hiba')+(e.filename?' @ '+String(e.filename).split('/').pop()+':'+e.lineno+':'+e.colno:'')+(e.error&&e.error.stack?' | '+String(e.error.stack).split('\n').slice(1,3).join(' ').trim():''),true);});
+window.addEventListener('unhandledrejection',e=>{const r=e.reason;elog('hiba','Kezeletlen ígéret: '+(r&&(r.message||r))+'',true);});
+/* szívverés: ha a játék úgy ér véget, hogy nem a felhasználó zárta be (pl. a telefon kevés memória miatt leállította), a következő indításkor kiderül */
+{let hb=null;try{hb=JSON.parse(localStorage.getItem('cv-hb')||'null');}catch(e){}const clean=(()=>{try{return localStorage.getItem('cv-clean');}catch(e){return '1';}})();
+ if(hb&&clean!=='1'&&Date.now()-hb.t<6*3600e3){elog(hb.vis?'leállás':'info',(hb.vis?'VÁRATLAN LEÁLLÁS játék közben (a rendszer bezárta vagy összeomlott)':'A játékot a háttérben zárta be a rendszer')+': utolsó jel '+Math.round((Date.now()-hb.t)/1000)+' mp-e, '+Math.round(hb.up/60)+' perc futás után, állapot: '+hb.c+(hb.mem?', memória: '+hb.mem+' MB':'')+(hb.cv?', képtárak: '+hb.cv:''),true);}
+ let nt='';try{nt=(performance.getEntriesByType('navigation')[0]||{}).type||'';}catch(e){}
+ elog('info','Indulás v'+APP_VERSION+(nt?' ('+({navigate:'megnyitás',reload:'újratöltés',back_forward:'vissza/előre'}[nt]||nt)+')':'')+' | '+(navigator.userAgent.match(/Android[^;)]*|iPhone OS [\d_]+|iPad|Windows NT [\d.]+|Mac OS X [\d_]+/)||[''])[0]+' | '+(navigator.userAgent.match(/(Chrome|Firefox|Safari|SamsungBrowser|MiuiBrowser)\/[\d.]+/)||[''])[0]+' | képernyő '+screen.width+'x'+screen.height+' @'+(window.devicePixelRatio||1)+(navigator.deviceMemory?' | RAM '+navigator.deviceMemory+' GB':'')+(navigator.hardwareConcurrency?' | '+navigator.hardwareConcurrency+' mag':'')+(matchMedia('(display-mode: standalone),(display-mode: fullscreen)').matches?' | telepített':' | böngésző'),true);
+ try{localStorage.setItem('cv-clean','0');}catch(e){}
+ const t0=Date.now();const beat=()=>{let mem=0;try{if(performance.memory)mem=Math.round(performance.memory.usedJSHeapSize/1048576);}catch(e){}
+  let cvs='';try{cvs=(typeof GLC!=='undefined'?'betű '+GLC.size:'')+(typeof SPR!=='undefined'?', tárgy '+SPR.size:'')+(typeof LTC!=='undefined'?', sáv '+LTC.size:'');}catch(e){}
+  try{localStorage.setItem('cv-hb',JSON.stringify({t:Date.now(),up:(Date.now()-t0)/1000,c:elogCtx(),vis:!document.hidden,mem:mem,cv:cvs}));}catch(e){}};
+ setInterval(beat,4000);beat();
+ window.addEventListener('pagehide',()=>{beat();try{localStorage.setItem('cv-clean','1');}catch(e){}});
+ document.addEventListener('visibilitychange',()=>{beat();elog('info',document.hidden?'Háttérbe került':'Előtérbe jött');});}
 var MG=null;const cv=document.getElementById('c'),ctx=cv.getContext('2d',{alpha:false})||cv.getContext('2d');
 cv.width=W*SC;cv.height=H*SC;
 function setSC(v){SC=v;cv.width=Math.round(W*SC);cv.height=Math.round(H*SC);if(typeof onSC==='function')onSC();}
@@ -68,7 +89,7 @@ const STC=new Map();
 function text(g,str,x,y,col,s,align,sh){s=s||1;str=String(str).toUpperCase();const w=textW(str,s);if(align==='center')x-=w/2;else if(align==='right')x-=w;x=Math.round(x);y=Math.round(y);
  // a változó (számot tartalmazó) feliratok betűnként, a már kész betűképekből rajzolódnak: így nem keletkezik másodpercenként sok új vászon
  if(typeof col==='string'&&str.length>1&&!/[0-9]/.test(str)){const k=str+'|'+col+'|'+s+'|'+sh+'|'+SC;let c=STC.get(k);
-  if(!c){if(STC.size>500)STC.delete(STC.keys().next().value);const cw=Math.ceil(w+s*2+2),chh=Math.ceil(10*s+2);c=document.createElement('canvas');c.width=Math.ceil(cw*SC);c.height=Math.ceil(chh*SC);const x2=c.getContext('2d');x2.setTransform(SC,0,0,SC,0,0);textRaw(x2,str,0,s*3,col,s,sh);c.lw=cw;c.lh=chh;STC.set(k,c);}
+  if(!c){if(STC.size>160)STC.delete(STC.keys().next().value);const cw=Math.ceil(w+s*2+2),chh=Math.ceil(10*s+2);c=document.createElement('canvas');c.width=Math.ceil(cw*SC);c.height=Math.ceil(chh*SC);const x2=c.getContext('2d');x2.setTransform(SC,0,0,SC,0,0);textRaw(x2,str,0,s*3,col,s,sh);c.lw=cw;c.lh=chh;STC.set(k,c);}
   g.drawImage(c,x,y-s*3,c.lw,c.lh);return;}
  textRaw(g,str,x,y,col,s,sh);}
 const GLWARM='ABCDEFGHIJKLMNOPQRSTUVWXYZÁÉÍÓÖŐÚÜŰ0123456789.,:-/%+()!?';

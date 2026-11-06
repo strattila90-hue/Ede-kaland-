@@ -29,7 +29,7 @@ function legKm(){return Math.min(LEGS[G.leg].km,P.dist*LEG.kmPerPx);}
 function distStr(km){return km<1?fmt(km*1000)+' m':fmt(km,1)+' km';}
 
 /* ---------- indulás ---------- */
-function startLeg(i,resume){G.leg=i;GPS_HD=null;LEG=buildLeg(i,G.ts);const L=LEGS[i];const dark=L.time!=='day'||['rain','storm','fog','snow'].includes(L.weather);
+function startLeg(i,resume){if(typeof elog==='function')elog('info','Szakasz indul: '+(i+1)+'. '+LEGS[i].from.split(',')[0]+' > '+LEGS[i].to+(resume?' (folytatás)':''));G.leg=i;GPS_HD=null;LEG=buildLeg(i,G.ts);const L=LEGS[i];const dark=L.time!=='day'||['rain','storm','fog','snow'].includes(L.weather);
  P={dist:resume||0,kmh:0,lane:i===0&&!resume?0:1,y:LANE[i===0&&!resume?0:1],ang:0,blink:0,inv:0,haz:false,lightMode:dark?2:1,fogF:['fog','snow'].includes(L.weather),fogR:L.weather==='fog',rev:false,doorsOpen:false,saveT:0,
   yF:0,vF:0,yR:0,vR:0,wF:0,wR:0,flat:null,sub:'drive',fix:0,pump:null,ev:null,evCD:3600,famCD:9000,chat:600,bub:null,arriving:false,arriveT:0,door:0,hide:{},walk:[],stopT:0,
   boarding:i===0&&!resume?0:-1,instCons:0,avgKm:0,avgL:0,lastSeg:null,hungerT:0,brake:false,gasF:0,engineOff:false};
@@ -140,7 +140,7 @@ function damage(d,why){const T=G.trip;d=Math.round(d);if(d<=0||P.sub!=='drive')r
  if(T.hp<=0){startTotal();return;}
  flash('Sérült az autó: '+T.hp+'% '+(T.hp<30?'- alig megy, szervizbe kell!':T.hp<50?'- füstöl a motor!':''),T.hp<30?'#ff6b6b':'#ffb347',220);}
 function hpMax(){const h=hpOf(G.trip);return h<15?50:h<30?80:h<50?120:CAR.top;}
-function startTotal(){const T=G.trip;P.inv=0;P.sub='total';P.kmh=0;P.cruise=0;P.auto=null;P.haz=true;P.rev=false;P.tt=0;P.tw={x:W+60,dx:0,tilt:0};P.carOff={x:0,y:0};
+function startTotal(){elog('info','Totálkár');const T=G.trip;P.inv=0;P.sub='total';P.kmh=0;P.cruise=0;P.auto=null;P.haz=true;P.rev=false;P.tt=0;P.tw={x:W+60,dx:0,tilt:0};P.carOff={x:0,y:0};
  ents=ents.filter(e=>Math.abs(e.x-P.dist)>W*1.5);SFX.hit();G.shake=Math.max(G.shake||0,12);vib([200,80,200]);say('Totálkár... Szerencsére mindenki jól van.','apa');
  const tow=35000+1500*10;book(-tow,'service','Tréler: totálkáros autó elszállítása a szervizbe (10 km)');flash('TOTÁLKÁR! Jön a tréler: '+fmt(tow)+' Ft','#ff6b6b',300);}
 function updTotal(){const f=++P.tt,tw=P.tw,ez=u=>u<0?0:u>1?1:u<0.5?2*u*u:1-Math.pow(-2*u+2,2)/2;
@@ -826,7 +826,7 @@ function update(){pauseWatch();if(!window.LAZY_DONE&&G.state!=='title'&&G.state!
  if(G.state==='title'&&introT()<150&&(K.enterP||TAPD||TAP||K.upP||K.dnP)){G.st=150;G.introSeen=true;K.enterP=K.upP=K.dnP=false;TAPD=TAP=null;}
  if(G.state==='title'){const opts=titleOpts(),n=opts.length;if(G.menu>=n)G.menu=0;if(K.upP)G.menu=(G.menu+n-1)%n,SFX.click();if(K.dnP)G.menu=(G.menu+1)%n,SFX.click();
   if(TAP){const i=Math.floor((TAP.y-221)/9);if(i>=0&&i<n)G.menu=i;}
-  if(K.enterP){SFX.click();const a=opts[G.menu].a;if(a==='color'){const ns=Object.keys(PALETTES);setColor(ns[(ns.indexOf(carColor)+1)%ns.length]);}
+  if(K.enterP&&!G.confirm){SFX.click();const a=opts[G.menu].a;if(a==='color'){const ns=Object.keys(PALETTES);setColor(ns[(ns.indexOf(carColor)+1)%ns.length]);}
    else if(a==='ts'){const k=TS_OPTS.findIndex(q=>q[0]===G.ts);G.ts=TS_OPTS[(k+1)%TS_OPTS.length][0];try{localStorage.setItem('csaladi-vakacio-ts',G.ts);}catch(e){}}
    else if(a==='specs'){G.state='specs';G.st=0;}
    else{if(a==='cont'){G.leg=G.save.leg;G.trip=fixLog(G.save.trip);if(G.trip.savedAt)restBreak((Date.now()-G.trip.savedAt)/1000);G.ts=G.save.ts||G.ts;G.resume=G.save.dist||0;}else{G.leg=0;G.trip=newTrip();G.resume=0;}G.state='map';G.st=0;}}}
@@ -844,7 +844,7 @@ function render(){if(G.state==='title'&&!G.ledger){const k=SC+'|'+Math.round(G.m
  if(!window.LAZY_DONE&&G.state!=='title'&&G.state!=='specs'){R(ctx,'#0b0f17',0,0,W,H);text(ctx,'Betöltés...',W/2,H/2-4,'#ffd84a',1.4,'center');return;}
  if(G.state==='title')drawTitle(ctx);else if(G.state==='specs')drawSpecs(ctx);else if(G.state==='map')drawMap(ctx);else if(G.state==='play'){drawPlay(ctx);if(PERF.on)drawPerf(ctx);}
  else if(G.state==='postcard')drawPostcard(ctx);else if(G.state==='over')drawOver(ctx);else if(G.state==='win')drawWin(ctx);
- if(typeof appTick==='function')appTick();}
+}
 let last=performance.now(),acc=0,perfT=0,perfN=0;const STEP=1000/60;
 document.addEventListener('visibilitychange',()=>{if(document.hidden){if(G.state==='play'&&P){G.paused=true;if(!G.pauseAt)G.pauseAt=Date.now();save(P.dist);}if(AC&&AC.state==='running')AC.suspend();}else{last=performance.now();if(AC)AC.resume();}});
 // minőségi fokozatok: renderfelbontás (SC) és effektek; a kijelző tényleges felbontásánál nem rajzol többet
@@ -852,7 +852,7 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden){if(G.state
 const QTIERS=[3.5,3,2.5,2,1.6,1.35];let QT=null,QUP=0,RT=0,HALF=false,FRM=0,QCOOL=0,QCAP=0;
 function wantSC(){const c=document.getElementById('c'),dpr=Math.min(window.devicePixelRatio||1,3);return Math.max(1,(c.clientWidth||W)*dpr/W);}
 function applyQ(force){const sc=Math.max(1.25,Math.min(QTIERS[QT],Math.round(wantSC()*4)/4));LOWQ=QT>=4;HALF=false;
- if(Math.abs(sc-SC)>(force?0.01:0.3)){setSC(sc);TFX=null;HUDC=null;TITLE_DRAWN=null;try{render();}catch(e){}if(typeof warmGlyphs==='function')warmGlyphs();}}
+ if(Math.abs(sc-SC)>(force?0.01:0.3)){if(typeof elog==='function'&&SC)elog('info','Felbontás: '+SC.toFixed(2)+' -> '+sc.toFixed(2)+(LOWQ?' (takarékos)':''));setSC(sc);TFX=null;HUDC=null;TITLE_DRAWN=null;try{render();}catch(e){}if(typeof warmGlyphs==='function')warmGlyphs();}}
 let QBAD=0,LONGF=0;
 /* Minőség: csak a valóban késő képkockák számítanak (két kép között >26 ms, azaz 40 kép/mp alatti pillanat).
    A kijelző saját 60/90/120/144 Hz-es váltogatása nem számít akadásnak. Lassan és ritkán vált, mert minden váltás
@@ -881,12 +881,14 @@ function renderI(a){if(G.state!=='play'||!P||G.paused||P._pd===undefined||MG){re
  try{render();}finally{P.dist=d;P.y=y;P.ang=pa;for(let i=0;i<sv.length;i+=2)sv[i].x=sv[i+1];}}
 let SLOWN=0,RENN=0;
 function frame(now){const dt=Math.min(200,now-last);if(dt>48&&dt<200&&G.state==='play'&&!G.paused)LONGF++;acc+=dt;last=now;if(dt>2&&dt<60)DTS.push(dt);
- let n=0;if(document.hidden)LASTR=0;while(acc>=STEP&&n<3){snapPrev();update();acc-=STEP;n++;}if(n>=3)acc=0;FRM++;
+ let n=0;if(document.hidden)LASTR=0;try{while(acc>=STEP&&n<3){snapPrev();update();acc-=STEP;n++;}}catch(e){acc=0;elog('hiba','Játéklogika: '+(e&&e.message)+' | '+String(e&&e.stack||'').split('\n').slice(1,3).join(' ').trim());}if(n>=3)acc=0;FRM++;
  // legfeljebb kb. 100 kép/mp: 60/90 Hz-en minden frissítésre, 120/144 Hz-en minden másodikra rajzol
- if(!LASTR||now-LASTR>=10.2){const r0=performance.now();renderI(clamp(acc/STEP,0,1));const rt=performance.now()-r0;RT+=rt;
+ if(!LASTR||now-LASTR>=10.2){const r0=performance.now();try{renderI(clamp(acc/STEP,0,1));}catch(e){elog('hiba','Rajzolás: '+(e&&e.message)+' | '+String(e&&e.stack||'').split('\n').slice(1,3).join(' ').trim());}const rt=performance.now()-r0;RT+=rt;
   if(LASTR&&!document.hidden){const ri=now-LASTR;RENN++;if(ri>26&&ri<200)SLOWN++;perfTick(now,ri,rt);}LASTR=now;}
  perfT+=dt;perfN++;if(perfN>=(QT===null?15:120)){
   if(DTS.length){DTS.sort((x,y)=>x-y);HZ=1000/DTS[DTS.length>>1];}DTS=[];
   const slow=RENN?SLOWN/RENN:0,ra=RT/perfN;perfT=0;perfN=0;RT=0;SLOWN=0;RENN=0;
-  if(G.state==='play'&&!G.paused||QT===null)qualityStep(slow,ra);}requestAnimationFrame(frame);}
+  if(G.state==='play'&&!G.paused||QT===null)qualityStep(slow,ra);}
+ /* a menük és gombok frissítése minden képkockán fut, akkor is, ha a főmenü képét épp nem kell újrarajzolni */
+ if(typeof appTick==='function'){try{appTick();}catch(e){}}requestAnimationFrame(frame);}
 requestAnimationFrame(frame);

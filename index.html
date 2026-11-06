@@ -233,6 +233,20 @@ body.touchui #topbar #bGps{display:none}
 #inst .tip{display:none;margin-top:6px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.06);color:#c9d3df;font:500 12px/1.4 var(--ff)}#inst .tip.on{display:block}
 #inst .box{max-height:calc(100dvh - 20px)}
 #inst.open ~ #toast{bottom:auto!important;top:calc(8px + var(--st,0px))!important}
+/* piros kilépés / törlés gombok, kilépő képernyő */
+#menu .mb.danger{background:linear-gradient(180deg,#d63a2f,#9c1f17)!important;border-color:rgba(255,160,150,.45)!important;color:#fff!important}
+#menu .mb.danger .sub{color:rgba(255,230,225,.85)!important}
+#bye{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;background:#07090e;color:#fff;font-family:var(--ff);text-align:center;padding:20px}
+#bye.on{display:flex}#bye b{display:block;font-size:44px;color:#ff5a4a;margin-bottom:6px}#bye h3{margin:0 0 8px;font:800 22px var(--ff)}#bye p{margin:0 auto 18px;max-width:420px;color:#b9c3cf;font:500 14.5px/1.45 var(--ff)}
+#bye button{min-height:48px;padding:0 22px;border-radius:14px;border:1px solid var(--line);background:linear-gradient(180deg,#2b3242,#191d27);color:#fff;font:800 15px var(--ff)}
+/* hibanapló */
+#elog{position:fixed;inset:0;z-index:42;display:none;align-items:center;justify-content:center;background:rgba(4,6,10,.6);padding:calc(10px + var(--st,0px)) calc(10px + var(--sr)) calc(10px + var(--sb)) calc(10px + var(--sl));font-family:var(--ff)}
+#elog.open{display:flex}#elog .sheet{width:min(760px,100%);max-height:100%;display:flex;flex-direction:column;border-radius:20px;overflow:hidden;background:rgba(16,20,30,.96);border:1px solid var(--line);color:#fff}
+#elog header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px 4px}#elog h3{margin:0;font:800 18px var(--ff)}#elog .x{width:40px;height:40px;border-radius:12px;border:0;background:#2a3040;color:#fff;font-size:18px}
+#elog .sum{margin:0;padding:0 14px 8px;color:#b9c3cf;font:600 13px/1.4 var(--ff)}#elog .list{overflow:auto;padding:0 10px;flex:1;min-height:80px}
+#elog .e{padding:6px 8px;border-top:1px solid rgba(255,255,255,.07);font:500 12.5px/1.35 var(--ff);color:#dfe6ee;word-break:break-word}#elog .e b{color:#9fb0c2;font-weight:700}#elog .e small{display:block;color:#7f8c9c;font-size:11px}
+#elog .e.err{color:#ffb3a8}#elog .e.stop{color:#ffd27a;background:rgba(255,190,60,.07)}#elog .btns{display:flex;gap:8px;padding:10px 12px}#elog .btns button{flex:1;min-height:44px;border-radius:12px;border:1px solid var(--line);background:linear-gradient(180deg,#2b3242,#191d27);color:#fff;font:800 14px var(--ff)}
+#elog #elogShare{background:linear-gradient(180deg,#3b7fe6,#2458b8)}
 </style>
 </head>
 <body>
@@ -270,6 +284,8 @@ body.touchui #topbar #bGps{display:none}
 <ul><li>📱 Ikon a kezdőképernyőn</li><li>✈️ Internet nélkül is fut</li><li>🖥️ Teljes képernyő</li><li>⟳ Magától frissül</li></ul>
 <div class="steps" id="instSteps"></div><button class="help" id="instHelp">Telepítés után nem nyílik meg az ikon?</button><div class="tip" id="instTip">Xiaomi / Redmi / POCO készüléken a rendszer alapból tiltja a Chrome-ból telepített ikonok indítását. Beállítások → Alkalmazások → Chrome → Egyéb engedélyek → „Kezdőképernyő-parancsikonok” és „Felugró ablakok megjelenítése háttérben futás közben”. Telepítés nélkül is játszhatsz: a link mindig közvetlenül a játékot nyitja meg.</div>
 <div class="btns"><button class="later" id="instLater">Most nem</button><button class="go" id="instGo">⬇ Telepítés most</button></div></div><div class="arrow" id="instArrow">⬇</div></div>
+<div id="bye"><div><b>⏻</b><h3>Kiléptél a játékból</h3><p>Az utad el van mentve. Most már bezárhatod az alkalmazást (kezdőképernyő gomb vagy az alkalmazásváltó).</p><button id="byeBack">Vissza a játékba</button></div></div>
+<div id="elog"><div class="sheet"><header><h3>🩺 Hibanapló</h3><button class="x" id="elogClose" aria-label="Bezárás">✕</button></header><p class="sum"></p><div class="list"></div><div class="btns"><button id="elogShare">Küldés</button><button id="elogCopy">Másolás</button><button id="elogClear">Törlés</button></div></div></div>
 <div id="toast"></div>
 <div id="rot"><b>📱</b>Fordítsd el a készüléket fekvő helyzetbe</div>
 <div id="splash"><img src="icons/icon-192.png" alt=""><h1>Családi Vakáció</h1><div class="bar"><i id="splbar"></i></div><small id="spltxt">Betöltés... 0%</small></div>

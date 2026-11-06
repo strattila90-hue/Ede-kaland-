@@ -13,7 +13,7 @@ tapBtn('bRadio',()=>K.radioP=true);tapBtn('bHb',()=>K.hbP=true);
 {const el=$('bLight');let tm=0,held=false,down=false;const on=e=>{e.preventDefault();e.stopPropagation();initAudio();if(down)return;down=true;held=false;el.classList.add('on');haptic(10);clearTimeout(tm);tm=setTimeout(()=>{if(down){held=true;K.flash=true;haptic(25);}},380);};
  const off=e=>{e.preventDefault();if(!down)return;down=false;clearTimeout(tm);el.classList.remove('on');if(held)K.flash=false;else K.lightP=true;held=false;};
  el.addEventListener('touchstart',on,{passive:false});el.addEventListener('touchend',off,{passive:false});el.addEventListener('touchcancel',off,{passive:false});el.addEventListener('mousedown',on);el.addEventListener('mouseup',off);el.addEventListener('mouseleave',e=>{if(down)off(e);});}
-function goHome(){if(G.state!=='play')return;if(MG)endMini();if(P)save(P.dist);G.paused=false;closeLedger&&G.ledger&&closeLedger();G.state='title';G.st=0;G.menu=0;engine(0,0);MENU_SIG='?';
+function goHome(){if(G.state!=='play')return;elog('info','Főmenü gomb (mentés)');if(MG)endMini();if(P)save(P.dist);G.paused=false;closeLedger&&G.ledger&&closeLedger();G.state='title';G.st=0;G.menu=0;engine(0,0);MENU_SIG='?';
  toast('Játékállás elmentve: '+fmt(G.trip.km,1)+' km, '+fmt(G.trip.money)+' Ft. A Folytatás gombbal innen indulsz tovább.',3600);}
 function autoSave(){try{if(G.state==='play'&&P)save(P.dist);}catch(e){}}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)autoSave();});window.addEventListener('pagehide',autoSave);
@@ -92,7 +92,7 @@ async function doUpdate(){if(updating)return;updating=true;
    else blob=await res.blob();done+=files[n];if(files[n]&&blob.size!==files[n])throw new Error('stale');got.push([n,blob,type]);}
   for(const [n,blob,type] of got){await cache.put(new Request(n),new Response(blob,{headers:{'content-type':type}}));if(n==='index.html')await cache.put(new Request('./'),new Response(blob,{headers:{'content-type':type}}));}
   if('serviceWorker' in navigator){const reg=await navigator.serviceWorker.getRegistration();if(reg){try{await reg.update();}catch(e){}}}
-  setUpd(100,'Kész: v'+v.version+' (100%)');haptic([20,40,20]);toast('Frissítve: v'+v.version+'. Újraindul...');if(P&&G.state==='play')save(P.dist);setTimeout(()=>location.reload(),900);}
+  setUpd(100,'Kész: v'+v.version+' (100%)');haptic([20,40,20]);elog('info','Frissítés v'+v.version+'-ra, újraindul',true);toast('Frissítve: v'+v.version+'. Újraindul...');if(P&&G.state==='play')save(P.dist);setTimeout(()=>location.reload(),900);}
  catch(e){updating=false;setUpd(0,'Frissítés');toast(e&&e.message==='stale'?'A szerveren még most töltődik fel az új verzió. Próbáld újra 1-2 perc múlva.':'Nem sikerült frissíteni. Van internetkapcsolat?');}}
 /* offline működés automatikusan */
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
@@ -111,16 +111,20 @@ window.addEventListener('offline',()=>toast('Offline mód: a játék internet n�
 setTimeout(checkUpdate,1500);
 /* menük */
 function titleAct(a){const opts=titleOpts();const i=opts.findIndex(o=>o.a===a);if(i>=0){G.menu=i;K.enterP=true;}}
-function menuDef(){const s=G.state;if(G.ledger||G.gps)return null;
- if(G.paused&&s==='play')return {cls:'center',title:'Szünet',items:[{a:'resume',l:'Folytatás',ic:'▶',c:'primary'},{a:'gps',l:'GPS térkép',ic:'🧭'},{a:'log',l:'Költségnapló: '+fmt(G.trip.money)+' Ft',ic:'📒'},{a:'radio',l:'Rádió: '+(radio.on?STATIONS[radio.idx].name:'ki'),ic:'📻'},{a:'perf',l:'Teljesítménymérő: '+(PERF.on?'be':'ki'),ic:'📊'},{a:'quit',l:'Mentés és kilépés a főmenübe',ic:'⌂'},{a:'update',l:updLabel,ic:'⟳',fill:1}]};
+function menuDef(){const s=G.state;if(G.ledger||G.gps||G.elogOpen)return null;
+ if(G.confirm==='new')return {cls:'center',title:'Teljesen új játék?',items:[{a:'newyes',l:'Igen, mindent elölről (a mentett út törlődik)',ic:'↺',c:'danger'},{a:'cancel',l:'Mégse',ic:'✕'}]};
+ if(G.confirm==='exit')return {cls:'center',title:'Kilépsz a játékból?',items:[{a:'exityes',l:'Igen, mentés és kilépés',ic:'⏻',c:'danger'},{a:'cancel',l:'Mégse, játszom tovább',ic:'▶',c:'primary'}]};
+ if(G.paused&&s==='play')return {cls:'center',title:'Szünet',items:[{a:'resume',l:'Folytatás',ic:'▶',c:'primary'},{a:'gps',l:'GPS térkép',ic:'🧭'},{a:'log',l:'Költségnapló: '+fmt(G.trip.money)+' Ft',ic:'📒'},{a:'radio',l:'Rádió: '+(radio.on?STATIONS[radio.idx].name:'ki'),ic:'📻'},{a:'perf',l:'Teljesítménymérő: '+(PERF.on?'be':'ki'),ic:'📊'},{a:'elog',l:'Hibanapló',ic:'🩺'},{a:'quit',l:'Mentés és vissza a főmenübe',ic:'⌂'},{a:'exit',l:'Kilépés a játékból',ic:'⏻',c:'danger'},{a:'update',l:updLabel,ic:'⟳',fill:1}]};
  if(s==='title'){const it=[];if(G.save&&(G.save.leg>0||G.save.dist>0))it.push({a:'cont',l:titleOpts().find(o=>o.a==='cont').l,ic:'▶',c:'primary'});
-  it.push({a:'new',l:'Új utazás Komáromból',ic:'🚐',c:it.length?'':'primary'},{a:'color',l:'Autó színe: '+carColor,ic:'🎨'},{a:'ts',l:'Utazás: '+(TS_OPTS.find(q=>q[0]===G.ts)||TS_OPTS[0])[1],ic:'⏱'},{a:'specs',l:'Az autó adatai',ic:'ℹ'});
+  it.push({a:'new',l:it.length?'Új játék (teljes újrakezdés)':'Új utazás Komáromból',ic:'🚐',c:it.length?'':'primary'},{a:'color',l:'Autó színe: '+carColor,ic:'🎨'},{a:'ts',l:'Utazás: '+(TS_OPTS.find(q=>q[0]===G.ts)||TS_OPTS[0])[1],ic:'⏱'},{a:'specs',l:'Az autó adatai',ic:'ℹ'});
   if(!isStandalone())it.push({a:'install',l:'Telepítés',ic:'⬇',c:deferredPrompt?'new':''});
   it.push({a:'share',l:'Megosztás',ic:'↗'},{a:'update',l:updLabel,ic:'⟳',fill:1,c:newVer?'new':''},{a:'music',l:'Zene: '+(musicOn?'be':'ki'),ic:'♪'});
+  it.push({a:'elog',l:'Hibanapló: '+(ELOG.list.filter(e=>e.k!=='info').length||'nincs hiba'),ic:'🩺'});
+  it.push({a:'exit',l:'Kilépés',ic:'⏻',c:'danger'});
   if(introT()<150)return null;
   // filmes elrendezés: nagy főgombok, alattuk csempék
-  for(const x of it){if(x.a==='cont'||x.a==='new'){x.c=(x.c==='primary'?'hero':'hero2');const m=x.l.match(/^(.*?) \((.*)\)$/);if(m){x.l=m[1];x.sub=m[2];}else if(x.a==='new')x.sub='Komárom, Táncsics Mihály utca';}
-   else{x.tile=1;const m=x.l.match(/^(.*?): (.*)$/);if(m){x.l=m[1];x.sub=m[2];}}}
+  for(const x of it){if(x.a==='cont'||x.a==='new'){x.c=(x.c==='primary'?'hero':'hero2');const m=x.l.match(/^(.*?) \((.*)\)$/);if(m){x.l=m[1];x.sub=m[2];}else if(x.a==='new')x.sub=it.some(q=>q.a==='cont')?'Komáromból, minden elölről: pénz, km, napló':'Komárom, Táncsics Mihály utca';}
+   else{x.tile=1;if(x.a==='exit'){x.sub='mentés és bezárás';}const m=x.l.match(/^(.*?): (.*)$/);if(m){x.l=m[1];x.sub=m[2];}}}
   return {cls:'cine',title:'',items:it,ver:true};}
  if(s==='map')return {cls:'bottom',items:[{a:'go',l:'Indulás',ic:'▶',c:'primary'},{a:'gps',l:'GPS',ic:'🧭'},{a:'log',l:'Napló',ic:'📒'},{a:'home',l:'Főmenü',ic:'⌂'}]};
  if(s==='specs')return {cls:'bottom',items:[{a:'go',l:'Vissza',ic:'◀'}]};
@@ -166,6 +170,12 @@ function renderMenu(){const d=menuDef(),m=$('menu');const sig=d?JSON.stringify(d
   b.addEventListener('click',e=>{e.stopPropagation();haptic(12);initAudio();SFX.click();menuAction(it.a);});if(it.tile){if(!grid){grid=document.createElement('div');grid.className='grid';m.appendChild(grid);}grid.appendChild(b);}else m.appendChild(b);}
  if(d.ver){const v=document.createElement('div');v.className='ver';let ready=false;try{ready=localStorage.getItem('cv-offline')===APP_VERSION;}catch(e){}v.textContent='Verzió: v'+APP_VERSION+(ready?'  •  ✓ teljes játék letöltve, offline is megy':(navigator.onLine?'  •  letöltés a háttérben…':'  •  offline'));m.appendChild(v);}}
 function menuAction(a){
+ if(a==='new'&&G.state==='title'&&G.save&&(G.save.leg>0||G.save.dist>0)&&!G.confirm){G.confirm='new';MENU_SIG='?';return;}
+ if(a==='newyes'){G.confirm=null;try{localStorage.removeItem('csaladi-vakacio-v2');}catch(e){}G.save=null;G.menu=0;MENU_SIG='?';titleAct('new');return;}
+ if(a==='cancel'){G.confirm=null;MENU_SIG='?';return;}
+ if(a==='exit'){G.confirm='exit';if(G.state==='play')G.paused=true;MENU_SIG='?';return;}
+ if(a==='exityes'){G.confirm=null;exitGame();return;}
+ if(a==='elog'){openElog();return;}
  if(a==='resume'){G.paused=false;}else if(a==='quit'){goHome();}
  else if(a==='perf'){PERF.on=!PERF.on;try{localStorage.setItem('cv-perf',PERF.on?'1':'0');}catch(e){}MENU_SIG='?';}else if(a==='gps'){if(typeof openGPS==='function')openGPS();}else if(a==='log'){openLedger(G.state==='play'?'pause':'menu');}else if(a==='radio'){radioNext();}else if(a==='install')doInstall();else if(a==='share')doShare();else if(a==='update')doUpdate();
  else if(a==='music'){toggleMusic();}else if(a==='home'){G.state='title';G.st=0;}
@@ -177,10 +187,36 @@ const setC=(id,cls,on)=>{const el=$(id);if(el&&el.classList.contains(cls)!==!!on
 let touchShown=null;
 function appTick(){{const bl=G.state==='play'&&P&&!G.paused?Math.round(((G.drowsy||0)*0.6+(G.eyelid||0)*0.4)*4)/4:0,v=bl>0.05?'blur('+bl.toFixed(2)+'px)':'';if(appTick.f!==v){appTick.f=v;document.getElementById('c').style.filter=v;}}
 appTick.n=(appTick.n||0)+1;if(G.state==='title'&&(appTick.n%20===0||!G.menuR)){const m=$('menu');if(m.style.display!=='none'&&m.offsetWidth){const r=m.getBoundingClientRect(),c=document.getElementById('c').getBoundingClientRect();if(c.width)G.menuR=clamp((r.right-c.left)/c.width*W,0,W*0.6);}}
-{const tb=G.state==='play'&&!G.paused&&!MG&&!G.ledger&&!G.gps&&!(P&&(P.sub==='pump'||P.sub==='shop'||P.sub==='wash'));const el=$('topbar');if(el.dataset.v!==String(tb)){el.dataset.v=tb;el.style.display=tb?'flex':'none';}}
+{const tb=G.state==='play'&&!G.paused&&!MG&&!G.ledger&&!G.gps&&!G.elogOpen&&!(P&&(P.sub==='pump'||P.sub==='shop'||P.sub==='wash'));const el=$('topbar');if(el.dataset.v!==String(tb)){el.dataset.v=tb;el.style.display=tb?'flex':'none';}}
  if(P&&G.state==='play'){const st=clamp((LANE[P.lane]-P.y)*2.2,-40,40);const v=st.toFixed(0)+'deg';if(appTick.st!==v){appTick.st=v;$('bHonk').style.setProperty('--steer',v);}}
 if(G.ledger&&G.ledger==='play'&&!G.paused)closeLedger();if(G.ledger&&G.state==='title')closeLedger();if(G.t%4===0||MENU_SIG==='?')renderMenu();
  const tch=isTouch&&G.state==='play'&&!G.paused&&!MG&&!(P&&(P.sub==='pump'||P.sub==='shop'||P.sub==='wash'));if(tch!==touchShown){touchShown=tch;$('touch').style.display=tch?'block':'none';if(!tch)$('cruiseBar').style.display='none';}
  if(tch&&P){const ls=lightStage(P);setC('bLight','act',P.lightMode>=1);setT('lLight',['KI','HELYZ','TOMP','REFL','KÖD'][ls]);setC('bLight','blue',P.lightMode===3||P.flashOn);setC('bLight','fog',ls===4);
   setC('bHaz','warn',P.haz);setC('bRev','act',P.rev);setC('bRadio','act',radio.on);setC('bCruise','blue',!!P.cruise);setT('lCruise',P.cruise?String(P.cruise):'TEMPO');if(appTick.cr!==P.cruise){appTick.cr=P.cruise;document.querySelectorAll('#cruiseBar button').forEach(b=>b.classList.toggle('on',+b.dataset.v===(P.cruise||0)));}setC('bHb','warn',P.hb);}}
+/* ---- kilépés csak a piros Kilépés gombbal: a vissza gomb / oldalra húzás nem zárja be a játékot ---- */
+let EXITING=false;
+function armBack(){if(EXITING||location.protocol==='file:')return;try{if(!(history.state&&history.state.cv))history.pushState({cv:1},'');}catch(e){}}
+window.addEventListener('pointerdown',armBack,{passive:true});window.addEventListener('keydown',armBack);
+window.addEventListener('popstate',()=>{if(EXITING)return;armBack();elog('info','Vissza gesztus / gomb (elkapva)');
+ if(G.gps&&typeof closeGPS==='function')closeGPS();else if(G.ledger)closeLedger();else if(G.confirm){G.confirm=null;}
+ else if(G.state==='play'&&!G.paused){G.paused=true;}
+ MENU_SIG='?';toast('Kilépni a piros Kilépés gombbal lehet.',2200);});
+function exitGame(){elog('info','Kilépés gomb',true);try{if(G.state==='play'&&P)save(P.dist);}catch(e){}EXITING=true;G.paused=true;try{if(document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen();}catch(e){}
+ try{window.close();}catch(e){}
+ setTimeout(()=>{if(document.hidden)return;$('bye').classList.add('on');},350);}
+$('byeBack').addEventListener('click',e=>{e.stopPropagation();EXITING=false;$('bye').classList.remove('on');armBack();if(G.state==='play')G.paused=true;MENU_SIG='?';});
+['pointerdown','touchstart'].forEach(ev=>$('bye').addEventListener(ev,e=>e.stopPropagation(),{passive:true}));
+/* ---- hibanapló ablak ---- */
+function elogText(){const pad=n=>String(n).padStart(2,'0');return 'Családi Vakáció hibanapló (v'+APP_VERSION+')\n'+ELOG.list.slice().reverse().map(e=>{const d=new Date(e.t);return pad(d.getMonth()+1)+'.'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds())+' ['+e.k+(e.n>1?' x'+e.n:'')+'] '+e.m+' {'+e.c+(e.v&&e.v!==APP_VERSION?' v'+e.v:'')+'}';}).join('\n');}
+function openElog(){const el=$('elog');G.elogOpen=true;if(G.state==='play')G.paused=true;const pad=n=>String(n).padStart(2,'0'),esc=t=>String(t).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'})[c]);
+ const errs=ELOG.list.filter(e=>e.k==='hiba').length,stops=ELOG.list.filter(e=>e.k==='leállás').length;
+ el.querySelector('.sum').textContent=(errs||stops)?('Hibák: '+errs+'  •  Váratlan leállások: '+stops):'Nincs rögzített hiba. Ha kilép a játék, a következő indításkor ide kerül, mikor és milyen állapotban történt.';
+ el.querySelector('.list').innerHTML=ELOG.list.slice().reverse().map(e=>{const d=new Date(e.t);return '<div class="e '+(e.k==='hiba'?'err':e.k==='leállás'?'stop':'')+'"><b>'+pad(d.getMonth()+1)+'.'+pad(d.getDate())+' '+pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds())+'</b> '+esc(e.m)+(e.n>1?' <i>×'+e.n+'</i>':'')+'<small>'+esc(e.c)+(e.v&&e.v!==APP_VERSION?' • v'+esc(e.v):'')+'</small></div>';}).join('')||'<div class="e">Üres.</div>';
+ el.classList.add('open');MENU_SIG='?';}
+function closeElog(){$('elog').classList.remove('open');G.elogOpen=false;MENU_SIG='?';}
+$('elogClose').addEventListener('click',e=>{e.stopPropagation();closeElog();});
+$('elogCopy').addEventListener('click',async e=>{e.stopPropagation();const t=elogText();try{await navigator.clipboard.writeText(t);toast('Hibanapló kimásolva. Illeszd be az üzenetbe!');}catch(_){window.prompt('Másold ki:',t.slice(0,4000));}});
+$('elogShare').addEventListener('click',async e=>{e.stopPropagation();const t=elogText();try{if(navigator.share){await navigator.share({title:'Családi Vakáció hibanapló',text:t});return;}}catch(_){return;}try{await navigator.clipboard.writeText(t);toast('Hibanapló kimásolva.');}catch(_){}});
+$('elogClear').addEventListener('click',e=>{e.stopPropagation();ELOG.list=[];elog('info','Napló törölve',true);openElog();});
+['pointerdown','touchstart'].forEach(ev=>$('elog').addEventListener(ev,e=>e.stopPropagation(),{passive:true}));
 window.APP_OK=true;

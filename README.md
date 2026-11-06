@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.16.2
+# 🚐 Családi Vakáció – v2.17.0
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -52,6 +52,12 @@ Amíg a GPS nyitva van, a játék áll, de ez nem számít pihenőnek. A térké
 **Lámpafigyelő:** 450 méterrel a jelzőlámpa előtt a jobb oldalon megjelenik egy kis lámpa: mutatja, melyik szín ég (világít), hány másodperc van hátra belőle (fogyó csíkkal), milyen messze van a lámpa, és a jelenlegi sebességed alapján tanácsot ad: **ÁTÉRSZ** (zöldben érsz oda), **LASSÍTS** (sárgában érnél oda), **FÉKEZZ** (pirosban érnél oda), **VÁRJ** (állsz a piros előtt), **ÁLLJ** (közvetlenül a lámpánál, nem zöld).
 
 ## 🎬 Főmenü: filmplakát
+
+**Hibanapló (🩺 a főmenüben és a Szünet menüben):** a játék rögzíti a hibákat (melyik fájl, melyik sor, milyen állapotban: szakasz, sebesség, felbontás), a fontos eseményeket (indulás, szakasz, totálkár, frissítés, háttérbe kerülés, vissza-gesztus), és ha a játék váratlanul leállt (pl. a telefon kevés memória miatt bezárta), a következő indításkor beírja, mikor, mennyi játék után és milyen állapotban történt. A naplót a **Küldés** gombbal el lehet küldeni (pl. Messengeren), vagy **Másolás**sal kimásolni. Menet közbeni hiba sem állítja le a játékot: a hibát naplózza, és fut tovább.
+
+
+**Új játék / kilépés:** ha van mentett út, a főmenüben a **Folytatás** mellett az **Új játék (teljes újrakezdés)** mindent elölről kezd (pénz, km, költségnapló), előtte rákérdez. A piros **Kilépés** gomb (főmenüben és a Szünet menüben) rákérdez, elment, és bezárja a játékot (ha a rendszer nem engedi az ablak bezárását, egy „Kiléptél” képernyő jelenik meg, onnan a kezdőképernyő gombbal lehet kimenni). Véletlen kilépés ellen: a vissza gomb és az oldalról behúzott vissza-gesztus nem zárja be a játékot, csak megállítja, és szól, hogy a piros gombbal lehet kilépni; a lefelé húzás nem tölti újra az oldalt. (A telefon saját kezdőképernyő-gesztusát egy weboldal nem tilthatja le, de ilyenkor a játék szünetel és ment.)
+
 
 A plakáton a játékbeli családi autó, benne az egész család, aranyórában a Balaton partján halad a lemenő nap felé: mély kékből narancsba hajló ég, alulról megvilágított felhősávok, a nap fénykoronája és sugarai, légperspektívás hegyek, a tóban csillogó napút és egy vitorlás, a túlparton nyárfasor és falu templomtoronnyal, rét szalmabálákkal, szalagkorlát, az úton elmosott mozgáscsíkok, az autón meleg ellenfény és égő fényszóró.
 

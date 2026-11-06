@@ -131,7 +131,7 @@ function openGPS(){if(!document.getElementById('gpsv')||GV.open||typeof GEO==='u
  const el=$('gpsv'),L=LEGS[G.leg];el.classList.toggle('night',L.time==='night'||L.time==='dusk');el.classList.add('open');gpsResize();gpsInfo();
  if(G.state==='map'){gpsMode('leg');GV.anim=null;gpsFit(LEGS[G.leg].pts,false);}else{GV.follow=true;gpsMode('follow');GV.anim=null;const c=gpsCar();GV.cx=c.lon-gpsOff()/GV.z;GV.cy=MY(c.lat);}
  if(SFX&&SFX.click)SFX.click();haptic(12);MENU_SIG='?';GV.last=0;cancelAnimationFrame(GV.raf);GV.raf=requestAnimationFrame(gpsLoop);}
-function closeGPS(){if(!GV.open)return;GV.open=false;cancelAnimationFrame(GV.raf);$('gpsv').classList.remove('open');GV.ptrs={};GV.pinch=GV.drag=null;G.gps=false;
+function closeGPS(){if(!GV.open)return;GV.open=false;cancelAnimationFrame(GV.raf);{const c=$('gpsc');c.width=1;c.height=1;}/* a nagy GPS-vászon memóriáját felszabadítja */$('gpsv').classList.remove('open');GV.ptrs={};GV.pinch=GV.drag=null;G.gps=false;
  if(!GV.wasPaused&&G.state==='play')G.paused=false;GV.wasPaused=false;K.gas=K.brake=false;TAP=TAPD=HOLD=null;haptic(10);MENU_SIG='?';}
 {const el=$('gpsv'),c=$('gpsc');
  ['pointerdown','touchstart','mousedown'].forEach(ev=>el.addEventListener(ev,e=>e.stopPropagation(),{passive:true}));
