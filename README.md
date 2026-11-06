@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.8.0
+# 🚐 Családi Vakáció – v2.9.0
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -6,7 +6,7 @@ A játék telepíthető alkalmazás (PWA): telefonon a kezdőképernyőre tehet�
 
 ## 👨‍👩‍👧‍👧 A család és az autó
 
-**Utasok:** Apa (sofőr), Anya, Anna (5 éves), Petra (3 éves) és kis Atti (10 hónapos, bébiülésben). A harmadik sorban a családi csomagok utaznak.
+**Utasok:** Apa (sofőr, 177 cm), Anya (174 cm), Anna (5 éves, kb. 110 cm), Petra (3 éves, kb. 96 cm) és kis Atti (10 hónapos, bébiülésben). Az alakok valós arányban látszanak az autóhoz képest. A harmadik sorban a családi csomagok utaznak.
 
 **Az autó:** saját tervezésű, 7 üléses egyterű 1.8 16V benzines motorral, valós műszaki adatokkal:
 
@@ -139,7 +139,7 @@ Minden tranzakció után a pénzkijelző egy pillanatra a levont vagy kapott ös
 ## 🚨 Rendkívüli helyzetek
 
 - **Atti sír**, **Petrának rossz**, **Annának pisilni kell:** állj meg időben a szélső sávban.
-- **Defekt:** állj meg, és apa kirakja az elakadásjelző háromszöget, megemeli az autót, és kicseréli a kereket. Pótkerék nélkül autómentőt kell hívni.
+- **Defekt:** a kerék valóban lapos lesz (a felni leül, a gumi alul szétnyomódik), az autó azon a sarkon megroggyan, menet közben puffog és ráz. Állj meg a szélső sávban, és Apa végigcsinálja a kerékcserét: kiszáll, elhátrál a háromszöggel, kiveszi a pótkereket és az emelőt, letérdel, csavarkulccsal lazít, felpumpálja az autót, leveszi a lapos kereket, felteszi a pótkereket, meghúzza a csavarokat, leengedi az autót, elrakja a kereket, visszahozza a háromszöget és visszaül (kb. 13 mp). Pótkerék nélkül autómentőt kell hívni.
 - **Traffipax**, **piros lámpa**, **dugó**, **útépítés**, **őz az úton**.
 - **Kifogyott a benzin:** az autómentő hoz 10 litert.
 

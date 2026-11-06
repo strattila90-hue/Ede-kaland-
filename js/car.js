@@ -56,27 +56,51 @@ function headFront(g,cx,cy,who,s){s=s||1;const f=FAM[who];const r=(who==='apa'||
  else{disc(g,'#1a1a1a',cx-r*0.35,cy,r*0.13);disc(g,'#1a1a1a',cx+r*0.35,cy,r*0.13);}
  g.strokeStyle='#a0524a';g.lineWidth=0.45*s;g.beginPath();g.arc(cx,cy+r*0.3,r*0.3,0.2,Math.PI-0.2);g.stroke();}
 /* gyalogos családtag (kiszállás, tankolás, kerékcsere) */
-function person(g,x,gy,who,t,mode){const f=FAM[who],kid=who==='anna'||who==='petra',s=kid?(who==='petra'?0.62:0.75):1;
- const walk=mode==='walk',wave=mode==='wave',work=mode==='work';const st=walk?Math.sin(t*0.25)*1.6*s:0,hop=wave&&((t>>4)&1)?1.5:0;gy-=hop;
- ell(g,'rgba(0,0,0,0.25)',x+2.5*s,gy+hop+0.5,4*s,1.1);
- const lh=7*s,bh=8*s;
- line(g,f.pants,x+1.4*s,gy-lh,x+1.4*s+st,gy,1.7*s);line(g,f.pants,x+3.4*s,gy-lh,x+3.4*s-st,gy,1.7*s);
- frr(g,f.shirt,x,gy-lh-bh,5*s,bh+0.6,1.6*s);
- if(wave)line(g,f.skin,x+4.5*s,gy-lh-bh+1.5*s,x+7*s,gy-lh-bh-3*s-((t>>3)&1)*1.2,1.3*s);
- else if(work)line(g,f.skin,x+4*s,gy-lh-bh+2*s,x+8*s,gy-lh-bh+5*s+Math.sin(t*0.4)*1.2,1.3*s);
- else line(g,f.skin,x+2.5*s,gy-lh-bh+1.5*s,x+2.5*s-st*0.6,gy-lh-1*s,1.3*s);
- headSide(g,x+2.5*s,gy-lh-bh-3.4*s,who,t,s*1.05);
- if(who==='anya'&&mode!=='work'){frr(g,'#fff1a8',x+3*s,gy-lh-bh+1.5*s,4.5,4,1.5);headSide(g,x+5.4*s,gy-lh-bh+1.6*s,'atti',t,0.85);}}
-
-/* ---- kerék ---- */
-function wheel(g,cx,cy,ang,flat,r){r=r||WR;g.save();g.translate(cx,cy);if(flat){g.translate(0,r*0.16);g.scale(1.1,0.82);}
- disc(g,'#14171b',0,0,r);g.strokeStyle='#2c3138';g.lineWidth=r*0.1;g.beginPath();g.arc(0,0,r*0.84,0,TAU);g.stroke();
+/* ---- emberalak valós arányokkal (1 m = MPX képpont): Apa 177, Anya 174, Anna 110, Petra 96 cm ----
+   módok: walk, wave, stand, kneel (térdel, a kéz a hand pontra nyúl), carry (kerékkel), pump (emelőt pumpál), work (tankol) */
+const HCM={apa:177,anya:174,anna:110,petra:96};
+function limb(g,c,ax,ay,bx,by,cx,cy,w){g.strokeStyle=c;g.lineWidth=w;g.lineCap='round';g.lineJoin='round';g.beginPath();g.moveTo(ax,ay);g.lineTo(bx,by);g.lineTo(cx,cy);g.stroke();}
+function person(g,x,gy,who,t,mode,o){o=o||{};const f=FAM[who],H=(HCM[who]||170)/100*(112/CAR.len),kid=who==='anna'||who==='petra';
+ const hr=kid?H/(who==='petra'?10:11):H/15,cx=x+H*0.06,dir=o.dir||1;g.save();if(dir<0){g.translate(cx*2,0);g.scale(-1,1);}
+ const walk=mode==='walk'||mode==='carry',kneel=mode==='kneel'||mode==='pump',ph=t*0.22,sw=walk?Math.sin(ph):0;
+ const hop=mode==='wave'&&((t>>4)&1)?H*0.03:0;gy-=hop;
+ ell(g,'rgba(0,0,0,0.25)',cx,gy+hop+0.6,H*0.13,H*0.025);
+ const legW=H*0.07,armW=H*0.05,shoe='#2a2420',pants=f.pants,shirt=f.shirt,skin=f.skin;
+ let hipX=cx,hipY=gy-H*0.49,lean=0;
+ if(kneel){hipY=gy-H*0.3;lean=0.28;
+  // hátsó láb: térd a földön, lábfej hátra
+  limb(g,shade(pants,0.85),hipX,hipY,hipX-H*0.02,gy-H*0.03,hipX-H*0.24,gy-H*0.02,legW);R(g,shoe,hipX-H*0.3,gy-H*0.05,H*0.07,H*0.05);
+  // első láb: comb előre, lábszár le
+  limb(g,pants,hipX,hipY,hipX+H*0.21,hipY-H*0.02,hipX+H*0.2,gy-H*0.02,legW);frr(g,shoe,hipX+H*0.17,gy-H*0.04,H*0.11,H*0.045,1);}
+ else{const kb=walk?H*0.05:0;for(const [k,sg] of [[0,1],[1,-1]]){const a=sw*sg*0.42,ka=a+(walk?Math.max(0,-sw*sg)*0.5:0);
+   const kx=hipX+Math.sin(a)*H*0.25,ky=hipY+Math.cos(a)*H*0.25,fx=kx+Math.sin(ka-0.1)*H*0.24,fy=Math.min(gy-H*0.02,ky+Math.cos(ka)*H*0.24);
+   limb(g,k?pants:shade(pants,0.85),hipX,hipY,kx+kb*0,ky,fx,fy,legW);frr(g,shoe,fx-H*0.03,fy-H*0.025,H*0.11,H*0.045,1);}}
+ // törzs (kissé dőlve térdelésnél)
+ const tl=H*(kid?0.3:0.33),shX=hipX+Math.sin(lean)*tl,shY=hipY-Math.cos(lean)*tl;
+ g.save();g.translate(hipX,hipY);g.rotate(lean);frr(g,lg(g,-H*0.08,0,H*0.08,0,[[0,shade(shirt,0.8)],[0.6,shirt],[1,shade(shirt,1.1)]]),-H*0.075,-tl-H*0.02,H*0.15,tl+H*0.05,H*0.05);g.restore();
+ // fej
+ const r0=who==='anna'?2.7:who==='petra'?2.4:3.2;headSide(g,shX+H*0.01,shY-hr*1.15,who,t,hr/r0);
+ // karok
+ const arm=H*0.37,ua=arm*0.5;let hx,hy,ex,ey;
+ if(mode==='wave'){ex=shX+ua*0.5;ey=shY-ua*0.6;hx=ex+ua*0.3+Math.sin(t*0.3)*H*0.04;hy=ey-ua*0.9;}
+ else if(kneel&&o.hand){hx=o.hand[0]-(dir<0?0:0);hy=o.hand[1];if(mode==='pump')hy+=Math.sin(t*0.35)*H*0.07;ex=(shX+hx)/2-H*0.02;ey=(shY+hy)/2+H*0.06;}
+ else if(mode==='carry'){ex=shX+ua*0.6;ey=shY+ua*0.6;hx=ex+ua*0.8;hy=ey-ua*0.1;}
+ else if(mode==='work'){ex=shX+ua*0.7;ey=shY+ua*0.55;hx=ex+ua*0.85;hy=ey+ua*0.15+Math.sin(t*0.4)*1;}
+ else{const a=-sw*0.5;ex=shX+Math.sin(a)*ua;ey=shY+Math.cos(a)*ua;hx=ex+Math.sin(a+0.3)*ua;hy=ey+Math.cos(a+0.3)*ua;}
+ const d=Math.hypot(hx-shX,hy-shY);if(d>arm){const k=arm/d;hx=shX+(hx-shX)*k;hy=shY+(hy-shY)*k;}
+ limb(g,shirt,shX,shY+H*0.01,(shX+ex)/2,(shY+ey)/2,(shX+ex)/2,(shY+ey)/2,armW*1.25);limb(g,skin,(shX+ex)/2,(shY+ey)/2,ex,ey,hx,hy,armW);disc(g,skin,hx,hy,armW*0.6);
+ if(who==='anya'&&mode!=='work'&&!kneel&&!o.noBaby){frr(g,'#fff1a8',shX+H*0.02,shY+H*0.05,H*0.11,H*0.1,2);headSide(g,shX+H*0.08,shY+H*0.05,'atti',t,0.9);}
+ g.restore();return {hx:hx,hy:hy};}
+function wheel(g,cx,cy,ang,flat,r){r=r||WR;g.save();g.translate(cx,cy);
+ if(flat){g.translate(0,r*0.34);// a felni lejjebb ül, a gumi alul szétnyomódik
+  const w=Math.sin(ang*3)*r*0.03;g.fillStyle='#14171b';g.beginPath();g.arc(0,0,r,Math.PI*1.08,Math.PI*1.92);g.bezierCurveTo(r*1.02,-r*0.1,r*1.2+w,r*0.3,r*1.02,r*0.62);g.lineTo(-r*1.02,r*0.62);g.bezierCurveTo(-r*1.2-w,r*0.3,-r*1.02,-r*0.1,Math.cos(Math.PI*1.08)*r,Math.sin(Math.PI*1.08)*r);g.closePath();g.fill();
+  g.strokeStyle='rgba(255,255,255,0.12)';g.lineWidth=r*0.05;for(let k=-1;k<=1;k++){g.beginPath();g.moveTo(k*r*0.45,r*0.36);g.quadraticCurveTo(k*r*0.45+r*0.12,r*0.5,k*r*0.45,r*0.6);g.stroke();}}
+ else disc(g,'#14171b',0,0,r);g.strokeStyle='#2c3138';g.lineWidth=r*0.1;g.beginPath();g.arc(0,0,r*0.84,0,TAU);g.stroke();
  g.strokeStyle='rgba(255,255,255,0.1)';g.lineWidth=r*0.06;g.beginPath();g.arc(0,0,r*0.93,Math.PI*1.1,Math.PI*1.6);g.stroke();
  const q=r*0.72;g.fillStyle=rg(g,-q*0.3,-q*0.3,q*0.1,q*1.2,[[0,'#f6f8fa'],[1,'#8d98a3']]);g.beginPath();g.arc(0,0,q,0,TAU);g.fill();
  disc(g,'#262c33',0,0,q*0.86);disc(g,'#59616a',0,0,q*0.56);
  g.rotate(ang);g.fillStyle='#e3e8ec';for(let i=0;i<6;i++){g.rotate(TAU/6);g.fillRect(q*0.2,-q*0.17,q*0.68,q*0.1);g.fillRect(q*0.2,q*0.07,q*0.68,q*0.1);}
- disc(g,'#cfd6dc',0,0,q*0.24);disc(g,'#7f8a95',0,0,q*0.09);g.restore();
- if(flat)ell(g,'#14171b',cx,cy+r*0.98,r*1.18,r*0.17);}
+ disc(g,'#cfd6dc',0,0,q*0.24);disc(g,'#7f8a95',0,0,q*0.09);g.restore();}
 
 /* ---- oldalnézet ---- */
 function bodyPath(g){g.beginPath();g.moveTo(9,48.6);g.bezierCurveTo(4,48.6,2.2,46.4,2.1,42.5);g.lineTo(2,30.5);g.bezierCurveTo(2,21.5,4.5,15.6,9.5,12.6);
@@ -84,7 +108,7 @@ function bodyPath(g){g.beginPath();g.moveTo(9,48.6);g.bezierCurveTo(4,48.6,2.2,4
  g.bezierCurveTo(99.6,28.6,104.6,29.8,108.2,32.4);g.bezierCurveTo(111.4,35,112.3,39.4,111.6,43.6);g.bezierCurveTo(111.1,47.2,109.2,48.6,105,48.6);g.closePath();}
 function glassPath(g){g.beginPath();g.moveTo(7.2,26.3);g.bezierCurveTo(6.9,19.4,8.7,15.2,13,13.3);g.bezierCurveTo(15.2,12.7,18.2,12.5,22,12.5);g.lineTo(61,12.7);
  g.bezierCurveTo(68.5,12.9,74,14.7,79.2,18.1);g.lineTo(92.6,27.6);g.lineTo(62,27.1);g.lineTo(7.4,26.6);g.closePath();}
-const SEATS=[['apa',68,18.6],['anya',63.4,18.2],['anna',42.6,19.8],['petra',33.4,20.6]];
+const SEATS=[['apa',68,17.7],['anya',63.4,18.5],['anna',42.6,19.8],['petra',33.4,20.6]];
 function drawCarSide(g,x,by,wy,o,lights){
  const t=o.t||0,hide=o.hide||{},ang=o.ang||0,pitch=o.pitch||0,lift=o.lift||0;
  const wyF=(o.wF||0),wyR=(o.wR||0);
