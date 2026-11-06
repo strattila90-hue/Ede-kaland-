@@ -48,7 +48,7 @@ const MINI={
      for(let cy=Math.floor((q.y-7)/5);cy<=Math.floor((q.y+7)/5);cy++)for(let cx=Math.floor((q.x-7)/5);cx<=Math.floor((q.x+7)/5);cx++)if(cx>=0&&cx<60&&cy>=0&&cy<30&&!m.cells[cy*60+cx]){m.cells[cy*60+cx]=1;m.cov++;}
      if(m.t%3===0)noise(0.03,0.04,0,4000);m.last=q;}
     if(!pts.length)m.last=null;
-    if(m.cov>60*30*0.72||inRect(TAP,[160,222,160,22])||K.enterP&&m.t>20)m.phase='reveal',m.rt=0;}
+    if(m.cov>60*30*0.72||inRect(TAP,[160,222,160,22])||K.enterKey&&m.t>20)m.phase='reveal',m.rt=0;}
    else{m.rt++;if(m.rt===1){m.reward=m.win;if(m.win){SFX.win();vib([60,40,60]);}else tone(220,0.3,'triangle',0.06);}
     if(m.rt>30&&(K.enterP||TAP))endMini();}},
   draw(g,m){panel(g,70,30,340,226,'Kaparós sorsjegy','#ffd84a');text(g,'Három egyforma összeg = nyeremény!',W/2,51,'#ffffff',1,'center');

@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.1.0
+# 🚐 Családi Vakáció – v2.2.0
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -26,6 +26,12 @@ A fogyasztás a sebességtől, a gyorsítástól, az út típusától, a hótól
 A játék valós léptékű: 90 km/h-val 1 km pontosan 40 másodperc, így Komáromtól Bábolnáig kb. negyedóra, Komáromtól Siófokig közel két óra. A teljes út kb. 4 600 km.
 
 A játék kétpercenként automatikusan menti az állást, így az út több napon át is folytatható. A főmenüben választható **Gyorsított (5x)** vagy **Turbó (20x)** utazás is, de alapból valós idővel megy.
+
+## 🌍 Európa körút (12 szakasz, kb. 5 800 km, 9 ország)
+
+Komárom → Siófok → Keszthely → Bécs → Prága → Berlin → Amszterdam → Párizs → Barcelona → Nizza → Velence → Salzburg (Alpok) → haza, Komárom.
+
+A sarokban **minitérkép** mutatja, merre jár a család (érintésre nagyobb). A térkép földrajzilag pontos, [Natural Earth](https://www.naturalearthdata.com) közkincs adatokból készült.
 
 ## 🗺️ Az útvonal
 
@@ -81,11 +87,19 @@ Megálláshoz állj meg a szélső (felső) sávban az üzlet előtt.
 - **Traffipax**, **piros lámpa**, **dugó**, **útépítés**, **őz az úton**.
 - **Kifogyott a benzin:** az autómentő hoz 10 litert.
 
+## 🚦 Forgalom
+
+Minden jármű valós méretarányban látszik a családi autóhoz képest: kisautó, rendőrautó, mentő, furgon, lakóautó, busz (12 m), kamion (16,5 m), traktor és motor.
+
+Előfordulhat **baleset** az úton (rendőr, mentő, lezárt sáv). Nagyon ritkán pedig **helyi rendőr** ér utol szirénával: le kell húzódni és megállni, ilyenkor jön az igazoltatás.
+
 ## 🚗 Az autó kezelése
 
 - **Világításkapcsoló:** kikapcsolva, helyzetjelző, tompított, reflektor.
 - **Fénykürt (villogtatás)** és **duda:** az előtted haladó autó lehúzódik.
 - **Ködlámpa:** első, majd első és hátsó.
+- **Tempomat:** 50 / 70 / 90 / 110 / 130 km/h egy érintéssel, fékre kikapcsol.
+- **Kézifék** visszajelző lámpával.
 - **Vészvillogó**, **ajtók nyitása és csukása** (csak állva), **hátramenet (R)** tolatólámpával.
 - **Féklámpa** fékezéskor és álló helyzetben.
 - **Rádió:** négy állomás saját szerzésű zenével (Retro FM, Rock Rádió, Pop Hullám, Esti Lounge).
@@ -106,6 +120,8 @@ Megálláshoz állj meg a szélső (felső) sávban az üzlet előtt.
 | V | ⚠ | vészvillogó |
 | O | AJTÓ | ajtók |
 | R | R | hátramenet |
+| T | TEMPO | tempomat |
+| B | KÉZI | kézifék |
 | Q | RÁDIÓ | rádió: következő állomás |
 | P | II | szünet |
 | M | Zene (főmenü) | menüzene |
@@ -140,6 +156,8 @@ Utána a játék itt érhető el: `https://strattila90-hue.github.io/Ede-kaland-
 | `js/car.js` | az autó minden nézetből, a család, a forgalom |
 | `js/world.js` | útvonal, útszakaszok, táj, utak, benzinkút |
 | `js/minigames.js` | minijátékok |
+| `js/shops.js` | boltok és tankolás |
+| `js/map.js`, `js/geo.js` | Európa-térkép és minitérkép |
 | `js/game.js` | játékmenet, fizika, fogyasztás, események, képernyők |
 | `js/app.js` | telepítés, megosztás, frissítés |
 | `sw.js`, `manifest.webmanifest`, `version.json`, `icons/` | az alkalmazás működéséhez szükséges fájlok |

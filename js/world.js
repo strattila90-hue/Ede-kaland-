@@ -3,32 +3,46 @@
    VILÁG – útvonal, útszakaszok, táj, út rajzolása
    ========================================================= */
 // útszakasz: [típus, név, minőség, km, ország]   típus: town | village | country | motorway   minőség: good | medium | bad | cobble
-const PXKM=7200; // 1 km = 7200 képpont: 90 km/h-nál 1 km pontosan 40 másodperc
+// path: valós útpontok [szélesség, hosszúság] a térképhez
+const PXKM=14400; // 1 km = 14 400 képpont: 90 km/h-nál 1 km pontosan 40 másodperc, a sebesség arányos az autó méretével
+const KPX=PXKM/216000; // km/h -> képpont/képkocka (60 fps)
+const GEOC={Komárom:[47.743,18.119],Ács:[47.712,17.996],Bábolna:[47.641,17.977],Tatabánya:[47.586,18.394],Budapest:[47.497,19.040],Székesfehérvár:[47.186,18.422],Siófok:[46.904,18.058],
+ Balatonboglár:[46.776,17.651],Fonyód:[46.744,17.553],Keszthely:[46.765,17.243],Sümeg:[46.977,17.282],Szombathely:[47.231,16.622],Graz:[47.07,15.44],Bécs:[48.208,16.373],Mikulov:[48.806,16.637],Brno:[49.195,16.607],
+ Jihlava:[49.396,15.591],Prága:[50.075,14.437],Ústí:[50.66,14.03],Drezda:[51.050,13.737],Berlin:[52.520,13.405],Magdeburg:[52.12,11.63],Hannover:[52.375,9.732],Osnabrück:[52.28,8.05],
+ 'Bad Bentheim':[52.30,7.16],Amersfoort:[52.156,5.387],Amszterdam:[52.370,4.895],Utrecht:[52.09,5.12],Antwerpen:[51.219,4.402],Brüsszel:[50.850,4.352],Lille:[50.63,3.06],Párizs:[48.857,2.352],
+ Orléans:[47.903,1.909],'Clermont-Ferrand':[45.78,3.08],Millau:[44.10,3.08],Montpellier:[43.61,3.88],Perpignan:[42.69,2.90],'Le Perthus':[42.46,2.86],Girona:[41.98,2.82],Barcelona:[41.385,2.173],
+ Nîmes:[43.84,4.36],Avignon:[43.949,4.806],Gordes:[43.911,5.200],'Aix-en-Provence':[43.53,5.45],Nizza:[43.710,7.262],Genova:[44.405,8.946],Piacenza:[45.05,9.70],Verona:[45.438,10.992],
+ Velence:[45.441,12.316],Mestre:[45.49,12.24],Udine:[46.06,13.24],Villach:[46.61,13.85],'St. Gilgen':[47.766,13.365],Salzburg:[47.809,13.055],Linz:[48.306,14.286],'St. Pölten':[48.20,15.62],Győr:[47.687,17.650]};
 const LEGS=[
- {from:'Komárom, Táncsics Mihály utca',to:'Siófok',region:'hu',weather:'sun',time:'day',price:612,
+ {from:'Komárom, Táncsics Mihály utca',to:'Siófok',region:'hu',weather:'sun',time:'day',price:612,path:['Komárom','Ács','Bábolna','Tatabánya','Budapest','Székesfehérvár','Siófok'],
   segs:[['town','Komárom','medium',4],['country','','medium',7],['village','Ács','medium',3],['country','','bad',9],['village','Bábolna','cobble',2],['country','','medium',9],
    ['motorway','M1','good',62,'HU'],['motorway','M0','good',18,'HU'],['motorway','M7','good',47,'HU'],['country','','good',2],['town','Siófok','good',4]]},
- {from:'Siófok',to:'Keszthely',region:'hu',weather:'rain',time:'day',price:612,
+ {from:'Siófok',to:'Keszthely',region:'hu',weather:'rain',time:'day',price:612,path:['Siófok','Balatonboglár','Fonyód','Keszthely'],
   segs:[['town','Siófok','good',3],['country','','medium',8],['village','Balatonszárszó','medium',3],['country','','good',6],['village','Balatonboglár','bad',3],['country','','good',7],
    ['village','Fonyód','medium',4],['country','','bad',18],['village','Balatonberény','cobble',2],['country','','medium',21],['town','Keszthely','medium',5]]},
- {from:'Keszthely',to:'Bécs',region:'hu',weather:'cloudy',time:'day',price:612,
+ {from:'Keszthely',to:'Bécs',region:'hu',weather:'cloudy',time:'day',price:612,path:['Keszthely','Sümeg','Szombathely','Graz','Bécs'],
   segs:[['town','Keszthely','medium',3],['country','','medium',18],['village','Sümeg','medium',3],['country','','bad',40],['town','Szombathely','good',6],['country','','medium',22],
-   ['motorway','A3','good',72,'AT'],['motorway','A2','good',62,'AT'],['town','Bécs','cobble',6],['town','Bécs','good',12]]},
- {from:'Bécs',to:'Salzburg (Alpok)',region:'alps',weather:'snow',time:'day',price:655,
-  segs:[['town','Bécs','good',10],['motorway','A1','good',250,'AT'],['country','','medium',6],['village','Mondsee','medium',3],['country','','bad',12],['village','St. Gilgen','cobble',2],['country','','medium',12],['town','Salzburg','good',5]]},
- {from:'Salzburg',to:'Velence',region:'it',weather:'fog',time:'day',price:735,
-  segs:[['town','Salzburg','good',4],['motorway','A10','good',190,'AT'],['country','','medium',16],['motorway','A23','good',100,'IT'],['motorway','A4','good',150,'IT'],['village','Mestre','bad',6],['town','Velence','cobble',4]]},
- {from:'Velence',to:'Párizs',region:'fr',weather:'clear',time:'night',price:730,
-  segs:[['town','Velence','good',4],['motorway','A4','good',260,'IT'],['motorway','A5','good',150,'IT'],['country','','medium',30],['motorway','A40','good',120,'FR'],['motorway','A6','good',200,'FR'],
-   ['village','Beaune','cobble',3],['motorway','A6','good',300,'FR'],['town','Párizs','cobble',8],['town','Párizs','good',25]]},
- {from:'Párizs',to:'Provence',region:'provence',weather:'storm',time:'dusk',price:730,
-  segs:[['town','Párizs','good',15],['motorway','A6','good',300,'FR'],['motorway','A7','good',330,'FR'],['country','','medium',15],['village','Orange','cobble',4],['country','','bad',18],['village','Gordes','cobble',3],['town','Avignon','medium',5]]},
- {from:'Provence',to:'Komárom (haza)',region:'hu',weather:'sun',time:'sunset',price:612,
-  segs:[['town','Avignon','medium',4],['motorway','A7','good',100,'FR'],['motorway','A8','good',200,'FR'],['motorway','A10','good',160,'IT'],['motorway','A4','good',350,'IT'],['motorway','A2','good',450,'AT'],
-   ['motorway','M1','good',120,'HU'],['country','','medium',6],['village','Ács','medium',3],['town','Komárom','cobble',3],['town','Komárom','medium',4]]}];
-LEGS.forEach(L=>L.km=L.segs.reduce((s,q)=>s+q[3],0));
-const LIVE_XY=[[47.743,18.119],[46.904,18.058],[46.765,17.243],[48.208,16.373],[47.809,13.055],[45.441,12.316],[48.857,2.352],[43.949,4.806],[47.743,18.119]];
-const CITY_XY=[['Komárom',344,106],['Siófok',338,140],['Keszthely',318,150],['Bécs',312,98],['Salzburg',262,116],['Velence',262,158],['Párizs',150,92],['Provence',176,172],['Komárom',344,106]];
+   ['motorway','A2','good',72,'AT'],['motorway','A2','good',62,'AT'],['town','Bécs','cobble',6],['town','Bécs','good',12]]},
+ {from:'Bécs',to:'Prága',region:'hu',weather:'sun',time:'day',price:640,path:['Bécs','Mikulov','Brno','Jihlava','Prága'],
+  segs:[['town','Bécs','good',8],['motorway','A5','good',60,'AT'],['country','','medium',10],['village','Mikulov','cobble',2],['country','','medium',45],['town','Brno','good',8],['motorway','D1','medium',190,'CZ'],['town','Prága','cobble',7]]},
+ {from:'Prága',to:'Berlin',region:'hu',weather:'cloudy',time:'day',price:690,path:['Prága','Ústí','Drezda','Berlin'],
+  segs:[['town','Prága','good',6],['motorway','D8','good',90,'CZ'],['country','','medium',10],['motorway','A17','good',40,'DE'],['town','Drezda','good',6],['motorway','A13','good',180,'DE'],['town','Berlin','good',18]]},
+ {from:'Berlin',to:'Amszterdam',region:'hu',weather:'rain',time:'day',price:690,path:['Berlin','Magdeburg','Hannover','Osnabrück','Bad Bentheim','Amersfoort','Amszterdam'],
+  segs:[['town','Berlin','good',12],['motorway','A2','good',280,'DE'],['town','Hannover','good',8],['motorway','A30','good',150,'DE'],['village','Bad Bentheim','cobble',3],['motorway','A1','good',180,'NL'],['town','Amszterdam','cobble',9]]},
+ {from:'Amszterdam',to:'Párizs',region:'fr',weather:'cloudy',time:'day',price:730,path:['Amszterdam','Utrecht','Antwerpen','Brüsszel','Lille','Párizs'],
+  segs:[['town','Amszterdam','good',6],['motorway','A2','good',90,'NL'],['town','Antwerpen','good',6],['motorway','E19','good',60,'BE'],['town','Brüsszel','cobble',8],['motorway','E19','good',90,'BE'],['motorway','A1','good',220,'FR'],['town','Párizs','cobble',20]]},
+ {from:'Párizs',to:'Barcelona',region:'provence',weather:'clear',time:'night',price:730,path:['Párizs','Orléans','Clermont-Ferrand','Millau','Montpellier','Perpignan','Le Perthus','Girona','Barcelona'],
+  segs:[['town','Párizs','good',15],['motorway','A10','good',120,'FR'],['town','Orléans','good',5],['motorway','A71','good',280,'FR'],['motorway','A75','good',300,'FR'],['village','Millau','cobble',3],['motorway','A9','good',120,'FR'],['village','Le Perthus','medium',2],['motorway','AP-7','good',150,'ES'],['town','Barcelona','good',13]]},
+ {from:'Barcelona',to:'Nizza',region:'provence',weather:'sun',time:'day',price:735,path:['Barcelona','Girona','Perpignan','Nîmes','Avignon','Gordes','Aix-en-Provence','Nizza'],
+  segs:[['town','Barcelona','good',8],['motorway','AP-7','good',150,'ES'],['motorway','A9','good',200,'FR'],['country','','medium',20],['village','Gordes','cobble',3],['country','','bad',15],['motorway','A8','good',250,'FR'],['town','Nizza','good',8]]},
+ {from:'Nizza',to:'Velence',region:'it',weather:'storm',time:'dusk',price:745,path:['Nizza','Genova','Piacenza','Verona','Mestre','Velence'],
+  segs:[['town','Nizza','good',5],['motorway','A10','good',160,'IT'],['town','Genova','cobble',8],['motorway','A21','good',140,'IT'],['motorway','A4','good',270,'IT'],['village','Mestre','bad',4],['town','Velence','cobble',6]]},
+ {from:'Velence',to:'Salzburg (Alpok)',region:'alps',weather:'snow',time:'day',price:660,path:['Velence','Udine','Villach','Salzburg','St. Gilgen','Salzburg'],
+  segs:[['town','Velence','good',4],['motorway','A4','good',100,'IT'],['motorway','A23','good',100,'IT'],['motorway','A10','good',220,'AT'],['country','','medium',10],['village','St. Gilgen','cobble',3],['country','','bad',20],['town','Salzburg','good',5]]},
+ {from:'Salzburg',to:'Komárom (haza)',region:'hu',weather:'sun',time:'sunset',price:612,path:['Salzburg','Linz','St. Pölten','Bécs','Győr','Ács','Komárom'],
+  segs:[['town','Salzburg','good',5],['motorway','A1','good',300,'AT'],['motorway','A4','good',60,'AT'],['motorway','M1','good',120,'HU'],['country','','medium',6],['village','Ács','medium',3],['town','Komárom','cobble',7]]}];
+LEGS.forEach(L=>{L.km=L.segs.reduce((s,q)=>s+q[3],0);L.pts=L.path.map(n=>GEOC[n]);});
+const LIVE_XY=[GEOC.Komárom].concat(LEGS.map(L=>L.pts[L.pts.length-1]));
 const WNAME={sun:'Napsütés',rain:'Eső',cloudy:'Borult ég',snow:'Havazás',fog:'Köd',clear:'Csillagos éjszaka',storm:'Vihar'};
 const TNAME={day:'',night:', éjszaka',dusk:', alkonyat',sunset:', naplemente'};
 const QNAME={good:'Jó minőségű út',medium:'Közepes út',bad:'Rossz, kátyús út',cobble:'Macskaköves út'};

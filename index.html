@@ -4,95 +4,118 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0b0f17">
+<meta name="color-scheme" content="dark">
 <meta name="description" content="Családi autós kalandjáték: Komáromtól Európán át, valós távolságokkal, fogyasztással és forinttal.">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Családi Vakáció">
+<meta name="format-detection" content="telephone=no">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <title>Családi Vakáció</title>
 <style>
-:root{--glass:rgba(14,18,28,.72);--line:rgba(255,255,255,.16);--hi:rgba(255,255,255,.1);--acc:#ffd84a;--ok:#5bd06a;--blue:#3b8bff}
-*{box-sizing:border-box}
-html,body{margin:0;height:100%;background:radial-gradient(ellipse at 50% 40%,#1c2433 0%,#0b0f17 70%);overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#fff}
-#wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
-#c{display:block;background:#000;image-rendering:pixelated;image-rendering:crisp-edges;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.05)}
-/* ---- kezelőszervek ---- */
-#touch{position:fixed;inset:0;pointer-events:none;display:none}
-.ctl{position:absolute;pointer-events:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:#e8eef5;-webkit-tap-highlight-color:transparent;
- background:linear-gradient(180deg,#2e3543 0%,#171b24 100%);border:1px solid var(--line);box-shadow:inset 0 1px 0 var(--hi),0 6px 14px rgba(0,0,0,.55);transition:transform .06s,box-shadow .15s,background .15s}
-.ctl svg{width:62%;height:62%;pointer-events:none}
-.ctl small{font:700 9px/1 system-ui;letter-spacing:.04em;opacity:.85;pointer-events:none}
-.ctl.on{transform:scale(.94);background:linear-gradient(180deg,#3b4456,#222837)}
+:root{--bg:#0b0f17;--glass:rgba(16,20,30,.78);--line:rgba(255,255,255,.14);--hi:rgba(255,255,255,.1);--acc:#ffd84a;--ok:#5bd06a;--blue:#3b8bff;--red:#ff5a4a;
+ --u:clamp(40px,7.2vmin,60px);--sl:env(safe-area-inset-left,0px);--sr:env(safe-area-inset-right,0px);--sb:env(safe-area-inset-bottom,0px);--st:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;height:100dvh;width:100%;position:fixed;inset:0;background:var(--bg);overflow:hidden;overscroll-behavior:none;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
+ font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,system-ui,sans-serif;color:#fff;-webkit-font-smoothing:antialiased}
+#wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 40%,#1a2232 0%,#0b0f17 70%)}
+#c{display:block;background:#000;image-rendering:pixelated;image-rendering:crisp-edges}
+/* indítóképernyő */
+#splash{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:radial-gradient(ellipse at 50% 35%,#1d2a40 0%,#0b0f17 75%);transition:opacity .45s}
+#splash img{width:clamp(84px,22vmin,132px);height:auto;border-radius:24%;box-shadow:0 18px 50px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.08)}
+#splash h1{margin:0;font:800 clamp(20px,4.6vmin,30px)/1.1 inherit;letter-spacing:.01em}
+#splash .bar{width:min(240px,50vw);height:6px;border-radius:6px;background:rgba(255,255,255,.12);overflow:hidden}
+#splash .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#2e8b57,#5bd06a);border-radius:6px;transition:width .2s}
+#splash small{color:#9fb0c2;font:600 13px inherit}
+/* menük */
+#menu{position:fixed;z-index:20;left:calc(14px + var(--sl));top:50%;transform:translateY(-50%);display:none;flex-direction:column;gap:8px;width:clamp(210px,30vw,280px);max-height:calc(100dvh - 24px);overflow:auto;padding:12px;border-radius:22px;
+ background:var(--glass);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);border:1px solid var(--line);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+#menu.center{left:50%;transform:translate(-50%,-50%)}
+#menu.bottom{top:auto;bottom:calc(14px + var(--sb));left:auto;right:calc(14px + var(--sr));transform:none;flex-direction:row;width:auto;max-width:92vw;padding:8px;border-radius:18px}
+#menu h2{margin:2px 4px 4px;font:700 13px/1.2 inherit;color:#9fb0c2;letter-spacing:.06em;text-transform:uppercase}
+.mb{position:relative;overflow:hidden;display:flex;align-items:center;gap:10px;min-height:44px;padding:10px 14px;border-radius:13px;border:1px solid var(--line);color:#fff;cursor:pointer;
+ background:linear-gradient(180deg,#2b3242,#191d27);box-shadow:inset 0 1px 0 var(--hi);font:600 15px/1.2 inherit;text-align:left;transition:transform .08s,filter .15s}
+.mb:active{transform:scale(.97);filter:brightness(1.2)}
+.mb.primary{background:linear-gradient(180deg,#3aa564,#23784a);border-color:rgba(255,255,255,.25)}
+.mb.blue{background:linear-gradient(180deg,#3b7fe6,#2458b8)}
+.mb .ic{width:22px;text-align:center;font-size:16px;opacity:.95}
+.mb .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,#2e8b57,#5bd06a);opacity:.85;transition:width .15s}
+.mb .lbl{position:relative}
+.mb.new{border-color:var(--acc);box-shadow:0 0 0 2px rgba(255,216,74,.35)}
+.ver{color:#7d8a9a;font:600 12px inherit;padding:2px 6px}
+#toast{position:fixed;left:50%;bottom:calc(24px + var(--sb));transform:translateX(-50%);z-index:60;background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--line);color:#fff;
+ padding:11px 18px;border-radius:14px;font:600 14px inherit;opacity:0;transition:opacity .25s;pointer-events:none;max-width:86vw;text-align:center}
+#rot{position:fixed;inset:0;z-index:70;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(11,15,23,.94);font:700 17px inherit;text-align:center;pointer-events:none}
+#rot b{font-size:44px;animation:rot 1.6s ease-in-out infinite}@keyframes rot{0%,30%{transform:rotate(0)}60%,100%{transform:rotate(-90deg)}}
+/* kezelőszervek */
+#touch{position:fixed;inset:0;pointer-events:none;display:none;z-index:10}
+.ctl{position:absolute;pointer-events:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;color:#e8eef5;
+ background:linear-gradient(180deg,#2f3646 0%,#161a23 100%);border:1px solid var(--line);box-shadow:inset 0 1px 0 var(--hi),0 6px 14px rgba(0,0,0,.55);transition:transform .06s,box-shadow .15s}
+.ctl svg{width:58%;height:58%;pointer-events:none}
+.ctl small{font:700 clamp(7px,1.6vmin,9px)/1 inherit;letter-spacing:0;opacity:.85;pointer-events:none;max-width:100%;overflow:hidden;white-space:nowrap}
+.ctl.on{transform:scale(.92)}
 .ctl.act{box-shadow:inset 0 1px 0 var(--hi),0 0 0 2px var(--ok),0 0 14px rgba(91,208,106,.55)}
 .ctl.blue{box-shadow:inset 0 1px 0 var(--hi),0 0 0 2px var(--blue),0 0 16px rgba(59,139,255,.65)}
-.ctl.warn{box-shadow:inset 0 1px 0 var(--hi),0 0 0 2px #ff5a4a,0 0 16px rgba(255,90,74,.6)}
-.round{width:46px;height:46px;border-radius:50%}
-.sq{width:52px;height:52px;border-radius:14px}
-#bUp,#bDn{width:58px;height:50px;border-radius:14px}
-#bHonk{width:62px;height:62px;border-radius:50%;background:radial-gradient(circle at 50% 40%,#3a4252,#12151c 70%)}
+.ctl.warn{box-shadow:inset 0 1px 0 var(--hi),0 0 0 2px var(--red),0 0 16px rgba(255,90,74,.6)}
+#bUp,#bDn{left:calc(12px + var(--sl));width:calc(var(--u)*1.12);height:calc(var(--u)*.95);border-radius:14px}
+#bDn{bottom:calc(12px + var(--sb))}#bUp{bottom:calc(20px + var(--sb) + var(--u)*.95)}
+#bHonk{left:calc(12px + var(--sl));bottom:calc(30px + var(--sb) + var(--u)*1.9);width:calc(var(--u)*1.12);height:calc(var(--u)*1.12);border-radius:50%;background:radial-gradient(circle at 50% 40%,#3a4252,#12151c 70%)}
 #bHonk svg{width:92%;height:92%}
 .pedal{border-radius:12px;background:linear-gradient(180deg,#3a3f48,#1a1d23);border:1px solid rgba(255,255,255,.22)}
 .pedal svg{width:100%;height:100%}
-#bGas{width:58px;height:104px}
-#bBr{width:86px;height:72px}
-#topctl{position:absolute;right:10px;top:var(--top,74px);display:flex;gap:8px;pointer-events:none}
-#topctl .ctl{position:relative}
-#bHaz{background:linear-gradient(180deg,#5a1e1e,#2a0d0d)}
-/* ---- főmenü gombsor ---- */
-#appbar{position:fixed;left:14px;top:50%;transform:translateY(-50%);display:none;flex-direction:column;gap:10px;z-index:6;width:190px;padding:12px;border-radius:18px;background:var(--glass);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);box-shadow:0 14px 40px rgba(0,0,0,.45)}
-#appbar button{position:relative;overflow:hidden;border:1px solid var(--line);background:linear-gradient(180deg,#2b3240,#181c26);color:#fff;border-radius:12px;padding:11px 12px;font:650 14px system-ui,sans-serif;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:inset 0 1px 0 var(--hi)}
-#appbar button:hover{filter:brightness(1.12)}
-#appbar button:active{transform:scale(.97)}
-#appbar button .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,#2e8b57,#5bd06a);opacity:.9;transition:width .15s}
-#appbar button .lbl{position:relative}
-#appbar button.new{border-color:var(--acc);box-shadow:0 0 0 2px rgba(255,216,74,.35)}
-#ver{color:#9fb0c2;font:600 12px system-ui;padding-left:4px}
-#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--glass);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);color:#fff;padding:11px 18px;border-radius:14px;font:600 14px system-ui;opacity:0;transition:opacity .25s;pointer-events:none;z-index:10;max-width:86vw;text-align:center}
-#rot{position:fixed;left:0;right:0;top:12px;display:none;justify-content:center;font:700 15px system-ui;text-align:center;pointer-events:none;z-index:9}
-#rot span{background:var(--glass);border:1px solid var(--line);padding:9px 14px;border-radius:12px}
+#bGas{right:calc(12px + var(--sr));bottom:calc(12px + var(--sb));width:calc(var(--u)*1.05);height:calc(var(--u)*1.85)}
+#bBr{right:calc(20px + var(--sr) + var(--u)*1.05);bottom:calc(12px + var(--sb));width:calc(var(--u)*1.5);height:calc(var(--u)*1.25)}
+#ctlrow{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(10px + var(--sb));display:flex;gap:6px;pointer-events:none;padding:6px;border-radius:18px;background:rgba(10,13,20,.35)}
+#ctlrow .ctl{position:relative;width:var(--u);height:var(--u);border-radius:50%}
+#bHaz{background:linear-gradient(180deg,#5a1e1e,#2a0d0d)!important}
+#cruiseBar{position:fixed;z-index:12;left:50%;transform:translateX(-50%);bottom:calc(var(--u) + 30px + var(--sb));display:none;gap:6px;padding:7px;border-radius:16px;background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--line);box-shadow:0 10px 30px rgba(0,0,0,.5)}
+#cruiseBar button{min-width:calc(var(--u)*.95);height:calc(var(--u)*.8);border-radius:12px;border:1px solid var(--line);background:linear-gradient(180deg,#2b3242,#191d27);color:#fff;font:700 15px inherit}
+#cruiseBar button.on{background:linear-gradient(180deg,#3b7fe6,#2458b8)}
+#cruiseBar button:active{transform:scale(.95)}
+#bPause{left:50%;transform:translateX(-50%);top:calc(6px + var(--st));width:calc(var(--u)*.8);height:calc(var(--u)*.62);border-radius:12px}
 </style>
 </head>
 <body>
 <div id="wrap"><canvas id="c"></canvas></div>
 <div id="touch">
- <div class="ctl" id="bUp" style="left:14px;bottom:76px"><svg viewBox="0 0 24 24"><path d="M5 15l7-7 7 7" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
- <div class="ctl" id="bDn" style="left:14px;bottom:16px"><svg viewBox="0 0 24 24"><path d="M5 9l7 7 7-7" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
- <div class="ctl" id="bHonk" style="left:12px;bottom:136px"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="none" stroke="#c9d1db" stroke-width="7"/><circle cx="50" cy="50" r="40" fill="none" stroke="#5a6474" stroke-width="1.5"/>
+ <div class="ctl" id="bUp"><svg viewBox="0 0 24 24"><path d="M5 15l7-7 7 7" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+ <div class="ctl" id="bDn"><svg viewBox="0 0 24 24"><path d="M5 9l7 7 7-7" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+ <div class="ctl" id="bHonk"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="none" stroke="#c9d1db" stroke-width="7"/><circle cx="50" cy="50" r="40" fill="none" stroke="#5a6474" stroke-width="1.5"/>
   <path d="M10 46h24M66 46h24M50 62v30" stroke="#c9d1db" stroke-width="8" stroke-linecap="round"/><circle cx="50" cy="50" r="17" fill="#232a36" stroke="#c9d1db" stroke-width="3"/>
   <path d="M41 46h6l7-6v20l-7-6h-6z" fill="#ffd84a"/><path d="M58 44q3 6 0 12" fill="none" stroke="#ffd84a" stroke-width="2.4" stroke-linecap="round"/></svg></div>
- <div class="ctl pedal" id="bBr" style="right:86px;bottom:16px"><svg viewBox="0 0 86 72"><rect x="8" y="10" width="70" height="50" rx="9" fill="#2b3038" stroke="#8a929c" stroke-width="2"/>
+ <div class="ctl pedal" id="bBr"><svg viewBox="0 0 86 72"><rect x="8" y="10" width="70" height="50" rx="9" fill="#2b3038" stroke="#8a929c" stroke-width="2"/>
   <g stroke="#5b636d" stroke-width="3" stroke-linecap="round"><path d="M16 22h54M16 31h54M16 40h54M16 49h54"/></g><text x="43" y="69" fill="#e8eef5" font-size="9" font-weight="700" text-anchor="middle" font-family="system-ui">FÉK</text></svg></div>
- <div class="ctl pedal" id="bGas" style="right:16px;bottom:16px"><svg viewBox="0 0 58 104"><rect x="9" y="6" width="40" height="84" rx="8" fill="#2b3038" stroke="#8a929c" stroke-width="2"/>
+ <div class="ctl pedal" id="bGas"><svg viewBox="0 0 58 104"><rect x="9" y="6" width="40" height="84" rx="8" fill="#2b3038" stroke="#8a929c" stroke-width="2"/>
   <g stroke="#5b636d" stroke-width="3" stroke-linecap="round"><path d="M19 16v64M29 16v64M39 16v64"/></g><text x="29" y="100" fill="#e8eef5" font-size="9" font-weight="700" text-anchor="middle" font-family="system-ui">GÁZ</text></svg></div>
- <div id="topctl">
-  <div class="ctl round" id="bLight"><svg viewBox="0 0 24 24"><path d="M9 6a6 6 0 0 0 0 12z" fill="#fff"/><path d="M12 8l7 1.5M12 12h7M12 16l7-1.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg><small id="lLight">TOMP</small></div>
-  <div class="ctl round" id="bFlash"><svg viewBox="0 0 24 24"><path d="M9 6a6 6 0 0 0 0 12z" fill="#7fb2ff"/><path d="M12 8h8M12 12h8M12 16h8" stroke="#7fb2ff" stroke-width="1.8" stroke-linecap="round"/></svg><small>VILL</small></div>
-  <div class="ctl round" id="bFog"><svg viewBox="0 0 24 24"><path d="M8 6a6 6 0 0 0 0 12z" fill="#fff"/><path d="M11 8l7 1.5M11 12h7M11 16l7-1.5" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><path d="M14.5 5q-2 3.5 0 7t0 7" fill="none" stroke="#fff" stroke-width="1.5"/></svg><small id="lFog">KÖD</small></div>
-  <div class="ctl round" id="bHaz"><svg viewBox="0 0 24 24"><path d="M12 4l9 16H3z" fill="none" stroke="#ff6b5a" stroke-width="2.4" stroke-linejoin="round"/><path d="M12 9.5l4 7H8z" fill="none" stroke="#ff6b5a" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
-  <div class="ctl round" id="bDoor"><svg viewBox="0 0 24 24"><path d="M5 5h8l4 5v9H5z" fill="none" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/><path d="M5 11h12" stroke="#fff" stroke-width="1.4"/><path d="M13 13h3" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg><small>AJTÓ</small></div>
-  <div class="ctl round" id="bRev"><svg viewBox="0 0 24 24"><text x="12" y="17" fill="#fff" font-size="15" font-weight="800" text-anchor="middle" font-family="system-ui">R</text></svg></div>
-  <div class="ctl round" id="bRadio"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="11" rx="2" fill="none" stroke="#fff" stroke-width="1.8"/><circle cx="15.5" cy="13.5" r="2.6" fill="#fff"/><path d="M6 11h5M6 14h5M6 17h5" stroke="#fff" stroke-width="1.4"/><path d="M5 8l11-4" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg><small>RÁDIÓ</small></div>
-  <div class="ctl round" id="bPause"><svg viewBox="0 0 24 24"><path d="M8 5v14M16 5v14" stroke="#fff" stroke-width="3.2" stroke-linecap="round"/></svg></div>
+ <div class="ctl" id="bPause"><svg viewBox="0 0 24 24"><path d="M8 5v14M16 5v14" stroke="#fff" stroke-width="3.2" stroke-linecap="round"/></svg></div>
+ <div id="ctlrow">
+  <div class="ctl" id="bLight"><svg viewBox="0 0 24 24"><path d="M9 6a6 6 0 0 0 0 12z" fill="#fff"/><path d="M12 8l7 1.5M12 12h7M12 16l7-1.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg><small id="lLight">TOMP</small></div>
+  <div class="ctl" id="bFlash"><svg viewBox="0 0 24 24"><path d="M9 6a6 6 0 0 0 0 12z" fill="#7fb2ff"/><path d="M12 8h8M12 12h8M12 16h8" stroke="#7fb2ff" stroke-width="1.8" stroke-linecap="round"/></svg><small>VILL</small></div>
+  <div class="ctl" id="bFog"><svg viewBox="0 0 24 24"><path d="M8 6a6 6 0 0 0 0 12z" fill="#fff"/><path d="M11 8l7 1.5M11 12h7M11 16l7-1.5" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><path d="M14.5 5q-2 3.5 0 7t0 7" fill="none" stroke="#fff" stroke-width="1.5"/></svg><small id="lFog">KÖD</small></div>
+  <div class="ctl" id="bHaz"><svg viewBox="0 0 24 24"><path d="M12 4l9 16H3z" fill="none" stroke="#ff6b5a" stroke-width="2.4" stroke-linejoin="round"/><path d="M12 9.5l4 7H8z" fill="none" stroke="#ff6b5a" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+  <div class="ctl" id="bHb"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6" fill="none" stroke="#fff" stroke-width="2"/><path d="M4.5 6.5a10 10 0 0 0 0 11M19.5 6.5a10 10 0 0 1 0 11" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/><text x="12" y="15.5" fill="#fff" font-size="9" font-weight="800" text-anchor="middle" font-family="system-ui">P</text></svg><small>KÉZI</small></div>
+  <div class="ctl" id="bDoor"><svg viewBox="0 0 24 24"><path d="M5 5h8l4 5v9H5z" fill="none" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/><path d="M5 11h12" stroke="#fff" stroke-width="1.4"/><path d="M13 13h3" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg><small>AJTÓ</small></div>
+  <div class="ctl" id="bRev"><svg viewBox="0 0 24 24"><text x="12" y="17" fill="#fff" font-size="15" font-weight="800" text-anchor="middle" font-family="system-ui">R</text></svg></div>
+  <div class="ctl" id="bCruise"><svg viewBox="0 0 24 24"><path d="M4 16a8 8 0 1 1 16 0" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/><path d="M12 16l4-5" stroke="#7fd1ff" stroke-width="2.2" stroke-linecap="round"/><circle cx="12" cy="16" r="1.6" fill="#fff"/></svg><small id="lCruise">TEMPO</small></div>
+  <div class="ctl" id="bRadio"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="11" rx="2" fill="none" stroke="#fff" stroke-width="1.8"/><circle cx="15.5" cy="13.5" r="2.6" fill="#fff"/><path d="M6 11h5M6 14h5M6 17h5" stroke="#fff" stroke-width="1.4"/><path d="M5 8l11-4" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg><small>RÁDIÓ</small></div>
  </div>
 </div>
-<div id="appbar">
- <button id="aInstall"><span class="lbl">⬇ Telepítés</span></button>
- <button id="aShare"><span class="lbl">↗ Megosztás</span></button>
- <button id="aUpdate"><span class="fill"></span><span class="lbl">⟳ Frissítés</span></button>
- <button id="aMusic"><span class="lbl">♪ Zene: be</span></button>
- <div id="ver"></div>
-</div>
+<div id="cruiseBar"><button data-v="50">50</button><button data-v="70">70</button><button data-v="90">90</button><button data-v="110">110</button><button data-v="130">130</button><button data-v="0">KI</button></div>
+<div id="menu"></div>
 <div id="toast"></div>
-<div id="rot"><span>Fordítsd el a telefont fekvő helyzetbe ↻</span></div>
-<script src="js/core.js"></script>
-<script src="js/radio.js"></script>
-<script src="js/car.js"></script>
-<script src="js/world.js"></script>
-<script src="js/minigames.js"></script>
-<script src="js/game.js"></script>
-<script src="js/app.js"></script>
+<div id="rot"><b>📱</b>Fordítsd el a telefont fekvő helyzetbe</div>
+<div id="splash"><img src="icons/icon-192.png" alt=""><h1>Családi Vakáció</h1><div class="bar"><i id="splbar"></i></div><small id="spltxt">Betöltés... 0%</small></div>
+<script>
+/* betöltő: a játék fájljai sorban, valós százalékkal */
+(function(){const files=['js/core.js','js/geo.js','js/radio.js','js/car.js','js/world.js','js/map.js','js/minigames.js','js/shops.js','js/game.js','js/app.js'];let i=0;
+ const bar=document.getElementById('splbar'),txt=document.getElementById('spltxt');
+ function next(){const p=Math.round(i/files.length*100);bar.style.width=p+'%';txt.textContent='Betöltés... '+p+'%';
+  if(i>=files.length){setTimeout(()=>{const s=document.getElementById('splash');s.style.opacity=0;setTimeout(()=>s.remove(),500);},250);return;}
+  const sc=document.createElement('script');sc.src=files[i++];sc.async=false;sc.onload=next;sc.onerror=()=>{txt.textContent='Hiba a betöltéskor. Ellenőrizd a kapcsolatot.';};document.body.appendChild(sc);}
+ next();})();
+</script>
 </body>
 </html>
