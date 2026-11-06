@@ -19,12 +19,12 @@ const LEGS=[
    ['motorway','M1','good',62,'HU'],['motorway','M0','good',18,'HU'],['motorway','M7','good',47,'HU'],['country','','good',2],['town','Siófok','good',4]]},
  {from:'Siófok',to:'Keszthely',region:'hu',weather:'rain',time:'day',price:612,path:['Siófok','Balatonboglár','Fonyód','Keszthely'],
   segs:[['town','Siófok','good',3],['country','','medium',8],['village','Balatonszárszó','medium',3],['country','','good',6],['village','Balatonboglár','bad',3],['country','','good',7],
-   ['village','Fonyód','medium',4],['country','','bad',18],['village','Balatonberény','cobble',2],['country','','medium',21],['town','Keszthely','medium',5]]},
+   ['village','Fonyód','medium',4],['country','','bad',6],['village','Balatonfenyves','medium',2],['country','','bad',4],['village','Balatonmáriafürdő','bad',2],['country','','medium',4],['village','Balatonberény','cobble',2],['country','','medium',12],['village','Fenékpuszta','bad',2],['country','','medium',7],['town','Keszthely','medium',5]]},
  {from:'Keszthely',to:'Bécs',region:'hu',weather:'cloudy',time:'day',price:612,path:['Keszthely','Sümeg','Szombathely','Graz','Bécs'],
-  segs:[['town','Keszthely','medium',3],['country','','medium',18],['village','Sümeg','medium',3],['country','','bad',40],['town','Szombathely','good',6],['country','','medium',22],
+  segs:[['town','Keszthely','medium',3],['country','','medium',18],['village','Sümeg','medium',3],['country','','bad',10],['village','Jánosháza','medium',3],['country','','medium',14],['village','Sárvár','good',3],['country','','bad',10],['town','Szombathely','good',6],['country','','medium',9],['village','Bucsu','bad',2],['country','','medium',11],
    ['motorway','A2','good',72,'AT'],['motorway','A2','good',62,'AT'],['town','Bécs','cobble',6],['town','Bécs','good',12]]},
  {from:'Bécs',to:'Prága',region:'hu',weather:'sun',time:'day',price:640,path:['Bécs','Mikulov','Brno','Jihlava','Prága'],
-  segs:[['town','Bécs','good',8],['motorway','A5','good',60,'AT'],['country','','medium',10],['village','Mikulov','cobble',2],['country','','medium',45],['town','Brno','good',8],['motorway','D1','medium',190,'CZ'],['town','Prága','cobble',7]]},
+  segs:[['town','Bécs','good',8],['motorway','A5','good',60,'AT'],['country','','medium',10],['village','Mikulov','cobble',2],['country','','medium',15],['village','Pohořelice','medium',3],['country','','medium',14],['village','Rajhrad','cobble',2],['country','','medium',11],['town','Brno','good',8],['motorway','D1','medium',190,'CZ'],['town','Prága','cobble',7]]},
  {from:'Prága',to:'Berlin',region:'hu',weather:'cloudy',time:'day',price:690,path:['Prága','Ústí','Drezda','Berlin'],
   segs:[['town','Prága','good',6],['motorway','D8','good',90,'CZ'],['country','','medium',10],['motorway','A17','good',40,'DE'],['town','Drezda','good',6],['motorway','A13','good',180,'DE'],['town','Berlin','good',18]]},
  {from:'Berlin',to:'Amszterdam',region:'hu',weather:'rain',time:'day',price:690,path:['Berlin','Magdeburg','Hannover','Osnabrück','Bad Bentheim','Amersfoort','Amszterdam'],
@@ -135,6 +135,19 @@ function birch(g,x,b,s,snow){frr(g,'#f1efe8',x-1,b-s*12,2.2,s*12,1);for(let k=1;
  for(const [dx,dy,r,c] of [[-3,-13,3.4,'#7fb85a'],[2.8,-14.5,3.2,'#93c868'],[0,-17,3.4,'#a3d474'],[-1,-11,2.6,'#6aa24a']])disc(g,snow?'#e8eef3':c,x+dx*s/2.6,b+dy*s,r*s);}
 function bush(g,x,b,s,snow,fl){disc(g,snow?'#dfe7ee':'#3e7a37',x,b-s*2.2,s*3);disc(g,snow?'#eef3f7':'#58984a',x+s*2.8,b-s*2.8,s*2.6);disc(g,snow?'#e6edf3':'#4a8a40',x+s*5,b-s*2,s*2.4);
  if(fl&&!snow)for(let k=0;k<5;k++)disc(g,['#ff6b8a','#ffffff','#ffd84a'][k%3],x-1+k*1.6,b-s*(2.5+hsh(k*7+fl)*2),0.6);}
+
+/* ---- falusi elemek ---- */
+function gemeskut(g,x,b,snow){frr(g,'#9a8f80',x-5,b-8,10,8,1.5);R(g,'#7a7064',x-5,b-8,10,1.6);line(g,'#6b4a2b',x+14,b,x+14,b-30,2.4);
+ line(g,'#7a5634',x-12,b-38,x+34,b-22,1.6);line(g,'#5a3d22',x-10,b-37,x-1,b-10,0.6);frr(g,'#5a3d22',x-3,b-12,4,3,0.6);frr(g,'#6b4a2b',x+28,b-27,8,6,1);if(snow)R(g,'#f4f8fb',x-5,b-9,10,1.4);}
+function haystack(g,x,b,snow){g.fillStyle=snow?'#eef3f7':'#d9b45a';g.beginPath();g.moveTo(x-9,b);g.quadraticCurveTo(x-9,b-20,x,b-22);g.quadraticCurveTo(x+9,b-20,x+9,b);g.closePath();g.fill();
+ if(!snow)for(let k=0;k<4;k++)line(g,'#b8913f',x-7+k*4,b-2,x-4+k*3,b-16,0.5);line(g,'#6b4a2b',x,b-22,x,b-26,1);}
+function fenceRow(g,x,b,w){for(let k=0;k<=w;k+=7)frr(g,'#a07c4a',x+k,b-9,1.6,9,0.5);R(g,'#b8925a',x,b-7,w,1.2);R(g,'#b8925a',x,b-3.6,w,1.2);}
+function chicken(g,x,b,t,i){const pk=((t+i*37)%90)<14;const hy=pk?b-2.6:b-5.4;ell(g,'#f6f3ec',x,b-3,3,2.2);disc(g,'#f6f3ec',x+2.6,hy,1.5);R(g,'#e53935',x+2.2,hy-2.2,1.2,1);R(g,'#f2a33a',x+3.8,hy,1.2,0.6);line(g,'#f2a33a',x,b-1,x,b,0.4);}
+function farmyard(g,x,b,t,snow,i){fenceRow(g,x,b,74);for(let k=0;k<4;k++)chicken(g,x+10+k*14+Math.sin((t+k*50)*0.01)*4,b-1,t,i*4+k);
+ if(hsh(i*13)>0.4){const cx=x+44;ell(g,'rgba(0,0,0,0.2)',cx+10,b-1,12,1.6);frr(g,'#f4f1ea',cx,b-14,20,9,3);disc(g,'#2a2a2a',cx+6,b-11,2);disc(g,'#2a2a2a',cx+14,b-9,1.6);for(const lx of [3,7,14,17])line(g,'#e8e3d6',cx+lx,b-6,cx+lx,b-1,1.4);frr(g,'#f4f1ea',cx+18,b-18,6,6,2);frr(g,'#f3a7b0',cx+21,b-14.5,3.4,2.4,1);}
+ frr(g,'#8a5a2b',x+60,b-12,12,12,1);g.fillStyle='#6d2f22';g.beginPath();g.moveTo(x+58,b-12);g.lineTo(x+66,b-18);g.lineTo(x+74,b-12);g.closePath();g.fill();}
+function garden(g,x,b,snow){R(g,snow?'#e6edf3':'#6b4f35',x,b-4,70,4);if(!snow)for(let k=0;k<14;k++){disc(g,k%3?'#4f9a3e':'#e53935',x+3+k*5,b-5,k%3?1.8:1.3);line(g,'#3d7a2f',x+3+k*5,b-4,x+3+k*5,b-6,0.5);}
+ for(let k=0;k<3;k++){line(g,'#7a5634',x+8+k*26,b,x+8+k*26,b-14,0.8);}line(g,'#8a6a3e',x+6,b-10,x+62,b-10,0.4);}
 /* ---- középső réteg: házak, fák, táblák ---- */
 function tree(g,x,b,s,snow){frr(g,lg(g,x+s*4-1,0,x+s*4+1.4,0,[[0,'#7a5634'],[1,'#4e3520']]),x+s*4-1,b-s*7,2.4,s*7,1);disc(g,'rgba(0,0,0,0.12)',x+s*4.3,b,s*3.6);disc(g,'#2f6230',x+s*5.4,b-s*9.4,s*3.6);disc(g,'#356f33',x+s*4.3,b-s*10,s*4.2);disc(g,'#4e9446',x+s*3.2,b-s*11.2,s*3.2);disc(g,'#5fa652',x+s*4.8,b-s*12.6,s*2.4);disc(g,'rgba(255,255,255,0.12)',x+s*2.8,b-s*12,s*1.5);if(snow){g.fillStyle='#f4f8fb';g.beginPath();g.arc(x+s*4,b-s*12,s*3.8,Math.PI,TAU);g.fill();}}
 function pine(g,x,b,h,snow){frr(g,'#5a3d22',x+6,b-6,3,6,1);for(let k=0;k<3;k++){const y=b-6-k*h/4;g.fillStyle=lg(g,x,0,x+15,0,[[0,'#2b6342'],[1,'#1f4d33']]);g.beginPath();g.moveTo(x,y);g.quadraticCurveTo(x+6,y-h/4,x+7.5,y-h/2.2);g.quadraticCurveTo(x+9,y-h/4,x+15,y);g.closePath();g.fill();
@@ -163,8 +176,8 @@ function drawMid(g,L,leg,dist,lights){const night=L.time==='night',snow=L.weathe
  const slot=84,i0=Math.floor(o/slot)-1;
  for(let i=i0;i<i0+8;i++){const m=i*slot,x=m-o,wx=(m-PX)/f+PX,s=segAtIn(leg.segs,wx),h=hsh(i*13+5);
   if(s.type==='town'){if(reg==='it'&&h<0.25){palm(g,x+10,b);continue;}building(g,x,b,78,60+hsh(i*7)*70,i,night,lights);}
-  else if(s.type==='village'){if(h<0.1)church(g,x+20,b,night);else if(h>=0.72&&h<0.8){birch(g,x+14,b,2.6,snow);bush(g,x+34,b,1.6,snow,i);poplar(g,x+64,b,46,snow);continue;}else if(h<0.72)house(g,x+18,b,['#f4efe2','#f2e2b8','#e8d6c8','#dfe9ef'][(hsh(i)*4)|0],reg==='provence'?'#c2552f':['#b5452b','#8a3a2a','#a85a2a'][(hsh(i*9)*3)|0],night,lights,snow);else{tree(g,x+10,b,3,snow);tree(g,x+48,b,2,snow);}}
-  else if(s.type==='country'){if(reg==='alps'){pine(g,x+6,b,40+h*20,snow);pine(g,x+40,b,30+h*12,snow);}else if(h<0.3){tree(g,x+18,b,3,snow);bush(g,x+52,b,1.5,snow,i);}else if(h<0.42){for(let k=0;k<4;k++)poplar(g,x+8+k*17,b,48+hsh(i*5+k)*14,snow);}else if(h<0.52){birch(g,x+12,b,2.6,snow);birch(g,x+34,b,2.2,snow);bush(g,x+56,b,1.4,snow,i);}else if(h<0.7){tree(g,x+6,b,2,snow);tree(g,x+44,b,3,snow);}
+  else if(s.type==='village'){const tt=typeof G!=='undefined'?G.t:0;if(h<0.08)church(g,x+20,b,night);else if(h>=0.48&&h<0.58){farmyard(g,x+4,b,tt,snow,i);continue;}else if(h>=0.58&&h<0.66){gemeskut(g,x+20,b,snow);haystack(g,x+58,b,snow);continue;}else if(h>=0.66&&h<0.72){garden(g,x+6,b,snow);continue;}else if(h>=0.72&&h<0.8){birch(g,x+14,b,2.6,snow);bush(g,x+34,b,1.6,snow,i);poplar(g,x+64,b,46,snow);continue;}else if(h<0.48)house(g,x+18,b,['#f4efe2','#f2e2b8','#e8d6c8','#dfe9ef'][(hsh(i)*4)|0],reg==='provence'?'#c2552f':['#b5452b','#8a3a2a','#a85a2a'][(hsh(i*9)*3)|0],night,lights,snow);else{tree(g,x+10,b,3,snow);tree(g,x+48,b,2,snow);}}
+  else if(s.type==='country'){if(reg==='alps'){pine(g,x+6,b,40+h*20,snow);pine(g,x+40,b,30+h*12,snow);}else if(h<0.3){tree(g,x+18,b,3,snow);bush(g,x+52,b,1.5,snow,i);}else if(h<0.42){for(let k=0;k<4;k++)poplar(g,x+8+k*17,b,48+hsh(i*5+k)*14,snow);}else if(h<0.52){birch(g,x+12,b,2.6,snow);birch(g,x+34,b,2.2,snow);bush(g,x+56,b,1.4,snow,i);}else if(h<0.58&&reg==='hu'){house(g,x+6,b,'#f4efe2','#8a3a2a',night,lights,snow);gemeskut(g,x+66,b,snow);continue;}else if(h<0.62){haystack(g,x+20,b,snow);haystack(g,x+46,b,snow);}else if(h<0.7){tree(g,x+6,b,2,snow);tree(g,x+44,b,3,snow);}
    else if(h<0.85){line(g,'#6b4a2b',x+30,b,x+30,b-70,2.4);line(g,'#6b4a2b',x+21,b-66,x+39,b-66,1.6);}}
   else{if(h<0.16)tree(g,x+18,b,2.5,snow);else if(h<0.3){poplar(g,x+12,b,44,snow);poplar(g,x+30,b,50,snow);bush(g,x+50,b,1.4,snow,0);}else if(h<0.42&&reg!=='alps'){/* zajvédő fal */frr(g,'#a7b0ba',x,b-22,84,22,1);for(let k=0;k<84;k+=12)R(g,'#8f99a4',x+k,b-22,1,22);}}}}
 /* ---- közeli réteg: járda, korlát, táblák (az úttal együtt mozog) ---- */
@@ -184,6 +197,8 @@ function drawNear(g,L,leg,dist,lights,t){const snow=L.weather==='snow',night=L.t
  // utcai lámpák városban
  for(let x=-((dist)%150)+40;x<W+10;x+=150){const wx=dist+x-PX,s=segAtIn(leg.segs,wx);if(s.type!=='town')continue;g.strokeStyle='#3a3f47';g.lineWidth=1.8;g.beginPath();g.moveTo(x,y0+8);g.lineTo(x,120);g.quadraticCurveTo(x,116,x+5,116);g.stroke();
   frr(g,'#3a3f47',x+3,115,8,3,1.2);frr(g,'#ffe9a3',x+4,117.6,6,1.2,0.6);if(night){glow(g,x+7,120,16,'rgba(255,230,160,0.35)');if(lights)lights.push({x:x+7,y:124,r:32});}}
+ // vadveszély táblák országúton
+ {const pk=1/leg.kmPerPx;for(const s of leg.segs){if(s.type!=='country')continue;for(let wx=s.x0+pk*0.35;wx<s.x1-pk*0.3;wx+=pk*3.5){const x=wx-dist+PX;if(x>-20&&x<W+20)wildSign(g,x,y0+8);}}}
  // helységnév-, autópálya- és sebességtáblák a szakaszhatárokon
  for(let k=0;k<leg.segs.length;k++){const s=leg.segs[k],sx=s.x0-dist+PX+30;if(sx<-90||sx>W+20)continue;const prev=leg.segs[k-1];
   if(s.type==='motorway'&&(!prev||prev.name!==s.name))roadSign(g,sx,y0+8,s.name,'motorway');
@@ -279,3 +294,15 @@ function drawPOIs(g,L,leg,dist,lights,t){const pk=1/leg.kmPerPx;
  for(const p of leg.pois){const sx=p.x-dist+PX;
   const adv=p.type==='veda'?0.3:0.5,ax=p.x-adv*pk-dist+PX;if(ax>-60&&ax<W+20)advanceSign(g,ax,p,adv,pk);
   if(sx>-240&&sx<W+80)drawPOI(g,p,sx,L,lights,t);}}
+/* ---- útburkolati jelek: felirat és nyíl a megállók előtt, STOP a lámpáknál, sebesség a település elején ---- */
+const MARK_TXT={fuel:'BENZIN',kis:'BOLT',hiper:'BOLT',trafik:'TRAFIK',ujsag:'ÚJSÁG',burger:'ÉTTEREM',rest:'PIHENŐ'};
+function paint(g,txt,x,y,a){g.save();g.translate(x,y);g.scale(1.5,0.62);g.globalAlpha=a||0.78;text(g,txt,0,-3.5,'#f2f2ec',1,'left',null);g.restore();}
+function paintArrow(g,x,y,a){g.save();g.globalAlpha=a||0.78;g.fillStyle='#f2f2ec';g.beginPath();g.moveTo(x,y+2);g.lineTo(x+14,y+2);g.lineTo(x+20,y-3);g.lineTo(x+22,y-1.6);g.lineTo(x+24,y-6);g.lineTo(x+17,y-5.4);g.lineTo(x+19,y-4.2);g.lineTo(x+13.4,y);g.lineTo(x,y);g.closePath();g.fill();g.restore();}
+function drawMarkings(g,leg,dist,t){const pk=1/leg.kmPerPx,y0=LANE[0]-5;
+ for(const p of leg.pois){const tx=MARK_TXT[p.type];if(!tx)continue;for(const d of [0.2,0.09]){const x=p.x-pk*d-dist+PX;if(x<-140||x>W+10)continue;
+   const w=textW(tx)*1.5;if(p.type==='rest'){frr(g,'rgba(242,242,236,0.75)',x-14,y0-6.5,10,6,1);g.save();g.scale(1,1);text(g,'P',x-9,y0-5.6,'#4d5159',1,'center',null);g.restore();}
+   paint(g,tx,x,y0,0.78);paintArrow(g,x+w+6,y0,0.78);}}
+ for(const l of leg.lights){const x=l.x-dist+PX;if(x<-80||x>W+10)continue;R(g,'rgba(242,242,236,0.85)',x-3,ROADT+5,2.6,ROADB-ROADT-10);for(const ln of [0,1,2])paint(g,'STOP',x-58,LANE[ln]-5,0.7);}
+ for(let k=1;k<leg.segs.length;k++){const s=leg.segs[k],pv=leg.segs[k-1];if((s.type==='town'||s.type==='village')&&pv.type!=='town'&&pv.type!=='village'){const x=s.x0+60-dist+PX;if(x<-60||x>W+10)continue;for(const ln of [0,1])paint(g,String(s.limit),x,LANE[ln]-5,0.75);}}}
+function wildSign(g,x,b){line(g,'#7d858d',x,b,x,b-20,1.2);g.fillStyle='#ffffff';g.beginPath();g.moveTo(x,b-35);g.lineTo(x+8.5,b-20);g.lineTo(x-8.5,b-20);g.closePath();g.fill();
+ g.strokeStyle='#d32f2f';g.lineWidth=1.6;g.stroke();g.fillStyle='#1a1a1a';g.beginPath();g.moveTo(x-4,b-23);g.lineTo(x-2,b-27);g.lineTo(x+2,b-27);g.lineTo(x+3,b-30);g.lineTo(x+4,b-29);g.lineTo(x+3.4,b-26);g.lineTo(x+3,b-23);g.lineTo(x+2,b-23);g.lineTo(x+1.6,b-25.4);g.lineTo(x-2,b-25.4);g.lineTo(x-3,b-23);g.closePath();g.fill();}

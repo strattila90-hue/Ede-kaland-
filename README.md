@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.5.0
+# 🚐 Családi Vakáció – v2.6.0
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -75,6 +75,15 @@ A HUD közepén lévő szívek a család kedvét mutatják. Ütközés, piros l�
 
 1 szívnél figyelmeztetés jelez előre.
 
+## 😴 Fáradás
+
+Apa fárad: valós 30 perc folyamatos vezetés után elálmosodik (a szívek alatt látszik a vezetési idő). 25 percnél figyelmeztetés jön, 30 percnél felszólítás, hogy állj meg pihenni. Utána egyre homályosabb a kép, és időnként lecsukódik a szeme (mikroalvás): elsötétül a kép, az autó kisodródik a sávból. 45 percnél a legerősebb.
+
+- **Pihenőhely:** teljesen kipihenten indulsz tovább.
+- **Kávé Apának:** 15 percet levesz a fáradtságból.
+- **Bármelyik megálló** (bolt, kút, étterem): 5 percet.
+- **Szállás** a szakasz végén: teljes pihenés.
+
 ## 🍔 Burger Pont gyorsétterem
 
 Városokban és az autópályák mentén (a kutak közelében) saját tervezésű gyorsétterem várja a családot, autós kiszolgálóval. Kínálat: sajtburger, gyerekmenü játékkal, csirkefalat, sült krumpli, shake, kávé Apának, családi menü és fagyikehely.
@@ -124,7 +133,17 @@ Minden jármű valós méretarányban látszik a családi autóhoz képest: kisa
 
 Előfordulhat **baleset** az úton (rendőr, mentő, lezárt sáv). Nagyon ritkán pedig **helyi rendőr** ér utol szirénával: le kell húzódni és megállni, ilyenkor jön az igazoltatás.
 
+## 🦌 Vadállatok
+
+Országúton és falvak mellett őz, vaddisznó, róka és mezei nyúl kel át az úton, éjjel és szürkületben gyakrabban; „Vadveszély” táblák figyelmeztetnek. Az őz éjjel megbénul a fényszóróban, a nyúl cikázik. A duda elriasztja őket. Ha elütsz egy nagy vadat (őz, vaddisznó), az javítási költséggel (kb. 35–70 ezer Ft) jár, és nagy sebességnél defektet is okozhat. Falvakban birka és tehén is átballaghat.
+
+## 🛣️ Útburkolati jelek
+
+A megállók előtt 200 és 90 méterrel festett felirat és kanyarodó nyíl jelzi a szélső sávban: BENZIN, BOLT, TRAFIK, ÚJSÁG, ÉTTEREM, P PIHENŐ. A lámpáknál STOP felirat és felfestett állóvonal van, a települések elején a sebességkorlát (50) az úton.
+
 ## 🌳 Táj
+
+**Falusi rész:** a hosszabb országúti szakaszokon valódi falvak (pl. Balatonfenyves, Balatonmáriafürdő, Fenékpuszta, Jánosháza, Sárvár, Bucsu, Pohořelice, Rajhrad) gémeskúttal, baromfiudvarral, kapirgáló csirkékkel, tehénnel, szénaboglyával és veteményessel. Országúton tanyák is feltűnnek.
 
 Mezők (búza, napraforgó, repce, kukorica, szántás, levendula) szalmabálákkal, fasorok, nyárfák, nyírfák, bokrok, virágos fű, tanyák silóval, szélerőművek, Hollandiában szélmalmok, madarak, párás távoli dombok, és út menti kilométerkövek valós km-számmal.
 

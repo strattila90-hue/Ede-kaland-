@@ -1,5 +1,5 @@
 {
- "version": "2.5.0",
+ "version": "2.6.0",
  "files": {
   "index.html": 23589,
   "manifest.webmanifest": 681,
@@ -9,11 +9,11 @@
   "js/radio.js": 6753,
   "js/map.js": 10149,
   "js/car.js": 28237,
-  "js/world.js": 40501,
+  "js/world.js": 45741,
   "js/minigames.js": 16444,
-  "js/shops.js": 16734,
-  "js/game.js": 81830,
-  "js/app.js": 18400,
+  "js/shops.js": 16843,
+  "js/game.js": 86786,
+  "js/app.js": 18636,
   "icons/icon-192.png": 27752,
   "icons/icon-512.png": 94753,
   "icons/icon-maskable-512.png": 90587
