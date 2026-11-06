@@ -34,7 +34,7 @@ html,body{margin:0;height:100%;height:100dvh;width:100%;position:fixed;inset:0;b
 #ledger{position:fixed;inset:0;z-index:40;display:none;align-items:center;justify-content:center;background:rgba(4,6,10,.55);padding:calc(10px + var(--st,0px)) calc(10px + var(--sr)) calc(10px + var(--sb)) calc(10px + var(--sl))}
 #ledger.open{display:flex;animation:lgIn .22s ease-out}
 @keyframes lgIn{from{opacity:0}to{opacity:1}}
-#ledger .sheet{width:min(760px,100%);max-height:100%;display:flex;flex-direction:column;border-radius:22px;overflow:hidden;background:rgba(16,20,30,.94);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);border:1px solid var(--line);box-shadow:0 24px 70px rgba(0,0,0,.6);color:#fff}
+#ledger .sheet{width:min(760px,100%);max-height:100%;display:flex;flex-direction:column;border-radius:22px;overflow:hidden;background:rgba(16,20,30,.94);border:1px solid var(--line);box-shadow:0 24px 70px rgba(0,0,0,.6);color:#fff}
 #ledger header{display:flex;align-items:center;gap:10px;padding:12px 14px 10px;border-bottom:1px solid var(--line)}
 #ledger header h3{flex:1;margin:0;font:800 17px/1.2 var(--ff)}
 #ledger .x{width:38px;height:38px;border-radius:12px;border:1px solid var(--line);background:linear-gradient(180deg,#2b3242,#191d27);color:#fff;font:700 18px var(--ff);cursor:pointer}
@@ -68,7 +68,7 @@ html,body{margin:0;height:100%;height:100dvh;width:100%;position:fixed;inset:0;b
 #ledger .empty{color:#8a96a6;font:600 13px var(--ff);padding:14px 2px}
 /* menük */
 #menu{position:fixed;z-index:20;left:calc(14px + var(--sl));top:50%;transform:translateY(-50%);display:none;flex-direction:column;gap:8px;width:clamp(210px,30vw,280px);max-height:calc(100dvh - 24px);overflow:auto;padding:12px;border-radius:22px;
- background:var(--glass);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);border:1px solid var(--line);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+ background:rgba(14,18,27,.9);border:1px solid var(--line);box-shadow:0 20px 60px rgba(0,0,0,.5)}
 #menu.center{left:50%;transform:translate(-50%,-50%)}
 #menu.bottom{top:auto;bottom:calc(14px + var(--sb));left:auto;right:calc(14px + var(--sr));transform:none;flex-direction:row;width:auto;max-width:92vw;padding:8px;border-radius:18px}
 #menu h2{margin:2px 4px 4px;font:700 13px/1.2 var(--ff);color:#9fb0c2;letter-spacing:.06em;text-transform:uppercase}
@@ -82,7 +82,7 @@ html,body{margin:0;height:100%;height:100dvh;width:100%;position:fixed;inset:0;b
 .mb .lbl{position:relative}
 .mb.new{border-color:var(--acc);box-shadow:0 0 0 2px rgba(255,216,74,.35)}
 .ver{color:#7d8a9a;font:600 12px var(--ff);padding:2px 6px}
-#toast{position:fixed;left:50%;bottom:calc(24px + var(--sb));transform:translateX(-50%);z-index:60;background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--line);color:#fff;
+#toast{background:rgba(14,18,27,.92)!important;position:fixed;left:50%;bottom:calc(24px + var(--sb));transform:translateX(-50%);z-index:60;background:var(--glass);border:1px solid var(--line);color:#fff;
  padding:11px 18px;border-radius:14px;font:600 14px var(--ff);opacity:0;transition:opacity .25s;pointer-events:none;max-width:86vw;text-align:center}
 #rot{position:fixed;inset:0;z-index:70;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(11,15,23,.94);font:700 17px var(--ff);text-align:center;pointer-events:none}
 #rot b{font-size:44px;animation:rot 1.6s ease-in-out infinite}@keyframes rot{0%,30%{transform:rotate(0)}60%,100%{transform:rotate(-90deg)}}
@@ -106,7 +106,7 @@ html,body{margin:0;height:100%;height:100dvh;width:100%;position:fixed;inset:0;b
 #bGas{right:calc(14px + var(--sr));bottom:calc(12px + var(--sb));width:calc(var(--u)*1.3);height:calc(var(--u)*2.25);border-radius:14px}
 #bBr{right:calc(14px + var(--sr) + var(--u)*1.3 + var(--u)*.42);bottom:calc(12px + var(--sb));width:calc(var(--u)*1.75);height:calc(var(--u)*1.5);border-radius:14px}
 #bHaz{background:linear-gradient(180deg,#5a1e1e,#2a0d0d)!important}
-#cruiseBar{position:fixed;z-index:12;left:50%;transform:translateX(-50%);bottom:calc(var(--u) + 30px + var(--sb));display:none;gap:6px;padding:7px;border-radius:16px;background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--line);box-shadow:0 10px 30px rgba(0,0,0,.5)}
+#cruiseBar{position:fixed;z-index:12;left:50%;transform:translateX(-50%);bottom:calc(var(--u) + 30px + var(--sb));display:none;gap:6px;padding:7px;border-radius:16px;background:var(--glass);border:1px solid var(--line);box-shadow:0 10px 30px rgba(0,0,0,.5)}
 #cruiseBar button{min-width:calc(var(--u)*.95);height:calc(var(--u)*.8);border-radius:12px;border:1px solid var(--line);background:linear-gradient(180deg,#2b3242,#191d27);color:#fff;font:700 15px var(--ff)}
 #cruiseBar button.on{background:linear-gradient(180deg,#3b7fe6,#2458b8)}
 #cruiseBar button:active{transform:scale(.95)}
@@ -139,7 +139,7 @@ html,body{margin:0;height:100%;height:100dvh;width:100%;position:fixed;inset:0;b
 #topbar .ctl svg{width:52%;height:62%}
 /* filmes főmenü */
 #menu.cine{left:calc(16px + var(--sl));width:clamp(240px,33vw,330px);padding:14px;gap:9px;border-radius:20px;
- background:linear-gradient(160deg,rgba(14,16,24,.72),rgba(10,12,18,.42));border:1px solid rgba(255,255,255,.1);border-left:2px solid rgba(255,216,74,.55);box-shadow:0 30px 80px rgba(0,0,0,.55)}
+ background:linear-gradient(160deg,rgba(14,16,24,.86),rgba(10,12,18,.66));border:1px solid rgba(255,255,255,.1);border-left:2px solid rgba(255,216,74,.55);box-shadow:0 30px 80px rgba(0,0,0,.55)}
 #menu.cine .mb.hero,#menu.cine .mb.hero2{min-height:54px;border-radius:15px;padding:10px 16px;font:800 16px/1.15 var(--ff);letter-spacing:.02em}
 #menu.cine .mb.hero{color:#1d1405;background:linear-gradient(180deg,#ffe07a,#ffb53a 60%,#f39a22);border-color:rgba(255,255,255,.55);box-shadow:0 10px 26px rgba(255,170,40,.35),inset 0 1px 0 rgba(255,255,255,.7)}
 #menu.cine .mb.hero .ic{font-size:18px}
@@ -186,7 +186,7 @@ html,body{margin:0;height:100%;height:100dvh;width:100%;position:fixed;inset:0;b
 </style>
 </head>
 <body>
-<div id="wrap"><canvas id="c"></canvas></div>
+<div id="wrap"><canvas id="c" style="will-change:transform"></canvas></div>
 <div id="touch">
  <div class="ctl" id="bUp"><svg viewBox="0 0 24 24"><path d="M5 15l7-7 7 7" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
  <div class="ctl" id="bDn"><svg viewBox="0 0 24 24"><path d="M5 9l7 7 7-7" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
@@ -195,7 +195,7 @@ html,body{margin:0;height:100%;height:100dvh;width:100%;position:fixed;inset:0;b
   <path d="M41 46h6l7-6v20l-7-6h-6z" fill="#ffd84a"/><path d="M58 44q3 6 0 12" fill="none" stroke="#ffd84a" stroke-width="2.4" stroke-linecap="round"/></svg></div>
  <div class="ctl pedal" id="bBr"><svg viewBox="0 0 86 72"><rect x="8" y="10" width="70" height="50" rx="9" fill="#2b3038" stroke="#8a929c" stroke-width="2"/>
   <g stroke="#5b636d" stroke-width="3" stroke-linecap="round"><path d="M16 22h54M16 31h54M16 40h54M16 49h54"/></g><text x="43" y="69" fill="#e8eef5" font-size="9" font-weight="700" text-anchor="middle" font-family="system-ui">FÉK</text></svg></div>
- <div class="ctl" id="bCruise"><svg viewBox="0 0 24 24"><path d="M4 16a8 8 0 1 1 16 0" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/><path d="M12 16l4-5" stroke="#7fd1ff" stroke-width="2.2" stroke-linecap="round"/><circle cx="12" cy="16" r="1.6" fill="#fff"/></svg><small id="lCruise">TEMPOMAT</small></div>
+ <div class="ctl" id="bCruise"><svg viewBox="0 0 24 24"><path d="M4 16a8 8 0 1 1 16 0" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/><path d="M12 16l4-5" stroke="#7fd1ff" stroke-width="2.2" stroke-linecap="round"/><circle cx="12" cy="16" r="1.6" fill="#fff"/></svg><small id="lCruise">TEMPO</small></div>
  <div class="ctl pedal" id="bGas"><svg viewBox="0 0 58 104"><rect x="9" y="6" width="40" height="84" rx="8" fill="#2b3038" stroke="#8a929c" stroke-width="2"/>
   <g stroke="#5b636d" stroke-width="3" stroke-linecap="round"><path d="M19 16v64M29 16v64M39 16v64"/></g><text x="29" y="100" fill="#e8eef5" font-size="9" font-weight="700" text-anchor="middle" font-family="system-ui">GÁZ</text></svg></div>
  <div id="ctlrow">
@@ -221,10 +221,11 @@ html,body{margin:0;height:100%;height:100dvh;width:100%;position:fixed;inset:0;b
 <div id="splash"><img src="icons/icon-192.png" alt=""><h1>Családi Vakáció</h1><div class="bar"><i id="splbar"></i></div><small id="spltxt">Betöltés... 0%</small></div>
 <script>
 /* betöltő: a játék fájljai sorban, valós százalékkal */
-(function(){const files=['js/core.js','js/geo.js','js/radio.js','js/car.js','js/world.js','js/map.js','js/minigames.js','js/shops.js','js/game.js','js/app.js'];let i=0;
+(function(){const files=['js/core.js','js/radio.js','js/car.js','js/world.js','js/game.js','js/app.js'],later=['js/geo.js','js/map.js','js/minigames.js','js/shops.js'];let i=0;
+ window.LAZY_DONE=false;function lazy(k){if(k>=later.length){window.LAZY_DONE=true;return;}const sc=document.createElement('script');sc.src=later[k];sc.async=false;sc.onload=()=>lazy(k+1);sc.onerror=()=>setTimeout(()=>lazy(k),1500);document.body.appendChild(sc);}
  const bar=document.getElementById('splbar'),txt=document.getElementById('spltxt');
  function next(){const p=Math.round(i/files.length*100);bar.style.width=p+'%';txt.textContent='Betöltés... '+p+'%';
-  if(i>=files.length){setTimeout(()=>{const s=document.getElementById('splash');s.style.opacity=0;setTimeout(()=>s.remove(),500);},250);return;}
+  if(i>=files.length){setTimeout(()=>{const s=document.getElementById('splash');s.style.opacity=0;setTimeout(()=>s.remove(),500);},250);(window.requestIdleCallback||setTimeout)(()=>lazy(0),{timeout:600});return;}
   const sc=document.createElement('script');sc.src=files[i++];sc.async=false;sc.onload=next;sc.onerror=()=>{txt.textContent='Hiba a betöltéskor. Ellenőrizd a kapcsolatot.';};document.body.appendChild(sc);}
  next();})();
 </script>

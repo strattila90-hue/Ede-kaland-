@@ -3,7 +3,7 @@
    MINIJÁTÉKOK – kaparós sorsjegy, bikázás, rakodás, zöldségszortírozás,
    autópálya-matrica
    ========================================================= */
-let MG=null;
+var MG=null;
 cv.addEventListener('pointermove',e=>{if(!HOLD)return;const r=cv.getBoundingClientRect();HOLD.x=(e.clientX-r.left)/r.width*W;HOLD.y=(e.clientY-r.top)/r.height*H;});
 function vib(ms){try{if(navigator.vibrate)navigator.vibrate(ms);}catch(e){}}
 function startMini(type,opt){MG={type:type,t:0,opt:opt||{},phase:'play',reward:0,msg:''};const init=MINI[type].init;if(init)init(MG);}

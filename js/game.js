@@ -520,7 +520,7 @@ function drawHUD(g){const L=LEGS[G.leg],T=G.trip,s=seg(),t=G.t,blinkOn=(t%40)<20
  const bar=(x,lbl,v)=>{text(g,lbl,x,37,'#9fb0c2',1,'left',null);frr(g,'#1b212b',x+textW(lbl)+3,38,30,5,2);frr(g,v<20?'#ff6b6b':v<45?'#ffcf33':'#5bd06a',x+textW(lbl)+3,38,30*v/100,5,2);};
  bar(rx+7,'Kaja',T.food);bar(rx+70,'Baba',T.baby);bar(rx+133,'Autó',hpOf(T));
  // minitérkép (érintésre nagyobb)
- const mr=mapRect();frr(g,'rgba(8,11,18,0.85)',mr[0]-2,mr[1]-2,mr[2]+4,mr[3]+4,9);if(G.mapBig)drawMiniMap(g,mr,G.leg,Math.min(1,P.dist/LEG.len),t);else{drawGPS(g,mr,G.leg,Math.min(1,P.dist/LEG.len),t,L.time==='night'||L.time==='dusk',Math.abs(P.kmh),Math.max(0,L.km-legKm()));drawUpcoming(g,mr[0]-2,mr[1]+mr[3]+5,ROADT+4);}
+ const mr=mapRect();frr(g,'rgba(8,11,18,0.85)',mr[0]-2,mr[1]-2,mr[2]+4,mr[3]+4,9);if(G.mapBig)drawMiniMap(g,mr,G.leg,Math.min(1,P.dist/LEG.len),t);else{drawGPSCached(g,mr,G.leg,Math.min(1,P.dist/LEG.len),t,L.time==='night'||L.time==='dusk',Math.abs(P.kmh),Math.max(0,L.km-legKm()));drawUpcoming(g,mr[0]-2,mr[1]+mr[3]+5,ROADT+4);}
  // jelzések
  const cxp=(W-mr[2]-8)/2+2;let y=isTouch?94:54;const pill=(txt,col)=>{const w=textW(txt.toUpperCase())+10;frr(g,'rgba(8,11,18,0.72)',cxp-w/2,y-2,w,11,5);text(g,txt,cxp,y,col,1,'center',null);y+=13;};
  if(G.segInfo)pill(G.segInfo.txt,'#ffffff');if(G.msg)pill(G.msg.txt,G.msg.col);
@@ -576,6 +576,17 @@ const TSCENES=[{L:{region:'hu',weather:'sun',time:'day'},type:'village',q:'good'
  {L:{region:'alps',weather:'snow',time:'day'},type:'country',q:'medium',lbl:'Alpok'},{L:{region:'it',weather:'sun',time:'day'},type:'village',q:'cobble',lbl:'Olasz tengerpart'},
  {L:{region:'provence',weather:'sun',time:'sunset'},type:'country',q:'good',lbl:'Provence, naplemente'},{L:{region:'fr',weather:'clear',time:'night'},type:'town',q:'good',lbl:'Párizs éjjel'}];
 TSCENES.forEach(sc=>sc.leg={segs:[{type:sc.type,name:'',q:sc.q,x0:-1e12,x1:1e12,limit:LIMIT[sc.type],cc:''}],pois:[],lights:[],stations:[],kmPerPx:1/PXKM});
+/* előre elkészített filmes rétegek (egyszer rajzolva, utána csak egy képmásolás) */
+let TFX=null,TGR=null;
+function titleFX(){if(TFX&&TFX.sc===SC)return TFX.c;const [c,x]=mk(W,H,SC);
+ x.fillStyle=lg(x,0,0,0,H,[[0,'rgba(0,95,150,0.16)'],[0.5,'rgba(0,0,0,0)'],[1,'rgba(255,140,60,0.14)']]);x.fillRect(0,0,W,H);
+ x.fillStyle=rg(x,W*0.58,H*0.52,H*0.3,W*0.72,[[0,'rgba(0,0,0,0)'],[1,'rgba(0,0,0,0.62)']]);x.fillRect(0,0,W,H);TFX={c:c,sc:SC};return c;}
+function grainTile(){if(TGR)return TGR;const [c,x]=mk(W+16,H+16,1);for(let i=0;i<2600;i++){x.fillStyle=Math.random()>0.5?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.09)';x.fillRect(Math.random()*(W+16),Math.random()*(H+16),1,1);}TGR=c;return c;}
+/* GPS: offscreen képbe rajzolva, kb. 12-szer másodpercenként frissül */
+let GPSC=null;
+function drawGPSCached(g,r,leg,frac,t,night,kmh,rem){const w=r[2],h=r[3];if(!GPSC||GPSC.sc!==SC||GPSC.w!==w||t-GPSC.t>=5||t<GPSC.t){const [c,x]=GPSC&&GPSC.sc===SC&&GPSC.w===w?[GPSC.c,GPSC.x]:mk(w+2,h+2,SC);
+  x.setTransform(SC,0,0,SC,0,0);x.clearRect(0,0,w+2,h+2);x.save();x.translate(1-r[0],1-r[1]);drawGPS(x,r,leg,frac,t,night,kmh,rem);x.restore();GPSC={c:c,x:x,sc:SC,w:w,t:t};}
+ g.drawImage(GPSC.c,r[0]-1,r[1]-1,w+2,h+2);}
 function introT(){if(G.introSeen)return 999;if(G.st>=170)G.introSeen=true;return G.st;}
 const CREDITS=['Apa','Anya','Anna (5)','Petra (3)','kis Atti (10 hó)','és a családi egyterű'];
 function drawTitle(g){const t=G.t,per=600,k=Math.floor(t/per)%TSCENES.length,ph=t%per,sc=TSCENES[k],L=sc.L,leg=sc.leg,dist=t*5,it=introT();lights=[];
@@ -591,15 +602,14 @@ function drawTitle(g){const t=G.t,per=600,k=Math.floor(t/per)%TSCENES.length,ph=
  if(L.weather==='snow'){g.fillStyle='#ffffff';for(let i=0;i<90;i++){const x=((hsh(i)*W-t*(0.6+hsh(i+3))*1.8)%W+W)%W,y=(hsh(i+7)*H+t*(0.5+hsh(i+1)))%H;g.beginPath();g.arc(x,y,hsh(i+9)>0.6?1.1:0.7,0,TAU);g.fill();}}
  darkness(g,L);g.restore();
  // színkorrekció: hűvös ég, meleg föld (filmes "teal & orange")
- if(!LOWQ){g.save();g.globalCompositeOperation='soft-light';g.fillStyle=lg(g,0,0,0,H,[[0,'rgba(0,110,160,0.45)'],[0.55,'rgba(120,120,120,0)'],[1,'rgba(255,150,60,0.45)']]);g.fillRect(0,0,W,H);g.restore();}
+ g.drawImage(titleFX(),0,0,W,H);
  // lencsefény a nap felől
  const sun=L.time==='day'&&L.weather==='sun'?[405,38]:L.time==='sunset'?[380,150]:null;
  if(sun&&!LOWQ){g.save();g.globalCompositeOperation='lighter';const vx=W*0.5-sun[0],vy=H*0.55-sun[1],fl=0.75+0.25*Math.sin(t*0.02);
   for(const [f,r,c] of [[0.35,7,'rgba(255,220,150,0.10)'],[0.6,3,'rgba(150,220,255,0.16)'],[0.85,12,'rgba(255,170,90,0.07)'],[1.25,5,'rgba(190,255,200,0.12)'],[1.6,18,'rgba(140,180,255,0.06)']])disc(g,c,sun[0]+vx*f,sun[1]+vy*f,r*fl);
   g.fillStyle=lg(g,sun[0]-120,0,sun[0]+120,0,[[0,'rgba(255,230,180,0)'],[0.5,'rgba(255,230,180,'+0.22*fl+')'],[1,'rgba(255,230,180,0)']]);g.fillRect(sun[0]-120,sun[1]-0.6,240,1.2);g.restore();}
  // vignetta és filmszemcse
- g.fillStyle=rg(g,W*0.58,H*0.52,H*0.3,W*0.72,[[0,'rgba(0,0,0,0)'],[1,'rgba(0,0,0,0.62)']]);g.fillRect(0,0,W,H);
- if(!LOWQ){for(let i=0;i<160;i++){const r=hsh(i*977+t*13);g.fillStyle=r>0.5?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.08)';g.fillRect(hsh(i*31+t*7)*W,hsh(i*17+t*3)*H,0.7,0.7);}
+ if(!LOWQ){const gr=grainTile();g.drawImage(gr,-((t*37)%16),-((t*23)%16),W+16,H+16);
   if(hsh(t*5)>0.985)R(g,'rgba(255,255,255,0.05)',hsh(t)*W,0,0.5,H);}
  // jelenetváltás: áttűnés feketébe
  const fade=ph<36?1-ph/36:ph>per-36?(ph-(per-36))/36:0;if(fade>0)R(g,'rgba(0,0,0,'+fade+')',0,0,W,H);
@@ -672,7 +682,7 @@ function drawWin(g){const t=G.t,T=G.trip;drawSky(g,LEGS[LEGS.length-1],t);drawCl
  r.forEach((s,k)=>text(g,s,W/2,56+k*12,'#ffffff',1,'center'));if(G.st>60&&((t>>4)&1))text(g,isTouch?'Érintsd meg: főmenü':'Enter: főmenü',W/2,134,'#cfd6df',1,'center');}
 
 /* ---------- fő frissítés ---------- */
-function update(){if(G.ledger&&G.state!=='play'){G.t++;K.upP=K.dnP=K.enterP=K.enterKey=K.pauseP=false;K.num=0;TAP=TAPD=null;return;}G.t++;G.st++;{const play=G.state==='play'&&!G.paused&&!MG;if(K.horn&&!G.hornPrev&&play)K.honkP=true;G.hornPrev=K.horn;hornSet(K.horn&&play);}updateMusic(G.paused||G.state==='play'||radio.on||G.state!=='title'&&G.state!=='map');if(G.state==='play'&&!G.paused)updRadio();if(radio.show>0)radio.show--;if(G.state!=='play'||G.paused)engine(0,0);
+function update(){if(!window.LAZY_DONE&&G.state!=='title'&&G.state!=='specs'){G.t++;return;}if(G.ledger&&G.state!=='play'){G.t++;K.upP=K.dnP=K.enterP=K.enterKey=K.pauseP=false;K.num=0;TAP=TAPD=null;return;}G.t++;G.st++;{const play=G.state==='play'&&!G.paused&&!MG;if(K.horn&&!G.hornPrev&&play)K.honkP=true;G.hornPrev=K.horn;hornSet(K.horn&&play);}updateMusic(G.paused||G.state==='play'||radio.on||G.state!=='title'&&G.state!=='map');if(G.state==='play'&&!G.paused)updRadio();if(radio.show>0)radio.show--;if(G.state!=='play'||G.paused)engine(0,0);
  if(G.state==='title'&&introT()<150&&(K.enterP||TAPD||TAP||K.upP||K.dnP)){G.st=150;G.introSeen=true;K.enterP=K.upP=K.dnP=false;TAPD=TAP=null;}
  if(G.state==='title'){const opts=titleOpts(),n=opts.length;if(G.menu>=n)G.menu=0;if(K.upP)G.menu=(G.menu+n-1)%n,SFX.click();if(K.dnP)G.menu=(G.menu+1)%n,SFX.click();
   if(TAP){const i=Math.floor((TAP.y-221)/9);if(i>=0&&i<n)G.menu=i;}
@@ -689,11 +699,18 @@ function update(){if(G.ledger&&G.state!=='play'){G.t++;K.upP=K.dnP=K.enterP=K.en
  else if(G.state==='win'){if(K.enterP&&G.st>60){SFX.click();G.state='title';G.menu=0;}}
  K.upP=K.dnP=K.honkP=K.enterP=K.pauseP=K.lightP=K.fogP=K.hazP=K.doorP=K.revP=K.radioP=K.hbP=false;K.enterKey=false;K.cruiseP=false;K.stopP=false;K.logP=false;TAPD=null;K.num=0;TAP=null;}
 function render(){ctx.setTransform(SC,0,0,SC,0,0);ctx.imageSmoothingEnabled=true;
+ if(!window.LAZY_DONE&&G.state!=='title'&&G.state!=='specs'){R(ctx,'#0b0f17',0,0,W,H);text(ctx,'Betöltés...',W/2,H/2-4,'#ffd84a',1.4,'center');return;}
  if(G.state==='title')drawTitle(ctx);else if(G.state==='specs')drawSpecs(ctx);else if(G.state==='map')drawMap(ctx);else if(G.state==='play')drawPlay(ctx);
  else if(G.state==='postcard')drawPostcard(ctx);else if(G.state==='over')drawOver(ctx);else if(G.state==='win')drawWin(ctx);
  if(typeof appTick==='function')appTick();}
 let last=performance.now(),acc=0,perfT=0,perfN=0;const STEP=1000/60;
 document.addEventListener('visibilitychange',()=>{if(document.hidden){if(G.state==='play'&&P){G.paused=true;save(P.dist);}if(AC&&AC.state==='running')AC.suspend();}else{last=performance.now();if(AC)AC.resume();}});
-function frame(now){const dt=Math.min(200,now-last);acc+=dt;last=now;let n=0;while(acc>=STEP&&n<4){update();acc-=STEP;n++;}if(n>=4)acc=0;render();
- perfT+=dt;perfN++;if(perfN>=180){const avg=perfT/perfN;perfT=0;perfN=0;if(avg>24&&SC>1.5){setSC(1.5);LOWQ=true;}}requestAnimationFrame(frame);}
+// minőségi fokozatok: renderfelbontás (SC) és effektek; a kijelző tényleges felbontásánál nem rajzol többet
+const QTIERS=[3,2.5,2,1.5,1.2];let QT=null,QUP=0,RT=0;
+function wantSC(){const c=document.getElementById('c'),dpr=window.devicePixelRatio||1;return Math.max(1,(c.clientWidth||W)*dpr/W);}
+function applyQ(){const sc=Math.min(QTIERS[QT],Math.max(1.2,Math.ceil(wantSC()*4)/4));LOWQ=QT>=3;if(Math.abs(sc-SC)>0.01){setSC(sc);TFX=null;GPSC=null;}}
+function qualityStep(avg,ra){if(document.hidden)return;if(QT===null){QT=(navigator.hardwareConcurrency||4)>=6&&(window.devicePixelRatio||1)>=2.5?1:2;applyQ();return;}
+ if(avg>21&&QT<QTIERS.length-1){QT++;QUP=0;applyQ();}else if(avg<18&&ra<5&&QT>0){if(++QUP>=4){QT--;QUP=0;applyQ();}}else QUP=0;}
+function frame(now){const dt=Math.min(200,now-last);acc+=dt;last=now;let n=0;while(acc>=STEP&&n<3){update();acc-=STEP;n++;}if(n>=3)acc=0;const r0=performance.now();render();RT+=performance.now()-r0;
+ perfT+=dt;perfN++;if(perfN>=90){const avg=perfT/perfN,ra=RT/perfN;perfT=0;perfN=0;RT=0;qualityStep(avg,ra);}requestAnimationFrame(frame);}
 requestAnimationFrame(frame);

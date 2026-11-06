@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.9.0
+# 🚐 Családi Vakáció – v2.9.1
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -205,6 +205,13 @@ Mezők (búza, napraforgó, repce, kukorica, szántás, levendula) szalmabálák
 | P | II | szünet |
 | M | Zene (főmenü) | menüzene |
 | 1–5, Enter | érintés | menük és minijátékok |
+
+## ⚡ Gyorsaság
+
+- **Kétlépcsős betöltés:** először csak a főképernyőhöz kellő rész töltődik be (kb. egy másodperc), a térkép, a boltok és a minijátékok a háttérben jönnek utána.
+- **Nincs élő elmosás:** a menük nem mossák el folyamatosan a mozgó képet (ez telefonon a leglassabb művelet volt).
+- **Előre elkészített rétegek:** a filmes színkorrekció, a vignetta és a filmszemcse egyszer készül el, utána csak bemásolódik. A betűk is gyorsítótárból jönnek, a GPS kb. 12-szer frissül másodpercenként.
+- **A telefonhoz igazodik:** erős telefonon élesebb felbontásban rajzol (a kijelzőnél soha nem többet), gyengébbnél automatikusan visszavesz a felbontásból és az effektekből, és ha újra van tartalék, visszaemeli.
 
 ## 📱 Telepítés, megosztás, frissítés
 

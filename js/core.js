@@ -2,12 +2,12 @@
 /* =========================================================
    CSALÁDI VAKÁCIÓ – alapok: vászon, rajzoló segédek, betűk, hang, bemenet
    ========================================================= */
-const APP_VERSION='2.9.0';
+const APP_VERSION='2.9.1';
 const W=480,H=270,PX=70,ROADT=194,ROADB=262,LANE=[212,232,252];
 const TAU=Math.PI*2;
 let SC=2,LOWQ=false;
 try{if(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=2){SC=1.5;LOWQ=true;}}catch(e){}
-const cv=document.getElementById('c'),ctx=cv.getContext('2d');
+var MG=null;const cv=document.getElementById('c'),ctx=cv.getContext('2d',{alpha:false,desynchronized:true})||cv.getContext('2d');
 cv.width=W*SC;cv.height=H*SC;
 function setSC(v){SC=v;cv.width=Math.round(W*SC);cv.height=Math.round(H*SC);if(typeof onSC==='function')onSC();}
 const isTouch=('ontouchstart' in window)||(navigator.maxTouchPoints>0);
@@ -56,9 +56,16 @@ function glyph(g,ch,x,y,s){let a=0;if(ACC[ch]){a=ACC[ch][1];ch=ACC[ch][0];}const
  else if(a===2){g.fillRect(x+s,y-2*s,s,s);g.fillRect(x+3*s,y-2*s,s,s);}
  else if(a===3){g.fillRect(x+2*s,y-3*s,s,s);g.fillRect(x+s,y-2*s,s,s);g.fillRect(x+4*s,y-3*s,s,s);g.fillRect(x+3*s,y-2*s,s,s);}}
 function textW(str,s){s=s||1;return String(str).length*6*s-s;}
+/* betűk gyorsítótára: minden betű színenként és méretenként egyszer rajzolódik pontokból, utána csak bemásolódik */
+const GLC=new Map();
+function glyphImg(ch,col,s){const k=ch+'|'+col+'|'+s+'|'+SC;let c=GLC.get(k);if(c)return c;if(GLC.size>1500)GLC.clear();
+ const w=Math.ceil(6*s+1),h=Math.ceil(10*s+1);c=document.createElement('canvas');c.width=Math.ceil(w*SC);c.height=Math.ceil(h*SC);const x=c.getContext('2d');x.setTransform(SC,0,0,SC,0,0);x.fillStyle=col;glyph(x,ch,0,s*3,s);c.lw=w;c.lh=h;GLC.set(k,c);return c;}
 function text(g,str,x,y,col,s,align,sh){s=s||1;str=String(str).toUpperCase();const w=textW(str,s);if(align==='center')x-=w/2;else if(align==='right')x-=w;x=Math.round(x);y=Math.round(y);
- if(sh!==null){g.fillStyle=sh||'rgba(10,12,20,0.85)';for(let i=0;i<str.length;i++)glyph(g,str[i],x+i*6*s+s*0.6,y+s*0.6,s);}
- g.fillStyle=col;for(let i=0;i<str.length;i++)glyph(g,str[i],x+i*6*s,y,s);}
+ if(typeof col!=='string'){if(sh!==null){g.fillStyle=sh||'rgba(10,12,20,0.85)';for(let i=0;i<str.length;i++)glyph(g,str[i],x+i*6*s+s*0.6,y+s*0.6,s);}g.fillStyle=col;for(let i=0;i<str.length;i++)glyph(g,str[i],x+i*6*s,y,s);return;}
+ const shc=sh===null?null:(sh||'rgba(10,12,20,0.85)');
+ for(let i=0;i<str.length;i++){const ch=str[i];if(ch===' ')continue;const gx=x+i*6*s;
+  if(shc){const c=glyphImg(ch,shc,s);g.drawImage(c,gx+s*0.6,y+s*0.6-s*3,c.lw,c.lh);}
+  const c=glyphImg(ch,col,s);g.drawImage(c,gx,y-s*3,c.lw,c.lh);}}
 
 /* ---------- hang ---------- */
 let AC=null,master=null,musicOn=true,mStep=0,mNext=0;
