@@ -29,11 +29,12 @@ SOAK=r"""
     if(P.flat&&P.sub==='drive'&&i>320&&i<900){K.gas=false;K.brake=true;if(P.lane>0)K.upP=true;}});
   handleSub();
   // célba érés, képeslap, térkép, következő szakasz
-  P.dist=LEG.len-150;P.kmh=60;let g2=0;while(G.state==='play'&&g2++<3000)step(1,()=>{K.gas=true;});
+  P.hb=false;P.rev=false;P.auto=null;P.dist=LEG.len-150;P.kmh=60;let g2=0;while(G.state==='play'&&g2++<3000)step(1,()=>{K.gas=true;});
   if(G.state==='postcard'){st.postcards++;G.st=999;step(5,()=>{K.enterP=true;});}
   if(G.state==='map'){G.st=999;step(5,()=>{K.enterP=true;});}
   if(G.state==='win')st.win++;
   if(G.leg!==leg||G.state==='win')st.legsDone++;
+  else errs.push({where:'leg',msg:'nem ért célba: állapot '+G.state+' sub '+(P&&P.sub)+' flat '+(P&&P.flat)+' km/h '+(P&&P.kmh|0)+' táv '+(P&&LEG.len-P.dist|0)+' auto '+(P&&P.auto&&P.auto.p&&P.auto.p.type)+' ev '+(P&&P.ev&&P.ev.type)+' arriving '+(P&&P.arriving)+' rev '+(P&&P.rev)+' hb '+(P&&P.hb),leg});
   try{openLedger('menu');renderLedger();closeLedger();}catch(e){rec('ledger',e);}
   const T=G.trip,sum=T.log.reduce((a,e)=>a+e.a,0);if(sum!==T.money)errs.push({where:'money',msg:'egyenleg '+T.money+' != napló '+sum,leg});if(!Number.isInteger(T.money))errs.push({where:'money',msg:'nem egész',leg});
   L.weather=ow;L.time=ot;G.state='play';}

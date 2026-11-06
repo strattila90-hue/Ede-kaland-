@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.21.2
+# 🚐 Családi Vakáció – v2.21.3
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -211,7 +211,7 @@ Minden tranzakció után a pénzkijelző egy pillanatra a levont vagy kapott ös
 ## 🚨 Rendkívüli helyzetek
 
 - **Atti sír**, **Petrának rossz**, **Annának pisilni kell:** állj meg időben a szélső sávban.
-- **Defekt:** a kerék valóban lapos lesz (a felni leül, a gumi alul szétnyomódik), az autó azon a sarkon megroggyan, menet közben puffog és ráz. Állj meg a szélső sávban, és Apa végigcsinálja a kerékcserét: kiszáll, elhátrál a háromszöggel, kiveszi a pótkereket és az emelőt, letérdel, csavarkulccsal lazít, felpumpálja az autót, leveszi a lapos kereket, felteszi a pótkereket, meghúzza a csavarokat, leengedi az autót, elrakja a kereket, visszahozza a háromszöget és visszaül (kb. 13 mp). Pótkerék nélkül autómentőt kell hívni.
+- **Defekt:** a kerék valóban lapos lesz (a felni leül, a gumi alul szétnyomódik), az autó azon a sarkon megroggyan, menet közben puffog és ráz. Állj meg a szélső sávban, és Apa végigcsinálja a kerékcserét: kiszáll, elhátrál a háromszöggel, kiveszi a pótkereket és az emelőt, letérdel, csavarkulccsal lazít, felpumpálja az autót, leveszi a lapos kereket, felteszi a pótkereket, meghúzza a csavarokat, leengedi az autót, elrakja a kereket, visszahozza a háromszöget és visszaül (kb. 13 mp). Pótkerék nélkül autómentőt kell hívni. A defekt ritka: kátyúnál jó úton kb. 3%, rossz úton kb. 7% az esélye (gyorsabban nagyobb), vadbalesetnél 15%, és egy defekt után legalább 10 percnyi vezetésig nem jön újabb.
 - **Traffipax**, **piros lámpa**, **dugó**, **útépítés**, **őz az úton**.
 - **Kifogyott a benzin:** az autómentő hoz 10 litert.
 
