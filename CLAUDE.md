@@ -60,7 +60,7 @@ Egy új JS fájlt **három helyre** kell felvenni: `index.html` betöltőlista, 
 - **Minőségszabályzó:** csak a valóban késő képkocka (két kép között >26 ms) számít akadásnak. A telefon saját 60/120 Hz-es váltása nem. Ne alakítsd vissza a frissítési idő minimumához mérő változatra (az okozta a 30 kép/mp-es hibát).
 - **A menü frissítése (`appTick`) a `frame()`-ben fut minden képkockán**, nem a `render()`-ben, mert a főmenü képét a játék nem rajzolja újra (`TITLE_DRAWN`).
 - `app.js`-ben a `$()` hiányzó elemnél egy üres elemet ad vissza (régi oldal + új szkript keveredésekor se álljon le a menü). Az `app.js` utolsó sora `window.APP_OK=true`; ha ez nem fut le, a betöltő egyszer tisztán újratölt.
-- **Szöveg:** `text(g,str,x,y,col,scale,align)`. A számot tartalmazó szövegek betűnként rajzolódnak, nem kerülnek a szövegtárba.
+- **Szöveg:** `text(g,str,x,y,col,scale,align)`. A betűk színenként és méretenként egy-egy atlaszképben vannak (`glyphAtlas`, `drawGlyph`, legfeljebb 40 atlasz). **Ne hozz létre elemenként külön kis vásznat** (betűnként, tárgyanként): telefonon ezer fölötti kis vászon miatt a rendszer leállította a játékot (hibanapló: „VÁRATLAN LEÁLLÁS”, „betű 1276”). A számot tartalmazó szövegek betűnként rajzolódnak, nem kerülnek a szövegtárba (`STC`, legfeljebb 80).
 - **Mentés:** `localStorage` kulcs: `csaladi-vakacio-v2`, `routeV:2` (a régi, 12 szakaszos mentést a `loadSave` átalakítja).
 - **Arculati korlátok:** a gyorsétterem saját „Burger Pont”, nem McDonald's. A térkép neve „GPS”, nem Google Maps. Az autó saját tervezésű, nem a Citroën C4 Picasso másolata.
 - **Hibanapló:** `elog(kind,msg)` (`kind`: `hiba` / `info` / `leállás`), a felhasználó a főmenüből küldi el. Ha „véletlen kilépést” jelent, először a naplót kérd.

@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.21.0
+# 🚐 Családi Vakáció – v2.21.1
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -299,6 +299,7 @@ Mindkét kiosztásban:
 - **Előmelegítés:** a betűképek induláskor és felbontásváltáskor a telefon üresjárati idejében készülnek el, nem játék közben.
 - **Mentés üresjáratban:** az automatikus mentés (10 mp-enként) akkor fut, amikor a telefon épp ráér, így nem okoz döccenést.
 - **Városi házak:** ablakonkénti színátmenet helyett egyszerű kitöltés és csillanás.
+- **Betűatlasz és memóriatakarítás (váratlan leállás javítása):** a betűk színenként és méretenként egyetlen közös képben (atlaszban) vannak, nem betűnként külön kis képben. Felbontásváltáskor minden régi kép (betűk, feliratok, tárgyak, tájsávok, autó) törlődik, és a kidobott képek grafikus memóriája azonnal felszabadul. Korábban egy telefonon 1 276 külön betűkép gyűlt össze, és a rendszer emiatt leállította a játékot. Mérve: 6 szakasz és 10 felbontásváltás után a memóriában maradt képek száma 2 043 helyett 84, a méretük kb. 150 helyett 44 MB.
 - **Előre megrajzolt autó:** a családi autó karosszériája, eleje és lámpái színenként és koszosság szerint egyszer megrajzolt kép, a tényleges nagyításon (nagyban sem elmosódott); az utasok, a kerekek és a fények élőben mozognak.
 - **Előre megrajzolt táj:** telefonon nem a felbontás, hanem a képkockánkénti apró rajzolási műveletek száma a lassú. Ezért a házak, fák, templomok, kutak és minden út menti tárgy egyszer megrajzolt képként, a városi háttér-sziluett és a mezősáv képernyőnyi csempékben készül el, és menet közben csak ezek a képek mozognak (éjjel az ablakfények is megmaradnak). A műszerfal is egy képbe rajzolódik, és 30-szor frissül másodpercenként. Eredmény: városban képkockánként kb. 2 300 helyett kb. 350, országúton kb. 940 helyett kb. 480 rajzolási művelet. A régi képek vásznait újrahasznosítja, így nem keletkezik folyton új.
 - **Sima mozgás 60/90/120/144 Hz-en is:** a játék 60 lépést tesz másodpercenként, a kép a kijelző frissítéséhez igazodik (60 Hz-en 60, 90 Hz-en 90, 120 Hz-en 60, 144 Hz-en 72 egyenletes kép/mp, akkor is, ha a telefon menet közben váltogat), és két lépés között az út, a járművek és a sávváltás helyzetét arányosan kiszámolja. Így gyors menetben sem rángat a kép (korábban a nagy frissítésű kijelzőkön a képek egyenetlen ütemben jöttek, ez tűnt akadásnak).

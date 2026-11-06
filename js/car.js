@@ -116,7 +116,7 @@ const SEATS=[['apa',68,17.7],['anya',63.4,18.5],['anna',42.6,19.8],['petra',33.4
 const CARC=new Map();
 function carLayer(g,key,draw){const tr=g.getTransform(),zs=Math.max(1,Math.round(Math.hypot(tr.a,tr.b)*4)/4);/* a tényleges nagyításon készül, hogy nagyban se legyen elmosódott */
  const ck=key+'|'+zs;let c=CARC.get(ck);if(c){CARC.delete(ck);CARC.set(ck,c);}
- else{if(CARC.size>=10)CARC.delete(CARC.keys().next().value);const r=mk(128,56,zs);r[1].translate(4,3);draw(r[1]);c=r[0];CARC.set(ck,c);}
+ else{if(CARC.size>=10){const k0=CARC.keys().next().value;freeCv(CARC.get(k0));CARC.delete(k0);}const r=mk(128,56,zs);r[1].translate(4,3);draw(r[1]);c=r[0];CARC.set(ck,c);}
  g.drawImage(c,-4,-3,128,56);}
 function carBodyBase(g,dirt){
  // tetőbox és tetősín

@@ -2,7 +2,7 @@
 /* =========================================================
    CSALÁDI VAKÁCIÓ – alapok: vászon, rajzoló segédek, betűk, hang, bemenet
    ========================================================= */
-const APP_VERSION='2.21.0';
+const APP_VERSION='2.21.1';
 const W=480,H=270,PX=70,ROADT=194,ROADB=262,LANE=[212,232,252];
 const TAU=Math.PI*2;
 let SC=2,LOWQ=false;
@@ -23,7 +23,7 @@ window.addEventListener('unhandledrejection',e=>{const r=e.reason;elog('hiba','K
  elog('info','Indulás v'+APP_VERSION+(nt?' ('+({navigate:'megnyitás',reload:'újratöltés',back_forward:'vissza/előre'}[nt]||nt)+')':'')+' | '+(navigator.userAgent.match(/Android[^;)]*|iPhone OS [\d_]+|iPad|Windows NT [\d.]+|Mac OS X [\d_]+/)||[''])[0]+' | '+(navigator.userAgent.match(/(Chrome|Firefox|Safari|SamsungBrowser|MiuiBrowser)\/[\d.]+/)||[''])[0]+' | képernyő '+screen.width+'x'+screen.height+' @'+(window.devicePixelRatio||1)+(navigator.deviceMemory?' | RAM '+navigator.deviceMemory+' GB':'')+(navigator.hardwareConcurrency?' | '+navigator.hardwareConcurrency+' mag':'')+(matchMedia('(display-mode: standalone),(display-mode: fullscreen)').matches?' | telepített':' | böngésző'),true);
  try{localStorage.setItem('cv-clean','0');}catch(e){}
  const t0=Date.now();const beat=()=>{let mem=0;try{if(performance.memory)mem=Math.round(performance.memory.usedJSHeapSize/1048576);}catch(e){}
-  let cvs='';try{cvs=(typeof GLC!=='undefined'?'betű '+GLC.size:'')+(typeof SPR!=='undefined'?', tárgy '+SPR.size:'')+(typeof LTC!=='undefined'?', sáv '+LTC.size:'');}catch(e){}
+  let cvs='';try{cvs=(typeof GLC!=='undefined'?'betűatlasz '+GLC.size:'')+(typeof STC!=='undefined'?', felirat '+STC.size:'')+(typeof SPR!=='undefined'?', tárgy '+SPR.size:'')+(typeof LTC!=='undefined'?', sáv '+LTC.size:'');}catch(e){}
   try{localStorage.setItem('cv-hb',JSON.stringify({t:Date.now(),up:(Date.now()-t0)/1000,c:elogCtx(),vis:!document.hidden,mem:mem,cv:cvs}));}catch(e){}};
  setInterval(beat,4000);beat();
  window.addEventListener('pagehide',e=>{beat();elog('info','Az oldal bezárult vagy leállt (pagehide'+(e.persisted?', megőrizve':'')+(document.hidden?', háttérben':', előtérben!')+')',true);try{localStorage.setItem('cv-clean','1');}catch(_){}});
@@ -31,7 +31,10 @@ window.addEventListener('unhandledrejection',e=>{const r=e.reason;elog('hiba','K
  document.addEventListener('visibilitychange',()=>{beat();elog('info',document.hidden?'Háttérbe került':'Előtérbe jött');});}
 var MG=null;const cv=document.getElementById('c'),ctx=cv.getContext('2d',{alpha:false})||cv.getContext('2d');
 cv.width=W*SC;cv.height=H*SC;
-function setSC(v){SC=v;cv.width=Math.round(W*SC);cv.height=Math.round(H*SC);if(typeof onSC==='function')onSC();}
+/* a kidobott vásznak grafikus memóriáját azonnal visszaadja (nem vár a böngésző takarítójára) */
+function freeCv(c){try{if(c&&c.width){c.width=0;c.height=0;}}catch(e){}}
+function freeMap(m,get){try{for(const v of m.values())freeCv(get?get(v):v);m.clear();}catch(e){}}
+function setSC(v){if(v!==SC){freeMap(GLC,a=>a.c);freeMap(STC);if(typeof SPR!=='undefined')freeMap(SPR,e=>e.c);if(typeof LTC!=='undefined')freeMap(LTC);if(typeof CARC!=='undefined')freeMap(CARC);}SC=v;cv.width=Math.round(W*SC);cv.height=Math.round(H*SC);if(typeof onSC==='function')onSC();}
 const isTouch=('ontouchstart' in window)||(navigator.maxTouchPoints>0);
 function resize(){const iw=window.innerWidth,ih=window.innerHeight,s=Math.min(iw/W,ih/H),cw=Math.round(W*s),ch=Math.round(H*s);
  cv.style.width=cw+'px';cv.style.height=ch+'px';
@@ -81,28 +84,37 @@ function glyph(g,ch,x,y,s){let a=0;if(ACC[ch]){a=ACC[ch][1];ch=ACC[ch][0];}const
  else if(a===2){g.fillRect(x+s,y-2*s,s,s);g.fillRect(x+3*s,y-2*s,s,s);}
  else if(a===3){g.fillRect(x+2*s,y-3*s,s,s);g.fillRect(x+s,y-2*s,s,s);g.fillRect(x+4*s,y-3*s,s,s);g.fillRect(x+3*s,y-2*s,s,s);}}
 function textW(str,s){s=s||1;return String(str).length*6*s-s;}
-/* betűk gyorsítótára: minden betű színenként és méretenként egyszer rajzolódik pontokból, utána csak bemásolódik */
-const GLC=new Map();
-function glyphImg(ch,col,s){const k=ch+'|'+col+'|'+s+'|'+SC;let c=GLC.get(k);if(c)return c;if(GLC.size>1500)GLC.clear();
- const w=Math.ceil(6*s+1),h=Math.ceil(10*s+1);c=document.createElement('canvas');c.width=Math.ceil(w*SC);c.height=Math.ceil(h*SC);const x=c.getContext('2d');x.setTransform(SC,0,0,SC,0,0);x.fillStyle=col;glyph(x,ch,0,s*3,s);c.lw=w;c.lh=h;GLC.set(k,c);return c;}
+/* betűk gyorsítótára ATLASZBAN: színenként és méretenként EGY kép, benne a betűk rácsban (nem betűnként külön vászon).
+   Telefonon minden külön vászon külön grafikus memóriát foglal; ezer fölötti kis vászon miatt a rendszer leállíthatja a játékot. */
+const GLC=new Map(),ACOLS=16,AROWS=8;
+function quantCol(col){const m=/^rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*([\d.]+)\s*\)$/.exec(col);return m?'rgba('+m[1]+','+m[2]+','+m[3]+','+(Math.round(+m[4]*20)/20)+')':col;}
+function glyphAtlas(col,s){const k=col+'|'+s+'|'+SC;let a=GLC.get(k);if(a){GLC.delete(k);GLC.set(k,a);return a;}
+ if(GLC.size>=40){const k0=GLC.keys().next().value;freeCv(GLC.get(k0).c);GLC.delete(k0);}
+ const cw=Math.ceil(6*s+1),ch=Math.ceil(10*s+1),pw=Math.ceil(cw*SC)+2,ph=Math.ceil(ch*SC)+2,c=document.createElement('canvas');c.width=pw*ACOLS;c.height=ph*AROWS;
+ a={c:c,x:c.getContext('2d'),cw:cw,ch:ch,pw:pw,ph:ph,map:new Map(),n:0,col:col,s:s};GLC.set(k,a);return a;}
+function glyphCell(a,chr){let i=a.map.get(chr);if(i!==undefined)return i;if(a.n>=ACOLS*AROWS)return -1;i=a.n++;
+ a.x.setTransform(SC,0,0,SC,(i%ACOLS)*a.pw+1,((i/ACOLS)|0)*a.ph+1);a.x.fillStyle=a.col;glyph(a.x,chr,0,a.s*3,a.s);a.map.set(chr,i);return i;}
+function drawGlyph(g,chr,col,s,dx,dy){const a=glyphAtlas(col,s),i=glyphCell(a,chr);
+ if(i<0){g.fillStyle=col;glyph(g,chr,dx,dy+s*3,s);return;}
+ g.drawImage(a.c,(i%ACOLS)*a.pw+1,((i/ACOLS)|0)*a.ph+1,a.pw-2,a.ph-2,dx,dy,a.cw,a.ch);}
 // teljes feliratok gyorsítótára: egy felirat egyetlen képmásolással rajzolódik ki
 const STC=new Map();
 function text(g,str,x,y,col,s,align,sh){s=s||1;str=String(str).toUpperCase();const w=textW(str,s);if(align==='center')x-=w/2;else if(align==='right')x-=w;x=Math.round(x);y=Math.round(y);
  // a változó (számot tartalmazó) feliratok betűnként, a már kész betűképekből rajzolódnak: így nem keletkezik másodpercenként sok új vászon
  if(typeof col==='string'&&str.length>1&&!/[0-9]/.test(str)){const k=str+'|'+col+'|'+s+'|'+sh+'|'+SC;let c=STC.get(k);
-  if(!c){if(STC.size>160)STC.delete(STC.keys().next().value);const cw=Math.ceil(w+s*2+2),chh=Math.ceil(10*s+2);c=document.createElement('canvas');c.width=Math.ceil(cw*SC);c.height=Math.ceil(chh*SC);const x2=c.getContext('2d');x2.setTransform(SC,0,0,SC,0,0);textRaw(x2,str,0,s*3,col,s,sh);c.lw=cw;c.lh=chh;STC.set(k,c);}
+  if(!c){if(STC.size>80){const k0=STC.keys().next().value;freeCv(STC.get(k0));STC.delete(k0);}const cw=Math.ceil(w+s*2+2),chh=Math.ceil(10*s+2);c=document.createElement('canvas');c.width=Math.ceil(cw*SC);c.height=Math.ceil(chh*SC);const x2=c.getContext('2d');x2.setTransform(SC,0,0,SC,0,0);textRaw(x2,str,0,s*3,col,s,sh);c.lw=cw;c.lh=chh;STC.set(k,c);}
   g.drawImage(c,x,y-s*3,c.lw,c.lh);return;}
  textRaw(g,str,x,y,col,s,sh);}
 const GLWARM='ABCDEFGHIJKLMNOPQRSTUVWXYZÁÉÍÓÖŐÚÜŰ0123456789.,:-/%+()!?';
 function warmGlyphs(){const cols=['#ffffff','#9fb0c2','#cfd6df','#ffd84a','rgba(10,12,20,0.85)','#ffb347','#7cd99c','#9fd8ff','#9cff9c'],todo=[];for(const c of cols)for(const ch of GLWARM)todo.push([ch,c]);
- const step=dl=>{let n=0;while(todo.length&&(dl?dl.timeRemaining()>2:n<40)){const [ch,c]=todo.pop();glyphImg(ch,c,1);n++;}if(todo.length)idle(step);};idle(step);}
+ const step=dl=>{let n=0;while(todo.length&&(dl?dl.timeRemaining()>2:n<40)){const [ch,c]=todo.pop();glyphCell(glyphAtlas(c,1),ch);n++;}if(todo.length)idle(step);};idle(step);}
 function idle(fn){if(window.requestIdleCallback)requestIdleCallback(fn,{timeout:1500});else setTimeout(()=>fn(null),60);}
 function textRaw(g,str,x,y,col,s,sh){
  if(typeof col!=='string'){if(sh!==null){g.fillStyle=sh||'rgba(10,12,20,0.85)';for(let i=0;i<str.length;i++)glyph(g,str[i],x+i*6*s+s*0.6,y+s*0.6,s);}g.fillStyle=col;for(let i=0;i<str.length;i++)glyph(g,str[i],x+i*6*s,y,s);return;}
- const shc=sh===null?null:(sh||'rgba(10,12,20,0.85)');
+ const shc=sh===null?null:quantCol(sh||'rgba(10,12,20,0.85)'),qc=quantCol(col);
  for(let i=0;i<str.length;i++){const ch=str[i];if(ch===' ')continue;const gx=x+i*6*s;
-  if(shc){const c=glyphImg(ch,shc,s);g.drawImage(c,gx+s*0.6,y+s*0.6-s*3,c.lw,c.lh);}
-  const c=glyphImg(ch,col,s);g.drawImage(c,gx,y-s*3,c.lw,c.lh);}}
+  if(shc)drawGlyph(g,ch,shc,s,gx+s*0.6,y+s*0.6-s*3);
+  drawGlyph(g,ch,qc,s,gx,y-s*3);}}
 
 /* ---------- hang ---------- */
 let AC=null,master=null,musicOn=true,mStep=0,mNext=0;

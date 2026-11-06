@@ -116,12 +116,12 @@ function lruPut(m,k,e,max){if(m.size>=max)m.delete(m.keys().next().value);m.set(
 /* parallax-sáv csempékben: a sáv 'f' sebességgel mozog; egy csempe egy képernyőnyi szélességű, egyszer rajzolódik */
 function layerTiles(g,key,f,dist,y0,h,draw){const Dt=W/f,k=Math.floor(dist/Dt),sh=(dist-k*Dt)*f;
  for(let j=0;j<2;j++){const kk=k+j,ck=key+'|'+kk+'|'+SC;let c=lruGet(LTC,ck);
-  if(!c){let cv=null,x=null;if(LTC.size>=8){const k0=LTC.keys().next().value,o=LTC.get(k0);LTC.delete(k0);if(o.width===Math.round((W+2)*SC)&&o.height===Math.round(h*SC)){cv=o;x=o.getContext('2d');x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,cv.width,cv.height);x.setTransform(SC,0,0,SC,0,0);}}
+  if(!c){let cv=null,x=null;if(LTC.size>=8){const k0=LTC.keys().next().value,o=LTC.get(k0);LTC.delete(k0);if(o.width!==Math.round((W+2)*SC)||o.height!==Math.round(h*SC))freeCv(o);else{cv=o;x=o.getContext('2d');x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,cv.width,cv.height);x.setTransform(SC,0,0,SC,0,0);}}
    if(!cv)[cv,x]=mk(W+2,h,SC);x.save();x.translate(0,-y0);draw(x,kk*Dt);x.restore();c=cv;LTC.set(ck,c);}
   g.drawImage(c,j*W-sh,y0,W+2,h);}}
 /* egy tárgy (ház, fasor, templom...) képe; a fényeket (éjjel) is megjegyzi */
 function sprite(g,key,dx,dy,w,h,lights,draw){const ck=key+'|'+SC;let e=lruGet(SPR,ck);
- if(!e){let c,x;if(SPR.size>=18){const k0=SPR.keys().next().value,o=SPR.get(k0);SPR.delete(k0);if(o.c.width===Math.round(w*SC)&&o.c.height===Math.round(h*SC)){c=o.c;x=o.x;x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,c.width,c.height);x.setTransform(SC,0,0,SC,0,0);}}
+ if(!e){let c,x;if(SPR.size>=18){const k0=SPR.keys().next().value,o=SPR.get(k0);SPR.delete(k0);if(o.c.width!==Math.round(w*SC)||o.c.height!==Math.round(h*SC))freeCv(o.c);else{c=o.c;x=o.x;x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,c.width,c.height);x.setTransform(SC,0,0,SC,0,0);}}
   if(!c)[c,x]=mk(w,h,SC);const ll=[];draw(x,ll);e={c:c,x:x,l:ll};SPR.set(ck,e);}/* a legrégebbi kép vásznát újrahasznosítja: nem keletkezik folyton új */
  g.drawImage(e.c,dx,dy,w,h);if(lights)for(const l of e.l)lights.push({x:l.x+dx,y:l.y+dy,r:l.r});}
 function drawFar(g,L,seg,dist,lights){const snow=L.weather==='snow',night=L.time==='night',reg=L.region;
