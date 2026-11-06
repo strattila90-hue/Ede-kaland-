@@ -204,8 +204,9 @@ function updPlay(){if(TAPD&&!G.paused&&!MG&&P&&P.sub==='drive'&&inRect(TAPD,mapR
  // gáz / fék / sebesség
  if(K.hbP){P.hb=!P.hb;SFX.clunk();vib(20);flash(P.hb?'Kézifék behúzva':'Kézifék kiengedve','#ffffff',80);}
  const CRUISE=[0,50,70,90,110,130];
- if(K.cruiseP){const k=CRUISE.indexOf(P.cruise||0);setCruise(CRUISE[(k+1)%CRUISE.length]);}
+ if(K.cruiseP)K.cruiseTap=true;
  if(K.cruiseSet!==undefined&&K.cruiseSet!==null){setCruise(K.cruiseSet);K.cruiseSet=null;}
+ if(K.cruiseTap){K.cruiseTap=false;if(P.cruise)setCruise(0);else if(P.kmh<25)flash('A tempomat 30 km/h felett kapcsolható be.','#9fd8ff',120);else setCruise(clamp(Math.round(P.kmh/5)*5,30,130));}
  const rawB=K.brake||K.pump;
  if(!P.rev&&P.sub==='drive'&&!P.auto&&!P.arriving&&rawB&&Math.abs(P.kmh)<0.2&&!P.hb&&P.boarding<0){P.revT=(P.revT||0)+1;if(P.revT===50){P.rev=true;SFX.click();flash('Hátramenet: fékkel tolatsz, gázzal vissza előremenetbe','#9fd8ff',150);}}else if(!rawB)P.revT=0;
  if(P.rev&&K.gas&&P.kmh>-0.3){P.rev=false;P.revT=-9999;}
@@ -466,7 +467,7 @@ function drawHUD(g){const L=LEGS[G.leg],T=G.trip,s=seg(),t=G.t,blinkOn=(t%40)<20
  // bal oldal: műszerfal
  frr(g,'rgba(8,11,18,0.85)',3,3,204,46,10);g.strokeStyle='rgba(255,255,255,0.14)';g.lineWidth=0.7;rrect(g,3,3,204,46,10);g.stroke();
  const sp=Math.abs(P.kmh),over=P.kmh>s.limit+5;gauge(g,26,26,19,sp,200,10);text(g,String(Math.round(sp)),26,31,over?'#ff6b6b':'#ffffff',1,'center',null);
- gauge(g,67,27,15,P.rpm||0,7000,7,6/7);text(g,String(P.gear||'N'),67,29,'#ffd84a',1,'center',null);if(P.cruise){frr(g,'#123a5a',47,40,40,9,3);text(g,'TEMP '+P.cruise,67,41,'#7fd1ff',1,'center',null);}
+ gauge(g,67,27,15,P.rpm||0,7000,7,6/7);text(g,String(P.gear||'N'),67,29,'#ffd84a',1,'center',null);if(P.cruise){frr(g,'#123a5a',52,40,30,9,3);text(g,'T'+P.cruise,67,41,'#7fd1ff',1,'center',null);}
  const fl=T.fuel/CAR.tank;frr(g,'#1b212b',89,8,5,28,2);frr(g,fl>0.25?'#5bd06a':fl>0.12?'#ffcf33':'#ff4d4d',89.6,8.6+26.8*(1-fl),3.8,26.8*fl,1.6);text(g,'F',96,8,'#8a96a6',1,'left',null);text(g,'E',96,29,'#8a96a6',1,'left',null);
  text(g,fmt(T.fuel,0)+'l',93,39,T.fuel<7?'#ff6b6b':'#cfd6df',1,'center',null);
  disc(g,'#d32f2f',117,16,7);disc(g,'#ffffff',117,16,5.4);text(g,String(s.limit),117.4,13.6,'#111',s.limit>=100?0.5:0.62,'center',null);

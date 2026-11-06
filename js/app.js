@@ -13,7 +13,9 @@ function goHome(){if(G.state!=='play')return;if(MG)endMini();if(P)save(P.dist);G
 function autoSave(){try{if(G.state==='play'&&P)save(P.dist);}catch(e){}}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)autoSave();});window.addEventListener('pagehide',autoSave);
 tapBtn('bHome',goHome);
-tapBtn('bCruise',()=>{const b=$('cruiseBar');b.style.display=b.style.display==='flex'?'none':'flex';});
+{const el=$('bCruise');let tm=null,long=false;const down=e=>{e.preventDefault();e.stopPropagation();initAudio();long=false;el.classList.add('on');tm=setTimeout(()=>{long=true;haptic(25);const b=$('cruiseBar');b.style.display=b.style.display==='flex'?'none':'flex';},450);};
+ const up=e=>{e.preventDefault();clearTimeout(tm);el.classList.remove('on');if(!long){haptic(12);K.cruiseTap=true;$('cruiseBar').style.display='none';}};
+ el.addEventListener('touchstart',down,{passive:false});el.addEventListener('touchend',up,{passive:false});el.addEventListener('mousedown',down);el.addEventListener('mouseup',up);}
 document.querySelectorAll('#cruiseBar button').forEach(b=>{const go=e=>{e.preventDefault();haptic(12);K.cruiseSet=+b.dataset.v;$('cruiseBar').style.display='none';};b.addEventListener('touchstart',go,{passive:false});b.addEventListener('mousedown',go);});
 document.querySelectorAll('#touch .ctl').forEach(el=>{el.addEventListener('touchstart',()=>haptic(10),{passive:true});});
 function toast(msg,ms){const t=$('toast');t.textContent=msg;t.style.opacity=1;clearTimeout(toast.h);toast.h=setTimeout(()=>t.style.opacity=0,ms||2600);}
@@ -29,11 +31,38 @@ document.addEventListener('gesturestart',e=>e.preventDefault());document.addEven
 let deferredPrompt=null;
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;MENU_SIG='?';});
 window.addEventListener('appinstalled',()=>{deferredPrompt=null;toast('Telepítve! Megtalálod a kezdőképernyőn.');});
-async function doInstall(){if(isStandalone()){toast('A játék már telepítve van.');return;}
+async function doInstall(){if(isStandalone()){toast('A játék már telepítve van.');return;}if(location.protocol.startsWith('http')){openInstall();return;}
  if(deferredPrompt){deferredPrompt.prompt();try{const r=await deferredPrompt.userChoice;if(r.outcome==='accepted')toast('Telepítés folyamatban...');}catch(e){}deferredPrompt=null;return;}
  const ios=/iphone|ipad|ipod|macintosh/i.test(navigator.userAgent)&&'ontouchend' in document;
  toast(ios?'iPhone / iPad: Safari Megosztás gomb, majd „Főképernyőhöz adás”':'Böngésző menü (⋮), majd „Alkalmazás telepítése”',6000);}
-async function doShare(){const url=location.href.split('#')[0].split('?')[0];const data={title:'Családi Vakáció',text:'Gyere velünk Európa körútra! Családi autós kalandjáték.',url:url};
+
+/* ---- telepítési ablak: megosztott linkről azonnal, böngészőből minden indításkor felajánlja ---- */
+const UA=navigator.userAgent,IOS=/iphone|ipad|ipod/i.test(UA)||(/macintosh/i.test(UA)&&'ontouchend' in document),IPAD=/ipad/i.test(UA)||(/macintosh/i.test(UA)&&'ontouchend' in document),
+ INAPP=/FBAN|FBAV|FB_IAB|Instagram|Messenger|Line\/|TikTok|Snapchat|MicroMessenger|; wv\)/i.test(UA),ANDROID=/android/i.test(UA);
+const SHARE_SVG='<svg viewBox="0 0 24 24"><path d="M12 3v12M7 8l5-5 5 5" fill="none" stroke="#7fb2ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><rect x="5" y="10" width="14" height="11" rx="2.5" fill="none" stroke="#7fb2ff" stroke-width="2"/></svg>';
+const ADD_SVG='<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4" fill="none" stroke="#7fb2ff" stroke-width="2"/><path d="M12 8v8M8 12h8" stroke="#7fb2ff" stroke-width="2.2" stroke-linecap="round"/></svg>';
+function instSteps(list){const el=$('instSteps');el.innerHTML=list.map((s,i)=>'<div class="st"><b>'+(i+1)+'</b>'+(s[1]||'')+'<span>'+s[0]+'</span></div>').join('');el.classList.add('on');}
+function openInstall(){if(isStandalone()||location.protocol==='file:')return;const go=$('instGo'),arrow=$('instArrow');arrow.classList.remove('on');$('instSteps').classList.remove('on');go.style.display='';
+ if(INAPP){$('instSub').textContent='Ez egy alkalmazáson belüli böngésző (pl. Messenger, Facebook), itt nem lehet telepíteni. Nyisd meg a linket a rendes böngészőben!';
+  go.textContent=ANDROID?'Megnyitás Chrome-ban':'Link másolása';instSteps(IOS?[['Koppints a jobb felső ⋯ menüre'],['Válaszd: „Megnyitás Safariban” / „Megnyitás böngészőben”'],['Ott koppints a telepítésre']]:[['Koppints a „Megnyitás Chrome-ban” gombra'],['A Chrome-ban jóváhagyod a telepítést']]);}
+ else if(IOS){$('instSub').textContent='iPhone-on és iPaden az Apple nem engedi az automatikus telepítést, de három koppintás az egész:';go.style.display='none';
+  instSteps([['Koppints a <b style="display:inline;background:none;width:auto">Megosztás</b> gombra'+(IPAD?' (fent)':' (lent középen; ha nem látod, előbb a ⋯ gombra)'),SHARE_SVG],['Görgess le: „Főképernyőhöz adás”',ADD_SVG],['Jobb fent: „Hozzáadás”. Kész, az ikon a kezdőképernyőn van!']]);
+  arrow.textContent=IPAD?'⬆':'⬇';arrow.style.cssText=IPAD?'top:6px;right:120px':'bottom:6px;left:calc(50% - 12px)';arrow.classList.add('on');}
+ else{$('instSub').textContent='Egy érintés, és úgy fut, mint egy igazi alkalmazás.';go.textContent='⬇ Telepítés most';
+  if(!deferredPrompt&&!('install' in navigator))instSteps([['Ha nem jön fel az ablak: böngésző menü (⋮ vagy ⋯)'],['„Alkalmazás telepítése” vagy „Hozzáadás a kezdőképernyőhöz”']]);}
+ $('inst').classList.add('open');}
+function closeInstall(later){$('inst').classList.remove('open');if(later){try{sessionStorage.setItem('cv-inst-later','1');}catch(e){}}}
+$('instLater').addEventListener('click',e=>{e.stopPropagation();haptic(10);closeInstall(true);});
+$('instGo').addEventListener('click',async e=>{e.stopPropagation();haptic(15);
+ if(INAPP){const url=location.href.split('#')[0];if(ANDROID){location.href='intent://'+url.replace(/^https?:\/\//,'')+'#Intent;scheme=https;package=com.android.chrome;end';}else{try{await navigator.clipboard.writeText(url);toast('Link másolva! Illeszd be a Safariba.');}catch(_){window.prompt('Másold ki a linket:',url);}}return;}
+ try{if('install' in navigator&&typeof navigator.install==='function'){await navigator.install();closeInstall(false);return;}}catch(err){if(err&&err.name==='AbortError'){closeInstall(true);return;}}
+ if(deferredPrompt){deferredPrompt.prompt();try{const r=await deferredPrompt.userChoice;closeInstall(r.outcome!=='accepted');if(r.outcome==='accepted')toast('Telepítés folyamatban...');}catch(_){}deferredPrompt=null;return;}
+ instSteps([['Böngésző menü (⋮ vagy ⋯) jobb fent'],['„Alkalmazás telepítése” vagy „Hozzáadás a kezdőképernyőhöz”']]);toast('A böngésző menüjéből telepítheted.',3500);});
+$('inst').addEventListener('pointerdown',e=>e.stopPropagation());
+window.addEventListener('appinstalled',()=>closeInstall(false));
+{const viaLink=/[?&]install=1/.test(location.search);let later=false;try{later=sessionStorage.getItem('cv-inst-later')==='1';}catch(e){}
+ if(!isStandalone()&&location.protocol.startsWith('http')&&(viaLink||!later))window.addEventListener('load',()=>setTimeout(()=>{if(!isStandalone())openInstall();},viaLink?900:2200));}
+async function doShare(){const url=location.href.split('#')[0].split('?')[0]+'?install=1';const data={title:'Családi Vakáció',text:'Gyere velünk Európa körútra! Családi autós kalandjáték.',url:url};
  try{if(navigator.share){await navigator.share(data);return;}await navigator.clipboard.writeText(url);toast('A link a vágólapra másolva!');}
  catch(e){if(e&&e.name==='AbortError')return;try{window.prompt('Másold ki a linket:',url);}catch(_){}}}
 /* frissítés százalékkal */
@@ -140,4 +169,4 @@ if(G.ledger&&G.ledger==='play'&&!G.paused)closeLedger();if(G.ledger&&G.state==='
  const tch=isTouch&&G.state==='play'&&!G.paused&&!MG&&!(P&&(P.sub==='pump'||P.sub==='shop'));if(tch!==touchShown){touchShown=tch;$('touch').style.display=tch?'block':'none';if(!tch)$('cruiseBar').style.display='none';}
  if(tch&&P){setC('bLight','act',P.lightMode>=1);$('lLight').textContent=['KI','HELYZ','TOMP','REFL'][P.lightMode];setC('bLight','blue',P.lightMode===3);
   setC('bFog','act',P.fogF||P.fogR);$('lFog').textContent=P.fogR?'KÖD 2':P.fogF?'KÖD 1':'KÖD';setC('bFlash','blue',P.flashOn);setC('bHaz','warn',P.haz);
-  setC('bDoor','warn',P.doorsOpen);setC('bRev','act',P.rev);setC('bRadio','act',radio.on);setC('bCruise','blue',!!P.cruise);$('lCruise').textContent=P.cruise?P.cruise+'':'TEMPO';document.querySelectorAll('#cruiseBar button').forEach(b=>b.classList.toggle('on',+b.dataset.v===(P.cruise||0)));setC('bHb','warn',P.hb);}}
+  setC('bDoor','warn',P.doorsOpen);setC('bRev','act',P.rev);setC('bRadio','act',radio.on);setC('bCruise','blue',!!P.cruise);$('lCruise').textContent=P.cruise?String(P.cruise):'TEMPOMAT';document.querySelectorAll('#cruiseBar button').forEach(b=>b.classList.toggle('on',+b.dataset.v===(P.cruise||0)));setC('bHb','warn',P.hb);}}

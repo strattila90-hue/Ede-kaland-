@@ -3,6 +3,7 @@
   "short_name": "Családi Vakáció",
   "description": "Családi autós kalandjáték Komáromtól Európán át, valós távolságokkal, fogyasztással és forinttal.",
   "lang": "hu",
+  "id": "./",
   "start_url": "./",
   "scope": "./",
   "display": "fullscreen",

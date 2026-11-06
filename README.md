@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.7.0
+# 🚐 Családi Vakáció – v2.8.0
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -145,7 +145,7 @@ Minden tranzakció után a pénzkijelző egy pillanatra a levont vagy kapott ös
 
 ## 🚦 Forgalom
 
-Minden jármű valós méretarányban látszik a családi autóhoz képest: kisautó, rendőrautó, mentő, furgon, lakóautó, busz (12 m), kamion (16,5 m), traktor és motor.
+Minden jármű valós méretarányban, részletesen kidolgozva látszik (a busz utasokkal, ajtókkal, viszonylatjelzővel és tükrökkel; a kamion ponyvás pótkocsival, terelős fülkével, üzemanyagtartállyal; a motoros bukósisakban, idomos géppel; a tréler fényhíddal és lebillenő platóval) a családi autóhoz képest: kisautó, rendőrautó, mentő, furgon, lakóautó, busz (12 m), kamion (16,5 m), traktor és motor.
 
 Előfordulhat **baleset** az úton (rendőr, mentő, lezárt sáv). Nagyon ritkán pedig **helyi rendőr** ér utol szirénával: le kell húzódni és megállni, ilyenkor jön az igazoltatás.
 
@@ -171,7 +171,7 @@ Mezők (búza, napraforgó, repce, kukorica, szántás, levendula) szalmabálák
 - **Világításkapcsoló:** kikapcsolva, helyzetjelző, tompított, reflektor.
 - **Fénykürt (villogtatás)** és **duda:** az előtted haladó autó lehúzódik.
 - **Ködlámpa:** első, majd első és hátsó.
-- **Tempomat:** 50 / 70 / 90 / 110 / 130 km/h egy érintéssel, fékre kikapcsol.
+- **Tempomat:** külön gomb a gázpedál fölött. Egy koppintás a mostani sebességet tartja (5 km/h-ra kerekítve, 30 km/h felett), újabb koppintás kikapcsolja; hosszan nyomva előre beállított sebességek (50–130). Fékre kikapcsol. Billentyűzeten: T.
 - **Kézifék** visszajelző lámpával.
 - **Vészvillogó**, **ajtók nyitása és csukása** (csak állva).
 - **Hátramenet:** álló helyzetben tartsd nyomva a féket kb. egy másodpercig: bekapcsol a hátramenet és a tolatólámpa, a fékkel tolatsz, a gázzal visszavált előremenetbe. Billentyűzeten az R is működik.
@@ -212,7 +212,14 @@ A főmenüben bal oldalt három gomb van:
 
 - **⬇ Telepítés:** a kezdőképernyőre teszi a játékot. iPhone-on Safariban: Megosztás, majd „Főképernyőhöz adás”.
 - **↗ Megosztás:** elküldi a játék linkjét.
-- **Offline magától:** az első indítás után a játék a háttérben letölti az összes fájlját, onnan internet nélkül is fut. Ha van új verzió, azt is magától letölti, és a következő indításkor már az fut.
+- **Telepítés megosztott linkről:** a Megosztás gomb olyan linket küld, amelyet megnyitva a játék azonnal felajánlja a telepítést, és amíg nincs telepítve, minden böngészős indításkor újra rákérdez.
+- **Android, Chrome/Edge (gépen is):** egy gombnyomás a „Telepítés most”, a böngésző saját telepítő ablaka jön fel.
+- **iPhone, iPad:** az Apple nem engedi az automatikus telepítést, ezért a játék megmutatja a három lépést (Megosztás → Főképernyőhöz adás → Hozzáadás), nyíllal a gomb felé.
+- **Messenger, Facebook, Instagram beépített böngészője:** itt nem lehet telepíteni, a játék Androidon egy gombbal átviszi a linket a Chrome-ba, iPhone-on kimásolja.
+
+Teljesen automatikus, jóváhagyás nélküli telepítést egyik böngésző sem enged, mindig a felhasználónak kell rábólintania.
+
+**Offline magától:** az első indítás után a játék a háttérben letölti az összes fájlját, onnan internet nélkül is fut. Ha van új verzió, azt is magától letölti, és a következő indításkor már az fut.
 - **⟳ Frissítés:** százalékosan mutatja a letöltést. Ha van új verzió, a gomb kiemelve jelzi. Alatta látszik az aktuális verziószám.
 
 ## 🚀 GitHub Pages
