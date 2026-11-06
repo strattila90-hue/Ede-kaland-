@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.21.1
+# 🚐 Családi Vakáció – v2.21.2
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -313,7 +313,7 @@ Mindkét kiosztásban:
 
 ## 📱 Telepítés, megosztás, frissítés
 
-**Biztonságos frissítés:** a játék előbb minden új fájlt letölt és méret szerint ellenőriz, és csak akkor cseréli le a régieket, ha mind megjött és mind az új verzióé (a GitHub Pages feltöltés után pár percig vegyesen adhat régi és új fájlt; ilyenkor később újrapróbálja). Ha mégis keveredés miatt nem indulna el a menü, a játék egyszer magától tisztán újratölti magát; a menü akkor is megjelenik, ha az oldal és a szkriptek verziója eltér.
+**Biztonságos frissítés:** a játék előbb minden új fájlt letölt és méret szerint ellenőriz, és csak akkor cseréli le a régieket, ha mind megjött és mind az új verzióé (a GitHub Pages feltöltés után pár percig vegyesen adhat régi és új fájlt; ilyenkor később újrapróbálja). A frissítéshez kért fájlokat a játék mindig a hálózatról tölti, sosem a saját tárolt régi példányából (v2.21.2 előtt ez a hiba miatt a frissítés minden próbálkozáskor elakadt). Ha a letöltött fájlok így sem egyeznek, a háttérben futó offline kezelő (service worker) magától letölti az új verziót, végső esetben a játék a mentés megtartásával tisztán újratelepíti magát. Ha mégis keveredés miatt nem indulna el a menü, a játék egyszer magától tisztán újratölti magát; a menü akkor is megjelenik, ha az oldal és a szkriptek verziója eltér.
 
 **Telepítési ablak:** magától csak egyszer jelenik meg, amikor valaki először nyitja meg a megosztott linket az adott készüléken; utána a főmenü mindig szabad, telepíteni a főmenü Telepítés gombjával lehet. A link telepítés nélkül is mindig közvetlenül a játékot nyitja meg. **Xiaomi / Redmi / POCO:** ha a telepített ikon nem indul, az a rendszer tiltása (a Chrome „Kezdőképernyő-parancsikonok” és „Felugró ablakok megjelenítése háttérben futás közben” engedélye); a magyarázat a telepítési ablak alján, egy koppintásra nyílik le. A Xiaomi saját böngészőjéből a játék felajánlja a megnyitást Chrome-ban.
 

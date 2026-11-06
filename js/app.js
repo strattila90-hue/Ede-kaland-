@@ -82,6 +82,18 @@ function verCmp(a,b){const x=String(a).split('.').map(Number),y=String(b).split(
 function setUpd(p,l){updPct=p;if(l)updLabel=l;const b=document.querySelector('[data-a="update"]');if(b){b.querySelector('.fill').style.width=p+'%';b.querySelector('.lbl').textContent=updLabel;}}
 async function checkUpdate(){if(location.protocol==='file:'||!navigator.onLine)return;try{const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});const v=await r.json();
  if(verCmp(v.version,APP_VERSION)>0){newVer=v.version;updLabel='Új verzió: v'+v.version;MENU_SIG='?';toast('Új verzió érhető el: v'+v.version);}}catch(e){}}
+/* ---- biztos frissítés ----
+   1) az új service worker telepítése (ő a hálózatról tölti le a friss fájlokat a tárolóba),
+   2) a tároló ellenőrzése a version.json méretei alapján,
+   3) ha valami mégsem stimmel: tiszta újratelepítés (régi tároló és service worker törlése, újratöltés). */
+async function swInstallNew(){if(!('serviceWorker' in navigator))return false;const reg=await navigator.serviceWorker.getRegistration();if(!reg)return false;
+ try{await reg.update();}catch(e){return false;}const w=reg.installing||reg.waiting;if(!w)return true;
+ await new Promise(res=>{const done=()=>{if(w.state==='activated'||w.state==='redundant')res();};w.addEventListener('statechange',done);done();setTimeout(res,20000);});return true;}
+async function cacheMatches(v){try{const c=await caches.open('csaladi-vakacio');for(const n of Object.keys(v.files||{})){const r=await c.match(n,{ignoreSearch:true});if(!r)return false;const b=await r.blob();if(v.files[n]&&b.size!==v.files[n])return false;}return true;}catch(e){return false;}}
+async function cleanReinstall(why){elog('info','Tiszta újratelepítés: '+why,true);if(G.state==='play'&&P)try{save(P.dist);}catch(e){}
+ try{const rs=await navigator.serviceWorker.getRegistrations();await Promise.all(rs.map(r=>r.unregister()));}catch(e){}
+ try{const ks=await caches.keys();await Promise.all(ks.map(k=>caches.delete(k)));}catch(e){}
+ location.reload();}
 async function doUpdate(){if(updating)return;updating=true;
  try{if(location.protocol==='file:'||!('caches' in window)){setUpd(100,'Újratöltés... 100%');setTimeout(()=>location.reload(),400);return;}
   if(!navigator.onLine){updating=false;toast('Nincs internet. A játék offline is működik.');return;}
@@ -93,15 +105,20 @@ async function doUpdate(){if(updating)return;updating=true;
   for(const [n,blob,type] of got){await cache.put(new Request(n),new Response(blob,{headers:{'content-type':type}}));if(n==='index.html')await cache.put(new Request('./'),new Response(blob,{headers:{'content-type':type}}));}
   if('serviceWorker' in navigator){const reg=await navigator.serviceWorker.getRegistration();if(reg){try{await reg.update();}catch(e){}}}
   setUpd(100,'Kész: v'+v.version+' (100%)');haptic([20,40,20]);elog('info','Frissítés v'+v.version+'-ra, újraindul',true);toast('Frissítve: v'+v.version+'. Újraindul...');if(P&&G.state==='play')save(P.dist);setTimeout(()=>location.reload(),900);}
- catch(e){updating=false;setUpd(0,'Frissítés');toast(e&&e.message==='stale'?'A szerveren még most töltődik fel az új verzió. Próbáld újra 1-2 perc múlva.':'Nem sikerült frissíteni. Van internetkapcsolat?');}}
+ catch(e){if(e&&e.message==='stale'&&navigator.onLine){setUpd(60,'Frissítés másik úton...');
+   try{const v=await (await fetch('version.json?t='+Date.now(),{cache:'no-store'})).json();await swInstallNew();
+    if(await cacheMatches(v)){setUpd(100,'Kész: v'+v.version);elog('info','Frissítés v'+v.version+'-ra (service workeren át), újraindul',true);if(P&&G.state==='play')save(P.dist);setTimeout(()=>location.reload(),600);return;}
+    setUpd(80,'Tiszta újratelepítés...');await cleanReinstall('a tárolt fájlok nem az új verzióéi');return;}catch(_){}}
+  updating=false;setUpd(0,'Frissítés');toast('Nem sikerült frissíteni. Van internetkapcsolat?');}}
 /* offline működés automatikusan */
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
 /* automatikus offline: minden fájl letöltése a háttérben, új verzió csendes letöltése */
+let AO_SW=0;
 async function autoOffline(){if(!('caches' in window)||!location.protocol.startsWith('http')||!navigator.onLine)return;
  try{const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});const v=await r.json();const names=Object.keys(v.files||{});const cache=await caches.open('csaladi-vakacio');
   const newer=verCmp(v.version,APP_VERSION)>0;let got=0;
   const dl=[];for(const n of names){const have=await cache.match(n,{ignoreSearch:true});if(have&&!newer)continue;const res=await fetch(n+'?v='+v.version+'&t='+Date.now(),{cache:'no-store'});if(!res.ok)throw new Error('net');
-   const b=await res.blob();if(v.files[n]&&b.size!==v.files[n]){setTimeout(autoOffline,90000);return;}/* a szerver még frissül: később újra */dl.push([n,b,res.headers.get('content-type')||'']);}
+   const b=await res.blob();if(v.files[n]&&b.size!==v.files[n]){/* régi tárolt példány vagy a szerver még frissül: az új service worker tölti le */if(newer&&!AO_SW){AO_SW=1;await swInstallNew();if(await cacheMatches(v)){newVer=v.version;updLabel='Újraindítás: v'+v.version;MENU_SIG='?';toast('Új verzió letöltve (v'+v.version+'). Koppints a frissítésre, vagy indítsd újra.',4200);return;}}setTimeout(autoOffline,90000);return;}dl.push([n,b,res.headers.get('content-type')||'']);}
   for(const [n,b,ct] of dl){const h={headers:{'content-type':ct}};await cache.put(new Request(n),new Response(b,h));if(n==='index.html')await cache.put(new Request('./'),new Response(b,h));got++;}
   let first=false;try{first=!localStorage.getItem('cv-offline');localStorage.setItem('cv-offline',v.version);}catch(e){}MENU_SIG='?';
   if(newer){newVer=v.version;updLabel='Újraindítás: v'+v.version;MENU_SIG='?';toast('Új verzió letöltve (v'+v.version+'). A következő indításkor érvényes, vagy koppints a frissítésre.',4200);}
