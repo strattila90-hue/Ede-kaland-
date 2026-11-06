@@ -2,7 +2,7 @@
 /* =========================================================
    CSALÁDI VAKÁCIÓ – alapok: vászon, rajzoló segédek, betűk, hang, bemenet
    ========================================================= */
-const APP_VERSION='2.9.2';
+const APP_VERSION='2.9.3';
 const W=480,H=270,PX=70,ROADT=194,ROADB=262,LANE=[212,232,252];
 const TAU=Math.PI*2;
 let SC=2,LOWQ=false;
@@ -32,8 +32,8 @@ function disc(g,c,cx,cy,r){if(r<=0)return;g.fillStyle=c;g.beginPath();g.arc(cx,c
 function ell(g,c,cx,cy,rx,ry){g.fillStyle=c;g.beginPath();g.ellipse(cx,cy,Math.max(0.5,rx+0.4),Math.max(0.5,ry+0.4),0,0,TAU);g.fill();}
 function poly(g,c,pts,ox,oy){ox=ox||0;oy=oy||0;g.fillStyle=c;g.beginPath();pts.forEach((p,i)=>i?g.lineTo(ox+p[0],oy+p[1]):g.moveTo(ox+p[0],oy+p[1]));g.closePath();g.fill();}
 function line(g,c,x0,y0,x1,y1,w){g.strokeStyle=c;g.lineWidth=w||1;g.lineCap='round';g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke();}
-function rrect(g,x,y,w,h,r){r=Math.min(r,w/2,h/2);g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();}
-function frr(g,c,x,y,w,h,r){g.fillStyle=c;rrect(g,x,y,w,h,r);g.fill();}
+function rrect(g,x,y,w,h,r){if(w<0){x+=w;w=-w;}if(h<0){y+=h;h=-h;}r=Math.max(0,Math.min(r||0,w/2,h/2));g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();}
+function frr(g,c,x,y,w,h,r){if(w<0){x+=w;w=-w;}if(h<0){y+=h;h=-h;}r=Math.max(0,Math.min(r||0,w/2,h/2));g.fillStyle=c;rrect(g,x,y,w,h,r);g.fill();}
 function lg(g,x0,y0,x1,y1,stops){const gr=g.createLinearGradient(x0,y0,x1,y1);for(const s of stops)gr.addColorStop(s[0],s[1]);return gr;}
 function rg(g,x,y,r0,r1,stops){const gr=g.createRadialGradient(x,y,r0,x,y,r1);for(const s of stops)gr.addColorStop(s[0],s[1]);return gr;}
 function glow(g,x,y,r,col){if(LOWQ&&r<5)return;g.fillStyle=rg(g,x,y,0,r,[[0,col],[1,'rgba(0,0,0,0)']]);g.fillRect(x-r,y-r,r*2,r*2);}

@@ -159,14 +159,15 @@ function menuAction(a){
  else if(a==='go'){K.enterP=true;G.st=Math.max(G.st,99);}
  else titleAct(a);
  MENU_SIG='?';}
+const setT=(id,v)=>{const el=$(id);if(el&&el.textContent!==v)el.textContent=v;};
 const setC=(id,cls,on)=>{const el=$(id);if(el&&el.classList.contains(cls)!==!!on)el.classList.toggle(cls,!!on);};
 let touchShown=null;
 function appTick(){{const bl=G.state==='play'&&P&&!G.paused?(G.drowsy||0)*0.9+(G.eyelid||0)*2.6:0,v=bl>0.05?'blur('+bl.toFixed(1)+'px) brightness('+(1-bl*0.07).toFixed(2)+')':'';if(appTick.f!==v){appTick.f=v;document.getElementById('c').style.filter=v;}}
-if(G.state==='title'){const m=$('menu');if(m.style.display!=='none'){const r=m.getBoundingClientRect(),c=document.getElementById('c').getBoundingClientRect();if(c.width)G.menuR=clamp((r.right-c.left)/c.width*W,0,W*0.6);}}
+if(G.state==='title'&&(G.t%30===0||G.menuR===undefined)){const m=$('menu');if(m.style.display!=='none'){const r=m.getBoundingClientRect(),c=document.getElementById('c').getBoundingClientRect();if(c.width)G.menuR=clamp((r.right-c.left)/c.width*W,0,W*0.6);}}
 {const tb=G.state==='play'&&!G.paused&&!MG&&!G.ledger&&!(P&&(P.sub==='pump'||P.sub==='shop'));const el=$('topbar');if(el.dataset.v!==String(tb)){el.dataset.v=tb;el.style.display=tb?'flex':'none';}}
  if(P&&G.state==='play'){const st=clamp((LANE[P.lane]-P.y)*2.2,-40,40);const v=st.toFixed(0)+'deg';if(appTick.st!==v){appTick.st=v;$('bHonk').style.setProperty('--steer',v);}}
-if(G.ledger&&G.ledger==='play'&&!G.paused)closeLedger();if(G.ledger&&G.state==='title')closeLedger();renderMenu();
+if(G.ledger&&G.ledger==='play'&&!G.paused)closeLedger();if(G.ledger&&G.state==='title')closeLedger();if(G.t%4===0||MENU_SIG==='?')renderMenu();
  const tch=isTouch&&G.state==='play'&&!G.paused&&!MG&&!(P&&(P.sub==='pump'||P.sub==='shop'));if(tch!==touchShown){touchShown=tch;$('touch').style.display=tch?'block':'none';if(!tch)$('cruiseBar').style.display='none';}
- if(tch&&P){setC('bLight','act',P.lightMode>=1);$('lLight').textContent=['KI','HELYZ','TOMP','REFL'][P.lightMode];setC('bLight','blue',P.lightMode===3);
-  setC('bFog','act',P.fogF||P.fogR);$('lFog').textContent=P.fogR?'KÖD 2':P.fogF?'KÖD 1':'KÖD';setC('bFlash','blue',P.flashOn);setC('bHaz','warn',P.haz);
-  setC('bDoor','warn',P.doorsOpen);setC('bRev','act',P.rev);setC('bRadio','act',radio.on);setC('bCruise','blue',!!P.cruise);$('lCruise').textContent=P.cruise?String(P.cruise):'TEMPO';document.querySelectorAll('#cruiseBar button').forEach(b=>b.classList.toggle('on',+b.dataset.v===(P.cruise||0)));setC('bHb','warn',P.hb);}}
+ if(tch&&P){setC('bLight','act',P.lightMode>=1);setT('lLight',['KI','HELYZ','TOMP','REFL'][P.lightMode]);setC('bLight','blue',P.lightMode===3);
+  setC('bFog','act',P.fogF||P.fogR);setT('lFog',P.fogR?'KÖD 2':P.fogF?'KÖD 1':'KÖD');setC('bFlash','blue',P.flashOn);setC('bHaz','warn',P.haz);
+  setC('bDoor','warn',P.doorsOpen);setC('bRev','act',P.rev);setC('bRadio','act',radio.on);setC('bCruise','blue',!!P.cruise);setT('lCruise',P.cruise?String(P.cruise):'TEMPO');if(appTick.cr!==P.cruise){appTick.cr=P.cruise;document.querySelectorAll('#cruiseBar button').forEach(b=>b.classList.toggle('on',+b.dataset.v===(P.cruise||0)));}setC('bHb','warn',P.hb);}}

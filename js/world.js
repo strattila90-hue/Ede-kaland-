@@ -53,8 +53,8 @@ function buildLeg(i,ts){ts=ts||1;const L=LEGS[i],pk=PXKM/ts;let x=0;
  const len=x;segs[segs.length-1].x1=len+40000;segs[0].x0=-40000;
  const pois=[],lights=[];const add=(type,km,s)=>{const px=s.x0+km*pk;if(px>s.x0+600&&px<Math.min(s.x1,len)-1500)pois.push({type:type,x:px,seg:s});};
  segs.forEach((s,k)=>{const h=(n)=>hsh(i*997+k*131+n);const x0=Math.max(0,s.x0);const sk=(Math.min(s.x1,len)-x0)/pk;const s2={x0:x0,x1:s.x1};
-  if(s.type==='motorway'){for(let d=12+h(1)*10;d<sk-5;d+=38+h(d)*14){add('fuel',d,s2);if(hsh(i*31+d*7)<0.6)add('burger',d+1.6,s2);}for(let d=26+h(6)*8;d<sk-5;d+=34+h(d+3)*12)add('rest',d,s2);for(let d=25+h(2)*10;d<sk-5;d+=45+h(d+7)*20)add('veda',d,s2);}
-  else if(s.type==='country'){if(sk>12)add('fuel',sk*(0.4+h(3)*0.2),s2);if(sk>8)add('rest',sk*(0.15+h(8)*0.1),s2);for(let d=6+h(4)*5;d<sk-3;d+=18+h(d)*10)add('veda',d,s2);}
+  if(s.type==='motorway'){for(let d=12+h(1)*10;d<sk-5;d+=38+h(d)*14){add('fuel',d,s2);if(hsh(i*31+d*7)<0.6)add('burger',d+1.6,s2);if(hsh(i*17+d*13)<0.35)add('garage',d+2.6,s2);}for(let d=26+h(6)*8;d<sk-5;d+=34+h(d+3)*12)add('rest',d,s2);for(let d=25+h(2)*10;d<sk-5;d+=45+h(d+7)*20)add('veda',d,s2);}
+  else if(s.type==='country'){if(sk>12)add('fuel',sk*(0.4+h(3)*0.2),s2);if(sk>9)add('garage',sk*0.7,s2);if(sk>8)add('rest',sk*(0.15+h(8)*0.1),s2);for(let d=6+h(4)*5;d<sk-3;d+=18+h(d)*10)add('veda',d,s2);}
   else if(s.type==='town'){add('veda',0.25,s2);add('kis',sk*0.22,s2);add('trafik',sk*0.38,s2);add('ujsag',sk*0.5,s2);if(sk>=3)add('fuel',sk*0.64,s2);if(sk>=3)add('hiper',sk*0.82,s2);if(sk>=2)add('burger',sk*0.92,s2);if(sk>=3)add('garage',sk*0.3,s2);
    for(let d=0.55;d<sk-0.3;d+=0.7+h(d)*0.4){const px=x0+d*pk;if(!pois.some(p=>Math.abs(p.x-px)<2500))lights.push({x:px,ph:Math.floor(h(d*9)*420)});}}
   else if(s.type==='village'){if(h(5)<0.6)add('veda',0.2,s2);add('kis',sk*0.45,s2);if(sk>=2)add('trafik',sk*0.7,s2);}});
@@ -100,10 +100,10 @@ function drawFar(g,L,seg,dist,lights){const snow=L.weather==='snow',night=L.time
 
 
 /* ---- táj részletei: madarak, mezők, szélkerekek, fák ---- */
-function birds(g,L,t){if(L.time==='night'||['rain','storm','snow','fog'].includes(L.weather))return;const n=L.weather==='cloudy'?3:5;
+function birds(g,L,t){if(LOWQ||L.time==='night'||['rain','storm','snow','fog'].includes(L.weather))return;const n=L.weather==='cloudy'?3:5;
  for(let i=0;i<n;i++){const sp=0.18+hsh(i*7+3)*0.22,x=((hsh(i*11)*W*1.6+t*sp)%(W*1.6))-W*0.3,y=30+hsh(i*5+1)*60+Math.sin(t*0.02+i)*4,fl=Math.sin(t*0.25+i*2)*1.6,s=0.8+hsh(i*3)*0.6;
   g.strokeStyle='rgba(40,48,60,0.75)';g.lineWidth=0.7;g.beginPath();g.moveTo(x-3*s,y-fl);g.quadraticCurveTo(x-1.4*s,y-1.2*s,x,y);g.quadraticCurveTo(x+1.4*s,y-1.2*s,x+3*s,y-fl);g.stroke();}}
-function haze(g,y0,y1,a){g.fillStyle=lg(g,0,y0,0,y1,[[0,'rgba(255,255,255,0)'],[1,'rgba(235,242,250,'+a+')']]);g.fillRect(0,y0,W,y1-y0);}
+function haze(g,y0,y1,a){if(LOWQ)return;g.fillStyle=lg(g,0,y0,0,y1,[[0,'rgba(255,255,255,0)'],[1,'rgba(235,242,250,'+a+')']]);g.fillRect(0,y0,W,y1-y0);}
 const FIELD_COLS={wheat:['#e2c25a','#c9a640'],green:['#86ba5c','#6c9f48'],plow:['#8e6c4a','#74563a'],rape:['#eadc4c','#cdbd2e'],sunf:['#5d8a3a','#e9b62a'],corn:['#8aae4a','#6f9038'],lav:['#9a78d4','#7d5cb8']};
 function fieldBand(g,L,seg,dist,snow){const yT=ROADT-27,yB=ROADT-10,f=0.3,o=dist*f,slot=96,i0=Math.floor(o/slot)-1,reg=L.region,cc=seg.cc||'HU';
  const types=reg==='provence'?['lav','lav','wheat','green']:cc==='NL'?['green','green','plow','rape']:['wheat','green','plow','rape','sunf','corn','wheat'];
@@ -111,8 +111,8 @@ function fieldBand(g,L,seg,dist,snow){const yT=ROADT-27,yB=ROADT-10,f=0.3,o=dist
   if(snow){c1='#e9eff4';c2='#cfd9e2';}
   g.fillStyle=lg(g,0,yT,0,yB,[[0,shade(c1,0.92)],[1,c1]]);g.beginPath();g.moveTo(x,yT+1+h*2);g.lineTo(x+w,yT+2-h);g.lineTo(x+w+6,yB);g.lineTo(x-6,yB);g.closePath();g.fill();
   // sorok: fölül sűrűbb, lent ritkább (perspektíva)
-  g.strokeStyle=snow?'rgba(160,175,190,0.5)':shade(c2,0.95);g.lineWidth=0.5;for(let k=0,yy=yT+3;yy<yB;k++,yy+=1.1+k*0.42){g.beginPath();g.moveTo(x-3+(yy-yT)*-0.2,yy);g.lineTo(x+w+3+(yy-yT)*0.2,yy);g.stroke();}
-  if(!snow&&tp==='sunf')for(let k=0;k<w;k+=3.2)for(let r=0;r<3;r++){const yy=yT+5+r*4;disc(g,'#f2c12e',x+k+r*1.6,yy,0.8+r*0.25);}
+  if(!LOWQ){g.strokeStyle=snow?'rgba(160,175,190,0.5)':shade(c2,0.95);g.lineWidth=0.5;}if(!LOWQ)for(let k=0,yy=yT+3;yy<yB;k++,yy+=1.1+k*0.42){g.beginPath();g.moveTo(x-3+(yy-yT)*-0.2,yy);g.lineTo(x+w+3+(yy-yT)*0.2,yy);g.stroke();}
+  if(!snow&&!LOWQ&&tp==='sunf')for(let k=0;k<w;k+=3.2)for(let r=0;r<3;r++){const yy=yT+5+r*4;disc(g,'#f2c12e',x+k+r*1.6,yy,0.8+r*0.25);}
   if(!snow&&tp==='wheat'&&h>0.55)for(let k=0;k<3;k++){const bx=x+14+k*(w/3.2)+hsh(i*5+k)*8,by=yB-3-hsh(i+k)*6,r=1.6+(by-yT)*0.08;disc(g,'#b58d3a',bx,by,r);g.strokeStyle='#8f6c28';g.lineWidth=0.4;g.beginPath();g.arc(bx,by,r*0.55,0,TAU);g.stroke();disc(g,'rgba(0,0,0,0.15)',bx+r*0.6,by+r*0.7,r*0.5);}
   // határsáv: fasor vagy bokor
   if(h<0.35&&!(reg==='provence'))for(let k=0;k<5;k++){const px=x+w-2+k*0.2,py=yT+2,ph=7+hsh(i*9+k)*4;ell(g,snow?'#c9d3dc':'#3f6e3a',px+k*3.2-6,py-ph/2+1,1.4,ph/2);}}}
@@ -189,7 +189,7 @@ function drawNear(g,L,leg,dist,lights,t){const snow=L.weather==='snow',night=L.t
   else if(s.type==='country'){R(g,snow?'#eef3f7':'#5d9a4e',a,y0,w,10);R(g,'#b9ab8c',a,ROADT-3,w,3);for(let x=a-((dist+a)%60);x<bx;x+=60)if(x>=a){frr(g,'#ffffff',x,y0-2,1.6,9,0.6);R(g,'#1a1a1a',x,y0-1,1.6,2);}}
   else{R(g,snow?'#eef3f7':'#5d9a4e',a,y0,w,10);R(g,lg(g,0,y0+1,0,y0+6,[[0,'#e2e6ea'],[1,'#8f979f']]),a,y0+1.5,w,3.6);for(let x=a-((dist+a)%24);x<bx;x+=24)if(x>=a)frr(g,'#7d858d',x,y0+1,1.8,9,0.5);}}
  // fű, virágok és kilométerkövek
- {const pk=1/leg.kmPerPx,x0=Math.floor((dist-PX)/5)*5;for(let wx=x0;wx<dist-PX+W+5;wx+=5){const s=segAtIn(leg.segs,wx);if(s.type==='town')continue;const x=wx-dist+PX,h=hsh((wx/5)|0);
+ {const pk=1/leg.kmPerPx,x0=Math.floor((dist-PX)/5)*5;if(!LOWQ)for(let wx=x0;wx<dist-PX+W+5;wx+=5){const s=segAtIn(leg.segs,wx);if(s.type==='town')continue;const x=wx-dist+PX,h=hsh((wx/5)|0);
    if(h<0.55){const c=snow?'#d5dfe8':h<0.3?'#3f7f39':'#79b65e';line(g,c,x,y0+9,x-0.8,y0+5+h*4,0.5);line(g,c,x+1,y0+9,x+1.6,y0+4+h*5,0.5);}
    else if(!snow&&!LOWQ&&h>0.93&&s.type!=='motorway')disc(g,['#ff6b8a','#ffffff','#ffd84a','#b48cff'][((h*1000)|0)%4],x,y0+4+((h*50)|0)%5,0.75);}
   const k0=Math.max(1,Math.ceil((dist-PX-20)/pk)),k1=Math.floor((dist-PX+W+20)/pk);for(let k=k0;k<=k1;k++){const wx=k*pk,s=segAtIn(leg.segs,wx);if(s.type==='town')continue;const x=wx-dist+PX,km=String(k);

@@ -562,7 +562,7 @@ function drawPlay(g){const L=LEGS[G.leg],t=G.t;lights=[];const s=seg();
    if(e.help==='truck')for(let k=0;k<5;k++)frr(g,['#b07a42','#c8955a','#8a5a2b'][k%3],ex-30+k*9,e.y-(k%2?16:8),8,8,1);person(g,ex-12,e.y+4,'apa',t,'wave');triangle(g,ex-48,e.y+2);}}else if(e.kind==='animal')drawAnimal(g,e,ex,t);else drawObstacle(g,e,ex,t);}
  for(const w of P.walk)person(g,w.x,w.y,w.w,w.t+(w.out?0:0),w.out&&w.x>=w.tx?'wave':'walk');
  for(const p of LEG.pois)if(p.type==='veda')drawVedaFront(g,p,p.x-P.dist+PX);
- drawParts(g,true);drawWeather(g,L,t);darkness(g,L);drawBubble(g);g.restore();drawParts(g,false);drawHUD(g);if(P.fadeA>0)R(g,'rgba(0,0,0,'+P.fadeA+')',0,0,W,H);if(G.eyelid>0.02){const k=G.eyelid,hh=H*0.46*k;g.fillStyle=lg(g,0,0,0,hh+12,[[0,'#000'],[Math.max(0.01,hh/(hh+12)),'#000'],[1,'rgba(0,0,0,0)']]);g.fillRect(0,0,W,hh+12);g.fillStyle=lg(g,0,H,0,H-hh-12,[[0,'#000'],[Math.max(0.01,hh/(hh+12)),'#000'],[1,'rgba(0,0,0,0)']]);g.fillRect(0,H-hh-12,W,hh+12);}if(P.sub==='pump')drawPumpUI(g);if(P.sub==='shop')drawShopUI(g);if(MG)drawMini(g);}
+ drawParts(g,true);drawWeather(g,L,t);darkness(g,L);drawBubble(g);g.restore();drawParts(g,false);drawHUDc(g);if(P.fadeA>0)R(g,'rgba(0,0,0,'+P.fadeA+')',0,0,W,H);if(G.eyelid>0.02){const k=G.eyelid,hh=H*0.46*k;g.fillStyle=lg(g,0,0,0,hh+12,[[0,'#000'],[Math.max(0.01,hh/(hh+12)),'#000'],[1,'rgba(0,0,0,0)']]);g.fillRect(0,0,W,hh+12);g.fillStyle=lg(g,0,H,0,H-hh-12,[[0,'#000'],[Math.max(0.01,hh/(hh+12)),'#000'],[1,'rgba(0,0,0,0)']]);g.fillRect(0,H-hh-12,W,hh+12);}if(P.sub==='pump')drawPumpUI(g);if(P.sub==='shop')drawShopUI(g);if(MG)drawMini(g);}
 
 /* ---------- képernyők ---------- */
 const VIEWS=['side','front','rear','top'],VNAMES=['Oldalnézet','Elölnézet','Hátulnézet','Felülnézet'];
@@ -587,6 +587,11 @@ let GPSC=null;
 function drawGPSCached(g,r,leg,frac,t,night,kmh,rem){const w=r[2],h=r[3];if(!GPSC||GPSC.sc!==SC||GPSC.w!==w||t-GPSC.t>=5||t<GPSC.t){const [c,x]=GPSC&&GPSC.sc===SC&&GPSC.w===w?[GPSC.c,GPSC.x]:mk(w+2,h+2,SC);
   x.setTransform(SC,0,0,SC,0,0);x.clearRect(0,0,w+2,h+2);x.save();x.translate(1-r[0],1-r[1]);drawGPS(x,r,leg,frac,t,night,kmh,rem);x.restore();GPSC={c:c,x:x,sc:SC,w:w,t:t};}
  g.drawImage(GPSC.c,r[0]-1,r[1]-1,w+2,h+2);}
+/* gyenge módban a kijelző csak minden 3. képkockán rajzolódik újra, közben a kész képe másolódik */
+let HUDC=null;
+function drawHUDc(g){if(!LOWQ){drawHUD(g);return;}if(!HUDC||HUDC.sc!==SC){const [c,x]=mk(W,H,SC);HUDC={c:c,x:x,sc:SC,t:-9};}
+ if(G.t-HUDC.t>=3||G.t<HUDC.t||TAPD){const x=HUDC.x;x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,HUDC.c.width,HUDC.c.height);x.setTransform(SC,0,0,SC,0,0);drawHUD(x);HUDC.t=G.t;}
+ g.drawImage(HUDC.c,0,0,W,H);}
 function introT(){if(G.introSeen)return 999;if(G.st>=170)G.introSeen=true;return G.st;}
 const CREDITS=['Apa','Anya','Anna (5)','Petra (3)','kis Atti (10 hó)','és a családi egyterű'];
 function drawTitle(g){const t=G.t,per=600,k=Math.floor(t/per)%TSCENES.length,ph=t%per,sc=TSCENES[k],L=sc.L,leg=sc.leg,dist=t*5,it=introT();lights=[];
@@ -706,11 +711,11 @@ function render(){ctx.setTransform(SC,0,0,SC,0,0);ctx.imageSmoothingEnabled=true
 let last=performance.now(),acc=0,perfT=0,perfN=0;const STEP=1000/60;
 document.addEventListener('visibilitychange',()=>{if(document.hidden){if(G.state==='play'&&P){G.paused=true;save(P.dist);}if(AC&&AC.state==='running')AC.suspend();}else{last=performance.now();if(AC)AC.resume();}});
 // minőségi fokozatok: renderfelbontás (SC) és effektek; a kijelző tényleges felbontásánál nem rajzol többet
-const QTIERS=[3,2.5,2,1.5,1.2];let QT=null,QUP=0,RT=0;
+const QTIERS=[3,2.5,2,1.5,1.25,1.25];let QT=null,QUP=0,RT=0,HALF=false,FRM=0;
 function wantSC(){const c=document.getElementById('c'),dpr=window.devicePixelRatio||1;return Math.max(1,(c.clientWidth||W)*dpr/W);}
-function applyQ(){const sc=Math.min(QTIERS[QT],Math.max(1.2,Math.ceil(wantSC()*4)/4));LOWQ=QT>=3;if(Math.abs(sc-SC)>0.01){setSC(sc);TFX=null;GPSC=null;}}
-function qualityStep(avg,ra){if(document.hidden)return;if(QT===null){QT=(navigator.hardwareConcurrency||4)>=6&&(window.devicePixelRatio||1)>=2.5?1:2;applyQ();return;}
- if(avg>21&&QT<QTIERS.length-1){QT++;QUP=0;applyQ();}else if(avg<18&&ra<5&&QT>0){if(++QUP>=4){QT--;QUP=0;applyQ();}}else QUP=0;}
-function frame(now){const dt=Math.min(200,now-last);acc+=dt;last=now;let n=0;while(acc>=STEP&&n<3){update();acc-=STEP;n++;}if(n>=3)acc=0;const r0=performance.now();render();RT+=performance.now()-r0;
- perfT+=dt;perfN++;if(perfN>=90){const avg=perfT/perfN,ra=RT/perfN;perfT=0;perfN=0;RT=0;qualityStep(avg,ra);}requestAnimationFrame(frame);}
+function applyQ(){const sc=Math.min(QTIERS[QT],Math.max(1.25,Math.ceil(wantSC()*4)/4));LOWQ=QT>=3;HALF=QT>=5;if(Math.abs(sc-SC)>0.01){setSC(sc);TFX=null;GPSC=null;}}
+function qualityStep(avg,ra){if(document.hidden)return;if(QT===null){const touch=('ontouchstart' in window)||navigator.maxTouchPoints>0;QT=touch?((navigator.hardwareConcurrency||4)>=8?2:3):((navigator.hardwareConcurrency||4)>=6?1:2);applyQ();return;}
+ if(HALF)avg/=2;if(avg>21&&QT<QTIERS.length-1){QT=Math.min(QTIERS.length-1,QT+(avg>30?2:1));QUP=0;applyQ();}else if(avg<18&&ra<5&&QT>0){if(++QUP>=4){QT--;QUP=0;applyQ();}}else QUP=0;}
+function frame(now){const dt=Math.min(200,now-last);acc+=dt;last=now;let n=0;while(acc>=STEP&&n<3){update();acc-=STEP;n++;}if(n>=3)acc=0;FRM++;if(!HALF||FRM%2===0){const r0=performance.now();render();RT+=performance.now()-r0*1;}
+ perfT+=dt;perfN++;if(perfN>=(QT===null?20:45)){const avg=perfT/perfN,ra=RT/perfN;perfT=0;perfN=0;RT=0;qualityStep(avg,ra);}requestAnimationFrame(frame);}
 requestAnimationFrame(frame);
