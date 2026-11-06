@@ -5,9 +5,13 @@
    ========================================================= */
 const $=id=>document.getElementById(id);
 const haptic=(ms)=>{try{if(navigator.vibrate)navigator.vibrate(ms||12);}catch(e){}};
-holdBtn('bGas','gas');holdBtn('bBr','brake');holdBtn('bFlash','flash');
+holdBtn('bGas','gas');holdBtn('bBr','brake');
 tapBtn('bUp',()=>K.upP=true);tapBtn('bDn',()=>K.dnP=true);holdBtn('bHonk','horn');tapBtn('bHaz',()=>K.hazP=true);tapBtn('bPause',()=>K.pauseP=true);
-tapBtn('bLight',()=>K.lightP=true);tapBtn('bFog',()=>K.fogP=true);tapBtn('bDoor',()=>K.doorP=true);tapBtn('bRadio',()=>K.radioP=true);tapBtn('bHb',()=>K.hbP=true);
+tapBtn('bRadio',()=>K.radioP=true);tapBtn('bHb',()=>K.hbP=true);
+/* egyetlen világításgomb: rövid érintés = következő fokozat, nyomva tartva = fénykürt */
+{const el=$('bLight');let tm=0,held=false,down=false;const on=e=>{e.preventDefault();e.stopPropagation();initAudio();if(down)return;down=true;held=false;el.classList.add('on');haptic(10);clearTimeout(tm);tm=setTimeout(()=>{if(down){held=true;K.flash=true;haptic(25);}},380);};
+ const off=e=>{e.preventDefault();if(!down)return;down=false;clearTimeout(tm);el.classList.remove('on');if(held)K.flash=false;else K.lightP=true;held=false;};
+ el.addEventListener('touchstart',on,{passive:false});el.addEventListener('touchend',off,{passive:false});el.addEventListener('touchcancel',off,{passive:false});el.addEventListener('mousedown',on);el.addEventListener('mouseup',off);el.addEventListener('mouseleave',e=>{if(down)off(e);});}
 function goHome(){if(G.state!=='play')return;if(MG)endMini();if(P)save(P.dist);G.paused=false;closeLedger&&G.ledger&&closeLedger();G.state='title';G.st=0;G.menu=0;engine(0,0);MENU_SIG='?';
  toast('Játékállás elmentve: '+fmt(G.trip.km,1)+' km, '+fmt(G.trip.money)+' Ft. A Folytatás gombbal innen indulsz tovább.',3600);}
 function autoSave(){try{if(G.state==='play'&&P)save(P.dist);}catch(e){}}
@@ -168,6 +172,5 @@ appTick.n=(appTick.n||0)+1;if(G.state==='title'&&(appTick.n%20===0||!G.menuR)){c
  if(P&&G.state==='play'){const st=clamp((LANE[P.lane]-P.y)*2.2,-40,40);const v=st.toFixed(0)+'deg';if(appTick.st!==v){appTick.st=v;$('bHonk').style.setProperty('--steer',v);}}
 if(G.ledger&&G.ledger==='play'&&!G.paused)closeLedger();if(G.ledger&&G.state==='title')closeLedger();if(G.t%4===0||MENU_SIG==='?')renderMenu();
  const tch=isTouch&&G.state==='play'&&!G.paused&&!MG&&!(P&&(P.sub==='pump'||P.sub==='shop'||P.sub==='wash'));if(tch!==touchShown){touchShown=tch;$('touch').style.display=tch?'block':'none';if(!tch)$('cruiseBar').style.display='none';}
- if(tch&&P){setC('bLight','act',P.lightMode>=1);setT('lLight',['KI','HELYZ','TOMP','REFL'][P.lightMode]);setC('bLight','blue',P.lightMode===3);
-  setC('bFog','act',P.fogF||P.fogR);setT('lFog',P.fogR?'KÖD 2':P.fogF?'KÖD 1':'KÖD');setC('bFlash','blue',P.flashOn);setC('bHaz','warn',P.haz);
-  setC('bDoor','warn',P.doorsOpen);setC('bRev','act',P.rev);setC('bRadio','act',radio.on);setC('bCruise','blue',!!P.cruise);setT('lCruise',P.cruise?String(P.cruise):'TEMPO');if(appTick.cr!==P.cruise){appTick.cr=P.cruise;document.querySelectorAll('#cruiseBar button').forEach(b=>b.classList.toggle('on',+b.dataset.v===(P.cruise||0)));}setC('bHb','warn',P.hb);}}
+ if(tch&&P){const ls=lightStage(P);setC('bLight','act',P.lightMode>=1);setT('lLight',['KI','HELYZ','TOMP','REFL','KÖD'][ls]);setC('bLight','blue',P.lightMode===3||P.flashOn);setC('bLight','fog',ls===4);
+  setC('bHaz','warn',P.haz);setC('bRev','act',P.rev);setC('bRadio','act',radio.on);setC('bCruise','blue',!!P.cruise);setT('lCruise',P.cruise?String(P.cruise):'TEMPO');if(appTick.cr!==P.cruise){appTick.cr=P.cruise;document.querySelectorAll('#cruiseBar button').forEach(b=>b.classList.toggle('on',+b.dataset.v===(P.cruise||0)));}setC('bHb','warn',P.hb);}}

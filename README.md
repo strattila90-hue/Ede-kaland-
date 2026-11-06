@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.12.1
+# 🚐 Családi Vakáció – v2.13.0
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -226,22 +226,24 @@ Mezők (búza, napraforgó, repce, kukorica, szántás, levendula) szalmabálák
 
 ## 🎮 Irányítás
 
+A középkonzolon csak három gomb van: **világítás** (egyetlen gomb minden fokozattal, nyomva tartva fénykürt), mellette a **vészvillogó**, és a **rádió**. A **kézifék** a fék- és gázpedál mellett, a fékpedál fölött van. Az **ajtók automatikusak**: kinyílnak, amikor a család kiszáll (pihenő, megérkezés, defekt, félreállás), és maguktól becsukódnak, ha mindenki visszaült.
+
+
 | Billentyű | Mobil gomb | Funkció |
 |---|---|---|
 | → | GÁZ | gyorsítás |
 | ← / Space | FÉK | fékezés |
 | ↑ ↓ | ▲ ▼ | sávváltás |
 | H | DUDA | duda |
-| L | TOMP | világításkapcsoló (fokozatok) |
-| K (tartsd) | VILL | fénykürt |
-| F | KÖD | ködlámpa |
-| V | ⚠ | vészvillogó |
-| O | AJTÓ | ajtók |
+| L | VILÁGÍTÁS gomb (érintés) | világítás: KI → helyzetjelző → tompított → reflektor → tompított + ködlámpák |
+| K (tartsd) | VILÁGÍTÁS gomb (nyomva tartva) | fénykürt |
+| F | – | ködlámpák külön |
+| V | VÉSZ (a világítás mellett) | vészvillogó |
 | R | fék tartva álló helyzetben | hátramenet |
 | T | TEMPO | tempomat |
 | E | P gomb | megállás a következő üzletnél |
 | N | pénz | költségnapló |
-| B | KÉZI | kézifék |
+| B | KÉZI (a fékpedál fölött) | kézifék |
 | Q | RÁDIÓ | rádió: következő állomás |
 | G | GPS | interaktív GPS térkép (húzás, csippentés, +/−, Esc = bezárás) |
 | P | II | szünet |
@@ -252,13 +254,15 @@ Mezők (búza, napraforgó, repce, kukorica, szántás, levendula) szalmabálák
 
 - **Kétlépcsős betöltés:** először csak a főképernyőhöz kellő rész töltődik be (kb. egy másodperc), a térkép, a boltok és a minijátékok a háttérben jönnek utána.
 - **Nincs élő elmosás:** a menük nem mossák el folyamatosan a mozgó képet (ez telefonon a leglassabb művelet volt).
-- **Előre elkészített rétegek:** a filmes színkorrekció, a vignetta és a filmszemcse egyszer készül el, utána csak bemásolódik. A betűk is gyorsítótárból jönnek, a GPS kb. 12-szer frissül másodpercenként.
+- **Előre elkészített rétegek:** a filmes színkorrekció, a vignetta és a filmszemcse egyszer készül el, utána csak bemásolódik. A betűk is gyorsítótárból jönnek.
 - **Éjszakai fények:** a sötétítő réteg fél felbontású (lágy fény, negyedannyi pixel), a lámpák fénye egy előre elkészített fénykörből jön; a csillagos ég egy képből.
-- **Feliratok:** minden felirat egyben gyorsítótárazva, egyetlen képmásolással kerül a képre.
+- **Feliratok:** az állandó feliratok egyben gyorsítótárazva, egyetlen képmásolással kerülnek a képre; a változó számok (km, idő, pénz) a kész betűképekből rakódnak össze, így menet közben nem készül folyton új kép (a régi 15 helyett kb. 1 új kép másodpercenként), és nincs emiatt memóriatakarítási akadás.
+- **Előmelegítés:** a betűképek induláskor és felbontásváltáskor a telefon üresjárati idejében készülnek el, nem játék közben.
+- **Mentés üresjáratban:** az automatikus mentés (10 mp-enként) akkor fut, amikor a telefon épp ráér, így nem okoz döccenést.
 - **Városi házak:** ablakonkénti színátmenet helyett egyszerű kitöltés és csillanás.
 - **Nincs fölösleges oldalfrissítés:** a gombok feliratai csak akkor íródnak újra, ha tényleg változnak.
 - **Gyenge telefonon:** egyszerűbb díszítés, a kijelző minden 3. képkockán rajzolódik újra, végső esetben 30 kép/mp rajzolás 60-as játéklogikával.
-- **A telefonhoz igazodik:** erős telefonon élesebb felbontásban rajzol (a kijelzőnél soha nem többet), gyengébbnél automatikusan visszavesz a felbontásból és az effektekből, és ha újra van tartalék, visszaemeli.
+- **A telefonhoz igazodik:** a processzormagok száma és a memória alapján választ kezdő minőséget (2 GB alatt rögtön takarékos mód); figyeli a hosszú, akadó képkockákat is, és ha ilyen többször előfordul, azonnal visszavesz. Erős telefonon élesebb felbontásban rajzol (a kijelzőnél soha nem többet), gyengébbnél automatikusan visszavesz a felbontásból és az effektekből, és ha újra van tartalék, visszaemeli.
 
 ## 📱 Telepítés, megosztás, frissítés
 

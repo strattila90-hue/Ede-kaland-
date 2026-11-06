@@ -208,6 +208,7 @@ function autoDrive(){const A=P.auto,L=LEGS[G.leg];const rem=A.tx-P.dist;let lim=
  for(const e of ents)if(e.kind==='traffic'&&!e.chase&&e.lane===0){const gap=e.x-(P.dist+118);if(gap>-4&&gap<A.tx-P.dist+40&&gap<90)lim=Math.min(lim,Math.max(0,(e.cur||0)-2+gap*0.08));}
  let stopAt=rem;for(const l of LEG.lights){const gap=l.x-(P.dist+114);const need=Math.pow(P.kmh*KPX,2)/(2*0.45*KPX)+2;if(gap>need*(lightState(l,G.t)==='yellow'?1:0.6)&&gap<rem&&lightState(l,G.t)!=='green')stopAt=Math.min(stopAt,gap);}
  const dec=0.32*KPX;const vd=Math.sqrt(2*dec*Math.max(0,stopAt))/KPX;return Math.min(lim,vd,stopAt<3?0:999);}
+function lightStage(p){return p.lightMode===2&&(p.fogF||p.fogR)?4:p.lightMode;}
 function updPlay(){if(K.gpsP){K.gpsP=false;if(P&&!MG&&typeof openGPS==='function')openGPS();}
  if(P&&!G.paused&&!MG&&(K.logP||TAPD&&inRect(TAPD,MONEY_R))){K.logP=false;TAPD=null;if(typeof openLedger==='function')openLedger('play');return;}
  if(P&&!G.paused&&!MG&&P.sub==='drive'&&!P.arriving){if(TAPD){for(const c of (G.chips||[]))if(inRect(TAPD,c.r)){if(c.cancel){P.auto=null;flash('Megállás törölve.','#9fd8ff',80);}else if(!P.flat&&!P.rev)startAuto(c.p);TAPD=null;break;}}
@@ -228,11 +229,11 @@ function updPlay(){if(K.gpsP){K.gpsP=false;if(P&&!MG&&typeof openGPS==='function
  if(P.sub==='repair'){updRepair();engine(850,0);susp(0,0);return;}
  if(P.sub==='fix'){updFix();susp(0,0);return;}
  // lámpák, kapcsolók
- if(K.lightP){P.lightMode=(P.lightMode+1)%4;SFX.click();flash(['Világítás kikapcsolva','Helyzetjelző','Tompított fényszóró','Reflektor (távolsági)'][P.lightMode],'#9fd8ff',90);}
+ if(K.lightP){const n=(lightStage(P)+1)%5;P.lightMode=[0,1,2,3,2][n];P.fogF=P.fogR=n===4;SFX.click();flash(['Világítás kikapcsolva','Helyzetjelző','Tompított fényszóró','Reflektor (távolsági)','Tompított + ködlámpák'][n],'#9fd8ff',90);}
  if(K.fogP){const st=(P.fogF?1:0)+(P.fogR?1:0);const n=(st+1)%3;P.fogF=n>=1;P.fogR=n>=2;SFX.click();flash(['Ködlámpák kikapcsolva','Első ködlámpa','Első és hátsó ködlámpa'][n],'#9cff9c',90);}
  if(K.hazP){P.haz=!P.haz;SFX.click();}
  if(K.radioP){radioNext();}
- if(K.doorP){if(Math.abs(P.kmh)<1){P.doorsOpen=!P.doorsOpen;SFX.clunk();}else flash('Menet közben nem nyitható ajtó!','#ffb347',90);}
+ K.doorP=false;P.doorsOpen=false;/* az ajtók maguktól nyílnak és csukódnak, amikor a család ki- vagy beszáll */
  if(K.revP){if(Math.abs(P.kmh)<1){P.rev=!P.rev;SFX.clunk();flash(P.rev?'Hátramenet (R)':'Előremenet','#ffffff',80);}else flash('Előbb állj meg a sebességváltáshoz!','#ffb347',90);}
  const flashing=K.flash;if(flashing&&!P.flashOn)yieldAhead('fény');P.flashOn=flashing;
  P.door=P.doorsOpen?Math.min(1,P.door+0.05):Math.max(0,P.door-0.05);
@@ -251,7 +252,7 @@ function updPlay(){if(K.gpsP){K.gpsP=false;if(P&&!MG&&typeof openGPS==='function
  if(brake&&P.cruise){P.cruise=0;flash('Tempomat kikapcsolva (fék)','#9fd8ff',80);}
  if(P.cruise&&!gas&&!P.rev&&!P.hb&&!P.engineOff&&!P.arriving&&P.door<0.05){const tg=Math.min(P.cruise,seg().limit>=P.cruise?P.cruise:P.cruise);if(P.kmh<tg-0.4)gas=true;else if(P.kmh<tg+0.4){P.kmh=lerp(P.kmh,tg,0.05);P.cruiseHold=true;}}
  if(P.hb){if(gas&&t%90===0)flash('Be van húzva a kézifék! (B / KÉZIFÉK)','#ffb347',80);gas=false;if(Math.abs(P.kmh)>0.5){P.kmh+=P.kmh>0?-0.7:0.7;if(t%6===0&&P.kmh>15)noise(0.08,0.12,0,2500);}else P.kmh=0;}
- if(gas&&P.door>0.05){gas=false;if(t%90===0)flash('Csukd be az ajtókat! (O / ajtó gomb)','#ffb347',80);}
+ if(gas&&P.door>0.05){gas=false;}
  const bk=L.weather==='snow'?0.3:L.weather==='rain'||L.weather==='storm'?0.38:0.5;
  if(P.arriving){P.kmh=Math.max(0,P.kmh-1.2);P.arriveT++;}
  else if(P.rev){const rb=rawB&&!P.hb&&P.door<0.05&&!P.engineOff;if(rb){a=0.06;P.kmh=Math.max(-15,P.kmh-a);}else P.kmh=Math.min(0,P.kmh+0.04);if(K.gas)P.kmh=Math.min(0,P.kmh+bk);}
@@ -336,7 +337,7 @@ function updPlay(){if(K.gpsP){K.gpsP=false;if(P&&!MG&&typeof openGPS==='function
     flash(over?'Igazoltatás: gyorshajtásért 30 000 Ft bírság. A papírok rendben.':pick(['Igazoltatás: minden rendben, jó utat a családnak!','Ellenőrzés: jogosítvány, forgalmi rendben. Vigyázzanak magukra!','Rutinellenőrzés: rendben, köszönjük a türelmet!']),over?'#ff8a8a':'#7cff7c',320);
     say(over?'Legközelebb lassabban...':'Szerencsére minden rendben.','anya');e.chase=false;e.kmh=e.base=s.limit+15;e.lane=1;e.ty=LANE[1];P.chase=null;}}
   else if(ch.t>2400){book(-50000,'fine','Nem állt meg a rendőri felszólításra');flash('Nem álltál meg a rendőri felszólításra! Bírság: 50 000 Ft','#ff8a8a',320);T.mood--;checkMood();e.chase=false;e.kmh=e.base=s.limit+20;e.lane=1;e.ty=LANE[1];P.chase=null;}}
- if(++P.saveT>=600&&!P.arriving){P.saveT=0;save(P.dist);}
+ if(++P.saveT>=600&&!P.arriving){P.saveT=0;idle(()=>{if(G.state==='play'&&P)save(P.dist);});}
  // defekt: kerékcsere megállva
  if(P.flat&&P.lane===0&&P.kmh<1&&!P.arriving){P.sub='fix';P.fix=0;P.hide.apa=1;}
  if(P.sub==='drive'&&!P.flat&&!P.auto&&!P.arriving&&!P.ev&&!P.rev&&P.boarding<0&&P.lane===0&&Math.abs(P.kmh)<0.5&&needRest()&&!nearLight()){P.rsT=(P.rsT||0)+1;if(P.rsT>=90)startRoadRest();}else P.rsT=0;
@@ -777,14 +778,16 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden){if(G.state
 const QTIERS=[3.5,3,2.5,2,1.6,1.35];let QT=null,QUP=0,RT=0,HALF=false,FRM=0,QCOOL=0;
 function wantSC(){const c=document.getElementById('c'),dpr=Math.min(window.devicePixelRatio||1,3);return Math.max(1,(c.clientWidth||W)*dpr/W);}
 function applyQ(force){const sc=Math.max(1.25,Math.min(QTIERS[QT],Math.round(wantSC()*4)/4));LOWQ=QT>=4;HALF=QT>=QTIERS.length-1&&QBAD>2;
- if(Math.abs(sc-SC)>(force?0.01:0.3)){setSC(sc);TFX=null;HUDC=null;TITLE_DRAWN=null;try{render();}catch(e){}}}
-let QBAD=0;
+ if(Math.abs(sc-SC)>(force?0.01:0.3)){setSC(sc);TFX=null;HUDC=null;TITLE_DRAWN=null;try{render();}catch(e){}if(typeof warmGlyphs==='function')warmGlyphs();}}
+let QBAD=0,LONGF=0;
 function qualityStep(avg,ra){if(document.hidden)return;
- if(QT===null){const touch=isTouch,cores=navigator.hardwareConcurrency||4;QT=touch?(cores>=8?2:3):(cores>=6?1:2);applyQ(true);return;}
+ if(QT===null){const touch=isTouch,cores=navigator.hardwareConcurrency||4,mem=navigator.deviceMemory||8;QT=touch?(cores>=8?2:3):(cores>=6?1:2);
+  if(mem<=2)QT=Math.max(QT,4);else if(mem<=4||cores<=4)QT=Math.max(QT,3);applyQ(true);warmGlyphs();return;}
+ if(LONGF>=3&&QT<QTIERS.length-1&&performance.now()>QCOOL-12000){avg=Math.max(avg,21);}LONGF=0;
  if(HALF)avg/=2;
  if(avg>20.5&&QT<QTIERS.length-1){QT=Math.min(QTIERS.length-1,QT+(avg>28?2:1));QUP=0;QCOOL=performance.now()+15000;if(QT===QTIERS.length-1)QBAD++;applyQ(true);}
  else if(avg<17.6&&QT>0&&performance.now()>QCOOL&&wantSC()>QTIERS[QT]+0.2){if(++QUP>=3){QT--;QUP=0;applyQ(true);}}else QUP=0;}
 let RSZ=0;window.addEventListener('resize',()=>{clearTimeout(RSZ);RSZ=setTimeout(()=>{if(QT!==null)applyQ(false);},500);});
-function frame(now){const dt=Math.min(200,now-last);acc+=dt;last=now;let n=0;while(acc>=STEP&&n<3){update();acc-=STEP;n++;}if(n>=3)acc=0;FRM++;if(!HALF||FRM%2===0){const r0=performance.now();render();RT+=performance.now()-r0*1;}
+function frame(now){const dt=Math.min(200,now-last);if(dt>48&&dt<200&&G.state==='play'&&!G.paused)LONGF++;acc+=dt;last=now;let n=0;while(acc>=STEP&&n<3){update();acc-=STEP;n++;}if(n>=3)acc=0;FRM++;if(!HALF||FRM%2===0){const r0=performance.now();render();RT+=performance.now()-r0*1;}
  perfT+=dt;perfN++;if(perfN>=(QT===null?15:45)){const avg=perfT/perfN,ra=RT/perfN;perfT=0;perfN=0;RT=0;qualityStep(avg,ra);}requestAnimationFrame(frame);}
 requestAnimationFrame(frame);

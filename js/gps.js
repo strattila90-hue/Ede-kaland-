@@ -105,7 +105,7 @@ function gpsDraw(now){const cv2=$('gpsc'),g=cv2.getContext('2d'),w=GV.w,h=GV.h,d
   g.textAlign='center';g.font='800 10px '+GV.ff;g.fillText('É ▲',x+px/2,y-8);}
  }
 function gpsLoop(now){if(!GV.open)return;GV.raf=requestAnimationFrame(gpsLoop);if(now-GV.last<(GV.anim||GV.drag||GV.pinch?14:40))return;GV.last=now;try{gpsDraw(now);}catch(e){console.error(e);}}
-function gpsResize(){const el=$('gpsv'),c=$('gpsc');GV.w=el.clientWidth||innerWidth;GV.h=el.clientHeight||innerHeight;GV.dpr=Math.min(2.5,window.devicePixelRatio||1);c.width=Math.round(GV.w*GV.dpr);c.height=Math.round(GV.h*GV.dpr);
+function gpsResize(){const el=$('gpsv'),c=$('gpsc');GV.w=el.clientWidth||innerWidth;GV.h=el.clientHeight||innerHeight;GV.dpr=Math.min(2,window.devicePixelRatio||1);c.width=Math.round(GV.w*GV.dpr);c.height=Math.round(GV.h*GV.dpr);
  const cs=getComputedStyle(document.documentElement);GV.sl=parseFloat(cs.getPropertyValue('--sl'))||0;GV.sb=parseFloat(cs.getPropertyValue('--sb'))||0;GV.ff=(cs.getPropertyValue('--ff')||'').trim()||'system-ui,sans-serif';GV.z=clamp(GV.z,gpsZMin(),GPS_ZMAX);}
 
 /* ---------- információs kártya ---------- */
