@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.3.0
+# 🚐 Családi Vakáció – v2.3.1
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 

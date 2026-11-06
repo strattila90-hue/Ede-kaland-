@@ -1,7 +1,7 @@
 {
- "version": "2.3.0",
+ "version": "2.3.1",
  "files": {
-  "index.html": 23386,
+  "index.html": 23702,
   "manifest.webmanifest": 681,
   "sw.js": 1183,
   "js/core.js": 11881,
@@ -9,11 +9,11 @@
   "js/radio.js": 6753,
   "js/map.js": 4375,
   "js/car.js": 26748,
-  "js/world.js": 38244,
+  "js/world.js": 38282,
   "js/minigames.js": 16444,
   "js/shops.js": 15011,
-  "js/game.js": 72236,
-  "js/app.js": 16859,
+  "js/game.js": 72483,
+  "js/app.js": 17081,
   "icons/icon-192.png": 27752,
   "icons/icon-512.png": 94753,
   "icons/icon-maskable-512.png": 90587
