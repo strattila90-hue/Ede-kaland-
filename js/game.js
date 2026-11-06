@@ -200,6 +200,21 @@ function consumption(v,type,gas){if(v<3)return 0;let c=2.9+0.00033*v*v;if(type==
 
 /* ---------- frissítés ---------- */
 const MONEY_R=[W-90,2,88,14];
+/* boltra, kútra, autómosóra, étteremre... koppintva (vagy a haladási sávon az ikonjára) az autó odahúzódik és megáll */
+const POI_W={fuel:120,hiper:150,kis:80,trafik:50,ujsag:52,burger:115,rest:130,garage:120,wash:125};
+function tapPOI(tp){if(!LEG||!P)return null;
+ // a felső haladási sáv ikonjai
+ if(G.stripHits&&tp.y>=50&&tp.y<=78){let best=null,bd=99;for(const h of G.stripHits){const dd=Math.abs(tp.x-h.x);if(dd<11&&dd<bd){bd=dd;best=h.p;}}if(best)return best;}
+ // maga az épület a tájban
+ if(tp.y<82||tp.y>ROADT+6)return null;let best=null,bd=1e9;
+ for(const p of LEG.pois){if(!POI_W[p.type])continue;const sx=p.x-P.dist+PX,w=POI_W[p.type],x0=sx-(p.type==='hiper'?28:14),x1=sx+w;
+  if(tp.x>=x0&&tp.x<=x1){const dd=Math.abs(tp.x-(x0+x1)/2);if(dd<bd){bd=dd;best=p;}}}
+ return best;}
+function tryStopAt(p){const rem=stopTarget(p)-P.dist,v=Math.max(0,P.kmh)*KPX,need=v*v/(2*0.32*KPX);
+ if(rem<4){flash('Ezt már elhagytuk: '+POI_NAME[p.type]+'.','#ffb347',110);return;}
+ if(rem<need*0.92){flash('Túl közel van, ennyi idő alatt nem tudunk megállni: '+POI_NAME[p.type]+'.','#ffb347',130);return;}
+ if(P.auto&&P.auto.p===p){P.auto=null;flash('Megállás törölve.','#9fd8ff',80);return;}
+ startAuto(p);}
 function stopTarget(p){return p.type==='fuel'?p.x+38.4:p.x+(p.type==='hiper'?66:30)-60;}
 function stopChips(){const out=[],seen={};if(!LEG||!P)return out;for(const p of LEG.pois){if(p.type==='veda'||seen[p.type])continue;const rem=stopTarget(p)-P.dist;const d=rem*LEG.kmPerPx;if(rem<8||d>2.5)continue;seen[p.type]=1;out.push({p:p,d:d});if(out.length>=3)break;}return out;}
 function startAuto(p){P.auto={p:p,tx:stopTarget(p),type:p.type};P.cruise=0;if(P.lane!==0){P.lastLane=P.lane;P.lane=0;P.blink=120;}P.stopCD=undefined;SFX.click();vib(15);
@@ -211,7 +226,8 @@ function autoDrive(){const A=P.auto,L=LEGS[G.leg];const rem=A.tx-P.dist;let lim=
 function lightStage(p){return p.lightMode===2&&(p.fogF||p.fogR)?4:p.lightMode;}
 function updPlay(){if(G.shake>0&&!G.paused)G.shake--;if(K.gpsP){K.gpsP=false;if(P&&!MG&&typeof openGPS==='function')openGPS();}
  if(P&&!G.paused&&!MG&&(K.logP||TAPD&&inRect(TAPD,MONEY_R))){K.logP=false;TAPD=null;if(typeof openLedger==='function')openLedger('play');return;}
- if(P&&!G.paused&&!MG&&P.sub==='drive'&&!P.arriving){if(TAPD){for(const c of (G.chips||[]))if(inRect(TAPD,c.r)){if(c.cancel){P.auto=null;flash('Megállás törölve.','#9fd8ff',80);}else if(!P.flat&&!P.rev)startAuto(c.p);TAPD=null;break;}}
+ if(P&&!G.paused&&!MG&&P.sub==='drive'&&!P.arriving){if(TAPD){for(const c of (G.chips||[]))if(inRect(TAPD,c.r)){if(c.cancel){P.auto=null;flash('Megállás törölve.','#9fd8ff',80);}else if(!P.flat&&!P.rev)startAuto(c.p);TAPD=null;break;}
+  if(TAPD&&!P.flat&&!P.rev){const p=tapPOI(TAPD);if(p){TAPD=null;tryStopAt(p);}}}
   if(K.stopP){if(P.auto){P.auto=null;flash('Megállás törölve.','#9fd8ff',80);}else{const c=stopChips()[0];if(c)startAuto(c.p);}}}const L=LEGS[G.leg],t=G.t,T=G.trip;if(K.pauseP&&!MG)G.paused=!G.paused;if(G.paused)return;
  if(MG){updMini();engine(P.engineOff?0:850,0);return;}
  const s=seg();
@@ -526,7 +542,7 @@ function upIcon(g,k,x,y,st){// 9x9-es ikonok
  else if(k==='flag'){line(g,'#e6ebf2',x+2,y+0.5,x+2,y+9,0.8);for(let i=0;i<3;i++)for(let j=0;j<2;j++)R(g,(i+j)%2?'#1a1a1a':'#ffffff',x+2.4+i*1.9,y+1+j*1.8,1.9,1.8);}
  else{g.fillStyle='#ffb02e';g.beginPath();g.moveTo(x+4.5,y+0.6);g.lineTo(x+8.8,y+8.4);g.lineTo(x+0.2,y+8.4);g.closePath();g.fill();R(g,'#1a1a1a',x+4,y+3,1,3);R(g,'#1a1a1a',x+4,y+6.6,1,1);}}
 function upcoming(){const out=[],kp=LEG.kmPerPx,front=P.dist+112;
- let nf=null;for(const p of LEG.pois){const d=(p.x-front)*kp;if(p.type==='fuel'&&d>2&&d<60&&!nf){nf=p;out.push({k:'fuel',d:d,n:POI_NAME.fuel});}if(d<0||d>2)continue;if(p.type==='veda'&&p.passed)continue;out.push({k:p.type,d:d,n:POI_NAME[p.type]});}
+ let nf=null;for(const p of LEG.pois){const d=(p.x-front)*kp;if(p.type==='fuel'&&d>2&&d<60&&!nf){nf=p;out.push({k:'fuel',d:d,n:POI_NAME.fuel,p:p});}if(d<0||d>2)continue;if(p.type==='veda'&&p.passed)continue;out.push({k:p.type,d:d,n:POI_NAME[p.type],p:p});}
  for(const l of LEG.lights){const d=(l.x-front)*kp;if(d>0&&d<2)out.push({k:'light',d:d,n:'Lámpa',st:lightState(l,G.t)});}
  for(let i=1;i<LEG.segs.length;i++){const s=LEG.segs[i],d=(s.x0-front)*kp,pv=LEG.segs[i-1];if(d<0||d>3)continue;
   if((s.type==='town'||s.type==='village')&&s.name&&s.name!==pv.name)out.push({k:'town',d:d,n:s.name});else if(s.type==='motorway'&&pv.type!=='motorway')out.push({k:'motorway',d:d,n:s.name||'Autópálya'});}
@@ -551,7 +567,7 @@ function drawStrip(g){const x0=6,x1=W-6,y0=51,h=26,ly=y0+13,cx=x0+14,ax=cx+12,bx
  frr(g,'#3b8bff',cx-6,ly-5,12,4.6,2);frr(g,'#a9d3f5',cx-2.5,ly-4,5,2.2,1);disc(g,'#111',cx-3.4,ly,1.5);disc(g,'#111',cx+3.4,ly,1.5);
  const list=upcoming(),near=[],far=[];for(const o of list)(o.d<=2?near:far).push(o);
  near.sort((a,b)=>a.d-b.d);const occ=[];const free=(a,b)=>{for(const o of occ)if(a<o[1]&&b>o[0])return false;occ.push([a,b]);return true;};
- const items=near.map(o=>({o:o,x:X(o.d)}));
+ const items=near.map(o=>({o:o,x:X(o.d)}));G.stripHits=[];for(const it of items)if(it.o.p&&POI_W[it.o.p.type])G.stripHits.push({x:it.x,p:it.o.p});
  for(let i=items.length-1;i>=0;i--){const it=items[i],o=it.o,x=it.x,warn=o.k==='warn',iy=ly-12;
   if(warn&&(G.t>>3)&1)frr(g,'rgba(255,60,40,0.55)',x-7.5,iy-2.5,15,15,3);
   if(P.auto&&P.auto.type===o.k&&o.d<2.5)frr(g,'rgba(124,217,156,0.55)',x-7.5,iy-2.5,15,15,3);
@@ -560,7 +576,7 @@ function drawStrip(g){const x0=6,x1=W-6,y0=51,h=26,ly=y0+13,cx=x0+14,ax=cx+12,bx
  for(const it of items){const o=it.o,ds=o.d<1?Math.max(10,Math.round(o.d*1000/10)*10)+' m':fmt(o.d,1)+' km',w=textW(ds.toUpperCase())*0.8;
   if(free(it.x-w/2-1,it.x+w/2+1))text(g,ds,it.x,ly+3,o.k==='warn'?'#ffb3a8':o.d<0.2?'#ffd84a':'#dfe6ee',0.8,'center',null);}
  // a sávon túli: következő kút és a cél
- far.sort((a,b)=>a.d-b.d);const fl=far.find(o=>o.k==='flag'),fo=far.find(o=>o.k!=='flag');[fo,fl].forEach((o,i)=>{if(!o)return;const x=bx+15+i*27;g.save();g.translate(x,ly-7.5);g.scale(1.25,1.25);upIcon(g,o.k,-4.5,-4.5,o.st);g.restore();text(g,(o.d<10?fmt(o.d,1):fmt(o.d))+' km',x,ly+3,'#dfe6ee',0.65,'center',null);});}
+ far.sort((a,b)=>a.d-b.d);const fl=far.find(o=>o.k==='flag'),fo=far.find(o=>o.k!=='flag');[fo,fl].forEach((o,i)=>{if(!o)return;const x=bx+15+i*27;if(o.p&&POI_W[o.p.type])G.stripHits.push({x:x,p:o.p});g.save();g.translate(x,ly-7.5);g.scale(1.25,1.25);upIcon(g,o.k,-4.5,-4.5,o.st);g.restore();text(g,(o.d<10?fmt(o.d,1):fmt(o.d))+' km',x,ly+3,'#dfe6ee',0.65,'center',null);});}
 /* ---- lámpafigyelő: a legközelebbi jelzőlámpa állapota, hátralévő ideje, és hogy át fogsz-e érni ---- */
 function drawLightAdvisor(g){if(!LEG||!P)return;const kp=LEG.kmPerPx,front=P.dist+112;let l=null,d=9;
  for(const q of LEG.lights){const dd=(q.x-front)*kp;if(dd>-0.005&&dd<0.45&&dd<d){d=dd;l=q;}}if(!l)return;

@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.18.0
+# 🚐 Családi Vakáció – v2.19.0
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -85,6 +85,8 @@ A főmenü egyetlen álló kép, családi road movie plakát: naplemente csíkos
 **Élő időjárás:** a célállomás aktuális időjárása (eső, hó, köd, vihar, napsütés) és napszaka az internetről érkezik, az [Open-Meteo](https://open-meteo.com) szolgáltatásból. Internet nélkül a beépített időjárással fut a játék.
 
 ## 🏪 Megállók az úton
+
+**Koppints oda, ahol meg akarsz állni:** egy boltra, hipermarketre, trafikra, újságosra, benzinkútra, gyorsétteremre, pihenőre, szervizre vagy autómosóra koppintva (gépen kattintva), vagy a felső haladási sávon az ikonjára, az autó kijelzi a megállást, behúzódik a szélső sávba, odamegy és megáll. Újabb koppintás a megállást törli. Ha a hely már elmaradt, vagy olyan közel van, hogy a sebesség miatt nem lehet biztonságosan megállni, a játék szól.
 
 A megállókat előjelző tábla jelzi („Benzinkút 500 m”), a következők pedig a kijelző alatt is látszanak:
 

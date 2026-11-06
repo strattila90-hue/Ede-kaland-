@@ -1,5 +1,5 @@
 /* Családi Vakáció – service worker (offline működés) */
-const VERSION='2.18.0';
+const VERSION='2.19.0';
 const CACHE='csaladi-vakacio';
 const ASSETS=['./','index.html','manifest.webmanifest','js/core.js','js/geo.js','js/radio.js','js/map.js','js/gps.js','js/geohd.js','js/car.js','js/world.js','js/minigames.js','js/shops.js','js/game.js','js/app.js','icons/icon-192.png','icons/icon-512.png','icons/icon-maskable-512.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>Promise.all(ASSETS.map(u=>fetch(new Request(u,{cache:'reload'})).then(r=>r.ok&&c.put(u,r)).catch(()=>{})))).then(()=>self.skipWaiting()));});

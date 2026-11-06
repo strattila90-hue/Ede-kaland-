@@ -229,7 +229,7 @@ const KEYROWS=()=>{const b=KEYMAP==='b';return [
  ['Világítás fokozatai','L'],['Fénykürt (tartva)','K'],['Ködlámpa','F'],['Vészvillogó','V'],
  ['Tempomat be / ki','T'],['Tempomat sebesség','1=50  2=70  3=90  4=110  5=130  0=ki'],['Megállás a következő helynél','E'],['Hátramenet kapcsoló (álló helyzetben)','R'],
  ['GPS térkép','G'],['Költségnapló','N  Tab'],['Rádió: következő adó','Q  C'],['Zene a főmenüben','M'],
- ['Szünet / vissza','P  Esc'],['Teljesítménymérő','F3'],['Ez a súgó','I  F1'],['Menük, boltok','↑ ↓ + Enter, vagy 1–9']];};
+ ['Szünet / vissza','P  Esc'],['Teljesítménymérő','F3'],['Ez a súgó','I  F1'],['Menük, boltok','↑ ↓ + Enter, vagy 1–9'],['Megállás egy boltnál, kútnál, mosónál','Kattints rá (vagy az ikonjára fent)']];};
 function renderKeys(){const el=$('keys');el.querySelector('.rows').innerHTML=KEYROWS().map(r=>'<div class="r"><span>'+r[0]+'</span><b>'+r[1].split('  ').map(k=>'<kbd>'+k+'</kbd>').join('')+'</b></div>').join('');
  el.querySelectorAll('.lay button').forEach(b=>b.classList.toggle('on',b.dataset.m===KEYMAP));}
 function openKeys(){G.keysOpen=true;G.keysWasPaused=!!G.paused;if(G.state==='play')G.paused=true;renderKeys();$('keys').classList.add('open');MENU_SIG='?';}
