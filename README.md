@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.4.0
+# 🚐 Családi Vakáció – v2.5.0
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -64,6 +64,20 @@ A megállókat előjelző tábla jelzi („Benzinkút 500 m”), a következők 
 **Megállás egy érintéssel:** a kijelző alatt zöld „P” gombok mutatják a következő megállókat („P Kisbolt 400 m”). Érintésre (vagy az **E** billentyűre) apa irányjelzővel átsorol a szélső sávba, finoman lassít, és pontosan az üzlet ajtaja, illetve a benzinkútnál a tanksapka a kút előtt áll meg. Utána magától nyílik a bolt vagy a kút. Piros lámpánál és az előttünk haladó autó mögött megvár. Fékkel vagy sávváltással a megállás törölhető. Kézzel is meg lehet állni a szélső sávban az üzlet előtt.
 
 **Sebességmérő kapu (VÉDA):** előtte „Sebességmérés” tábla áll. Ha túl gyorsan haladsz át alatta, villan, és jön a bírság (15 000 – 100 000 Ft).
+
+## ❤️ A család kedve (5 szív)
+
+A HUD közepén lévő szívek a család kedvét mutatják. Ütközés, piros lámpa, éhség, vagy ha nem állsz meg időben, amikor Atti sír, Petrának rossz vagy Annának pisilnie kell, egy szívet elvisz. Fagyi, játék, gyerekújság, gyerekmenü vagy egy pihenő visszaad.
+
+**Nincs újrakezdés.** Ha elfogy minden szív, a család **nyűgös** lesz: a gyerekek nyafognak, sírnak, és Anya pihenőt kér. Ilyenkor elég megállni:
+- **pihenőhelyen** (P tábla, padok, játszótér, mosdó): a család kiszáll, nyújtózik, a gyerekek csúszdáznak; utána legalább 3, plusz 1 szív. Ingyenes. A sürgős eseteket (sírás, rosszullét, pisilés) is megoldja.
+- **gyorsétteremben vagy bármelyik boltnál:** legalább 2 szív.
+
+1 szívnél figyelmeztetés jelez előre.
+
+## 🍔 Burger Pont gyorsétterem
+
+Városokban és az autópályák mentén (a kutak közelében) saját tervezésű gyorsétterem várja a családot, autós kiszolgálóval. Kínálat: sajtburger, gyerekmenü játékkal, csirkefalat, sült krumpli, shake, kávé Apának, családi menü és fagyikehely.
 
 ## 💰 Pénz: 500 000 Ft kezdő keret
 
