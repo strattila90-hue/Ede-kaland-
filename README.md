@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.14.0
+# 🚐 Családi Vakáció – v2.15.0
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -47,7 +47,9 @@ Külön térképképernyő nincs: a térkép a **GPS** gomb mögött van. Út k�
 
 Amíg a GPS nyitva van, a játék áll, de ez nem számít pihenőnek. A térkép a [Natural Earth](https://www.naturalearthdata.com) közkincs adataiból készült.
 
-**Mi közeledik:** a jobb felső sarokban kis ikonok mutatják, mi jön, és hány méterre: benzinkút, bolt, trafik, újságos, sebességmérő, közlekedési lámpa (az aktuális színével), település, autópálya, kátyú, útépítés, baleset, dugó, állat, és a cél.
+**Haladási sáv (a kép tetején, a műszerfal alatt):** bal szélén az autó, előtte egy 2 km-es vonal, rajta ikonokként minden, ami jön, a saját helyén és távolsággal: benzinkút, bolt, hipermarket, trafik, újságos, gyorsétterem, pihenő, szerviz, autómosó, sebességmérő, jelzőlámpa (az aktuális színével), település, autópálya, és villogó piros jelöléssel a veszélyek (kátyú, útépítés, baleset, dugó, állat). A sáv végén, 2 km-en túl a következő benzinkút és az úti cél távolsága. A kiválasztott megálló zölden ki van emelve. A közeli dolgok a sávon arányosan szétterülnek, így egy pillantással látszik, mi mennyire van közel.
+
+**Lámpafigyelő:** 450 méterrel a jelzőlámpa előtt a jobb oldalon megjelenik egy kis lámpa: mutatja, melyik szín ég (világít), hány másodperc van hátra belőle (fogyó csíkkal), milyen messze van a lámpa, és a jelenlegi sebességed alapján tanácsot ad: **ÁTÉRSZ** (zöldben érsz oda), **LASSÍTS** (sárgában érnél oda), **FÉKEZZ** (pirosban érnél oda), **VÁRJ** (állsz a piros előtt), **ÁLLJ** (közvetlenül a lámpánál, nem zöld).
 
 ## 🎬 Főmenü: filmplakát
 
