@@ -384,12 +384,22 @@ function drawView(g,v,t,ph){const o={pos:true,t:t,ang:t*0.09,door:(v==='side')?M
  if(v==='side'||v==='sideR')drawCarSide(g,0,0,0,o,null);else if(v==='front')drawFront(g,20,0,o);else if(v==='rear')drawRear(g,20,0,o);else drawTop(g,2,0,o);}
 function titleOpts(){const o=[];if(G.save&&(G.save.leg>0||G.save.dist>0))o.push({l:'Folytatás ('+LEGS[G.save.leg].from.split(',')[0]+' > '+LEGS[G.save.leg].to+(G.save.dist?', '+fmt(G.save.dist/(PXKM/(G.save.ts||1)),1)+' km':'')+')',a:'cont'});o.push({l:'Új utazás Komáromból',a:'new'});
  o.push({l:'Autó színe: '+carColor,a:'color'});o.push({l:'Utazás: '+(TS_OPTS.find(q=>q[0]===G.ts)||TS_OPTS[0])[1],a:'ts'});o.push({l:'Az autó adatai',a:'specs'});return o;}
-function drawTitle(g){const t=G.t;drawSky(g,TITLE_L,t);drawClouds(g,TITLE_L,t*0.6,t);drawFar(g,TITLE_L,TITLE_LEG.segs[0],t*0.6,null);drawMid(g,TITLE_L,TITLE_LEG,t*0.6,null);drawNear(g,TITLE_L,TITLE_LEG,t*0.6,null,t);drawRoad(g,TITLE_L,TITLE_LEG,t*0.6,t);
- const per=220,vi=Math.floor(t/per)%VIEWS.length,ph=(t%per)/per,v=VIEWS[vi];let sx=1;if(ph<0.08)sx=ph/0.08;else if(ph>0.92)sx=(1-ph)/0.08;sx=Math.max(0.02,sx);
- const cx=W*0.62,gy=206,sc=1.7;g.fillStyle=rg(g,cx,gy,4,110,[[0,'rgba(0,0,0,0.4)'],[1,'rgba(0,0,0,0)']]);g.save();g.translate(cx,gy);g.scale(sx,0.07);g.beginPath();g.arc(0,0,110,0,TAU);g.fill();g.restore();
- g.save();g.translate(cx,gy-55.5*sc);g.scale(sc*sx,sc);g.translate(v==='top'?-55:-56,0);drawView(g,v,t,ph);g.restore();
- frr(g,'rgba(10,13,22,0.5)',0,0,W,62,0);text(g,'Családi Vakáció',W/2,14,'#ffd84a',3,'center','#7a3b12');text(g,'Európa körút Komárom, Táncsics Mihály utcából',W/2,44,'#ffffff',1,'center');
- frr(g,'rgba(10,13,22,0.6)',cx-58,gy+4,116,11,3);text(g,'Nézet: '+VNAMES[vi],cx,gy+6.5,'#ffffff',1,'center');
+const TSCENES=[{L:{region:'hu',weather:'sun',time:'day'},type:'village',q:'good',lbl:'Komárom, Táncsics Mihály utca'},{L:{region:'hu',weather:'sun',time:'day'},type:'motorway',q:'good',lbl:'M1 autópálya'},
+ {L:{region:'alps',weather:'snow',time:'day'},type:'country',q:'medium',lbl:'Alpok'},{L:{region:'it',weather:'sun',time:'day'},type:'village',q:'cobble',lbl:'Olasz tengerpart'},
+ {L:{region:'provence',weather:'sun',time:'sunset'},type:'country',q:'good',lbl:'Provence, naplemente'},{L:{region:'fr',weather:'clear',time:'night'},type:'town',q:'good',lbl:'Párizs éjjel'}];
+TSCENES.forEach(sc=>sc.leg={segs:[{type:sc.type,name:'',q:sc.q,x0:-1e12,x1:1e12,limit:LIMIT[sc.type],cc:''}],pois:[],lights:[],stations:[],kmPerPx:1/PXKM});
+function drawTitle(g){const t=G.t,per=520,k=Math.floor(t/per)%TSCENES.length,ph=t%per,sc=TSCENES[k],L=sc.L,leg=sc.leg,dist=t*5;lights=[];
+ drawSky(g,L,t);drawClouds(g,L,dist,t);drawFar(g,L,leg.segs[0],dist,lights);drawMid(g,L,leg,dist,lights);drawNear(g,L,leg,dist,lights,t);drawRoad(g,L,leg,dist,t);
+ const cx=W*0.6,gy=214,s2=1.7,night=L.time==='night'||L.time==='sunset';
+ g.fillStyle=rg(g,cx,gy,4,110,[[0,'rgba(0,0,0,0.42)'],[1,'rgba(0,0,0,0)']]);g.save();g.translate(cx,gy);g.scale(1,0.07);g.beginPath();g.arc(0,0,110,0,TAU);g.fill();g.restore();
+ const bob=Math.sin(t*0.21)*0.35+(sc.q==='cobble'?Math.sin(t*1.3)*0.25:0);
+ g.save();g.translate(cx-56*s2,gy-55.5*s2);g.scale(s2,s2);const lt=[];drawCarSide(g,0,bob,0,{t:t,ang:dist/WR,pos:true,lightsOn:night,wF:Math.sin(t*0.17)*0.3,wR:Math.sin(t*0.17-1.1)*0.3,pitch:Math.sin(t*0.05)*0.004,bounce:true},night?lt:null);g.restore();
+ for(const l of lt){const o={x:cx-56*s2+l.x*s2,y:gy-55.5*s2+l.y*s2,r:(l.r||0)*s2,cone:l.cone,high:l.high,g:gy};lights.push(o);}
+ if(L.weather==='snow'){g.fillStyle='#ffffff';for(let i=0;i<90;i++){const x=((hsh(i)*W-t*(0.6+hsh(i+3))*1.8)%W+W)%W,y=(hsh(i+7)*H+t*(0.5+hsh(i+1)))%H;g.beginPath();g.arc(x,y,hsh(i+9)>0.6?1.1:0.7,0,TAU);g.fill();}}
+ darkness(g,L);
+ const fade=ph<30?1-ph/30:ph>per-30?(ph-(per-30))/30:0;if(fade>0)R(g,'rgba(8,10,16,'+fade+')',0,0,W,H);
+ frr(g,'rgba(10,13,22,0.5)',0,0,W,62,0);const tx=G.state==='title'&&!isTouch&&false?W/2:W*0.6;text(g,'Családi Vakáció',tx,14,'#ffd84a',2.6,'center','#7a3b12');text(g,'Európa körút Komárom, Táncsics Mihály utcából',tx,40,'#ffffff',1,'center');
+ const lw=textW(sc.lbl.toUpperCase())+12;frr(g,'rgba(10,13,22,0.6)',cx-lw/2,gy+8,lw,11,4);text(g,sc.lbl,cx,gy+10.5,'#ffffff',1,'center');
  text(g,'v'+APP_VERSION,W-4,262,'#6f7d8c',1,'right');}
 function drawSpecs(g){R(g,'#141a26',0,0,W,H);g.save();g.translate(250,40);g.scale(1.8,1.8);drawCarSide(g,0,0,0,{t:G.t,ang:G.t*0.05,lightsOn:true},null);g.restore();
  text(g,'Az autó adatai',20,16,'#ffd84a',2);const rows=[['Típus','7 üléses egyterű'],['Motor','1.8 16V benzin'],['Teljesítmény',CAR.hp+' LE'],['Nyomaték',CAR.torque+' Nm'],['Végsebesség',CAR.top+' km/h'],['0-100 km/h',fmt(CAR.acc100,1)+' s'],
