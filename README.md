@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.11.1
+# 🚐 Családi Vakáció – v2.11.2
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -99,7 +99,7 @@ Erős ütközésnél kinyílik a **légzsák**, és leeresztve ott lóg a javít
 
 ## 😴 Fáradás
 
-Apa fárad: valós 30 perc folyamatos vezetés után elálmosodik (a szívek alatt látszik a vezetési idő). 25 percnél figyelmeztetés jön, 30 percnél felszólítás, hogy állj meg pihenni. Utána egyre homályosabb a kép, és időnként lecsukódik a szeme (mikroalvás): elsötétül a kép, az autó kisodródik a sávból. 45 percnél a legerősebb.
+Apa fárad: valós 30 perc folyamatos vezetés után elálmosodik (a szívek alatt látszik a vezetési idő). 25 percnél figyelmeztetés jön, 30 percnél felszólítás, hogy állj meg pihenni. Utána kissé homályosabb a kép, és ritkán (legfeljebb 20 másodpercenként) lecsukódik a szeme (mikroalvás): a kép széle elsötétül, középen piros felirat jelzi, hogy „Apa elbóbiskolt!”, és az autó kisodródik a sávból. 45 percnél a legerősebb.
 
 - **Pihenőhely:** teljesen kipihenten indulsz tovább.
 - **Kávé Apának:** 15 percet levesz a fáradtságból.

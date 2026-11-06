@@ -257,12 +257,12 @@ function updPlay(){if(TAPD&&!G.paused&&!MG&&P&&P.sub==='drive'&&inRect(TAPD,mapR
  let autoEnd=false;if(P.auto){const rem=P.auto.tx-P.dist;if(rem<=0.5||P.kmh*KPX>=rem||(rem<2.5&&P.kmh<1.2)){P.kmh=Math.max(0,rem)/KPX;autoEnd=true;}}
  P.brake=brake||autoBrk||P.arriving&&P.kmh>0.5;if(P.rev)P.brake=K.gas&&P.kmh<-0.3;
  // fáradás: valós idejű folyamatos vezetés (60 képkocka = 1 mp)
- {if(P.sub==='drive'&&Math.abs(P.kmh)>3&&!P.arriving)T.driveS=(T.driveS||0)+1/60;const F=T.driveS||0,D=clamp((F-1800)/900,0,1);
+ {if(P.msCD>0)P.msCD--;if(P.sub==='drive'&&Math.abs(P.kmh)>3&&!P.arriving)T.driveS=(T.driveS||0)+1/60;const F=T.driveS||0,D=clamp((F-1800)/900,0,1);
   if(F>=1500&&!P.fw25){P.fw25=true;flash('25 perce vezetsz. Hamarosan tarts pihenőt!','#ffcf33',240);}
   if(F>=1800&&!P.fw30){P.fw30=true;flash('Apa elfáradt: 30 perce vezet! Állj meg pihenni.','#ff8a5a',320);say('Kezdek elálmosodni...','apa');tone(660,0.15,'sine',0.08);tone(520,0.25,'sine',0.08,0.17);}
   if(F<1500){P.fw25=false;P.fw30=false;}
   if(P.ms){P.ms.t++;const u=P.ms.t/P.ms.len;if(u<0.85)P.y+=0.07*(0.4+D)*P.ms.dir;if(P.ms.t>=P.ms.len){P.ms=null;flash('Majdnem elaludtál! Állj meg pihenni!','#ff6b6b',200);vib([60,40,60]);SFX.honk();setTimeout(()=>hornSet(false),10);}}
-  else if(D>0&&P.sub==='drive'&&P.kmh>20&&Math.random()<0.0006+D*0.003)P.ms={t:0,len:Math.round(50+D*70),dir:P.lane===0?1:P.lane===2?-1:pick([-1,1])};
+  else if(D>0&&P.sub==='drive'&&P.kmh>20&&!(P.msCD>0)&&Math.random()<0.0004+D*0.0016)P.msCD=1200,P.ms={t:0,len:Math.round(50+D*70),dir:P.lane===0?1:P.lane===2?-1:pick([-1,1])};
   G.drowsy=D;G.eyelid=P.ms?Math.sin(Math.PI*Math.min(1,P.ms.t/P.ms.len)):0;}
  // satufék: féknyom, gumicsikorgás, az utasok előrebillennek, a gyerekek sikítanak
  {const hard=brake&&!P.rev&&P.kmh>45&&P.sub==='drive';P.brakeT=hard?(P.brakeT||0)+1:0;P.skids=P.skids||[];
@@ -595,7 +595,7 @@ function drawPlay(g){const L=LEGS[G.leg],t=G.t;lights=[];const s=seg();
    if(e.help==='truck')for(let k=0;k<5;k++)frr(g,['#b07a42','#c8955a','#8a5a2b'][k%3],ex-30+k*9,e.y-(k%2?16:8),8,8,1);person(g,ex-12,e.y+4,'apa',t,'wave');triangle(g,ex-48,e.y+2);}}else if(e.kind==='animal')drawAnimal(g,e,ex,t);else drawObstacle(g,e,ex,t);}
  for(const w of P.walk)person(g,w.x,w.y,w.w,w.t+(w.out?0:0),w.out&&w.x>=w.tx?'wave':'walk');
  for(const p of LEG.pois)if(p.type==='veda')drawVedaFront(g,p,p.x-P.dist+PX);
- drawParts(g,true);drawWeather(g,L,t);darkness(g,L);drawBubble(g);g.restore();drawParts(g,false);drawHUDc(g);if(P.fadeA>0)R(g,'rgba(0,0,0,'+P.fadeA+')',0,0,W,H);if(G.eyelid>0.02){const k=G.eyelid,hh=H*0.46*k;g.fillStyle=lg(g,0,0,0,hh+12,[[0,'#000'],[Math.max(0.01,hh/(hh+12)),'#000'],[1,'rgba(0,0,0,0)']]);g.fillRect(0,0,W,hh+12);g.fillStyle=lg(g,0,H,0,H-hh-12,[[0,'#000'],[Math.max(0.01,hh/(hh+12)),'#000'],[1,'rgba(0,0,0,0)']]);g.fillRect(0,H-hh-12,W,hh+12);}if(P.sub==='pump')drawPumpUI(g);if(P.sub==='wash')drawWashUI(g);if(P.sub==='shop')drawShopUI(g);if(MG)drawMini(g);}
+ drawParts(g,true);drawWeather(g,L,t);darkness(g,L);drawBubble(g);g.restore();drawParts(g,false);drawHUDc(g);if(P.fadeA>0)R(g,'rgba(0,0,0,'+P.fadeA+')',0,0,W,H);if(G.eyelid>0.02){const k=G.eyelid,hh=H*0.2*k;g.fillStyle=lg(g,0,0,0,hh+12,[[0,'#000'],[Math.max(0.01,hh/(hh+12)),'#000'],[1,'rgba(0,0,0,0)']]);g.fillRect(0,0,W,hh+12);g.fillStyle=lg(g,0,H,0,H-hh-12,[[0,'#000'],[Math.max(0.01,hh/(hh+12)),'#000'],[1,'rgba(0,0,0,0)']]);g.fillRect(0,H-hh-12,W,hh+12);const msg='Apa elbóbiskolt! Fáradt, állj meg pihenni!';const mw=textW(msg.toUpperCase())+16;frr(g,'rgba(120,20,20,0.9)',W/2-mw/2,H/2-8,mw,16,6);text(g,msg,W/2,H/2-3,'#ffffff',1,'center',null);}if(P.sub==='pump')drawPumpUI(g);if(P.sub==='wash')drawWashUI(g);if(P.sub==='shop')drawShopUI(g);if(MG)drawMini(g);}
 
 /* ---------- képernyők ---------- */
 const VIEWS=['side','front','rear','top'],VNAMES=['Oldalnézet','Elölnézet','Hátulnézet','Felülnézet'];
@@ -742,14 +742,15 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden){if(G.state
 // minőségi fokozatok: maximális renderfelbontás (a kijelző valódi pixelszámánál soha nem több) és effektek
 const QTIERS=[3.5,3,2.5,2,1.6,1.35];let QT=null,QUP=0,RT=0,HALF=false,FRM=0,QCOOL=0;
 function wantSC(){const c=document.getElementById('c'),dpr=Math.min(window.devicePixelRatio||1,3);return Math.max(1,(c.clientWidth||W)*dpr/W);}
-function applyQ(){const sc=Math.max(1.25,Math.min(QTIERS[QT],Math.round(wantSC()*4)/4));LOWQ=QT>=4;HALF=QT>=QTIERS.length-1&&QBAD>2;if(Math.abs(sc-SC)>0.01){setSC(sc);TFX=null;GPSC=null;HUDC=null;}}
+function applyQ(force){const sc=Math.max(1.25,Math.min(QTIERS[QT],Math.round(wantSC()*4)/4));LOWQ=QT>=4;HALF=QT>=QTIERS.length-1&&QBAD>2;
+ if(Math.abs(sc-SC)>(force?0.01:0.3)){setSC(sc);TFX=null;GPSC=null;HUDC=null;TITLE_DRAWN=null;try{render();}catch(e){}}}
 let QBAD=0;
 function qualityStep(avg,ra){if(document.hidden)return;
- if(QT===null){const touch=isTouch,cores=navigator.hardwareConcurrency||4;QT=touch?(cores>=8?2:3):(cores>=6?1:2);applyQ();return;}
+ if(QT===null){const touch=isTouch,cores=navigator.hardwareConcurrency||4;QT=touch?(cores>=8?2:3):(cores>=6?1:2);applyQ(true);return;}
  if(HALF)avg/=2;
- if(avg>20.5&&QT<QTIERS.length-1){QT=Math.min(QTIERS.length-1,QT+(avg>28?2:1));QUP=0;QCOOL=performance.now()+15000;if(QT===QTIERS.length-1)QBAD++;applyQ();}
- else if(avg<17.6&&QT>0&&performance.now()>QCOOL&&wantSC()>QTIERS[QT]+0.2){if(++QUP>=3){QT--;QUP=0;applyQ();}}else QUP=0;}
-window.addEventListener('resize',()=>{if(QT!==null)applyQ();});
+ if(avg>20.5&&QT<QTIERS.length-1){QT=Math.min(QTIERS.length-1,QT+(avg>28?2:1));QUP=0;QCOOL=performance.now()+15000;if(QT===QTIERS.length-1)QBAD++;applyQ(true);}
+ else if(avg<17.6&&QT>0&&performance.now()>QCOOL&&wantSC()>QTIERS[QT]+0.2){if(++QUP>=3){QT--;QUP=0;applyQ(true);}}else QUP=0;}
+let RSZ=0;window.addEventListener('resize',()=>{clearTimeout(RSZ);RSZ=setTimeout(()=>{if(QT!==null)applyQ(false);},500);});
 function frame(now){const dt=Math.min(200,now-last);acc+=dt;last=now;let n=0;while(acc>=STEP&&n<3){update();acc-=STEP;n++;}if(n>=3)acc=0;FRM++;if(!HALF||FRM%2===0){const r0=performance.now();render();RT+=performance.now()-r0*1;}
  perfT+=dt;perfN++;if(perfN>=(QT===null?15:45)){const avg=perfT/perfN,ra=RT/perfN;perfT=0;perfN=0;RT=0;qualityStep(avg,ra);}requestAnimationFrame(frame);}
 requestAnimationFrame(frame);
