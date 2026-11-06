@@ -2,7 +2,7 @@
 /* =========================================================
    CSALÁDI VAKÁCIÓ – alapok: vászon, rajzoló segédek, betűk, hang, bemenet
    ========================================================= */
-const APP_VERSION='2.17.1';
+const APP_VERSION='2.18.0';
 const W=480,H=270,PX=70,ROADT=194,ROADB=262,LANE=[212,232,252];
 const TAU=Math.PI*2;
 let SC=2,LOWQ=false;
@@ -149,16 +149,40 @@ function toggleMusic(){initAudio();musicOn=!musicOn;}
 
 /* ---------- bemenet ---------- */
 const K={horn:false,cruiseP:false,cruiseSet:null,hbP:false,flash:false,doorP:false,revP:false,radioP:false,gas:false,brake:false,pump:false,upP:false,dnP:false,honkP:false,enterP:false,pauseP:false,lightP:false,fogP:false,hazP:false,num:0};
-window.addEventListener('keydown',e=>{initAudio();const k=e.key;
- if(k==='ArrowRight'||k==='d'||k==='D')K.gas=true;else if(k==='ArrowLeft'||k==='a'||k==='A')K.brake=true;
- else if(k==='ArrowUp'||k==='w'||k==='W'){if(!e.repeat)K.upP=true;}else if(k==='ArrowDown'||k==='s'||k==='S'){if(!e.repeat)K.dnP=true;}
- else if(k===' '){K.pump=true;if(!e.repeat)K.brakeTap=true;}else if(k==='h'||k==='H'){if(!e.repeat){K.honkP=true;K.horn=true;}}
- else if(k==='Enter'){K.enterP=true;K.enterKey=true;}else if(k==='p'||k==='P'||k==='Escape'){K.pauseP=true;}else if(k==='m'||k==='M'){toggleMusic();}
- else if(k==='l'||k==='L'){K.lightP=true;}else if(k==='f'||k==='F'){K.fogP=true;}else if(k==='v'||k==='V'){K.hazP=true;}
- else if(k==='k'||k==='K'){K.flash=true;}else if(k==='o'||k==='O'){K.doorP=true;}else if(k==='b'||k==='B'){K.hbP=true;}else if(k==='t'||k==='T'){K.cruiseP=true;}else if(k==='e'||k==='E'){K.stopP=true;}else if(k==='n'||k==='N'){K.logP=true;}else if(k==='r'||k==='R'){K.revP=true;}else if(k==='g'||k==='G'){if(!e.repeat&&typeof G!=='undefined'&&(G.state==='play'||G.state==='map'))K.gpsP=true;}else if(k==='q'||k==='Q'||k==='c'||k==='C'){K.radioP=true;}
- else if(k>='1'&&k<='9'){K.num=+k;}
- if([' ','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(k))e.preventDefault();});
-window.addEventListener('keyup',e=>{const k=e.key;if(k==='ArrowRight'||k==='d'||k==='D')K.gas=false;else if(k==='ArrowLeft'||k==='a'||k==='A')K.brake=false;else if(k===' ')K.pump=false;else if(k==='k'||k==='K')K.flash=false;else if(k==='h'||k==='H')K.horn=false;});
+/* ---- billentyűzet: két kiosztás (Klasszikus / Autós), plusz kiegészítő gombok ---- */
+let KEYMAP='a';try{KEYMAP=localStorage.getItem('cv-keys')==='b'?'b':'a';}catch(e){}
+function setKeymap(m){KEYMAP=m==='b'?'b':'a';try{localStorage.setItem('cv-keys',KEYMAP);}catch(e){}}
+function kRole(e){const c=e.code||'',k=e.key;const inPlay=typeof G!=='undefined'&&G.state==='play'&&!G.paused&&!MG&&!G.gps&&!G.ledger;
+ const up=c==='ArrowUp'||c==='KeyW'||c==='Numpad8',dn=c==='ArrowDown'||c==='KeyS'||c==='Numpad2',lf=c==='ArrowLeft'||c==='KeyA'||c==='Numpad4',rt=c==='ArrowRight'||c==='KeyD'||c==='Numpad6';
+ if(!inPlay){if(up)return 'up';if(dn)return 'dn';if(rt)return 'gas';if(lf)return 'brake';}
+ else if(KEYMAP==='b'){if(up)return 'gas';if(dn)return 'brake';if(lf)return 'up';if(rt)return 'dn';}
+ else{if(rt)return 'gas';if(lf)return 'brake';if(up)return 'up';if(dn)return 'dn';}
+ if(k===' '||c==='Numpad0')return 'pump';if(c==='KeyH'||c==='ShiftLeft'||c==='ShiftRight'||c==='NumpadAdd')return 'horn';
+ if(k==='Enter'||c==='NumpadEnter')return 'enter';if(c==='KeyP'||k==='Escape'||c==='Pause')return 'pause';if(c==='KeyM')return 'music';
+ if(c==='KeyL')return 'light';if(c==='KeyF')return 'fog';if(c==='KeyV')return 'haz';if(c==='KeyK')return 'flash';if(c==='KeyO')return 'door';
+ if(c==='KeyB'||c==='KeyX'||c==='Numpad5')return 'hb';if(c==='KeyT')return 'cruise';if(c==='KeyE')return 'stop';if(c==='KeyN'||c==='Tab')return 'log';if(c==='KeyR')return 'rev';
+ if(c==='KeyG')return 'gps';if(c==='KeyQ'||c==='KeyC')return 'radio';if(c==='KeyI'||k==='F1'||k==='?')return 'help';if(k==='F3')return 'perf';
+ if(/^Digit[0-9]$/.test(c))return 'num'+c.slice(5);if(/^Numpad[1-9]$/.test(c)&&!up&&!dn&&!lf&&!rt)return 'num'+c.slice(6);
+ return null;}
+window.addEventListener('keydown',e=>{initAudio();const r=kRole(e);if(!r)return;const rep=e.repeat;if(e.code)KHELD.add(e.code);
+ if(r==='gas'||r==='brake')kPedals();else if(r==='up'){if(!rep)K.upP=true;}else if(r==='dn'){if(!rep)K.dnP=true;}
+ else if(r==='pump'){K.pump=true;if(!rep)K.brakeTap=true;}else if(r==='horn'){if(!rep){K.honkP=true;K.horn=true;}}
+ else if(r==='enter'){K.enterP=true;K.enterKey=true;}else if(r==='pause'){if(typeof G!=='undefined'&&G.keysOpen){if(typeof closeKeys==='function')closeKeys();}else K.pauseP=true;}else if(r==='music'){toggleMusic();}
+ else if(r==='light')K.lightP=true;else if(r==='fog')K.fogP=true;else if(r==='haz')K.hazP=true;else if(r==='flash')K.flash=true;else if(r==='door')K.doorP=true;
+ else if(r==='hb'){if(!rep)K.hbP=true;}else if(r==='cruise')K.cruiseP=true;else if(r==='stop')K.stopP=true;else if(r==='log')K.logP=true;else if(r==='rev')K.revP=true;
+ else if(r==='gps'){if(!rep&&typeof G!=='undefined'&&(G.state==='play'||G.state==='map'))K.gpsP=true;}else if(r==='radio')K.radioP=true;
+ else if(r==='help'){if(!rep&&typeof toggleKeys==='function')toggleKeys();}
+ else if(r==='perf'){if(!rep&&typeof PERF!=='undefined'){PERF.on=!PERF.on;try{localStorage.setItem('cv-perf',PERF.on?'1':'0');}catch(_){}}}
+ else if(r.startsWith('num')){const n=+r.slice(3);
+  // menet közben a számok a tempomatot állítják (1=50 ... 5=130, 0=ki); boltban, minijátékban választanak
+  if(typeof G!=='undefined'&&G.state==='play'&&typeof P!=='undefined'&&P&&P.sub==='drive'&&!MG&&!G.paused){const v=[0,50,70,90,110,130][n];if(n===0||v)K.cruiseSet=n===0?0:v;}else if(n>0)K.num=n;}
+ if(['pump','gas','brake','up','dn','log','help','perf'].includes(r)||r.startsWith('num'))e.preventDefault();});
+const KHELD=new Set();
+function kPedals(){const A=KEYMAP==='b'?{g:['ArrowUp','KeyW','Numpad8'],b:['ArrowDown','KeyS','Numpad2']}:{g:['ArrowRight','KeyD','Numpad6'],b:['ArrowLeft','KeyA','Numpad4']};
+ K.gas=A.g.some(c=>KHELD.has(c));K.brake=A.b.some(c=>KHELD.has(c));}
+window.addEventListener('keyup',e=>{const r=kRole(e);KHELD.delete(e.code);kPedals();
+ if(r==='pump')K.pump=false;else if(r==='flash')K.flash=false;else if(r==='horn')K.horn=false;});
+window.addEventListener('blur',()=>{KHELD.clear();K.gas=K.brake=K.pump=K.flash=K.horn=false;});
 function holdBtn(id,key){const el=document.getElementById(id);const on=e=>{e.preventDefault();e.stopPropagation();initAudio();K[key]=true;el.classList.add('on');};const off=e=>{e.preventDefault();K[key]=false;el.classList.remove('on');};
  el.addEventListener('touchstart',on,{passive:false});el.addEventListener('touchend',off,{passive:false});el.addEventListener('touchcancel',off,{passive:false});
  el.addEventListener('mousedown',on);el.addEventListener('mouseup',off);el.addEventListener('mouseleave',off);}

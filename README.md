@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.17.1
+# 🚐 Családi Vakáció – v2.18.0
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -239,29 +239,36 @@ Mezők (búza, napraforgó, repce, kukorica, szántás, levendula) szalmabálák
 
 ## 🎮 Irányítás
 
-A középkonzolon csak három gomb van: **világítás** (egyetlen gomb minden fokozattal, nyomva tartva fénykürt), mellette a **vészvillogó**, és a **rádió**. A **kézifék** a fék- és gázpedál mellett, a fékpedál fölött van. Az **ajtók automatikusak**: kinyílnak, amikor a család kiszáll (pihenő, megérkezés, defekt, félreállás), és maguktól becsukódnak, ha mindenki visszaült.
+A középkonzolon csak három gomb van: **világítás** (egyetlen gomb minden fokozattal, nyomva tartva fénykürt), mellette a **vészvillogó**, és a **rádió**. A **kézifék** a fék- és gázpedál mellett, a fékpedál fölött van. Az **ajtók automatikusak**.
 
+**Billentyűzet (laptop, számítógép):** két választható kiosztás, a főmenüben vagy a Szünet menüben a **⌨ Billentyűzet** gombbal (vagy az **I** / **F1** billentyűvel) nyíló súgóban lehet váltani; az első játéknál magától megjelenik. A WASD a fizikai helyén működik magyar billentyűzeten is.
 
-| Billentyű | Mobil gomb | Funkció |
+| Funkció | Klasszikus | Autós |
 |---|---|---|
-| → | GÁZ | gyorsítás |
-| ← / Space | FÉK | fékezés |
-| ↑ ↓ | ▲ ▼ | sávváltás |
-| H | DUDA | duda |
-| L | VILÁGÍTÁS gomb (érintés) | világítás: KI → helyzetjelző → tompított → reflektor → tompított + ködlámpák |
-| K (tartsd) | VILÁGÍTÁS gomb (nyomva tartva) | fénykürt |
-| F | – | ködlámpák külön |
-| V | VÉSZ (a világítás mellett) | vészvillogó |
-| R | fék tartva álló helyzetben | hátramenet |
-| T | TEMPO | tempomat |
-| E | P gomb | megállás a következő üzletnél |
-| N | pénz | költségnapló |
-| B | KÉZI (a fékpedál fölött) | kézifék |
-| Q | RÁDIÓ | rádió: következő állomás |
-| G | GPS | interaktív GPS térkép (húzás, csippentés, +/−, Esc = bezárás) |
-| P | II | szünet |
-| M | Zene (főmenü) | menüzene |
-| 1–5, Enter | érintés | menük és minijátékok |
+| Gáz | → D Num6 | ↑ W Num8 |
+| Fék (álló helyzetben tartva: hátramenet) | ← A Num4 | ↓ S Num2 |
+| Sávváltás fel / le | ↑ ↓ · W S · Num8 Num2 | ← → · A D · Num4 Num6 |
+
+Mindkét kiosztásban:
+
+| Billentyű | Funkció |
+|---|---|
+| Szóköz, Num0 | satufék / pumpálás a kútnál |
+| B, X, Num5 | kézifék |
+| H, Shift, Num+ | duda |
+| L / K (tartva) / F / V | világítás fokozatai / fénykürt / ködlámpa / vészvillogó |
+| T | tempomat be/ki |
+| 1, 2, 3, 4, 5 / 0 | tempomat 50, 70, 90, 110, 130 km/h / ki (menet közben) |
+| E | megállás a következő helynél |
+| R | hátramenet kapcsoló (álló helyzetben) |
+| G | GPS térkép |
+| N, Tab | költségnapló |
+| Q, C | rádió: következő adó |
+| M | menüzene |
+| P, Esc | szünet / vissza |
+| F3 | teljesítménymérő |
+| I, F1 | billentyűzet súgó |
+| ↑ ↓ + Enter, 1–9 | menük, boltok, minijátékok |
 
 ## ⚡ Gyorsaság
 

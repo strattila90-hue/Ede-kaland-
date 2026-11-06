@@ -29,7 +29,7 @@ function legKm(){return Math.min(LEGS[G.leg].km,P.dist*LEG.kmPerPx);}
 function distStr(km){return km<1?fmt(km*1000)+' m':fmt(km,1)+' km';}
 
 /* ---------- indulás ---------- */
-function startLeg(i,resume){if(typeof elog==='function')elog('info','Szakasz indul: '+(i+1)+'. '+LEGS[i].from.split(',')[0]+' > '+LEGS[i].to+(resume?' (folytatás)':''));G.leg=i;GPS_HD=null;LEG=buildLeg(i,G.ts);const L=LEGS[i];const dark=L.time!=='day'||['rain','storm','fog','snow'].includes(L.weather);
+function startLeg(i,resume){if(typeof FINE!=='undefined'&&FINE&&!isTouch){let seen=false;try{seen=localStorage.getItem('cv-keys-seen')==='1';localStorage.setItem('cv-keys-seen','1');}catch(e){}if(!seen)setTimeout(()=>{if(G.state==='play'&&!G.paused&&!G.gps&&!G.ledger&&!G.elogOpen&&!MG&&typeof openKeys==='function')openKeys();},1600);}if(typeof elog==='function')elog('info','Szakasz indul: '+(i+1)+'. '+LEGS[i].from.split(',')[0]+' > '+LEGS[i].to+(resume?' (folytatás)':''));G.leg=i;GPS_HD=null;LEG=buildLeg(i,G.ts);const L=LEGS[i];const dark=L.time!=='day'||['rain','storm','fog','snow'].includes(L.weather);
  P={dist:resume||0,kmh:0,lane:i===0&&!resume?0:1,y:LANE[i===0&&!resume?0:1],ang:0,blink:0,inv:0,haz:false,lightMode:dark?2:1,fogF:['fog','snow'].includes(L.weather),fogR:L.weather==='fog',rev:false,doorsOpen:false,saveT:0,
   yF:0,vF:0,yR:0,vR:0,wF:0,wR:0,flat:null,sub:'drive',fix:0,pump:null,ev:null,evCD:3600,famCD:9000,chat:600,bub:null,arriving:false,arriveT:0,door:0,hide:{},walk:[],stopT:0,
   boarding:i===0&&!resume?0:-1,instCons:0,avgKm:0,avgL:0,lastSeg:null,hungerT:0,brake:false,gasF:0,engineOff:false};

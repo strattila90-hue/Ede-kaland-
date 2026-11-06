@@ -247,6 +247,17 @@ body.touchui #topbar #bGps{display:none}
 #elog .e{padding:6px 8px;border-top:1px solid rgba(255,255,255,.07);font:500 12.5px/1.35 var(--ff);color:#dfe6ee;word-break:break-word}#elog .e b{color:#9fb0c2;font-weight:700}#elog .e small{display:block;color:#7f8c9c;font-size:11px}
 #elog .e.err{color:#ffb3a8}#elog .e.stop{color:#ffd27a;background:rgba(255,190,60,.07)}#elog .btns{display:flex;gap:8px;padding:10px 12px}#elog .btns button{flex:1;min-height:44px;border-radius:12px;border:1px solid var(--line);background:linear-gradient(180deg,#2b3242,#191d27);color:#fff;font:800 14px var(--ff)}
 #elog #elogShare{background:linear-gradient(180deg,#3b7fe6,#2458b8)}
+/* billentyűzet súgó */
+#keys{position:fixed;inset:0;z-index:42;display:none;align-items:center;justify-content:center;background:rgba(4,6,10,.6);padding:12px;font-family:var(--ff)}
+#keys.open{display:flex}#keys .sheet{width:min(820px,100%);max-height:100%;display:flex;flex-direction:column;border-radius:20px;overflow:hidden;background:rgba(16,20,30,.96);border:1px solid var(--line);color:#fff}
+#keys header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px 6px}#keys h3{margin:0;font:800 18px var(--ff)}#keys .x{width:40px;height:40px;border-radius:12px;border:0;background:#2a3040;color:#fff;font-size:18px;cursor:pointer}
+#keys .lay{display:flex;gap:8px;align-items:center;padding:0 14px 10px;flex-wrap:wrap}#keys .lay span{color:#9fb0c2;font:700 13px var(--ff)}
+#keys .lay button{flex:1;min-width:170px;padding:8px 12px;border-radius:12px;border:1px solid var(--line);background:linear-gradient(180deg,#2b3242,#191d27);color:#fff;font:800 14px var(--ff);cursor:pointer;text-align:left}
+#keys .lay button small{display:block;font:600 11.5px var(--ff);color:#9fb0c2;margin-top:2px}#keys .lay button.on{background:linear-gradient(180deg,#3b7fe6,#2458b8);border-color:rgba(255,255,255,.4)}#keys .lay button.on small{color:#dbe8ff}
+#keys .rows{overflow:auto;padding:0 14px 14px;display:grid;grid-template-columns:1fr 1fr;column-gap:18px}
+#keys .r{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:5px 0;border-top:1px solid rgba(255,255,255,.07);font:600 13px/1.3 var(--ff);color:#dfe6ee}
+#keys .r b{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}#keys kbd{display:inline-block;min-width:22px;padding:2px 6px;border-radius:6px;background:#2b3242;border:1px solid rgba(255,255,255,.18);border-bottom-width:2px;font:800 12px var(--ff);color:#fff;text-align:center;white-space:nowrap}
+@media (max-width:700px){#keys .rows{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -286,6 +297,7 @@ body.touchui #topbar #bGps{display:none}
 <div class="btns"><button class="later" id="instLater">Most nem</button><button class="go" id="instGo">⬇ Telepítés most</button></div></div><div class="arrow" id="instArrow">⬇</div></div>
 <div id="bye"><div><b>⏻</b><h3>Kiléptél a játékból</h3><p>Az utad el van mentve. Most már bezárhatod az alkalmazást (kezdőképernyő gomb vagy az alkalmazásváltó).</p><button id="byeBack">Vissza a játékba</button></div></div>
 <div id="elog"><div class="sheet"><header><h3>🩺 Hibanapló</h3><button class="x" id="elogClose" aria-label="Bezárás">✕</button></header><p class="sum"></p><div class="list"></div><div class="btns"><button id="elogShare">Küldés</button><button id="elogCopy">Másolás</button><button id="elogClear">Törlés</button></div></div></div>
+<div id="keys"><div class="sheet"><header><h3>⌨ Billentyűzet</h3><button class="x" id="keysClose" aria-label="Bezárás">✕</button></header><div class="lay"><span>Kiosztás:</span><button data-m="a">Klasszikus<small>→ gáz, ← fék, ↑↓ sáv</small></button><button data-m="b">Autós<small>↑ gáz, ↓ fék, ←→ sáv</small></button></div><div class="rows"></div></div></div>
 <div id="toast"></div>
 <div id="rot"><b>📱</b>Fordítsd el a készüléket fekvő helyzetbe</div>
 <div id="splash"><img src="icons/icon-192.png" alt=""><h1>Családi Vakáció</h1><div class="bar"><i id="splbar"></i></div><small id="spltxt">Betöltés... 0%</small></div>
