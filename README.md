@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.11.3
+# 🚐 Családi Vakáció – v2.11.4
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -98,6 +98,12 @@ Erős ütközésnél kinyílik a **légzsák**, és leeresztve ott lóg a javít
 **Autószerviz:** városokban, országutakon és az autópályák mentén is van (P gombbal, „SZERVIZ” útburkolati jellel, közeledő ikonnal). Csak karosszériát javít: mutatja az autó állapotát, a javítandó részeket (karcok, horpadások, lökhárító, fényszóró, motorháztető, szélvédő, tükör, légzsák) és a költséget (3 200 Ft / %, légzsák 118 000 Ft). Ép autónál kiírja, hogy nincs mit javítani.
 
 **Mínuszba is lehet menni:** ha elfogy a pénz, bankkártya-hitelre folytatódik a vásárlás és a javítás, az egyenleg pirosan mutatja a tartozást.
+
+## ⏸️ Szünet
+
+Szünet alatt és amikor a játék a háttérben van (másik alkalmazás, lezárt képernyő), semmi nem számol tovább: nem fogy a kaja, nem nő a fáradtság, nem jönnek események. A háttérbe kerüléskor a játék magától szünetel és ment. A szünet valós ideje pihenésnek számít: Apa fáradtságából annyi perc lejön, amennyi a szünet volt; 10 perc felett az egész család kipiheni magát. Ez akkor is így van, ha kilépsz és később folytatod.
+
+**Családi gondok gyakorisága:** egy óra vezetés alatt átlagosan kb. 4 (sírás, rosszullét, pisilés), és két ilyen között legalább kb. 5 perc telik el.
 
 ## 😴 Fáradás
 
