@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.11.0
+# 🚐 Családi Vakáció – v2.11.1
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -230,6 +230,9 @@ Mezők (búza, napraforgó, repce, kukorica, szántás, levendula) szalmabálák
 - **Kétlépcsős betöltés:** először csak a főképernyőhöz kellő rész töltődik be (kb. egy másodperc), a térkép, a boltok és a minijátékok a háttérben jönnek utána.
 - **Nincs élő elmosás:** a menük nem mossák el folyamatosan a mozgó képet (ez telefonon a leglassabb művelet volt).
 - **Előre elkészített rétegek:** a filmes színkorrekció, a vignetta és a filmszemcse egyszer készül el, utána csak bemásolódik. A betűk is gyorsítótárból jönnek, a GPS kb. 12-szer frissül másodpercenként.
+- **Éjszakai fények:** a sötétítő réteg fél felbontású (lágy fény, negyedannyi pixel), a lámpák fénye egy előre elkészített fénykörből jön; a csillagos ég egy képből.
+- **Feliratok:** minden felirat egyben gyorsítótárazva, egyetlen képmásolással kerül a képre.
+- **Városi házak:** ablakonkénti színátmenet helyett egyszerű kitöltés és csillanás.
 - **Nincs fölösleges oldalfrissítés:** a gombok feliratai csak akkor íródnak újra, ha tényleg változnak.
 - **Gyenge telefonon:** egyszerűbb díszítés, a kijelző minden 3. képkockán rajzolódik újra, végső esetben 30 kép/mp rajzolás 60-as játéklogikával.
 - **A telefonhoz igazodik:** erős telefonon élesebb felbontásban rajzol (a kijelzőnél soha nem többet), gyengébbnél automatikusan visszavesz a felbontásból és az effektekből, és ha újra van tartalék, visszaemeli.

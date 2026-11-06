@@ -2,7 +2,7 @@
 /* =========================================================
    CSALÁDI VAKÁCIÓ – alapok: vászon, rajzoló segédek, betűk, hang, bemenet
    ========================================================= */
-const APP_VERSION='2.11.0';
+const APP_VERSION='2.11.1';
 const W=480,H=270,PX=70,ROADT=194,ROADB=262,LANE=[212,232,252];
 const TAU=Math.PI*2;
 let SC=2,LOWQ=false;
@@ -63,7 +63,14 @@ function textW(str,s){s=s||1;return String(str).length*6*s-s;}
 const GLC=new Map();
 function glyphImg(ch,col,s){const k=ch+'|'+col+'|'+s+'|'+SC;let c=GLC.get(k);if(c)return c;if(GLC.size>1500)GLC.clear();
  const w=Math.ceil(6*s+1),h=Math.ceil(10*s+1);c=document.createElement('canvas');c.width=Math.ceil(w*SC);c.height=Math.ceil(h*SC);const x=c.getContext('2d');x.setTransform(SC,0,0,SC,0,0);x.fillStyle=col;glyph(x,ch,0,s*3,s);c.lw=w;c.lh=h;GLC.set(k,c);return c;}
+// teljes feliratok gyorsítótára: egy felirat egyetlen képmásolással rajzolódik ki
+const STC=new Map();
 function text(g,str,x,y,col,s,align,sh){s=s||1;str=String(str).toUpperCase();const w=textW(str,s);if(align==='center')x-=w/2;else if(align==='right')x-=w;x=Math.round(x);y=Math.round(y);
+ if(typeof col==='string'&&str.length>1){const k=str+'|'+col+'|'+s+'|'+sh+'|'+SC;let c=STC.get(k);
+  if(!c){if(STC.size>500)STC.delete(STC.keys().next().value);const cw=Math.ceil(w+s*2+2),chh=Math.ceil(10*s+2);c=document.createElement('canvas');c.width=Math.ceil(cw*SC);c.height=Math.ceil(chh*SC);const x2=c.getContext('2d');x2.setTransform(SC,0,0,SC,0,0);textRaw(x2,str,0,s*3,col,s,sh);c.lw=cw;c.lh=chh;STC.set(k,c);}
+  g.drawImage(c,x,y-s*3,c.lw,c.lh);return;}
+ textRaw(g,str,x,y,col,s,sh);}
+function textRaw(g,str,x,y,col,s,sh){
  if(typeof col!=='string'){if(sh!==null){g.fillStyle=sh||'rgba(10,12,20,0.85)';for(let i=0;i<str.length;i++)glyph(g,str[i],x+i*6*s+s*0.6,y+s*0.6,s);}g.fillStyle=col;for(let i=0;i<str.length;i++)glyph(g,str[i],x+i*6*s,y,s);return;}
  const shc=sh===null?null:(sh||'rgba(10,12,20,0.85)');
  for(let i=0;i<str.length;i++){const ch=str[i];if(ch===' ')continue;const gx=x+i*6*s;

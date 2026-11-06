@@ -438,13 +438,15 @@ function fixPose(){const f=P.fix,k=P.flat,wx=PX+(k==='f'?WHEELS[1]:WHEELS[0]),do
  return o;}
 
 /* ---------- rajzolás: játék ---------- */
-let [DK,dg]=mk(W,H,SC);
-function onSC(){TITLE_DRAWN=null;if(G&&G.state==='title'){try{render();}catch(e){}}[DK,dg]=mk(W,H,SC);COBBLE=null;for(const k in MAPCACHE)delete MAPCACHE[k];}
+let [DK,dg]=mk(W,H,SC*0.5);
+// előre elkészített fénykör: a sötétítő rétegből ezzel vágjuk ki a lámpák fényét (nem kell minden lámpához új színátmenet)
+const LSPR=(()=>{const [c,x]=mk(64,64,1);x.fillStyle=rg(x,32,32,0,32,[[0,'rgba(0,0,0,0.9)'],[0.5,'rgba(0,0,0,0.5)'],[1,'rgba(0,0,0,0)']]);x.fillRect(0,0,64,64);return c;})();
+function onSC(){TITLE_DRAWN=null;if(G&&G.state==='title'){try{render();}catch(e){}}[DK,dg]=mk(W,H,SC*0.5);COBBLE=null;for(const k in MAPCACHE)delete MAPCACHE[k];}
 function darkness(g,L){let a=0;if(L.time==='night')a=0.62;else if(L.time==='dusk')a=0.26;else if(L.weather==='storm')a=0.3;else if(L.time==='sunset')a=0.05;
  if(L.time==='dusk'||L.time==='sunset')R(g,'rgba(255,130,60,0.1)',0,0,W,H);if(a<=0)return;
- dg.setTransform(SC,0,0,SC,0,0);dg.globalCompositeOperation='source-over';dg.clearRect(0,0,W,H);dg.fillStyle='rgba(8,12,38,'+a+')';dg.fillRect(0,0,W,H);dg.globalCompositeOperation='destination-out';
+ dg.setTransform(SC*0.5,0,0,SC*0.5,0,0);dg.globalCompositeOperation='source-over';dg.clearRect(0,0,W,H);dg.fillStyle='rgba(8,12,38,'+a+')';dg.fillRect(0,0,W,H);dg.globalCompositeOperation='destination-out';
  for(const l of lights){if(l.cone){const ln=l.high?320:170,sp=l.high?44:22;const gr=dg.createLinearGradient(l.x,0,l.x+ln,0);gr.addColorStop(0,'rgba(0,0,0,0.97)');gr.addColorStop(1,'rgba(0,0,0,0)');dg.fillStyle=gr;dg.beginPath();dg.moveTo(l.x,l.y-2);dg.lineTo(l.x+ln,l.y-sp);dg.lineTo(l.x+ln,l.g+10);dg.lineTo(l.x,l.y+3);dg.closePath();dg.fill();}
-  else{dg.fillStyle=rg(dg,l.x,l.y,0,l.r,[[0,'rgba(0,0,0,0.9)'],[1,'rgba(0,0,0,0)']]);dg.fillRect(l.x-l.r,l.y-l.r,l.r*2,l.r*2);}}
+  else if(l.x+l.r>0&&l.x-l.r<W)dg.drawImage(LSPR,l.x-l.r,l.y-l.r,l.r*2,l.r*2);}
  dg.globalCompositeOperation='source-over';g.drawImage(DK,0,0,W,H);}
 function drawWeather(g,L,t){if(L.weather==='rain'||L.weather==='storm'){R(g,'rgba(40,60,90,0.12)',0,0,W,H);g.strokeStyle='rgba(190,215,240,0.7)';g.lineWidth=0.6;g.beginPath();for(const d of drops){g.moveTo(d.x,d.y);g.lineTo(d.x-1.4,d.y+5);}g.stroke();}
  else if(L.weather==='snow'){g.fillStyle='#ffffff';for(const d of drops){g.beginPath();g.arc(d.x,d.y,d.v>1.1?1.1:0.7,0,TAU);g.fill();}}
