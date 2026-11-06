@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.9.1
+# 🚐 Családi Vakáció – v2.9.2
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -178,6 +178,7 @@ Mezők (búza, napraforgó, repce, kukorica, szántás, levendula) szalmabálák
 - **Irányjelző:** valós ütemben, percenként 90-et villan, relékattogással; sávváltáskor 3 villanás.
 - **Duda:** valódi kéthangú autóduda, amíg nyomod, szól.
 - **Nagy kamion, busz mellett:** ha egy jármű eltakarná az autót, áttetszővé válik, így a családi autó mindig látszik.
+- **Hátsó lámpa:** függőleges, a hátsó oszlop ívét követi, három LED-csíkkal; benne a helyzetjelző, a féklámpa (fékezéskor az egész lámpa felizzik) és az irányjelző.
 - **Féklámpa** fékezéskor és álló helyzetben.
 - **Rádió:** négy állomás saját szerzésű zenével (Retro FM, Rock Rádió, Pop Hullám, Esti Lounge).
 - **Motorhang:** négyhengeres motor, fordulatszám és terhelés szerint változik.

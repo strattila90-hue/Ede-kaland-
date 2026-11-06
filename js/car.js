@@ -103,6 +103,9 @@ function wheel(g,cx,cy,ang,flat,r){r=r||WR;g.save();g.translate(cx,cy);
  disc(g,'#cfd6dc',0,0,q*0.24);disc(g,'#7f8a95',0,0,q*0.09);g.restore();}
 
 /* ---- oldalnézet ---- */
+/* függőleges hátsó lámpa a hátsó oszlop ívén (saját forma: karcsú, lekerekített, három vízszintes LED-csíkkal) */
+function tailPath(g,ox,oy){ox=ox||0;oy=oy||0;g.beginPath();g.moveTo(ox+2.35,oy+31.2);g.lineTo(ox+2.25,oy+24.5);g.bezierCurveTo(ox+2.4,oy+20,ox+3.6,oy+16.9,ox+6.1,oy+15.0);
+ g.quadraticCurveTo(ox+7.1,oy+14.5,ox+7.0,oy+15.8);g.bezierCurveTo(ox+6.3,oy+18.4,ox+6.0,oy+21.5,ox+6.0,oy+24.6);g.lineTo(ox+6.0,oy+29.6);g.quadraticCurveTo(ox+6.0,oy+31.6,ox+4.4,oy+31.7);g.closePath();}
 function bodyPath(g){g.beginPath();g.moveTo(9,48.6);g.bezierCurveTo(4,48.6,2.2,46.4,2.1,42.5);g.lineTo(2,30.5);g.bezierCurveTo(2,21.5,4.5,15.6,9.5,12.6);
  g.bezierCurveTo(13.5,10.3,19.5,9.7,27.5,9.6);g.lineTo(61,9.8);g.bezierCurveTo(70,10.1,76.5,12.4,83,16.8);g.lineTo(95.6,26.4);
  g.bezierCurveTo(99.6,28.6,104.6,29.8,108.2,32.4);g.bezierCurveTo(111.4,35,112.3,39.4,111.6,43.6);g.bezierCurveTo(111.1,47.2,109.2,48.6,105,48.6);g.closePath();}
@@ -158,7 +161,8 @@ function drawCarSide(g,x,by,wy,o,lights){
  // tükör
  g.fillStyle=lg(g,0,22,0,26.6,[[0,CP.hl],[1,CP.d]]);g.beginPath();g.ellipse(76.5,24.2,3.4,2.1,-0.15,0,TAU);g.fill();frr(g,'#1a1e24',73.6,25.3,2.2,2.3,0.5);
  // hátsó lámpa (vízszintes, körbeérő LED-sáv)
- frr(g,lg(g,0,20.4,0,24.2,[[0,'#ff6b6b'],[1,'#8e1c24']]),1.8,20.4,10.4,3.8,1.9);frr(g,'rgba(255,200,200,0.7)',2.6,21.2,8,0.7,0.35);frr(g,CP.tl,2.2,40.6,3,1.2,0.5);
+ tailPath(g);g.fillStyle=lg(g,2,0,7,0,[[0,'#7a1018'],[0.45,'#c9283a'],[1,'#e85a64']]);g.fill();g.strokeStyle='rgba(235,240,245,0.85)';g.lineWidth=0.35;g.stroke();
+ for(const ly of [18.6,22.6,26.6])frr(g,'rgba(255,190,190,0.55)',2.9,ly,2.8,0.7,0.35);frr(g,'rgba(255,255,255,0.35)',5.2,17.2,0.5,11,0.25);frr(g,CP.tl,2.2,40.6,3,1.2,0.5);
  // fényszóró (karcsú LED)
  g.fillStyle=lg(g,96,29,108,34,[[0,'#f6f9fb'],[1,'#a3aeb8']]);g.beginPath();g.moveTo(96.6,28.9);g.bezierCurveTo(100.6,29.4,104.8,30.7,108.4,33.1);g.lineTo(107.5,34.7);g.bezierCurveTo(104,33.6,100,32.5,96.2,31.2);g.closePath();g.fill();
  g.strokeStyle='#ffffff';g.lineWidth=0.6;g.beginPath();g.moveTo(97,31.3);g.bezierCurveTo(100.4,32.4,104,33.4,107.4,34.6);g.stroke();disc(g,CP.proj,104.4,32.4,0.9);
@@ -178,12 +182,12 @@ function drawCarSide(g,x,by,wy,o,lights){
  const L=(dx,dy)=>[x+dx,by+dy];
  if(o.wiping){const a=(Math.sin(t*0.14)+1)/2;line(g,'#14171c',x+86,by+25,x+86-6-a*4,by+25-6-a*6,0.8);}
  const fogF=o.fogF||o.fog,fogR=o.fogR,pos=o.pos||o.lightsOn||o.high;
- if(pos){glow(g,x+106,by+31.6,4,'rgba(255,250,230,0.85)');frr(g,'rgba(255,70,70,0.95)',x+1.8,by+21,10.4,2.4,1.2);glow(g,x+4,by+22,6,'rgba(255,40,40,0.5)');if(lights)lights.push({x:x+4,y:by+22,r:9});}
+ if(pos){glow(g,x+106,by+31.6,4,'rgba(255,250,230,0.85)');for(const ly of [18.6,22.6,26.6])frr(g,'rgba(255,80,80,0.98)',x+2.9,by+ly,2.8,0.9,0.45);glow(g,x+3.6,by+22.6,6,'rgba(255,40,40,0.5)');if(lights)lights.push({x:x+3,y:by+23,r:9});}
  if(fogF){disc(g,'#ffffff',x+108.6,by+42.2,1);glow(g,x+108.6,by+42.2,6,'rgba(255,255,230,0.9)');if(lights)lights.push({x:x+112,y:by+44,r:16});}
  if(fogR){frr(g,'#ff2a2a',x+2,by+38.8,3,1.8,0.8);glow(g,x+3,by+39.6,7,'rgba(255,30,30,0.85)');if(lights)lights.push({x:x+2,y:by+40,r:12});}
  if(o.rev){frr(g,'#ffffff',x+2,by+35.6,3,1.6,0.8);glow(g,x+3,by+36.4,9,'rgba(255,255,255,0.95)');if(lights)lights.push({x:x,y:by+40,r:26});}
- if(o.brake){frr(g,'#ff3b3b',x+1.8,by+20.4,10.4,3.8,1.9);glow(g,x+5,by+22,10,'rgba(255,40,40,0.6)');if(lights)lights.push({x:x+4,y:by+22,r:16});}
- if(o.blink){disc(g,CP.amb,x+110.6,by+37.6,1.1);glow(g,x+110.6,by+37.6,5,'rgba(255,170,30,0.8)');disc(g,CP.amb,x+2.6,by+24.6,0.9);glow(g,x+2.6,by+24.6,4,'rgba(255,170,30,0.7)');frr(g,CP.amb,x+74,by+24.6,4,0.9,0.45);}
+ if(o.brake){tailPath(g,x,by);g.fillStyle='#ff3b3b';g.fill();for(const ly of [18.6,22.6,26.6])frr(g,'#ffd0d0',x+2.9,by+ly,2.8,0.8,0.4);glow(g,x+3.6,by+20,8,'rgba(255,40,40,0.6)');glow(g,x+3.6,by+27,8,'rgba(255,40,40,0.6)');if(lights)lights.push({x:x+3,y:by+23,r:16});}
+ if(o.blink){disc(g,CP.amb,x+110.6,by+37.6,1.1);glow(g,x+110.6,by+37.6,5,'rgba(255,170,30,0.8)');frr(g,CP.amb,x+2.8,by+28.6,3,1.6,0.6);glow(g,x+3.8,by+29.4,4,'rgba(255,170,30,0.7)');frr(g,CP.amb,x+74,by+24.6,4,0.9,0.45);}
  if((o.lightsOn||o.high)&&!(o.dmg>0.6)){frr(g,'#ffffff',x+98,by+30.2,9,1.2,0.6);glow(g,x+106,by+32.6,o.high?9:6,o.high?'rgba(220,235,255,0.95)':'rgba(255,255,230,0.9)');if(lights)lights.push({cone:true,high:!!o.high,x:x+108,y:by+32,g:wy+55});}}
 
 /* ---- sérülés: d = 0 (ép) ... 1 (totálkár), az autó saját koordinátáiban ---- */

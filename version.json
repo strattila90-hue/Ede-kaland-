@@ -1,5 +1,5 @@
 {
- "version": "2.9.1",
+ "version": "2.9.2",
  "files": {
   "index.html": 27418,
   "manifest.webmanifest": 695,
@@ -8,7 +8,7 @@
   "js/geo.js": 22119,
   "js/radio.js": 6753,
   "js/map.js": 10149,
-  "js/car.js": 42566,
+  "js/car.js": 43408,
   "js/world.js": 46814,
   "js/minigames.js": 16417,
   "js/shops.js": 17962,
