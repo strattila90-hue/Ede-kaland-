@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.6.0
+# 🚐 Családi Vakáció – v2.7.0
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -74,6 +74,22 @@ A HUD közepén lévő szívek a család kedvét mutatják. Ütközés, piros l�
 - **gyorsétteremben vagy bármelyik boltnál:** legalább 2 szív.
 
 1 szívnél figyelmeztetés jelez előre.
+
+## 💥 Sérülés, totálkár, tréler, szerviz
+
+Az autónak állapota van (100%), a HUD jobb panelján az **Autó** sáv mutatja. Ütközéskor a különbségi sebességtől függően sérül (egy 60 km/h-s ráfutás kb. 40%), vadbaleset és bója is visz le belőle. Ahogy romlik, látszik is:
+- karcok és horpadások a sárvédőn;
+- repedt fényszóró, leszakadt, menet közben lengő-lógó első lökhárító;
+- gyűrődött motorháztető, pókhálósan repedt szélvédő;
+- lelógó visszapillantó, füstölő, majd feketén füstölő motor, az úton szikrázó lökhárító.
+
+Erős ütközésnél kinyílik a **légzsák**, és leeresztve ott lóg a javításig. A sérült autó lassabb: 50% alatt max. 120, 30% alatt 80, 15% alatt 50 km/h.
+
+**Totálkár (0%):** jön a **tréler** (50 000 Ft), az autót felhúzza a platóra és elviszi a legközelebbi **szervizbe 10 km-rel hátrébb**. Ott megjavítják: karosszéria és fényezés 186 000 Ft, fényszóró, lökhárító, tükör 46 500 Ft, légzsák 118 000 Ft. Utána a szerviztől folytatódik az út. Minden tétel bekerül a költségnaplóba.
+
+**Autószerviz** a városokban is van: részleges javítás (3 200 Ft / %), autómosás, olajcsere, pótkerék.
+
+**Mínuszba is lehet menni:** ha elfogy a pénz, bankkártya-hitelre folytatódik a vásárlás és a javítás, az egyenleg pirosan mutatja a tartozást.
 
 ## 😴 Fáradás
 

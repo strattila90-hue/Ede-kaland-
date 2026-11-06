@@ -119,7 +119,7 @@ const MINI={
    else{frr(g,'rgba(10,13,22,0.85)',120,90,240,60,6);text(g,'A zöldséges fizet: '+fmt(m.reward)+' Ft',W/2,104,'#7cff7c',1.3,'center');text(g,'Helyes: '+m.ok+'  Hibás: '+m.bad,W/2,122,'#ffffff',1,'center');if(m.rt>30)text(g,'Tovább: Enter / érintés',W/2,136,'#cfd6df',1,'center');}}},
 
  /* ---- autópálya-matrica ---- */
- vignette:{init(m){},upd(m){const o=m.opt;if(K.num===1||inRect(TAP,[110,150,120,26])||K.enterP){if(G.trip.money>=o.price){book(-o.price,'road','Autópálya-matrica: '+o.label);G.trip.vig[o.cc]=true;SFX.cash();}endMini();}
+ vignette:{init(m){},upd(m){const o=m.opt;if(K.num===1||inRect(TAP,[110,150,120,26])||K.enterP){book(-o.price,'road','Autópálya-matrica: '+o.label);G.trip.vig[o.cc]=true;SFX.cash();endMini();}
    else if(K.num===2||inRect(TAP,[250,150,120,26])){G.trip.noVig=G.trip.noVig||{};G.trip.noVig[o.cc]=true;endMini();}},
   draw(g,m){const o=m.opt;panel(g,90,70,300,124,'Autópálya-matrica','#7fd1ff');text(g,o.label,W/2,96,'#ffffff',1,'center');text(g,'Ár: '+fmt(o.price)+' Ft (kb.)',W/2,110,'#ffd84a',1.2,'center');
    text(g,'Matrica nélkül pótdíjat kaphatsz!',W/2,130,'#ff8a8a',1,'center');mbtn(g,[110,150,120,26],'1: Megveszem','#2e8b57');mbtn(g,[250,150,120,26],'2: Nem kérem','#555c66');}}};

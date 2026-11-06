@@ -47,7 +47,7 @@ const WNAME={sun:'Napsütés',rain:'Eső',cloudy:'Borult ég',snow:'Havazás',fo
 const TNAME={day:'',night:', éjszaka',dusk:', alkonyat',sunset:', naplemente'};
 const QNAME={good:'Jó minőségű út',medium:'Közepes út',bad:'Rossz, kátyús út',cobble:'Macskaköves út'};
 const LIMIT={town:50,village:50,country:90,motorway:130};
-const POI_NAME={burger:'Gyorsétterem',rest:'Pihenő',fuel:'Benzinkút',kis:'Kisbolt',hiper:'Hipermarket',trafik:'Trafik',ujsag:'Újságos',veda:'Sebességmérés'};
+const POI_NAME={garage:'Autószerviz',burger:'Gyorsétterem',rest:'Pihenő',fuel:'Benzinkút',kis:'Kisbolt',hiper:'Hipermarket',trafik:'Trafik',ujsag:'Újságos',veda:'Sebességmérés'};
 function buildLeg(i,ts){ts=ts||1;const L=LEGS[i],pk=PXKM/ts;let x=0;
  const segs=L.segs.map((q,k)=>{const w=q[3]*pk;const s={type:q[0],name:q[1],q:q[2],km:q[3],cc:q[4]||'',x0:x,x1:x+w,k:k,limit:(L.region!=='hu'&&q[0]==='country')?100:LIMIT[q[0]]};x+=w;return s;});
  const len=x;segs[segs.length-1].x1=len+40000;segs[0].x0=-40000;
@@ -55,7 +55,7 @@ function buildLeg(i,ts){ts=ts||1;const L=LEGS[i],pk=PXKM/ts;let x=0;
  segs.forEach((s,k)=>{const h=(n)=>hsh(i*997+k*131+n);const x0=Math.max(0,s.x0);const sk=(Math.min(s.x1,len)-x0)/pk;const s2={x0:x0,x1:s.x1};
   if(s.type==='motorway'){for(let d=12+h(1)*10;d<sk-5;d+=38+h(d)*14){add('fuel',d,s2);if(hsh(i*31+d*7)<0.6)add('burger',d+1.6,s2);}for(let d=26+h(6)*8;d<sk-5;d+=34+h(d+3)*12)add('rest',d,s2);for(let d=25+h(2)*10;d<sk-5;d+=45+h(d+7)*20)add('veda',d,s2);}
   else if(s.type==='country'){if(sk>12)add('fuel',sk*(0.4+h(3)*0.2),s2);if(sk>8)add('rest',sk*(0.15+h(8)*0.1),s2);for(let d=6+h(4)*5;d<sk-3;d+=18+h(d)*10)add('veda',d,s2);}
-  else if(s.type==='town'){add('veda',0.25,s2);add('kis',sk*0.22,s2);add('trafik',sk*0.38,s2);add('ujsag',sk*0.5,s2);if(sk>=3)add('fuel',sk*0.64,s2);if(sk>=3)add('hiper',sk*0.82,s2);if(sk>=2)add('burger',sk*0.92,s2);
+  else if(s.type==='town'){add('veda',0.25,s2);add('kis',sk*0.22,s2);add('trafik',sk*0.38,s2);add('ujsag',sk*0.5,s2);if(sk>=3)add('fuel',sk*0.64,s2);if(sk>=3)add('hiper',sk*0.82,s2);if(sk>=2)add('burger',sk*0.92,s2);if(sk>=3)add('garage',sk*0.3,s2);
    for(let d=0.55;d<sk-0.3;d+=0.7+h(d)*0.4){const px=x0+d*pk;if(!pois.some(p=>Math.abs(p.x-px)<2500))lights.push({x:px,ph:Math.floor(h(d*9)*420)});}}
   else if(s.type==='village'){if(h(5)<0.6)add('veda',0.2,s2);add('kis',sk*0.45,s2);if(sk>=2)add('trafik',sk*0.7,s2);}});
  pois.sort((a,b)=>a.x-b.x);
@@ -282,6 +282,7 @@ function drawPOI(g,p,sx,L,lights,t){const night=L.time==='night'||L.time==='dusk
   line(g,'#d84a3a',sx+80,b,sx+80,b-20,1.4);line(g,'#d84a3a',sx+92,b,sx+92,b-20,1.4);R(g,'#ffcf33',sx+79,b-21,14,3);line(g,'#3b8bff',sx+92,b-19,sx+106,b-1,2.2);
   frr(g,'#e9e1cf',sx+134,b-22,22,22,1.5);R(g,'#7d5a3a',sx+134,b-24,22,3);text(g,'WC',sx+145,b-17,'#1f5fbf',0.8,'center',null);
   if(night&&lights)lights.push({x:sx+60,y:b-24,r:36});}
+ else if(p.type==='garage')drawGarage(g,sx-30,night,lights,t,false);
  else if(p.type==='fuel')drawStation(g,sx,L,lights);}
 function drawVedaFront(g,p,sx){if(sx<-30||sx>W+30)return;/* közeli oszlop, az autó mögötte halad el */line(g,'#9aa3ad',sx+14,ROADB+6,sx+14,ROADT-66,2.6);line(g,'#b8c0c8',sx,ROADT-74,sx+14,ROADT-66,2.4);
  frr(g,'#1b1f26',sx+8,ROADT-62,9,6,1.5);disc(g,'#5a7a9a',sx+12.5,ROADT-59,1.3);if(p.flash>0)glow(g,sx+12.5,ROADT-59,26,'rgba(255,255,255,0.9)');}
@@ -295,7 +296,7 @@ function drawPOIs(g,L,leg,dist,lights,t){const pk=1/leg.kmPerPx;
   const adv=p.type==='veda'?0.3:0.5,ax=p.x-adv*pk-dist+PX;if(ax>-60&&ax<W+20)advanceSign(g,ax,p,adv,pk);
   if(sx>-240&&sx<W+80)drawPOI(g,p,sx,L,lights,t);}}
 /* ---- útburkolati jelek: felirat és nyíl a megállók előtt, STOP a lámpáknál, sebesség a település elején ---- */
-const MARK_TXT={fuel:'BENZIN',kis:'BOLT',hiper:'BOLT',trafik:'TRAFIK',ujsag:'ÚJSÁG',burger:'ÉTTEREM',rest:'PIHENŐ'};
+const MARK_TXT={garage:'SZERVIZ',fuel:'BENZIN',kis:'BOLT',hiper:'BOLT',trafik:'TRAFIK',ujsag:'ÚJSÁG',burger:'ÉTTEREM',rest:'PIHENŐ'};
 function paint(g,txt,x,y,a){g.save();g.translate(x,y);g.scale(1.5,0.62);g.globalAlpha=a||0.78;text(g,txt,0,-3.5,'#f2f2ec',1,'left',null);g.restore();}
 function paintArrow(g,x,y,a){g.save();g.globalAlpha=a||0.78;g.fillStyle='#f2f2ec';g.beginPath();g.moveTo(x,y+2);g.lineTo(x+14,y+2);g.lineTo(x+20,y-3);g.lineTo(x+22,y-1.6);g.lineTo(x+24,y-6);g.lineTo(x+17,y-5.4);g.lineTo(x+19,y-4.2);g.lineTo(x+13.4,y);g.lineTo(x,y);g.closePath();g.fill();g.restore();}
 function drawMarkings(g,leg,dist,t){const pk=1/leg.kmPerPx,y0=LANE[0]-5;
@@ -306,3 +307,12 @@ function drawMarkings(g,leg,dist,t){const pk=1/leg.kmPerPx,y0=LANE[0]-5;
  for(let k=1;k<leg.segs.length;k++){const s=leg.segs[k],pv=leg.segs[k-1];if((s.type==='town'||s.type==='village')&&pv.type!=='town'&&pv.type!=='village'){const x=s.x0+60-dist+PX;if(x<-60||x>W+10)continue;for(const ln of [0,1])paint(g,String(s.limit),x,LANE[ln]-5,0.75);}}}
 function wildSign(g,x,b){line(g,'#7d858d',x,b,x,b-20,1.2);g.fillStyle='#ffffff';g.beginPath();g.moveTo(x,b-35);g.lineTo(x+8.5,b-20);g.lineTo(x-8.5,b-20);g.closePath();g.fill();
  g.strokeStyle='#d32f2f';g.lineWidth=1.6;g.stroke();g.fillStyle='#1a1a1a';g.beginPath();g.moveTo(x-4,b-23);g.lineTo(x-2,b-27);g.lineTo(x+2,b-27);g.lineTo(x+3,b-30);g.lineTo(x+4,b-29);g.lineTo(x+3.4,b-26);g.lineTo(x+3,b-23);g.lineTo(x+2,b-23);g.lineTo(x+1.6,b-25.4);g.lineTo(x-2,b-25.4);g.lineTo(x-3,b-23);g.closePath();g.fill();}
+/* ---- autószerviz épület ---- */
+function drawGarage(g,sx,night,lights,t,busy){const b=ROADT-6;if(sx<-220||sx>W+40)return;
+ frr(g,lg(g,0,b-56,0,b,[[0,'#e7e9ec'],[1,'#c4c9cf']]),sx,b-56,170,56,2);R(g,'#c62828',sx,b-56,170,8);frr(g,'#1b1f26',sx+40,b-74,92,16,3);text(g,'AUTÓSZERVIZ',sx+86,b-70,'#ffd84a',1,'center',null);
+ // két szerelőakna, nyitott kapuk
+ for(const gx of [12,92]){frr(g,'#2e3238',sx+gx,b-40,66,40,2);for(let k=0;k<5;k++)R(g,'#3c4148',sx+gx,b-40+k*3,66,1);frr(g,night?'#ffe9a8':'#5b6168',sx+gx+4,b-30,58,30,1);}
+ // szerszámfal, gumik
+ for(let k=0;k<3;k++)disc(g,'#22262b',sx+150,b-6-k*8,4.4);frr(g,'#a1744a',sx+138,b-48,26,10,1);for(let k=0;k<5;k++)line(g,'#5b636d',sx+141+k*5,b-46,sx+141+k*5,b-40,0.8);
+ if(busy&&((t>>2)&1)){for(let k=0;k<4;k++)disc(g,'#ffd27a',sx+40+hsh(t+k)*20,b-14+hsh(t*3+k)*8,0.6);glow(g,sx+48,b-10,8,'rgba(255,210,140,0.8)');}
+ if(night&&lights)lights.push({x:sx+86,y:b-30,r:60});}
