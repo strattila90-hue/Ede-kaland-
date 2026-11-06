@@ -83,7 +83,7 @@ function buildLeg(i,ts){ts=ts||1;const L=LEGS[i],pk=PXKM/ts;let x=0;
   if(s.type==='motorway'){for(let d=12+h(1)*10;d<sk-5;d+=38+h(d)*14){add('fuel',d,s2);if(hsh(i*31+d*7)<0.6)add('burger',d+1.6,s2);if(hsh(i*17+d*13)<0.35)add('garage',d+2.6,s2);if(hsh(i*23+d*11)<0.5)add('wash',d+0.6,s2);}for(let d=26+h(6)*8;d<sk-5;d+=34+h(d+3)*12)add('rest',d,s2);for(let d=25+h(2)*10;d<sk-5;d+=45+h(d+7)*20)add('veda',d,s2);}
   else if(s.type==='country'){if(sk>12)add('fuel',sk*(0.4+h(3)*0.2),s2);if(sk>9)add('garage',sk*0.7,s2);if(sk>8)add('rest',sk*(0.15+h(8)*0.1),s2);for(let d=6+h(4)*5;d<sk-3;d+=18+h(d)*10)add('veda',d,s2);}
   else if(s.type==='town'){add('veda',0.25,s2);add('kis',sk*0.22,s2);add('trafik',sk*0.38,s2);add('ujsag',sk*0.5,s2);if(sk>=3)add('fuel',sk*0.64,s2);if(sk>=3)add('hiper',sk*0.82,s2);if(sk>=2)add('burger',sk*0.92,s2);if(sk>=3)add('garage',sk*0.3,s2);if(sk>=3)add('wash',sk*0.72,s2);
-   for(let d=0.55;d<sk-0.3;d+=0.7+h(d)*0.4){const px=x0+d*pk;if(!pois.some(p=>Math.abs(p.x-px)<2500))lights.push({x:px,ph:Math.floor(h(d*9)*420)});}}
+   for(let d=0.55;d<sk-0.3;d+=0.7+h(d)*0.4){const px=x0+d*pk;if(!pois.some(p=>Math.abs(p.x-px)<2500))lights.push({x:px,ph:Math.floor(h(d*9)*1980)});}}
   else if(s.type==='village'){if(h(5)<0.6)add('veda',0.2,s2);add('kis',sk*0.45,s2);if(sk>=2)add('trafik',sk*0.7,s2);}});
  pois.sort((a,b)=>a.x-b.x);
  return {len:len,segs:segs,pois:pois,stations:pois.filter(p=>p.type==='fuel').map(p=>p.x),lights:lights,kmPerPx:1/pk,ts:ts};}
@@ -287,7 +287,9 @@ function drawRoad(g,L,leg,dist,t){const snow=L.weather==='snow',wet=L.weather===
  const sgc=segAtIn(leg.segs,dist+PX);const gc=sgc.type==='town'?'#b6b0a6':L.region==='it'&&sgc.type!=='country'?'#e8d3a2':snow?'#eef3f7':'#5d9a4e';
  R(g,gc,0,ROADB,W,H-ROADB);R(g,'rgba(0,0,0,0.2)',0,ROADB,W,1);}
 /* ---- közlekedési lámpa ---- */
-function lightState(l,t){const c=(t+l.ph)%420;return c<200?'green':c<240?'yellow':'red';}
+/* jelzőlámpa ciklus (képkocka, 60/mp): zöld 20 mp, sárga 3 mp, piros 10 mp */
+const LG_G=1200,LG_Y=180,LG_R=600,LG_C=LG_G+LG_Y+LG_R;
+function lightState(l,t){const c=(t+l.ph)%LG_C;return c<LG_G?'green':c<LG_G+LG_Y?'yellow':'red';}
 function drawTrafficLight(g,l,dist,t){const x=l.x-dist+PX;if(x<-20||x>W+20)return;const st=lightState(l,t);
  R(g,'#eef1f4',x,ROADT+4,1.6,ROADB-ROADT-8);line(g,'#2f343b',x+4,ROADT-8,x+4,ROADT-58,1.8);frr(g,'#1f2329',x,ROADT-74,8,18,2);
  for(const [k,c,yy] of [['red','#ff3b30',-70],['yellow','#ffcc00',-65],['green','#34c759',-60]]){disc(g,st===k?c:'#3a3f47',x+4,ROADT+yy,1.9);if(st===k)glow(g,x+4,ROADT+yy,7,{red:'rgba(255,59,48,0.6)',yellow:'rgba(255,204,0,0.6)',green:'rgba(52,199,89,0.6)'}[k]);}}

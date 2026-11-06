@@ -564,7 +564,7 @@ function drawStrip(g){const x0=6,x1=W-6,y0=51,h=26,ly=y0+13,cx=x0+14,ax=cx+12,bx
 /* ---- lámpafigyelő: a legközelebbi jelzőlámpa állapota, hátralévő ideje, és hogy át fogsz-e érni ---- */
 function drawLightAdvisor(g){if(!LEG||!P)return;const kp=LEG.kmPerPx,front=P.dist+112;let l=null,d=9;
  for(const q of LEG.lights){const dd=(q.x-front)*kp;if(dd>-0.005&&dd<0.45&&dd<d){d=dd;l=q;}}if(!l)return;
- const t=G.t,st=lightState(l,t),c=(t+l.ph)%420,rem=st==='green'?200-c:st==='yellow'?240-c:420-c,len=st==='green'?200:st==='yellow'?40:180,secs=Math.ceil(rem/60);
+ const t=G.t,st=lightState(l,t),c=(t+l.ph)%LG_C,rem=st==='green'?LG_G-c:st==='yellow'?LG_G+LG_Y-c:LG_C-c,len=st==='green'?LG_G:st==='yellow'?LG_Y:LG_R,secs=Math.ceil(rem/60);
  const v=Math.max(0,P.kmh)/3.6,dm=Math.max(0,d*1000),eta=v>0.8?dm/v*60:1e9,arr=eta<1e8?lightState(l,t+Math.round(eta)):st;
  let adv,ac;if(dm<6&&st!=='green'){adv='ÁLLJ';ac='#ff5a4a';}else if(st==='red'&&v<0.8){adv='VÁRJ';ac='#ff8a7a';}else if(arr==='green'){adv='ÁTÉRSZ';ac='#5bd06a';}else if(arr==='yellow'){adv='LASSÍTS';ac='#ffcf33';}else{adv='FÉKEZZ';ac='#ff8a7a';}
  const x=W-74,y=82,w=68,h=58,col=st==='red'?'#ff3b30':st==='yellow'?'#ffcc00':'#34c759';
