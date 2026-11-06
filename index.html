@@ -268,6 +268,20 @@ body.touchui #topbar #bGps{display:none}
 #saves .badge{color:#9fd0ff;font:800 12px var(--ff);white-space:nowrap}#saves .inf{margin:6px 2px;color:#c9d3df;font:600 12.5px/1.35 var(--ff)}
 #saves .bt{display:flex;gap:6px;flex-wrap:wrap}#saves button{min-height:38px;padding:0 10px;border-radius:10px;border:1px solid var(--line);background:linear-gradient(180deg,#2b3242,#191d27);color:#fff;font:700 12.5px var(--ff);cursor:pointer}
 #saves button.use{background:linear-gradient(180deg,#3b7fe6,#2458b8)}#saves button.del{background:linear-gradient(180deg,#6b2a26,#3d1714);margin-left:auto}
+/* album, beállítások */
+.sheetwrap{position:fixed;inset:0;z-index:42;display:none;align-items:center;justify-content:center;background:rgba(4,6,10,.6);padding:10px;font-family:var(--ff)}
+.sheetwrap.open{display:flex}.sheetwrap .sheet{width:min(860px,100%);max-height:100%;display:flex;flex-direction:column;border-radius:20px;overflow:hidden;background:rgba(16,20,30,.97);border:1px solid var(--line);color:#fff}
+.sheetwrap header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px 4px}.sheetwrap h3{margin:0;font:800 18px var(--ff)}.sheetwrap .x{width:40px;height:40px;border-radius:12px;border:0;background:#2a3040;color:#fff;font-size:18px;cursor:pointer}
+.sheetwrap .body{overflow:auto;padding:0 14px 14px}.sheetwrap h4{margin:12px 0 6px;font:800 14px var(--ff);color:#ffd84a}.sheetwrap h4 span{color:#9fb0c2;font-weight:700;margin-left:6px}
+#album .cards{display:flex;flex-wrap:wrap;gap:8px}#album .card{display:flex;flex-direction:column;align-items:center;gap:3px;width:82px;padding:2px;border-radius:8px;background:#f5ecd7;color:#1b1f2a;font:700 10.5px/1.2 var(--ff);text-align:center}
+#album .card canvas{border-radius:6px}#album .card.no{background:#1b2030;color:#6c7789}
+#album .aw{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:6px}#album .a{display:flex;gap:8px;align-items:center;padding:6px 8px;border-radius:10px;background:#1b2030;opacity:.45;filter:grayscale(1)}
+#album .a.on{opacity:1;filter:none;background:linear-gradient(180deg,#3a3420,#241f12);border:1px solid rgba(255,216,74,.35)}#album .a b{font-size:24px}#album .a i{display:block;font:800 13px var(--ff);font-style:normal}#album .a small{display:block;color:#b9c3cf;font:500 11.5px var(--ff)}
+#album .st{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));column-gap:16px}#album .st div{display:flex;justify-content:space-between;padding:5px 0;border-top:1px solid rgba(255,255,255,.07);font:600 13px var(--ff);color:#dfe6ee}
+#settings .tg{display:flex;gap:10px;align-items:flex-start;padding:10px;margin-top:10px;border-radius:12px;background:#1b2030;cursor:pointer}#settings .tg input{width:22px;height:22px;margin-top:2px;accent-color:#3b8bff}
+#settings .tg b{font:800 15px var(--ff)}#settings .tg em{font:600 12px var(--ff);color:#9fb0c2;font-style:normal}#settings .tg small{display:block;margin-top:3px;color:#b9c3cf;font:500 12.5px/1.4 var(--ff)}
+#settings .vol{display:grid;grid-template-columns:170px 1fr 48px;align-items:center;gap:10px;padding:6px 2px;font:600 13.5px var(--ff)}#settings .vol input{width:100%;accent-color:#3b8bff;height:28px}#settings .vol b{text-align:right;color:#9fb0c2}
+@media (max-width:560px){#settings .vol{grid-template-columns:110px 1fr 40px}}
 </style>
 </head>
 <body>
@@ -309,6 +323,19 @@ body.touchui #topbar #bGps{display:none}
 <div id="elog"><div class="sheet"><header><h3>🩺 Hibanapló</h3><button class="x" id="elogClose" aria-label="Bezárás">✕</button></header><p class="sum"></p><div class="list"></div><div class="btns"><button id="elogShare">Küldés</button><button id="elogCopy">Másolás</button><button id="elogClear">Törlés</button></div></div></div>
 <div id="keys"><div class="sheet"><header><h3>⌨ Billentyűzet</h3><button class="x" id="keysClose" aria-label="Bezárás">✕</button></header><div class="lay"><span>Kiosztás:</span><button data-m="a">Klasszikus<small>→ gáz, ← fék, ↑↓ sáv</small></button><button data-m="b">Autós<small>↑ gáz, ↓ fék, ←→ sáv</small></button></div><div class="rows"></div></div></div>
 <div id="saves"><div class="sheet"><header><h3>💾 Mentések</h3><button class="x" id="savesClose" aria-label="Bezárás">✕</button></header><p class="hint">Három külön utazás (például gyerekenként). A mentést fájlba lehet tenni vagy elküldeni, és másik telefonon vagy tableten a „Betöltés fájlból” gombbal folytatható.</p><div class="list"></div></div><input type="file" id="saveFile" accept=".json,application/json" hidden></div>
+<div id="album" class="sheetwrap"><div class="sheet"><header><h3>🖼 Album és rekordok</h3><button class="x" id="albumClose" aria-label="Bezárás">✕</button></header><div class="body">
+<h4>Képeslapok <span class="ct"></span></h4><div class="cards"></div>
+<h4>Kitüntetések <span class="act"></span></h4><div class="aw"></div>
+<h4>Útinapló</h4><div class="st"></div></div></div></div>
+<div id="settings" class="sheetwrap"><div class="sheet"><header><h3>⚙ Beállítások</h3><button class="x" id="setClose" aria-label="Bezárás">✕</button></header><div class="body">
+<label class="tg"><input type="checkbox" id="setEasy"><span><b>Könnyű mód</b> <em class="who"></em><small>Kisebbeknek: nincs sérülés, bírság és fáradás, a család mindig jókedvű. Mentési helyenként külön állítható.</small></span></label>
+<h4>Hangerő</h4>
+<div class="vol"><span>🎵 Zene</span><input type="range" min="0" max="100" data-k="music"><b></b></div>
+<div class="vol"><span>🚗 Motor</span><input type="range" min="0" max="100" data-k="eng"><b></b></div>
+<div class="vol"><span>📻 Rádió</span><input type="range" min="0" max="100" data-k="radio"><b></b></div>
+<div class="vol"><span>📯 Hanghatások, duda</span><input type="range" min="0" max="100" data-k="sfx"><b></b></div>
+<label class="tg"><input type="checkbox" id="setBatt"><span><b>Akkukímélő mód</b><small>Hosszú autóúton: kb. 30 kép/mp és kisebb felbontás, így kevésbé melegszik a telefon és tovább bírja az akku.</small></span></label>
+</div></div></div>
 <div id="toast"></div>
 <div id="rot"><b>📱</b>Fordítsd el a készüléket fekvő helyzetbe</div>
 <div id="splash"><img src="icons/icon-192.png" alt=""><h1>Családi Vakáció</h1><div class="bar"><i id="splbar"></i></div><small id="spltxt">Betöltés... 0%</small></div>

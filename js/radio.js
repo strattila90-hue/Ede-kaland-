@@ -13,7 +13,7 @@ function engineInit(){if(!AC||EN)return;
  const lp=AC.createBiquadFilter();lp.type='lowpass';lp.Q.value=0.9;const hp=AC.createBiquadFilter();hp.type='highpass';hp.frequency.value=28;
  const g1=AC.createGain(),g2=AC.createGain(),g3=AC.createGain(),gn=AC.createGain(),out=AC.createGain();g1.gain.value=0.45;g2.gain.value=0.3;g3.gain.value=0.4;gn.gain.value=0.22;out.gain.value=0;
  const am=AC.createGain();am.gain.value=0.7;const lfo=AC.createOscillator();lfo.type='square';const lfg=AC.createGain();lfg.gain.value=0.3;lfo.connect(lfg);lfg.connect(am.gain);
- o1.connect(g1);o2.connect(g2);o3.connect(g3);ns.connect(bp);bp.connect(gn);g1.connect(am);g2.connect(am);g3.connect(am);gn.connect(am);am.connect(ws);ws.connect(lp);lp.connect(hp);hp.connect(out);out.connect(master);
+ o1.connect(g1);o2.connect(g2);o3.connect(g3);ns.connect(bp);bp.connect(gn);g1.connect(am);g2.connect(am);g3.connect(am);gn.connect(am);am.connect(ws);ws.connect(lp);lp.connect(hp);hp.connect(out);out.connect(BUS?BUS.eng:master);
  [o1,o2,o3,ns,lfo].forEach(n=>n.start());EN={o1:o1,o2:o2,o3:o3,bp:bp,lp:lp,out:out,lfo:lfo,gn:gn};}
 function engine(rpm,load){if(!AC)return;engineInit();if(!EN)return;const t=AC.currentTime,f=Math.max(rpm,1)/60*2;
  EN.o1.frequency.setTargetAtTime(f,t,0.04);EN.o2.frequency.setTargetAtTime(f*0.5,t,0.04);EN.o3.frequency.setTargetAtTime(f*1.5,t,0.04);EN.lfo.frequency.setTargetAtTime(f*0.25,t,0.04);
@@ -28,7 +28,7 @@ const STATIONS=[
  {name:'Esti Lounge 104,7',bpm:84,style:'chill',key:62,prog:[0,5,-3,-5],minor:false}];
 const radio={on:false,idx:-1,step:0,next:0,bus:null,show:0};
 function radioInit(){if(!AC||radio.bus)return;const b=AC.createGain();b.gain.value=0.55;const f1=AC.createBiquadFilter();f1.type='highpass';f1.frequency.value=90;const f2=AC.createBiquadFilter();f2.type='lowpass';f2.frequency.value=7000;
- b.connect(f1);f1.connect(f2);f2.connect(master);radio.bus=b;}
+ b.connect(f1);f1.connect(f2);f2.connect(BUS?BUS.radio:master);radio.bus=b;}
 function radioNext(){initAudio();if(!AC)return;radioInit();radio.idx++;if(radio.idx>=STATIONS.length){radio.idx=-1;radio.on=false;}else radio.on=true;radio.show=200;radio.step=0;radio.next=AC.currentTime+0.35;noise(0.3,0.12,0,3500);}
 function rv(f,d,type,v,t0,cut,att){const t=AC.currentTime+t0,o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.setValueAtTime(f,t);
  g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(v,t+(att||0.005));g.gain.exponentialRampToValueAtTime(0.0001,t+d);let node=o;

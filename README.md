@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.20.0
+# 🚐 Családi Vakáció – v2.21.0
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -52,6 +52,20 @@ Amíg a GPS nyitva van, a játék áll, de ez nem számít pihenőnek. A térké
 **Jelzőlámpák:** zöld 20 másodperc, sárga 3 másodperc, piros 10 másodperc (egy teljes ciklus 33 mp); a lámpák egymástól függetlenül, eltolva váltanak.
 
 **Lámpafigyelő:** 450 méterrel a jelzőlámpa előtt a jobb oldalon megjelenik egy kis lámpa: mutatja, melyik szín ég (világít), hány másodperc van hátra belőle (fogyó csíkkal), milyen messze van a lámpa, és a jelenlegi sebességed alapján tanácsot ad: **ÁTÉRSZ** (zöldben érsz oda), **LASSÍTS** (sárgában érnél oda), **FÉKEZZ** (pirosban érnél oda), **VÁRJ** (állsz a piros előtt), **ÁLLJ** (közvetlenül a lámpánál, nem zöld).
+
+## 🖼 Album, útinapló, kitüntetések
+
+A főmenüben az **Album és rekordok** gomb (a Szünet menüből is elérhető) mentési helyenként mutatja:
+
+- **Képeslap-album:** minden teljesített szakasz után a célváros képeslapja bekerül az albumba (22 gyűjthető). A még hiányzók kérdőjellel látszanak.
+- **Kitüntetések (15):** például Elindultunk!, Félúton, Európa-bajnok, Ezer és Ötezer kilométer, Példás sofőr (szakasz bírság nélkül), Szabálytisztelő, Csillogó autó, Piknikbajnok, Nagybevásárlás, Kerékcserélő, Száguldó család, Képeslapgyűjtő, Teljes album, Egy óra az úton. Ha összejön egy, a játék menet közben szól.
+- **Útinapló:** megtett km, teljesített szakaszok (és ebből hány bírság nélkül), hazaérkezések, játékidő, legnagyobb sebesség, elköltött pénz, tankolások, boltlátogatások, pihenők, autómosások, bírságok, kerékcserék, totálkárok.
+
+## ⚙ Beállítások
+
+- **Könnyű mód** (mentési helyenként): kisebbeknek. Nincs sérülés, bírság és fáradás, a család mindig jókedvű.
+- **Hangerő** külön: zene, motor, rádió, hanghatások és duda.
+- **Akkukímélő mód:** hosszú autóúton kb. 30 kép/mp és kisebb felbontás, kevésbé melegszik a telefon és tovább bírja az akku.
 
 ## 🎬 Főmenü: filmplakát
 
@@ -285,6 +299,7 @@ Mindkét kiosztásban:
 - **Előmelegítés:** a betűképek induláskor és felbontásváltáskor a telefon üresjárati idejében készülnek el, nem játék közben.
 - **Mentés üresjáratban:** az automatikus mentés (10 mp-enként) akkor fut, amikor a telefon épp ráér, így nem okoz döccenést.
 - **Városi házak:** ablakonkénti színátmenet helyett egyszerű kitöltés és csillanás.
+- **Előre megrajzolt autó:** a családi autó karosszériája, eleje és lámpái színenként és koszosság szerint egyszer megrajzolt kép, a tényleges nagyításon (nagyban sem elmosódott); az utasok, a kerekek és a fények élőben mozognak.
 - **Előre megrajzolt táj:** telefonon nem a felbontás, hanem a képkockánkénti apró rajzolási műveletek száma a lassú. Ezért a házak, fák, templomok, kutak és minden út menti tárgy egyszer megrajzolt képként, a városi háttér-sziluett és a mezősáv képernyőnyi csempékben készül el, és menet közben csak ezek a képek mozognak (éjjel az ablakfények is megmaradnak). A műszerfal is egy képbe rajzolódik, és 30-szor frissül másodpercenként. Eredmény: városban képkockánként kb. 2 300 helyett kb. 350, országúton kb. 940 helyett kb. 480 rajzolási művelet. A régi képek vásznait újrahasznosítja, így nem keletkezik folyton új.
 - **Sima mozgás 60/90/120/144 Hz-en is:** a játék 60 lépést tesz másodpercenként, a kép a kijelző frissítéséhez igazodik (60 Hz-en 60, 90 Hz-en 90, 120 Hz-en 60, 144 Hz-en 72 egyenletes kép/mp, akkor is, ha a telefon menet közben váltogat), és két lépés között az út, a járművek és a sávváltás helyzetét arányosan kiszámolja. Így gyors menetben sem rángat a kép (korábban a nagy frissítésű kijelzőkön a képek egyenetlen ütemben jöttek, ez tűnt akadásnak).
 - **Rossz úton** a kép egyenletesen, finoman rezeg, nem véletlenszerűen ugrál képkockánként; a kerekek forgása is folyamatos.

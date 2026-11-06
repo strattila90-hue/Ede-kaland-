@@ -111,15 +111,16 @@ window.addEventListener('offline',()=>toast('Offline mód: a játék internet n�
 setTimeout(checkUpdate,1500);
 /* menük */
 function titleAct(a){const opts=titleOpts();const i=opts.findIndex(o=>o.a===a);if(i>=0){G.menu=i;K.enterP=true;}}
-function menuDef(){const s=G.state;if(G.ledger||G.gps||G.elogOpen||G.keysOpen||G.savesOpen)return null;
+function menuDef(){const s=G.state;if(G.ledger||G.gps||G.elogOpen||G.keysOpen||G.savesOpen||G.albumOpen||G.setOpen)return null;
  if(G.confirm==='new')return {cls:'center',title:'Teljesen új játék?',items:[{a:'newyes',l:'Igen, mindent elölről (a mentett út törlődik)',ic:'↺',c:'danger'},{a:'cancel',l:'Mégse',ic:'✕'}]};
  if(G.confirm==='exit')return {cls:'center',title:'Kilépsz a játékból?',items:[{a:'exityes',l:'Igen, mentés és kilépés',ic:'⏻',c:'danger'},{a:'cancel',l:'Mégse, játszom tovább',ic:'▶',c:'primary'}]};
- if(G.paused&&s==='play')return {cls:'center',title:'Szünet',items:[{a:'resume',l:'Folytatás',ic:'▶',c:'primary'},{a:'gps',l:'GPS térkép',ic:'🧭'},{a:'log',l:'Költségnapló: '+fmt(G.trip.money)+' Ft',ic:'📒'},{a:'radio',l:'Rádió: '+(radio.on?STATIONS[radio.idx].name:'ki'),ic:'📻'},{a:'perf',l:'Teljesítménymérő: '+(PERF.on?'be':'ki'),ic:'📊'},{a:'elog',l:'Hibanapló',ic:'🩺'},...(typeof FINE!=='undefined'&&FINE?[{a:'keys',l:'Billentyűzet és kiosztás',ic:'⌨'}]:[]),{a:'quit',l:'Mentés és vissza a főmenübe',ic:'⌂'},{a:'exit',l:'Kilépés a játékból',ic:'⏻',c:'danger'},{a:'update',l:updLabel,ic:'⟳',fill:1}]};
+ if(G.paused&&s==='play')return {cls:'center',title:'Szünet',items:[{a:'resume',l:'Folytatás',ic:'▶',c:'primary'},{a:'gps',l:'GPS térkép',ic:'🧭'},{a:'log',l:'Költségnapló: '+fmt(G.trip.money)+' Ft',ic:'📒'},{a:'radio',l:'Rádió: '+(radio.on?STATIONS[radio.idx].name:'ki'),ic:'📻'},{a:'perf',l:'Teljesítménymérő: '+(PERF.on?'be':'ki'),ic:'📊'},{a:'settings',l:'Beállítások (könnyű mód, hangerő, akku)',ic:'⚙'},{a:'album',l:'Album és rekordok',ic:'🖼'},{a:'elog',l:'Hibanapló',ic:'🩺'},...(typeof FINE!=='undefined'&&FINE?[{a:'keys',l:'Billentyűzet és kiosztás',ic:'⌨'}]:[]),{a:'quit',l:'Mentés és vissza a főmenübe',ic:'⌂'},{a:'exit',l:'Kilépés a játékból',ic:'⏻',c:'danger'},{a:'update',l:updLabel,ic:'⟳',fill:1}]};
  if(s==='title'){const it=[];if(G.save&&(G.save.leg>0||G.save.dist>0))it.push({a:'cont',l:titleOpts().find(o=>o.a==='cont').l,ic:'▶',c:'primary'});
   it.push({a:'new',l:it.length?'Új játék (teljes újrakezdés)':'Új utazás Komáromból',ic:'🚐',c:it.length?'':'primary'},{a:'color',l:'Autó színe: '+carColor,ic:'🎨'},{a:'ts',l:'Utazás: '+(TS_OPTS.find(q=>q[0]===G.ts)||TS_OPTS[0])[1],ic:'⏱'},{a:'specs',l:'Az autó adatai',ic:'ℹ'});
   if(!isStandalone())it.push({a:'install',l:'Telepítés',ic:'⬇',c:deferredPrompt?'new':''});
   it.push({a:'share',l:'Megosztás',ic:'↗'},{a:'update',l:updLabel,ic:'⟳',fill:1,c:newVer?'new':''},{a:'music',l:'Zene: '+(musicOn?'be':'ki'),ic:'♪'});
   it.push({a:'saves',l:'Mentések: '+(typeof PROF!=='undefined'?PROF.name:''),ic:'💾'});
+  it.push({a:'album',l:'Album és rekordok: '+Object.keys(PROF.album||{}).length+'/'+LEGS.length,ic:'🖼'},{a:'settings',l:'Beállítások: '+(PROF.easy?'könnyű mód':'hang, akku'),ic:'⚙'});
   if(typeof FINE!=='undefined'&&FINE)it.push({a:'keys',l:'Billentyűzet: '+(KEYMAP==='b'?'Autós':'Klasszikus'),ic:'⌨'});
   it.push({a:'elog',l:'Hibanapló: '+(ELOG.list.filter(e=>e.k!=='info').length||'nincs hiba'),ic:'🩺'});
   it.push({a:'exit',l:'Kilépés',ic:'⏻',c:'danger'});
@@ -179,6 +180,8 @@ function menuAction(a){
  if(a==='exityes'){G.confirm=null;exitGame();return;}
  if(a==='elog'){openElog();return;}
  if(a==='keys'){openKeys();return;}
+ if(a==='album'){openAlbum();return;}
+ if(a==='settings'){openSettings();return;}
  if(a==='saves'){openSaves();return;}
  if(a==='resume'){G.paused=false;}else if(a==='quit'){goHome();}
  else if(a==='perf'){PERF.on=!PERF.on;try{localStorage.setItem('cv-perf',PERF.on?'1':'0');}catch(e){}MENU_SIG='?';}else if(a==='gps'){if(typeof openGPS==='function')openGPS();}else if(a==='log'){openLedger(G.state==='play'?'pause':'menu');}else if(a==='radio'){radioNext();}else if(a==='install')doInstall();else if(a==='share')doShare();else if(a==='update')doUpdate();
@@ -191,7 +194,7 @@ const setC=(id,cls,on)=>{const el=$(id);if(el&&el.classList.contains(cls)!==!!on
 let touchShown=null;
 function appTick(){{const bl=G.state==='play'&&P&&!G.paused?Math.round(((G.drowsy||0)*0.6+(G.eyelid||0)*0.4)*4)/4:0,v=bl>0.05?'blur('+bl.toFixed(2)+'px)':'';if(appTick.f!==v){appTick.f=v;document.getElementById('c').style.filter=v;}}
 appTick.n=(appTick.n||0)+1;if(G.state==='title'&&(appTick.n%20===0||!G.menuR)){const m=$('menu');if(m.style.display!=='none'&&m.offsetWidth){const r=m.getBoundingClientRect(),c=document.getElementById('c').getBoundingClientRect();if(c.width)G.menuR=clamp((r.right-c.left)/c.width*W,0,W*0.6);}}
-{const tb=G.state==='play'&&!G.paused&&!MG&&!G.ledger&&!G.gps&&!G.elogOpen&&!G.keysOpen&&!(P&&(P.sub==='pump'||P.sub==='shop'||P.sub==='wash'));const el=$('topbar');if(el.dataset.v!==String(tb)){el.dataset.v=tb;el.style.display=tb?'flex':'none';}}
+{const tb=G.state==='play'&&!G.paused&&!MG&&!G.ledger&&!G.gps&&!G.elogOpen&&!G.keysOpen&&!G.albumOpen&&!G.setOpen&&!(P&&(P.sub==='pump'||P.sub==='shop'||P.sub==='wash'));const el=$('topbar');if(el.dataset.v!==String(tb)){el.dataset.v=tb;el.style.display=tb?'flex':'none';}}
  if(P&&G.state==='play'){const st=clamp((LANE[P.lane]-P.y)*2.2,-40,40);const v=st.toFixed(0)+'deg';if(appTick.st!==v){appTick.st=v;$('bHonk').style.setProperty('--steer',v);}}
 if(G.ledger&&G.ledger==='play'&&!G.paused)closeLedger();if(G.ledger&&G.state==='title')closeLedger();if(G.t%4===0||MENU_SIG==='?')renderMenu();
  const tch=isTouch&&G.state==='play'&&!G.paused&&!MG&&!(P&&(P.sub==='pump'||P.sub==='shop'||P.sub==='wash'));if(tch!==touchShown){touchShown=tch;$('touch').style.display=tch?'block':'none';if(!tch)$('cruiseBar').style.display='none';}
@@ -274,4 +277,34 @@ function openSaves(){if(G.state!=='title')return;G.savesOpen=true;renderSaves();
 function closeSaves(){G.savesOpen=false;$('saves').classList.remove('open');MENU_SIG='?';}
 $('savesClose').addEventListener('click',e=>{e.stopPropagation();closeSaves();});
 ['pointerdown','touchstart','keydown'].forEach(ev=>$('saves').addEventListener(ev,e=>e.stopPropagation(),{passive:true}));
+/* ---- album, útinapló, kitüntetések ---- */
+function cardCanvas(i,got){const dpr=Math.min(2,window.devicePixelRatio||1),w=78,h=94,c=document.createElement('canvas');c.width=Math.round(w*dpr);c.height=Math.round(h*dpr);c.style.width=w+'px';c.style.height=h+'px';
+ const g=c.getContext('2d');const L=LEGS[i];
+ if(got){g.setTransform(dpr*w/156,0,0,dpr*h/188,0,0);try{drawLandmark(g,LMK[L.to]!==undefined?LMK[L.to]:0,0,0,156,188);}catch(e){g.fillStyle='#3a4152';g.fillRect(0,0,156,188);}}
+ else{g.setTransform(dpr,0,0,dpr,0,0);g.fillStyle='#232937';g.fillRect(0,0,w,h);g.fillStyle='#3a4254';g.font='800 34px system-ui';g.textAlign='center';g.textBaseline='middle';g.fillText('?',w/2,h/2-4);}
+ return c;}
+function fmtT(sec){sec=Math.round(sec||0);const h=Math.floor(sec/3600),m=Math.floor(sec%3600/60);return h?h+' ó '+m+' p':m+' perc';}
+function openAlbum(){G.albumOpen=true;G.albumWasPaused=!!G.paused;if(G.state==='play')G.paused=true;const el=$('album'),st=PROF.stats||{},aw=PROF.awards||{},alb=PROF.album||{};
+ el.querySelector('h3').textContent='🖼 '+PROF.name+': album és rekordok';
+ const grid=el.querySelector('.cards');grid.innerHTML='';LEGS.forEach((L,i)=>{const got=!!alb[i],d=document.createElement('div');d.className='card'+(got?'':' no');d.appendChild(cardCanvas(i,got));const t=document.createElement('span');t.textContent=L.to.split(' (')[0];d.appendChild(t);grid.appendChild(d);});
+ el.querySelector('.ct').textContent=Object.keys(alb).length+' / '+LEGS.length;
+ el.querySelector('.aw').innerHTML=AWARDS.map(a=>'<div class="a'+(aw[a[0]]?' on':'')+'"><b>'+a[1]+'</b><div><i>'+a[2]+'</i><small>'+a[3]+'</small></div></div>').join('');
+ el.querySelector('.act').textContent=Object.keys(aw).length+' / '+AWARDS.length;
+ const rows=[['Megtett út',fmt(Math.round(st.km||0))+' km'],['Teljesített szakaszok',(st.legs||0)+' (bírság nélkül: '+(st.cleanLegs||0)+')'],['Körutak haza',st.wins||0],['Játékidő',fmtT(st.playS)],['Legnagyobb sebesség',(st.vmax||0)+' km/h'],
+  ['Elköltött pénz',fmt(Math.round(st.spent||0))+' Ft'],['Tankolások',st.refuels||0],['Boltlátogatások',st.shops||0],['Pihenők',st.rests||0],['Autómosások',st.washes||0],['Bírságok',st.fines||0],['Kerékcserék',st.fixes||0],['Totálkárok',st.totals||0]];
+ el.querySelector('.st').innerHTML=rows.map(r=>'<div><span>'+r[0]+'</span><b>'+r[1]+'</b></div>').join('');
+ el.classList.add('open');MENU_SIG='?';}
+function closeAlbum(){G.albumOpen=false;$('album').classList.remove('open');if(G.state==='play'&&!G.albumWasPaused)G.paused=false;MENU_SIG='?';}
+$('albumClose').addEventListener('click',e=>{e.stopPropagation();closeAlbum();});
+/* ---- beállítások: könnyű mód, hangerők, akkukímélő ---- */
+function openSettings(){G.setOpen=true;G.setWasPaused=!!G.paused;if(G.state==='play')G.paused=true;const el=$('settings');
+ el.querySelector('#setEasy').checked=!!PROF.easy;el.querySelector('#setBatt').checked=!!BATT;el.querySelector('.who').textContent=PROF.name;
+ el.querySelectorAll('input[type=range]').forEach(r=>{r.value=Math.round((VOL[r.dataset.k]??1)*100);r.nextElementSibling.textContent=r.value+'%';});
+ el.classList.add('open');MENU_SIG='?';}
+function closeSettings(){G.setOpen=false;$('settings').classList.remove('open');if(G.state==='play'&&!G.setWasPaused)G.paused=false;MENU_SIG='?';}
+$('setClose').addEventListener('click',e=>{e.stopPropagation();closeSettings();});
+$('setEasy').addEventListener('change',e=>{PROF.easy=e.target.checked;saveProf();elog('info','Könnyű mód: '+(PROF.easy?'be':'ki'));if(PROF.easy&&G.trip){G.trip.driveS=0;G.trip.mood=Math.max(G.trip.mood||0,4);if(typeof P!=='undefined'&&P)P.cranky=false;}MENU_SIG='?';});
+$('setBatt').addEventListener('change',e=>{setBatt(e.target.checked);MENU_SIG='?';});
+document.querySelectorAll('#settings input[type=range]').forEach(r=>r.addEventListener('input',()=>{initAudio();setVol(r.dataset.k,r.value/100);r.nextElementSibling.textContent=r.value+'%';if(r.dataset.k==='sfx')tone(880,0.08,'square',0.08);}));
+['pointerdown','touchstart'].forEach(ev=>{$('album').addEventListener(ev,e=>e.stopPropagation(),{passive:true});$('settings').addEventListener(ev,e=>e.stopPropagation(),{passive:true});});
 window.APP_OK=true;

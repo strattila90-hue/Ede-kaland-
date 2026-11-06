@@ -61,7 +61,7 @@ function garageItems(){const T=G.trip,hp=T.hp===undefined?100:T.hp;return hp<100
 function shopList(type){const T=G.trip,ps=P.shop;if(type==='garage')return garageItems();return SHOPS[type].items.filter(it=>(!it.work||!ps.worked)&&(!it.tyre||!T.spare));}
 function cardRect(i){return [PANEL[0]+8+(i%4)*74,PANEL[1]+40+Math.floor(i/4)*60,70,56];}
 const GO_BTN=[PANEL[0]+8,PANEL[1]+PANEL[3]-26,PANEL[2]-16,20];
-function enterShop(type){G.trip.driveS=Math.max(0,(G.trip.driveS||0)-300);if(typeof cheerUp==='function'&&P.cranky)cheerUp(2,type==='burger'?'A gyerekek imádják a gyorséttermet!':'Jót tett a kis szünet!');P.sub='shop';P.shop={type:type,msg:'',worked:false,anim:0,last:-1};P.hide.apa=1;if(type!=='fuel')P.hide.anna=1;SFX.click();
+function enterShop(type){stat('shops');G.trip.driveS=Math.max(0,(G.trip.driveS||0)-300);if(typeof cheerUp==='function'&&P.cranky)cheerUp(2,type==='burger'?'A gyerekek imádják a gyorséttermet!':'Jót tett a kis szünet!');P.sub='shop';P.shop={type:type,msg:'',worked:false,anim:0,last:-1};P.hide.apa=1;if(type!=='fuel')P.hide.anna=1;SFX.click();
  if(P.ev&&P.ev.type==='pee'){P.ev=null;flash('Anna elszaladt a mosdóba. Megkönnyebbült!','#7cff7c');}}
 function leaveStop(){P.sub='drive';P.hide.apa=0;P.hide.anna=0;P.shop=null;P.pump=null;P.stopCD=P.dist;SFX.clunk();say('Mehetünk tovább!','apa');}
 function updShop(){const T=G.trip,ps=P.shop,items=shopList(ps.type);if(ps.anim>0)ps.anim--;

@@ -112,10 +112,13 @@ function bodyPath(g){g.beginPath();g.moveTo(9,48.6);g.bezierCurveTo(4,48.6,2.2,4
 function glassPath(g){g.beginPath();g.moveTo(7.2,26.3);g.bezierCurveTo(6.9,19.4,8.7,15.2,13,13.3);g.bezierCurveTo(15.2,12.7,18.2,12.5,22,12.5);g.lineTo(61,12.7);
  g.bezierCurveTo(68.5,12.9,74,14.7,79.2,18.1);g.lineTo(92.6,27.6);g.lineTo(62,27.1);g.lineTo(7.4,26.6);g.closePath();}
 const SEATS=[['apa',68,17.7],['anya',63.4,18.5],['anna',42.6,19.8],['petra',33.4,20.6]];
-function drawCarSide(g,x,by,wy,o,lights){
- const t=o.t||0,hide=o.hide||{},ang=o.ang||0,pitch=o.pitch||0,lift=o.lift||0;
- const wyF=(o.wF||0),wyR=(o.wR||0);
- g.save();g.translate(x,by-lift);g.translate(56,45);g.rotate(pitch);g.translate(-56,-45);
+/* ---- a családi autó állandó részei képként (telefonon kevesebb rajzolási művelet) ---- */
+const CARC=new Map();
+function carLayer(g,key,draw){const tr=g.getTransform(),zs=Math.max(1,Math.round(Math.hypot(tr.a,tr.b)*4)/4);/* a tényleges nagyításon készül, hogy nagyban se legyen elmosódott */
+ const ck=key+'|'+zs;let c=CARC.get(ck);if(c){CARC.delete(ck);CARC.set(ck,c);}
+ else{if(CARC.size>=10)CARC.delete(CARC.keys().next().value);const r=mk(128,56,zs);r[1].translate(4,3);draw(r[1]);c=r[0];CARC.set(ck,c);}
+ g.drawImage(c,-4,-3,128,56);}
+function carBodyBase(g,dirt){
  // tetőbox és tetősín
  frr(g,lg(g,0,2.6,0,9,[[0,'#4c5664'],[1,'#1b2027']]),20,2.8,41,6.4,3.2);frr(g,'rgba(255,255,255,0.22)',25,3.4,26,0.9,0.45);
  g.strokeStyle='#e3e9ee';g.lineWidth=0.9;g.beginPath();g.moveTo(14,9.3);g.bezierCurveTo(30,8.7,50,8.7,67,9.6);g.stroke();
@@ -131,7 +134,7 @@ function drawCarSide(g,x,by,wy,o,lights){
   g.lineWidth=0.9;g.strokeStyle='rgba(255,255,255,0.6)';g.beginPath();g.moveTo(5,28.6);g.bezierCurveTo(40,28.1,80,28.7,101,30.8);g.stroke();
   g.lineWidth=0.7;g.strokeStyle='rgba(0,0,0,0.25)';g.beginPath();g.moveTo(10,37.6);g.bezierCurveTo(40,36.5,75,36.3,104,37.3);g.stroke();
   g.strokeStyle='rgba(255,255,255,0.25)';g.beginPath();g.moveTo(10,38.5);g.bezierCurveTo(40,37.4,75,37.2,104,38.2);g.stroke();
-  if(o.dirt>0.05){const d=o.dirt;g.fillStyle=lg(g,0,10,0,49,[[0,'rgba(150,130,100,'+(0.12*d)+')'],[1,'rgba(110,85,55,'+(0.5*d)+')']]);g.fillRect(0,10,120,40);
+  if(dirt>0.05){const d=dirt;g.fillStyle=lg(g,0,10,0,49,[[0,'rgba(150,130,100,'+(0.12*d)+')'],[1,'rgba(110,85,55,'+(0.5*d)+')']]);g.fillRect(0,10,120,40);
    for(let k=0;k<10;k++){const mx=6+hsh(k*11)*104,my=40+hsh(k*5)*7;g.fillStyle='rgba(95,70,45,'+(0.55*d*(0.5+hsh(k)))+')';g.beginPath();g.ellipse(mx,my,2+hsh(k*3)*4,1+hsh(k*7)*1.6,0,0,TAU);g.fill();}}
   // ajtóvonalak
   g.strokeStyle='rgba(18,22,28,0.6)';g.lineWidth=0.55;g.beginPath();g.moveTo(22.9,27);g.lineTo(22.7,31.6);g.moveTo(50.2,27);g.bezierCurveTo(50.4,36,50.4,40,50.2,43.6);
@@ -141,6 +144,26 @@ function drawCarSide(g,x,by,wy,o,lights){
  // kilincsek, tanksapka
  for(const hx of [28,55.5]){frr(g,'rgba(0,0,0,0.35)',hx,31.5,5.4,0.8,0.4);frr(g,lg(g,0,30.4,0,31.8,[[0,'#ffffff'],[1,'#9aa6b1']]),hx,30.4,5.4,1.4,0.7);}
  g.strokeStyle='rgba(20,24,30,0.55)';g.lineWidth=0.5;g.beginPath();g.arc(13.6,31,2.1,0,TAU);g.stroke();
+}
+function carBodyFront(g){
+ g.strokeStyle='#e6edf2';g.lineWidth=0.75;glassPath(g);g.stroke();
+ // tükör
+ g.fillStyle=lg(g,0,22,0,26.6,[[0,CP.hl],[1,CP.d]]);g.beginPath();g.ellipse(76.5,24.2,3.4,2.1,-0.15,0,TAU);g.fill();frr(g,'#1a1e24',73.6,25.3,2.2,2.3,0.5);
+ // hátsó lámpa (vízszintes, körbeérő LED-sáv)
+ tailPath(g);g.fillStyle=lg(g,2,0,7,0,[[0,'#7a1018'],[0.45,'#c9283a'],[1,'#e85a64']]);g.fill();g.strokeStyle='rgba(235,240,245,0.85)';g.lineWidth=0.35;g.stroke();
+ for(const ly of [18.6,22.6,26.6])frr(g,'rgba(255,190,190,0.55)',2.9,ly,2.8,0.7,0.35);frr(g,'rgba(255,255,255,0.35)',5.2,17.2,0.5,11,0.25);frr(g,CP.tl,2.2,40.6,3,1.2,0.5);
+ // fényszóró (karcsú LED)
+ g.fillStyle=lg(g,96,29,108,34,[[0,'#f6f9fb'],[1,'#a3aeb8']]);g.beginPath();g.moveTo(96.6,28.9);g.bezierCurveTo(100.6,29.4,104.8,30.7,108.4,33.1);g.lineTo(107.5,34.7);g.bezierCurveTo(104,33.6,100,32.5,96.2,31.2);g.closePath();g.fill();
+ g.strokeStyle='#ffffff';g.lineWidth=0.6;g.beginPath();g.moveTo(97,31.3);g.bezierCurveTo(100.4,32.4,104,33.4,107.4,34.6);g.stroke();disc(g,CP.proj,104.4,32.4,0.9);
+ // első alsó légbeömlő és ködlámpa
+ frr(g,'#191d22',103.4,39.6,8,4.4,2);frr(g,'#4a525b',104.4,40.8,6,0.5,0.25);}
+function drawCarSide(g,x,by,wy,o,lights){
+ const t=o.t||0,hide=o.hide||{},ang=o.ang||0,pitch=o.pitch||0,lift=o.lift||0;
+ const wyF=(o.wF||0),wyR=(o.wR||0);
+ g.save();g.translate(x,by-lift);g.translate(56,45);g.rotate(pitch);g.translate(-56,-45);
+ // a karosszéria és az eleje előre megrajzolt kép (színenként, koszosság szerint); az utasok, kerekek, fények élőben
+ const useC=!o.live,dq=o.dirt>0.05?Math.round(o.dirt*10)/10:0;
+ if(useC)carLayer(g,'b|'+CP.m+'|'+dq,xg=>carBodyBase(xg,dq));else carBodyBase(g,o.dirt||0);
  // üvegfelület az utasokkal
  glassPath(g);g.fillStyle=lg(g,0,12.5,0,27,[[0,'#b4d6e8'],[0.45,'#628aa3'],[1,'#21384a']]);g.fill();
  g.save();glassPath(g);g.clip();
@@ -159,17 +182,8 @@ function drawCarSide(g,x,by,wy,o,lights){
   g.strokeStyle='#13171c';g.lineWidth=2.7;g.beginPath();g.moveTo(74.6,27.4);g.lineTo(78.4,16.8);g.stroke();
   g.fillStyle='rgba(255,255,255,0.13)';g.beginPath();g.moveTo(76,27.4);g.lineTo(79.8,17.6);g.lineTo(92.6,27.6);g.closePath();g.fill();
  g.restore();
- g.strokeStyle='#e6edf2';g.lineWidth=0.75;glassPath(g);g.stroke();
- // tükör
- g.fillStyle=lg(g,0,22,0,26.6,[[0,CP.hl],[1,CP.d]]);g.beginPath();g.ellipse(76.5,24.2,3.4,2.1,-0.15,0,TAU);g.fill();frr(g,'#1a1e24',73.6,25.3,2.2,2.3,0.5);
- // hátsó lámpa (vízszintes, körbeérő LED-sáv)
- tailPath(g);g.fillStyle=lg(g,2,0,7,0,[[0,'#7a1018'],[0.45,'#c9283a'],[1,'#e85a64']]);g.fill();g.strokeStyle='rgba(235,240,245,0.85)';g.lineWidth=0.35;g.stroke();
- for(const ly of [18.6,22.6,26.6])frr(g,'rgba(255,190,190,0.55)',2.9,ly,2.8,0.7,0.35);frr(g,'rgba(255,255,255,0.35)',5.2,17.2,0.5,11,0.25);frr(g,CP.tl,2.2,40.6,3,1.2,0.5);
- // fényszóró (karcsú LED)
- g.fillStyle=lg(g,96,29,108,34,[[0,'#f6f9fb'],[1,'#a3aeb8']]);g.beginPath();g.moveTo(96.6,28.9);g.bezierCurveTo(100.6,29.4,104.8,30.7,108.4,33.1);g.lineTo(107.5,34.7);g.bezierCurveTo(104,33.6,100,32.5,96.2,31.2);g.closePath();g.fill();
- g.strokeStyle='#ffffff';g.lineWidth=0.6;g.beginPath();g.moveTo(97,31.3);g.bezierCurveTo(100.4,32.4,104,33.4,107.4,34.6);g.stroke();disc(g,CP.proj,104.4,32.4,0.9);
- // első alsó légbeömlő és ködlámpa
- frr(g,'#191d22',103.4,39.6,8,4.4,2);frr(g,'#4a525b',104.4,40.8,6,0.5,0.25);disc(g,o.fog?'#ffffff':'#e8e2c4',108.6,42.2,0.95);
+ if(useC)carLayer(g,'f|'+CP.m,xg=>carBodyFront(xg));else carBodyFront(g);
+ disc(g,o.fog?'#ffffff':'#e8e2c4',108.6,42.2,0.95);
  if(o.dmg)drawDamage(g,o.dmg,t,o.spd||0);
  g.restore();
  if(o.dmg)drawSmoke(g,x+100,by+28,o.dmg,t);

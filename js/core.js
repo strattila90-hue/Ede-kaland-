@@ -2,7 +2,7 @@
 /* =========================================================
    CSALÁDI VAKÁCIÓ – alapok: vászon, rajzoló segédek, betűk, hang, bemenet
    ========================================================= */
-const APP_VERSION='2.20.0';
+const APP_VERSION='2.21.0';
 const W=480,H=270,PX=70,ROADT=194,ROADB=262,LANE=[212,232,252];
 const TAU=Math.PI*2;
 let SC=2,LOWQ=false;
@@ -26,7 +26,8 @@ window.addEventListener('unhandledrejection',e=>{const r=e.reason;elog('hiba','K
   let cvs='';try{cvs=(typeof GLC!=='undefined'?'betű '+GLC.size:'')+(typeof SPR!=='undefined'?', tárgy '+SPR.size:'')+(typeof LTC!=='undefined'?', sáv '+LTC.size:'');}catch(e){}
   try{localStorage.setItem('cv-hb',JSON.stringify({t:Date.now(),up:(Date.now()-t0)/1000,c:elogCtx(),vis:!document.hidden,mem:mem,cv:cvs}));}catch(e){}};
  setInterval(beat,4000);beat();
- window.addEventListener('pagehide',()=>{beat();try{localStorage.setItem('cv-clean','1');}catch(e){}});
+ window.addEventListener('pagehide',e=>{beat();elog('info','Az oldal bezárult vagy leállt (pagehide'+(e.persisted?', megőrizve':'')+(document.hidden?', háttérben':', előtérben!')+')',true);try{localStorage.setItem('cv-clean','1');}catch(_){}});
+ document.addEventListener('freeze',()=>{elog('info','A rendszer lefagyasztotta a háttérben (energiatakarékos)',true);});document.addEventListener('resume',()=>{elog('info','A rendszer visszaengedte (resume)');});
  document.addEventListener('visibilitychange',()=>{beat();elog('info',document.hidden?'Háttérbe került':'Előtérbe jött');});}
 var MG=null;const cv=document.getElementById('c'),ctx=cv.getContext('2d',{alpha:false})||cv.getContext('2d');
 cv.width=W*SC;cv.height=H*SC;
@@ -105,11 +106,17 @@ function textRaw(g,str,x,y,col,s,sh){
 
 /* ---------- hang ---------- */
 let AC=null,master=null,musicOn=true,mStep=0,mNext=0;
-function initAudio(){if(AC){if(AC.state==='suspended')AC.resume();return;}try{AC=new (window.AudioContext||window.webkitAudioContext)();master=AC.createGain();master.gain.value=0.5;master.connect(AC.destination);}catch(e){AC=null;}}
-function tone(f,d,type,v,t0,slide){if(!AC)return;const t=AC.currentTime+(t0||0);const o=AC.createOscillator(),g=AC.createGain();o.type=type||'square';o.frequency.setValueAtTime(f,t);if(slide)o.frequency.linearRampToValueAtTime(Math.max(20,f+slide),t+d);
- g.gain.setValueAtTime(v||0.1,t);g.gain.exponentialRampToValueAtTime(0.001,t+d);o.connect(g);g.connect(master);o.start(t);o.stop(t+d+0.02);}
+/* hangerők: zene, motor, rádió, hanghatások (duda is) – külön csatornák, a beállításokban állíthatók */
+let VOL={music:1,eng:1,radio:1,sfx:1};try{Object.assign(VOL,JSON.parse(localStorage.getItem('cv-vol')||'{}'));}catch(e){}
+let BUS=null;
+function setVol(k,v){VOL[k]=clamp(+v||0,0,1);try{localStorage.setItem('cv-vol',JSON.stringify(VOL));}catch(e){}if(BUS&&BUS[k])BUS[k].gain.setTargetAtTime(VOL[k],AC.currentTime,0.05);}
+function initAudio(){if(AC){if(AC.state==='suspended')AC.resume();return;}try{AC=new (window.AudioContext||window.webkitAudioContext)();master=AC.createGain();master.gain.value=0.5;master.connect(AC.destination);
+ BUS={};for(const k of ['music','eng','radio','sfx']){const g=AC.createGain();g.gain.value=VOL[k];g.connect(master);BUS[k]=g;}}catch(e){AC=null;}}
+const sfxOut=()=>BUS?BUS.sfx:master;
+function tone(f,d,type,v,t0,slide,dest){if(!AC)return;const t=AC.currentTime+(t0||0);const o=AC.createOscillator(),g=AC.createGain();o.type=type||'square';o.frequency.setValueAtTime(f,t);if(slide)o.frequency.linearRampToValueAtTime(Math.max(20,f+slide),t+d);
+ g.gain.setValueAtTime(v||0.1,t);g.gain.exponentialRampToValueAtTime(0.001,t+d);o.connect(g);g.connect(dest||sfxOut());o.start(t);o.stop(t+d+0.02);}
 function noise(d,v,t0,lp){if(!AC)return;const n=Math.max(1,AC.sampleRate*d|0),b=AC.createBuffer(1,n,AC.sampleRate),a=b.getChannelData(0);for(let i=0;i<n;i++)a[i]=(Math.random()*2-1)*(1-i/n);
- const s=AC.createBufferSource();s.buffer=b;const f=AC.createBiquadFilter();f.type='lowpass';f.frequency.value=lp||1200;const g=AC.createGain();g.gain.value=v||0.3;s.connect(f);f.connect(g);g.connect(master);s.start(AC.currentTime+(t0||0));}
+ const s=AC.createBufferSource();s.buffer=b;const f=AC.createBiquadFilter();f.type='lowpass';f.frequency.value=lp||1200;const g=AC.createGain();g.gain.value=v||0.3;s.connect(f);f.connect(g);g.connect(sfxOut());s.start(AC.currentTime+(t0||0));}
 
 /* valódi autóduda: két tárcsás kürt (kb. 420 és 510 Hz, kis terc), torzítással és sávszűrővel, nyomva tartva szól */
 let HORN=null;
@@ -117,7 +124,7 @@ function hornSet(on){if(!AC)return;const now=AC.currentTime;
  if(on&&!HORN){const out=AC.createGain();out.gain.setValueAtTime(0.0001,now);out.gain.exponentialRampToValueAtTime(0.32,now+0.012);
   const ws=AC.createWaveShaper(),cv=new Float32Array(1024);for(let i=0;i<1024;i++){const x=i/511.5-1;cv[i]=Math.tanh(x*3.2)/Math.tanh(3.2);}ws.curve=cv;
   const bp=AC.createBiquadFilter();bp.type='peaking';bp.frequency.value=2400;bp.Q.value=1.2;bp.gain.value=7;const hp=AC.createBiquadFilter();hp.type='highpass';hp.frequency.value=250;const lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.value=5200;
-  const pre=AC.createGain();pre.gain.value=0.55;ws.connect(bp);bp.connect(hp);hp.connect(lp);lp.connect(out);out.connect(master);const osc=[];
+  const pre=AC.createGain();pre.gain.value=0.55;ws.connect(bp);bp.connect(hp);hp.connect(lp);lp.connect(out);out.connect(sfxOut());const osc=[];
   for(const [f,v] of [[418,0.5],[421.5,0.25],[507,0.45],[510.5,0.22]]){const o=AC.createOscillator(),gg=AC.createGain();o.type='sawtooth';o.frequency.value=f;gg.gain.value=v;o.connect(gg);gg.connect(pre);o.start(now);osc.push(o);}
   pre.connect(ws);HORN={out:out,osc:osc,t0:now};}
  else if(!on&&HORN){const h=HORN;HORN=null;const end=Math.max(now,h.t0+0.24);h.out.gain.setValueAtTime(0.32,end);h.out.gain.exponentialRampToValueAtTime(0.0001,end+0.06);h.osc.forEach(o=>o.stop(end+0.08));}}
@@ -126,10 +133,10 @@ function scream(f0,d,t0){if(!AC)return;const t=AC.currentTime+(t0||0);const o=AC
  o.type='sawtooth';o.frequency.setValueAtTime(f0*0.8,t);o.frequency.linearRampToValueAtTime(f0*1.12,t+0.18);o.frequency.linearRampToValueAtTime(f0*0.92,t+d);lfo.frequency.value=7.5;lg2.gain.value=f0*0.05;lfo.connect(lg2);lg2.connect(o.frequency);
  f1.type='bandpass';f1.frequency.value=f0*2.1;f1.Q.value=3;f2.type='bandpass';f2.frequency.value=3200;f2.Q.value=2;
  g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.22,t+0.06);g.gain.setValueAtTime(0.22,t+d*0.7);g.gain.exponentialRampToValueAtTime(0.0001,t+d);
- o.connect(f1);o.connect(f2);f1.connect(g);f2.connect(g);g.connect(master);o.start(t);lfo.start(t);o.stop(t+d+0.05);lfo.stop(t+d+0.05);}
+ o.connect(f1);o.connect(f2);f1.connect(g);f2.connect(g);g.connect(sfxOut());o.start(t);lfo.start(t);o.stop(t+d+0.05);lfo.stop(t+d+0.05);}
 /* gumicsikorgás */
 function screech(v){if(!AC)return;const t=AC.currentTime;for(const f of [1480,1555]){const o=AC.createOscillator(),g=AC.createGain();o.type='triangle';o.frequency.setValueAtTime(f+Math.random()*60,t);o.frequency.linearRampToValueAtTime(f-80,t+0.16);
-  g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.045*v,t+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t+0.17);o.connect(g);g.connect(master);o.start(t);o.stop(t+0.2);}
+  g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.045*v,t+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t+0.17);o.connect(g);g.connect(sfxOut());o.start(t);o.stop(t+0.2);}
  noise(0.16,0.06*v,0,3500);}
 /* irányjelző relé: kattanás és visszakattanás */
 function blinkTick(on){tone(on?2100:1500,0.012,'square',0.05);tone(on?380:300,0.02,'triangle',0.05);}
@@ -144,7 +151,7 @@ const MEL=[72,0,76,79,76,0,72,74,76,76,74,72,74,0,67,0,72,0,76,79,81,79,76,72,74
 const BAS=[48,55,52,55,50,57,53,57,48,55,52,55,43,50,47,50,53,60,57,60,48,55,52,55,45,52,48,52,43,50,47,50];
 const mf=n=>440*Math.pow(2,(n-69)/12);
 function updateMusic(paused){if(!AC||!musicOn||paused)return;const spb=0.15;if(mNext<AC.currentTime)mNext=AC.currentTime+0.05;
- while(mNext<AC.currentTime+0.25){const n=MEL[mStep%MEL.length],d=mNext-AC.currentTime;if(n)tone(mf(n),0.13,'square',0.03,d);if(mStep%2===0)tone(mf(BAS[(mStep>>1)%BAS.length]),0.26,'triangle',0.07,d);mNext+=spb;mStep++;}}
+ while(mNext<AC.currentTime+0.25){const n=MEL[mStep%MEL.length],d=mNext-AC.currentTime;if(n)tone(mf(n),0.13,'square',0.03,d,0,BUS&&BUS.music);if(mStep%2===0)tone(mf(BAS[(mStep>>1)%BAS.length]),0.26,'triangle',0.07,d,0,BUS&&BUS.music);mNext+=spb;mStep++;}}
 function toggleMusic(){initAudio();musicOn=!musicOn;}
 
 /* ---------- bemenet ---------- */
@@ -167,7 +174,7 @@ function kRole(e){const c=e.code||'',k=e.key;const inPlay=typeof G!=='undefined'
 window.addEventListener('keydown',e=>{initAudio();const r=kRole(e);if(!r)return;const rep=e.repeat;if(e.code)KHELD.add(e.code);
  if(r==='gas'||r==='brake')kPedals();else if(r==='up'){if(!rep)K.upP=true;}else if(r==='dn'){if(!rep)K.dnP=true;}
  else if(r==='pump'){K.pump=true;if(!rep)K.brakeTap=true;}else if(r==='horn'){if(!rep){K.honkP=true;K.horn=true;}}
- else if(r==='enter'){K.enterP=true;K.enterKey=true;}else if(r==='pause'){if(typeof G!=='undefined'&&G.keysOpen){if(typeof closeKeys==='function')closeKeys();}else K.pauseP=true;}else if(r==='music'){toggleMusic();}
+ else if(r==='enter'){K.enterP=true;K.enterKey=true;}else if(r==='pause'){if(typeof G!=='undefined'&&G.keysOpen){if(typeof closeKeys==='function')closeKeys();}else if(typeof G!=='undefined'&&G.albumOpen)closeAlbum();else if(typeof G!=='undefined'&&G.setOpen)closeSettings();else K.pauseP=true;}else if(r==='music'){toggleMusic();}
  else if(r==='light')K.lightP=true;else if(r==='fog')K.fogP=true;else if(r==='haz')K.hazP=true;else if(r==='flash')K.flash=true;else if(r==='door')K.doorP=true;
  else if(r==='hb'){if(!rep)K.hbP=true;}else if(r==='cruise')K.cruiseP=true;else if(r==='stop')K.stopP=true;else if(r==='log')K.logP=true;else if(r==='rev')K.revP=true;
  else if(r==='gps'){if(!rep&&typeof G!=='undefined'&&(G.state==='play'||G.state==='map'))K.gpsP=true;}else if(r==='radio')K.radioP=true;
