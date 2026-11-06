@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.3.2
+# 🚐 Családi Vakáció – v2.4.0
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -31,7 +31,9 @@ A játék kétpercenként automatikusan menti az állást, így az út több nap
 
 Komárom → Siófok → Keszthely → Bécs → Prága → Berlin → Amszterdam → Párizs → Barcelona → Nizza → Velence → Salzburg (Alpok) → haza, Komárom.
 
-A sarokban **minitérkép** mutatja, merre jár a család (érintésre nagyobb). A térkép földrajzilag pontos, [Natural Earth](https://www.naturalearthdata.com) közkincs adatokból készült.
+A jobb felső sarokban **GPS** mutatja az autó környékét: ráközelít a kocsira, menetirány szerint fordul, kék vonallal mutatja az utat, rajta a városok, tavak (Balaton, Fertő, Garda, Bodeni- és Genfi-tó), erdők és mellékutak. Alul a hátralévő km és a várható menetidő. Érintésre a teljes Európa-térkép jelenik meg.
+
+**Mi közeledik:** a GPS alatt kis ikonok mutatják, mi jön, és hány méterre: benzinkút, bolt, trafik, újságos, sebességmérő, közlekedési lámpa (az aktuális színével), település, autópálya, kátyú, útépítés, baleset, dugó, állat, és a cél. A térkép földrajzilag pontos, [Natural Earth](https://www.naturalearthdata.com) közkincs adatokból készült.
 
 ## 🎬 Filmes főmenü
 
@@ -40,6 +42,8 @@ A főmenü úgy indul, mint egy film: feketéből úszik be a kép, szélesvász
 ## 🛣️ Út közben
 
 Út közben folyamatosan váltakozik a város, a falu, az országút és az autópálya, a táblákon valós településnevekkel (Ács, Bábolna, Sümeg, Mondsee, Beaune…). A sebességkorlátozás is szakaszonként változik: 50, 90/100 vagy 130 km/h.
+
+**Satufék:** erős fékezésnél csikorognak a gumik, féknyom marad az úton, az utasok előrebillennek, tágra nyílt szemmel ijednek meg, a gyerekek sikítanak. Normál fékezésnél is kicsit előredőlnek.
 
 **Sávváltás:** az autó fokozatosan, ívben sorol át (kb. 1,5 s, lassan hosszabb, havon és esőben óvatosabb), nincs hirtelen rántás. A forgalom többi járműve is így vált sávot.
 
@@ -120,7 +124,11 @@ Mezők (búza, napraforgó, repce, kukorica, szántás, levendula) szalmabálák
 - **Ködlámpa:** első, majd első és hátsó.
 - **Tempomat:** 50 / 70 / 90 / 110 / 130 km/h egy érintéssel, fékre kikapcsol.
 - **Kézifék** visszajelző lámpával.
-- **Vészvillogó**, **ajtók nyitása és csukása** (csak állva), **hátramenet (R)** tolatólámpával.
+- **Vészvillogó**, **ajtók nyitása és csukása** (csak állva).
+- **Hátramenet:** álló helyzetben tartsd nyomva a féket kb. egy másodpercig: bekapcsol a hátramenet és a tolatólámpa, a fékkel tolatsz, a gázzal visszavált előremenetbe. Billentyűzeten az R is működik.
+- **Irányjelző:** valós ütemben, percenként 90-et villan, relékattogással; sávváltáskor 3 villanás.
+- **Duda:** valódi kéthangú autóduda, amíg nyomod, szól.
+- **Nagy kamion, busz mellett:** ha egy jármű eltakarná az autót, áttetszővé válik, így a családi autó mindig látszik.
 - **Féklámpa** fékezéskor és álló helyzetben.
 - **Rádió:** négy állomás saját szerzésű zenével (Retro FM, Rock Rádió, Pop Hullám, Esti Lounge).
 - **Motorhang:** négyhengeres motor, fordulatszám és terhelés szerint változik.
@@ -139,7 +147,7 @@ Mezők (búza, napraforgó, repce, kukorica, szántás, levendula) szalmabálák
 | F | KÖD | ködlámpa |
 | V | ⚠ | vészvillogó |
 | O | AJTÓ | ajtók |
-| R | R | hátramenet |
+| R | fék tartva álló helyzetben | hátramenet |
 | T | TEMPO | tempomat |
 | E | P gomb | megállás a következő üzletnél |
 | N | pénz | költségnapló |
@@ -155,6 +163,7 @@ A főmenüben bal oldalt három gomb van:
 
 - **⬇ Telepítés:** a kezdőképernyőre teszi a játékot. iPhone-on Safariban: Megosztás, majd „Főképernyőhöz adás”.
 - **↗ Megosztás:** elküldi a játék linkjét.
+- **Offline magától:** az első indítás után a játék a háttérben letölti az összes fájlját, onnan internet nélkül is fut. Ha van új verzió, azt is magától letölti, és a következő indításkor már az fut.
 - **⟳ Frissítés:** százalékosan mutatja a letöltést. Ha van új verzió, a gomb kiemelve jelzi. Alatta látszik az aktuális verziószám.
 
 ## 🚀 GitHub Pages

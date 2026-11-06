@@ -103,8 +103,8 @@ html,body{margin:0;height:100%;height:100dvh;width:100%;position:fixed;inset:0;b
 #bHonk svg{width:92%;height:92%}
 .pedal{border-radius:12px;border:1px solid rgba(255,255,255,.22)}
 .pedal svg{width:100%;height:100%}
-#bGas{right:calc(12px + var(--sr));bottom:calc(12px + var(--sb));width:calc(var(--u)*1.05);height:calc(var(--u)*1.85)}
-#bBr{right:calc(20px + var(--sr) + var(--u)*1.05);bottom:calc(12px + var(--sb));width:calc(var(--u)*1.5);height:calc(var(--u)*1.25)}
+#bGas{right:calc(14px + var(--sr));bottom:calc(12px + var(--sb));width:calc(var(--u)*1.3);height:calc(var(--u)*2.25);border-radius:14px}
+#bBr{right:calc(14px + var(--sr) + var(--u)*1.3 + var(--u)*.42);bottom:calc(12px + var(--sb));width:calc(var(--u)*1.75);height:calc(var(--u)*1.5);border-radius:14px}
 #bHaz{background:linear-gradient(180deg,#5a1e1e,#2a0d0d)!important}
 #cruiseBar{position:fixed;z-index:12;left:50%;transform:translateX(-50%);bottom:calc(var(--u) + 30px + var(--sb));display:none;gap:6px;padding:7px;border-radius:16px;background:var(--glass);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid var(--line);box-shadow:0 10px 30px rgba(0,0,0,.5)}
 #cruiseBar button{min-width:calc(var(--u)*.95);height:calc(var(--u)*.8);border-radius:12px;border:1px solid var(--line);background:linear-gradient(180deg,#2b3242,#191d27);color:#fff;font:700 15px var(--ff)}
@@ -112,9 +112,9 @@ html,body{margin:0;height:100%;height:100dvh;width:100%;position:fixed;inset:0;b
 #cruiseBar button:active{transform:scale(.95)}
 
 /* kezelőszervek v2.3: középkonzol, LED-ek, pedálok */
-#ctlrow{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(8px + var(--sb));display:flex;gap:5px;pointer-events:none;padding:6px 7px;border-radius:18px;
+#ctlrow{position:absolute;left:calc(50% - var(--u)*.85);transform:translateX(-50%);bottom:calc(8px + var(--sb));display:flex;gap:5px;pointer-events:none;padding:6px 7px;border-radius:18px;
  background:linear-gradient(180deg,rgba(28,32,42,.82),rgba(10,12,18,.88));border:1px solid rgba(255,255,255,.1);box-shadow:0 10px 30px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.08)}
-#ctlrow .ctl{position:relative;width:clamp(34px,calc((100vw - var(--u)*5.4 - var(--sl) - var(--sr))/9 - 5px),calc(var(--u)*1.02));height:calc(var(--u)*.98);border-radius:13px;padding-top:4px;
+#ctlrow .ctl{position:relative;width:clamp(34px,calc((100vw - var(--u)*7.2 - var(--sl) - var(--sr))/8 - 5px),calc(var(--u)*1.02));height:calc(var(--u)*.98);border-radius:13px;padding-top:4px;
  background:linear-gradient(180deg,#3a4152 0%,#232835 48%,#181b24 100%);border:1px solid rgba(255,255,255,.13);box-shadow:inset 0 1px 0 rgba(255,255,255,.16),inset 0 -2px 0 rgba(0,0,0,.35),0 3px 0 #0b0d12,0 5px 10px rgba(0,0,0,.45)}
 #ctlrow .ctl svg{width:50%;height:50%}
 #ctlrow .ctl small{margin-top:1px;padding-top:2px;font:800 clamp(6.5px,1.45vmin,8.5px)/1.3 var(--ff);letter-spacing:.02em;opacity:.8;text-overflow:clip}
@@ -181,7 +181,6 @@ html,body{margin:0;height:100%;height:100dvh;width:100%;position:fixed;inset:0;b
   <div class="ctl" id="bHaz"><svg viewBox="0 0 24 24"><path d="M12 4l9 16H3z" fill="none" stroke="#ff6b5a" stroke-width="2.4" stroke-linejoin="round"/><path d="M12 9.5l4 7H8z" fill="none" stroke="#ff6b5a" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
   <div class="ctl" id="bHb"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6" fill="none" stroke="#fff" stroke-width="2"/><path d="M4.5 6.5a10 10 0 0 0 0 11M19.5 6.5a10 10 0 0 1 0 11" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/><text x="12" y="15.5" fill="#fff" font-size="9" font-weight="800" text-anchor="middle" font-family="system-ui">P</text></svg><small>KÉZI</small></div>
   <div class="ctl" id="bDoor"><svg viewBox="0 0 24 24"><path d="M5 5h8l4 5v9H5z" fill="none" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/><path d="M5 11h12" stroke="#fff" stroke-width="1.4"/><path d="M13 13h3" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg><small>AJTÓ</small></div>
-  <div class="ctl" id="bRev"><svg viewBox="0 0 24 24"><text x="12" y="17" fill="#fff" font-size="15" font-weight="800" text-anchor="middle" font-family="system-ui">R</text></svg></div>
   <div class="ctl" id="bCruise"><svg viewBox="0 0 24 24"><path d="M4 16a8 8 0 1 1 16 0" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/><path d="M12 16l4-5" stroke="#7fd1ff" stroke-width="2.2" stroke-linecap="round"/><circle cx="12" cy="16" r="1.6" fill="#fff"/></svg><small id="lCruise">TEMPO</small></div>
   <div class="ctl" id="bRadio"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="11" rx="2" fill="none" stroke="#fff" stroke-width="1.8"/><circle cx="15.5" cy="13.5" r="2.6" fill="#fff"/><path d="M6 11h5M6 14h5M6 17h5" stroke="#fff" stroke-width="1.4"/><path d="M5 8l11-4" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg><small>RÁDIÓ</small></div>
  </div>

@@ -18,15 +18,35 @@ const FAM={apa:{skin:'#efc29a',hair:'#5a3b22',shirt:'#3f7fd9',pants:'#2c3e50',na
  atti:{skin:'#fbdcc2',hair:'#d9b47a',shirt:'#7fd1ff',pants:'#7fd1ff',name:'kis Atti'}};
 const WHEELS=[24,89],WR=9.4,WCY=55.5-9.4,ARCH=12.4;
 /* fej oldalnézetből (jobbra néz) – cx,cy a fej közepe */
-function headSide(g,cx,cy,who,t,s){s=s||1;const f=FAM[who];const r=(who==='anna'?2.7:who==='petra'?2.4:who==='atti'?2.1:3.2)*s;
+function headSide(g,cx,cy,who,t,s,sc){s=s||1;sc=sc||0;const f=FAM[who];const r=(who==='anna'?2.7:who==='petra'?2.4:who==='atti'?2.1:3.2)*s;
  if(who==='anya'){g.fillStyle=f.hair;g.beginPath();g.ellipse(cx-r*0.5,cy+r*0.4,r*0.9,r*1.4,0,0,TAU);g.fill();}
- disc(g,f.skin,cx,cy,r);g.fillStyle=f.skin;g.beginPath();g.ellipse(cx+r*0.95,cy+r*0.15,r*0.28,r*0.22,0,0,TAU);g.fill();
+ // nyak és fej, finom árnyékkal
+ R(g,shade(f.skin,0.85),cx-r*0.3,cy+r*0.7,r*0.6,r*0.6);
+ g.fillStyle=lg(g,cx-r,cy,cx+r,cy,[[0,shade(f.skin,0.88)],[0.6,f.skin],[1,shade(f.skin,1.04)]]);g.beginPath();g.arc(cx,cy,r,0,TAU);g.fill();
+ // orr, áll
+ g.fillStyle=f.skin;g.beginPath();g.ellipse(cx+r*0.96,cy+r*0.12,r*0.22,r*0.2,0,0,TAU);g.fill();
+ // fül
+ disc(g,shade(f.skin,0.86),cx-r*0.18,cy+r*0.12,r*0.24);
+ // haj
  g.fillStyle=f.hair;g.beginPath();g.arc(cx-r*0.1,cy-r*0.1,r*1.02,Math.PI*0.95,Math.PI*1.9);g.closePath();g.fill();
  if(who==='petra'){disc(g,f.hair,cx-r*1.05,cy+r*0.2,r*0.45);}
  if(who==='anna'){g.fillStyle=f.hair;g.beginPath();g.ellipse(cx-r*0.7,cy+r*0.6,r*0.5,r*1.0,0.3,0,TAU);g.fill();disc(g,'#ff5a9a',cx-r*0.2,cy-r*0.95,r*0.3);}
- if(who==='apa'){g.fillStyle='#14171c';rrect(g,cx+r*0.15,cy-r*0.25,r*0.95,r*0.38,r*0.12);g.fill();}
- else disc(g,'#1a1a1a',cx+r*0.55,cy-r*0.1,r*0.17);
- if(who==='atti'&&((t>>5)&1))disc(g,'#ffffff',cx+r*0.95,cy+r*0.5,r*0.25);}
+ const ex=cx+r*0.56,ey=cy-r*0.12,blink=!sc&&((t+(who.length*37))%233)<5;
+ if(who==='apa'){g.fillStyle='#14171c';rrect(g,cx+r*0.15,cy-r*0.25,r*0.95,r*0.38,r*0.12);g.fill();R(g,'rgba(255,255,255,0.35)',cx+r*0.3,cy-r*0.2,r*0.3,r*0.08);
+  if(sc>0.3)line(g,f.hair,cx+r*0.25,cy-r*(0.42+sc*0.25),cx+r*0.9,cy-r*(0.4+sc*0.25),r*0.13);}
+ else{// szem: nyugodtan pötty, ijedten nagy fehér szem pupillával
+  if(blink)line(g,'#2a1d14',ex-r*0.14,ey,ex+r*0.12,ey,r*0.09);
+  else if(sc>0.25){const e=r*(0.2+sc*0.14);disc(g,'#ffffff',ex,ey,e);disc(g,'#1a1a1a',ex+e*0.25,ey,e*0.45);}
+  else{disc(g,'#ffffff',ex+r*0.02,ey,r*0.16);disc(g,'#1e1a17',ex+r*0.06,ey,r*0.12);}
+  // szemöldök
+  if(who!=='atti')line(g,shade(f.hair,0.8),ex-r*0.2,ey-r*(0.32+sc*0.22),ex+r*0.18,ey-r*(0.36+sc*0.24),r*0.09);}
+ // száj: semleges vonal, ijedten nyitott „O”
+ const mx=cx+r*0.7,my=cy+r*0.48;
+ if(sc>0.3){g.fillStyle='#5a1f1f';g.beginPath();g.ellipse(mx,my+r*0.05,r*(0.13+sc*0.08),r*(0.14+sc*0.16),0,0,TAU);g.fill();}
+ else line(g,shade(f.skin,0.62),mx-r*0.16,my,mx+r*0.12,my-r*0.02,r*0.08);
+ if(who==='atti'&&!sc&&((t>>5)&1))disc(g,'#ffffff',cx+r*0.95,cy+r*0.5,r*0.25);
+ // pír
+ if(who!=='apa')disc(g,'rgba(255,120,120,0.22)',cx+r*0.5,cy+r*0.3,r*0.2);}
 /* fej szemből */
 function headFront(g,cx,cy,who,s){s=s||1;const f=FAM[who];const r=(who==='apa'||who==='anya'?3.6:who==='atti'?2.2:2.8)*s;
  if(who==='anya'){g.fillStyle=f.hair;g.beginPath();g.ellipse(cx,cy+r*0.5,r*1.25,r*1.5,0,0,TAU);g.fill();}
@@ -99,8 +119,9 @@ function drawCarSide(g,x,by,wy,o,lights){
   // csomagok a 3. sorban
   frr(g,'#d8433b',8.5,19.5,6,7,1.2);frr(g,'#3f7fd9',13.5,17.5,6,9,1.2);frr(g,'#f2c14e',10,15.5,5,4,1);
   // bébiülés kis Attival (menetiránynak háttal)
-  if(!hide.atti){frr(g,'#3b4a63',23.6,15.6,6.4,10.4,2.4);headSide(g,27.2,19.4+bob,'atti',t);}
-  for(const [w,hx,hy] of SEATS)if(!hide[w])headSide(g,hx,hy+(w==='petra'||w==='anna'?bob:0),w,t);
+  const sc=o.scare||0,ln=o.lean||0,jit=w=>sc>0.2&&w!=='apa'?Math.sin(t*1.7+w.length)*0.35*sc:0;
+  if(!hide.atti){frr(g,'#3b4a63',23.6,15.6,6.4,10.4,2.4);headSide(g,27.2+ln*0.4+jit('atti'),19.4+bob,'atti',t,1,sc);}
+  for(const [w,hx,hy] of SEATS)if(!hide[w])headSide(g,hx+ln*(w==='apa'?0.6:1)+jit(w),hy+(w==='petra'||w==='anna'?bob:0)+ln*0.15,w,t,1,w==='apa'?sc*0.6:sc);
   if(!hide.petra)frr(g,'#d8433b',30,22.6,7,3.6,1.4);
   g.fillStyle='rgba(16,34,52,0.3)';g.fillRect(0,0,120,30);
   g.fillStyle='rgba(255,255,255,0.15)';for(let k=0;k<6;k++){g.beginPath();g.moveTo(4+k*17,28);g.lineTo(12+k*17,12);g.lineTo(16+k*17,12);g.lineTo(8+k*17,28);g.closePath();g.fill();}

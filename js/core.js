@@ -2,7 +2,7 @@
 /* =========================================================
    CSALÁDI VAKÁCIÓ – alapok: vászon, rajzoló segédek, betűk, hang, bemenet
    ========================================================= */
-const APP_VERSION='2.3.2';
+const APP_VERSION='2.4.0';
 const W=480,H=270,PX=70,ROADT=194,ROADB=262,LANE=[212,232,252];
 const TAU=Math.PI*2;
 let SC=2,LOWQ=false;
@@ -67,7 +67,30 @@ function tone(f,d,type,v,t0,slide){if(!AC)return;const t=AC.currentTime+(t0||0);
  g.gain.setValueAtTime(v||0.1,t);g.gain.exponentialRampToValueAtTime(0.001,t+d);o.connect(g);g.connect(master);o.start(t);o.stop(t+d+0.02);}
 function noise(d,v,t0,lp){if(!AC)return;const n=Math.max(1,AC.sampleRate*d|0),b=AC.createBuffer(1,n,AC.sampleRate),a=b.getChannelData(0);for(let i=0;i<n;i++)a[i]=(Math.random()*2-1)*(1-i/n);
  const s=AC.createBufferSource();s.buffer=b;const f=AC.createBiquadFilter();f.type='lowpass';f.frequency.value=lp||1200;const g=AC.createGain();g.gain.value=v||0.3;s.connect(f);f.connect(g);g.connect(master);s.start(AC.currentTime+(t0||0));}
-const SFX={honk(){tone(392,0.18,'square',0.12);tone(494,0.18,'square',0.1);tone(392,0.22,'square',0.12,0.22);tone(494,0.22,'square',0.1,0.22);},
+
+/* valódi autóduda: két tárcsás kürt (kb. 420 és 510 Hz, kis terc), torzítással és sávszűrővel, nyomva tartva szól */
+let HORN=null;
+function hornSet(on){if(!AC)return;const now=AC.currentTime;
+ if(on&&!HORN){const out=AC.createGain();out.gain.setValueAtTime(0.0001,now);out.gain.exponentialRampToValueAtTime(0.32,now+0.012);
+  const ws=AC.createWaveShaper(),cv=new Float32Array(1024);for(let i=0;i<1024;i++){const x=i/511.5-1;cv[i]=Math.tanh(x*3.2)/Math.tanh(3.2);}ws.curve=cv;
+  const bp=AC.createBiquadFilter();bp.type='peaking';bp.frequency.value=2400;bp.Q.value=1.2;bp.gain.value=7;const hp=AC.createBiquadFilter();hp.type='highpass';hp.frequency.value=250;const lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.value=5200;
+  const pre=AC.createGain();pre.gain.value=0.55;ws.connect(bp);bp.connect(hp);hp.connect(lp);lp.connect(out);out.connect(master);const osc=[];
+  for(const [f,v] of [[418,0.5],[421.5,0.25],[507,0.45],[510.5,0.22]]){const o=AC.createOscillator(),gg=AC.createGain();o.type='sawtooth';o.frequency.value=f;gg.gain.value=v;o.connect(gg);gg.connect(pre);o.start(now);osc.push(o);}
+  pre.connect(ws);HORN={out:out,osc:osc,t0:now};}
+ else if(!on&&HORN){const h=HORN;HORN=null;const end=Math.max(now,h.t0+0.24);h.out.gain.setValueAtTime(0.32,end);h.out.gain.exponentialRampToValueAtTime(0.0001,end+0.06);h.osc.forEach(o=>o.stop(end+0.08));}}
+/* gyerek sikoltás: magas, vibráló hang formánsszűrővel */
+function scream(f0,d,t0){if(!AC)return;const t=AC.currentTime+(t0||0);const o=AC.createOscillator(),lfo=AC.createOscillator(),lg2=AC.createGain(),g=AC.createGain(),f1=AC.createBiquadFilter(),f2=AC.createBiquadFilter();
+ o.type='sawtooth';o.frequency.setValueAtTime(f0*0.8,t);o.frequency.linearRampToValueAtTime(f0*1.12,t+0.18);o.frequency.linearRampToValueAtTime(f0*0.92,t+d);lfo.frequency.value=7.5;lg2.gain.value=f0*0.05;lfo.connect(lg2);lg2.connect(o.frequency);
+ f1.type='bandpass';f1.frequency.value=f0*2.1;f1.Q.value=3;f2.type='bandpass';f2.frequency.value=3200;f2.Q.value=2;
+ g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.22,t+0.06);g.gain.setValueAtTime(0.22,t+d*0.7);g.gain.exponentialRampToValueAtTime(0.0001,t+d);
+ o.connect(f1);o.connect(f2);f1.connect(g);f2.connect(g);g.connect(master);o.start(t);lfo.start(t);o.stop(t+d+0.05);lfo.stop(t+d+0.05);}
+/* gumicsikorgás */
+function screech(v){if(!AC)return;const t=AC.currentTime;for(const f of [1480,1555]){const o=AC.createOscillator(),g=AC.createGain();o.type='triangle';o.frequency.setValueAtTime(f+Math.random()*60,t);o.frequency.linearRampToValueAtTime(f-80,t+0.16);
+  g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.045*v,t+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t+0.17);o.connect(g);g.connect(master);o.start(t);o.stop(t+0.2);}
+ noise(0.16,0.06*v,0,3500);}
+/* irányjelző relé: kattanás és visszakattanás */
+function blinkTick(on){tone(on?2100:1500,0.012,'square',0.05);tone(on?380:300,0.02,'triangle',0.05);}
+const SFX={honk(){hornSet(true);setTimeout(()=>{if(!K.horn)hornSet(false);},60);},
  pick(){[523,659,784,1046].forEach((f,i)=>tone(f,0.08,'square',0.07,i*0.05));},hit(){noise(0.3,0.45,0,900);tone(180,0.25,'sawtooth',0.12,0,-120);},
  bump(){noise(0.09,0.25,0,350);},thunder(){noise(1.6,0.7,0,260);},splash(){noise(0.25,0.18,0,2600);},pop(){noise(0.45,0.4,0,3000);},
  win(){[523,659,784,1046,784,1046].forEach((f,i)=>tone(f,0.14,'square',0.09,i*0.12));},moo(){tone(140,0.5,'sawtooth',0.12,0,-30);},baa(){tone(330,0.35,'sawtooth',0.06,0,-40);},
@@ -82,17 +105,17 @@ function updateMusic(paused){if(!AC||!musicOn||paused)return;const spb=0.15;if(m
 function toggleMusic(){initAudio();musicOn=!musicOn;}
 
 /* ---------- bemenet ---------- */
-const K={cruiseP:false,cruiseSet:null,hbP:false,flash:false,doorP:false,revP:false,radioP:false,gas:false,brake:false,pump:false,upP:false,dnP:false,honkP:false,enterP:false,pauseP:false,lightP:false,fogP:false,hazP:false,num:0};
+const K={horn:false,cruiseP:false,cruiseSet:null,hbP:false,flash:false,doorP:false,revP:false,radioP:false,gas:false,brake:false,pump:false,upP:false,dnP:false,honkP:false,enterP:false,pauseP:false,lightP:false,fogP:false,hazP:false,num:0};
 window.addEventListener('keydown',e=>{initAudio();const k=e.key;
  if(k==='ArrowRight'||k==='d'||k==='D')K.gas=true;else if(k==='ArrowLeft'||k==='a'||k==='A')K.brake=true;
  else if(k==='ArrowUp'||k==='w'||k==='W'){if(!e.repeat)K.upP=true;}else if(k==='ArrowDown'||k==='s'||k==='S'){if(!e.repeat)K.dnP=true;}
- else if(k===' '){K.pump=true;if(!e.repeat)K.brakeTap=true;}else if(k==='h'||k==='H'){if(!e.repeat)K.honkP=true;}
+ else if(k===' '){K.pump=true;if(!e.repeat)K.brakeTap=true;}else if(k==='h'||k==='H'){if(!e.repeat){K.honkP=true;K.horn=true;}}
  else if(k==='Enter'){K.enterP=true;K.enterKey=true;}else if(k==='p'||k==='P'||k==='Escape'){K.pauseP=true;}else if(k==='m'||k==='M'){toggleMusic();}
  else if(k==='l'||k==='L'){K.lightP=true;}else if(k==='f'||k==='F'){K.fogP=true;}else if(k==='v'||k==='V'){K.hazP=true;}
  else if(k==='k'||k==='K'){K.flash=true;}else if(k==='o'||k==='O'){K.doorP=true;}else if(k==='b'||k==='B'){K.hbP=true;}else if(k==='t'||k==='T'){K.cruiseP=true;}else if(k==='e'||k==='E'){K.stopP=true;}else if(k==='n'||k==='N'){K.logP=true;}else if(k==='r'||k==='R'){K.revP=true;}else if(k==='q'||k==='Q'||k==='c'||k==='C'){K.radioP=true;}
  else if(k>='1'&&k<='9'){K.num=+k;}
  if([' ','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(k))e.preventDefault();});
-window.addEventListener('keyup',e=>{const k=e.key;if(k==='ArrowRight'||k==='d'||k==='D')K.gas=false;else if(k==='ArrowLeft'||k==='a'||k==='A')K.brake=false;else if(k===' ')K.pump=false;else if(k==='k'||k==='K')K.flash=false;});
+window.addEventListener('keyup',e=>{const k=e.key;if(k==='ArrowRight'||k==='d'||k==='D')K.gas=false;else if(k==='ArrowLeft'||k==='a'||k==='A')K.brake=false;else if(k===' ')K.pump=false;else if(k==='k'||k==='K')K.flash=false;else if(k==='h'||k==='H')K.horn=false;});
 function holdBtn(id,key){const el=document.getElementById(id);const on=e=>{e.preventDefault();e.stopPropagation();initAudio();K[key]=true;el.classList.add('on');};const off=e=>{e.preventDefault();K[key]=false;el.classList.remove('on');};
  el.addEventListener('touchstart',on,{passive:false});el.addEventListener('touchend',off,{passive:false});el.addEventListener('touchcancel',off,{passive:false});
  el.addEventListener('mousedown',on);el.addEventListener('mouseup',off);el.addEventListener('mouseleave',off);}

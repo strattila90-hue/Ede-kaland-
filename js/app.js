@@ -6,8 +6,8 @@
 const $=id=>document.getElementById(id);
 const haptic=(ms)=>{try{if(navigator.vibrate)navigator.vibrate(ms||12);}catch(e){}};
 holdBtn('bGas','gas');holdBtn('bBr','brake');holdBtn('bFlash','flash');
-tapBtn('bUp',()=>K.upP=true);tapBtn('bDn',()=>K.dnP=true);tapBtn('bHonk',()=>K.honkP=true);tapBtn('bHaz',()=>K.hazP=true);tapBtn('bPause',()=>K.pauseP=true);
-tapBtn('bLight',()=>K.lightP=true);tapBtn('bFog',()=>K.fogP=true);tapBtn('bDoor',()=>K.doorP=true);tapBtn('bRev',()=>K.revP=true);tapBtn('bRadio',()=>K.radioP=true);tapBtn('bHb',()=>K.hbP=true);
+tapBtn('bUp',()=>K.upP=true);tapBtn('bDn',()=>K.dnP=true);holdBtn('bHonk','horn');tapBtn('bHaz',()=>K.hazP=true);tapBtn('bPause',()=>K.pauseP=true);
+tapBtn('bLight',()=>K.lightP=true);tapBtn('bFog',()=>K.fogP=true);tapBtn('bDoor',()=>K.doorP=true);tapBtn('bRadio',()=>K.radioP=true);tapBtn('bHb',()=>K.hbP=true);
 function goHome(){if(G.state!=='play')return;if(MG)endMini();if(P)save(P.dist);G.paused=false;closeLedger&&G.ledger&&closeLedger();G.state='title';G.st=0;G.menu=0;engine(0,0);MENU_SIG='?';
  toast('Játékállás elmentve: '+fmt(G.trip.km,1)+' km, '+fmt(G.trip.money)+' Ft. A Folytatás gombbal innen indulsz tovább.',3600);}
 function autoSave(){try{if(G.state==='play'&&P)save(P.dist);}catch(e){}}
@@ -55,7 +55,17 @@ async function doUpdate(){if(updating)return;updating=true;
  catch(e){updating=false;setUpd(0,'Frissítés');toast('Nem sikerült frissíteni. Van internetkapcsolat?');}}
 /* offline működés automatikusan */
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
-window.addEventListener('offline',()=>toast('Offline mód: a játék internet nélkül is fut.'));window.addEventListener('online',()=>{toast('Újra van internet.');checkUpdate();});
+/* automatikus offline: minden fájl letöltése a háttérben, új verzió csendes letöltése */
+async function autoOffline(){if(!('caches' in window)||!location.protocol.startsWith('http')||!navigator.onLine)return;
+ try{const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});const v=await r.json();const names=Object.keys(v.files||{});const cache=await caches.open('csaladi-vakacio');
+  const newer=verCmp(v.version,APP_VERSION)>0;let got=0;
+  for(const n of names){const have=await cache.match(n,{ignoreSearch:true});if(have&&!newer)continue;const res=await fetch(n+'?v='+v.version,{cache:'no-store'});if(!res.ok)continue;
+   const b=await res.blob(),h={headers:{'content-type':res.headers.get('content-type')||''}};await cache.put(new Request(n),new Response(b,h));if(n==='index.html')await cache.put(new Request('./'),new Response(b,h));got++;}
+  let first=false;try{first=!localStorage.getItem('cv-offline');localStorage.setItem('cv-offline',v.version);}catch(e){}
+  if(newer){newVer=v.version;updLabel='Újraindítás: v'+v.version;MENU_SIG='?';toast('Új verzió letöltve (v'+v.version+'). A következő indításkor érvényes, vagy koppints a frissítésre.',4200);}
+  else if(first)toast('Offline mód kész: a játék internet nélkül is fut.',3200);}catch(e){}}
+window.addEventListener('load',()=>setTimeout(autoOffline,2500));
+window.addEventListener('offline',()=>toast('Offline mód: a játék internet nélkül is fut.'));window.addEventListener('online',()=>{toast('Újra van internet.');autoOffline();});
 setTimeout(checkUpdate,1500);
 /* menük */
 function titleAct(a){const opts=titleOpts();const i=opts.findIndex(o=>o.a===a);if(i>=0){G.menu=i;K.enterP=true;}}
