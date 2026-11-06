@@ -16,7 +16,7 @@ function goHome(){if(G.state!=='play')return;if(MG)endMini();if(P)save(P.dist);G
  toast('Játékállás elmentve: '+fmt(G.trip.km,1)+' km, '+fmt(G.trip.money)+' Ft. A Folytatás gombbal innen indulsz tovább.',3600);}
 function autoSave(){try{if(G.state==='play'&&P)save(P.dist);}catch(e){}}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)autoSave();});window.addEventListener('pagehide',autoSave);
-tapBtn('bHome',goHome);tapBtn('bGps',()=>{if(typeof openGPS==='function')openGPS();});
+tapBtn('bHome',goHome);tapBtn('bGps',()=>{if(typeof openGPS==='function')openGPS();});tapBtn('bGpsBig',()=>{if(typeof openGPS==='function')openGPS();});if(isTouch)document.body.classList.add('touchui');
 {const el=$('bCruise');let tm=null,long=false;const down=e=>{e.preventDefault();e.stopPropagation();initAudio();long=false;el.classList.add('on');tm=setTimeout(()=>{long=true;haptic(25);const b=$('cruiseBar');b.style.display=b.style.display==='flex'?'none':'flex';},450);};
  const up=e=>{e.preventDefault();clearTimeout(tm);el.classList.remove('on');if(!long){haptic(12);K.cruiseTap=true;$('cruiseBar').style.display='none';}};
  el.addEventListener('touchstart',down,{passive:false});el.addEventListener('touchend',up,{passive:false});el.addEventListener('mousedown',down);el.addEventListener('mouseup',up);}

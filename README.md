@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.15.0
+# 🚐 Családi Vakáció – v2.16.0
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -37,7 +37,7 @@ A régi (12 szakaszos) mentések automatikusan átállnak: a játék a legközel
 
 ## 🧭 GPS
 
-Külön térképképernyő nincs: a térkép a **GPS** gomb mögött van. Út közben a felső sávban, indulás előtt az Indulás gomb mellett található (gépen a **G** billentyű, vagy a Szünet menü). Az indulás előtti képen a szakasz tája, a családi autó, a cél képeslapja és az út adatai látszanak. A GPS teljes képernyős, interaktív térképet nyit:
+Külön térképképernyő nincs: a térkép a **GPS** gomb mögött van. Út közben telefonon a jobb oldali oszlopban, a tempomat fölött egy nagy kék **GPS** gomb (tableten a lenti sávban a tempomat fölött, gépen a felső sávban), indulás előtt az Indulás gomb mellett található (gépen a **G** billentyű, vagy a Szünet menü). Az indulás előtti képen a szakasz tája, a családi autó, a cél képeslapja és az út adatai látszanak. A GPS teljes képernyős, interaktív térképet nyit:
 
 - **Követés:** az autó a térkép közepén, nyíl mutatja a menetirányt; a megtett út sárga, a hátralévő kék.
 - **Húzással** mozgatható, **két ujjal csippentve**, egérgörgővel vagy a **+ / −** gombokkal nagyítható, dupla koppintásra ráközelít.
@@ -52,6 +52,9 @@ Amíg a GPS nyitva van, a játék áll, de ez nem számít pihenőnek. A térké
 **Lámpafigyelő:** 450 méterrel a jelzőlámpa előtt a jobb oldalon megjelenik egy kis lámpa: mutatja, melyik szín ég (világít), hány másodperc van hátra belőle (fogyó csíkkal), milyen messze van a lámpa, és a jelenlegi sebességed alapján tanácsot ad: **ÁTÉRSZ** (zöldben érsz oda), **LASSÍTS** (sárgában érnél oda), **FÉKEZZ** (pirosban érnél oda), **VÁRJ** (állsz a piros előtt), **ÁLLJ** (közvetlenül a lámpánál, nem zöld).
 
 ## 🎬 Főmenü: filmplakát
+
+A plakáton a játékbeli családi autó, benne az egész család, aranyórában a Balaton partján halad a lemenő nap felé: mély kékből narancsba hajló ég, alulról megvilágított felhősávok, a nap fénykoronája és sugarai, légperspektívás hegyek, a tóban csillogó napút és egy vitorlás, a túlparton nyárfasor és falu templomtoronnyal, rét szalmabálákkal, szalagkorlát, az úton elmosott mozgáscsíkok, az autón meleg ellenfény és égő fényszóró.
+
 
 A főmenü egyetlen álló kép, családi road movie plakát: naplemente csíkos nappal, hegyek, a horizontba futó út, rajta hátulról a családi autó csomagokkal a tetőn, nagy „Családi Vakáció” cím, alcím („Öt ember. Egy autó. 9 600 kilométer.”) és alul a szereplők. A kép egyszer rajzolódik meg, utána a főmenüben a játék nem rajzol képkockákat, így a belépés gyors és sima.
 

@@ -679,30 +679,58 @@ function introT(){return 999;}
 function introT_old(){if(G.introSeen)return 999;if(G.st>=170)G.introSeen=true;return G.st;}
 const CREDITS=['Apa','Anya','Anna (5)','Petra (3)','kis Atti (10 hó)','és a családi egyterű'];
 /* ---- főmenü: egyetlen álló, filmplakát jellegű kép (egyszer rajzolódik, utána nincs animáció) ---- */
-function drawPoster(g){const mR=Math.max(0,Math.min(W*0.6,G.menuR||W*0.36)),cx=Math.round((mR+W)/2),hz=150;
- // naplementés ég
- g.fillStyle=lg(g,0,0,0,hz,[[0,'#1a2350'],[0.45,'#7a3b7a'],[0.75,'#ff7a4a'],[1,'#ffc98a']]);g.fillRect(0,0,W,hz);
- for(let i=0;i<70;i++){const x=hsh(i*7)*W,y=hsh(i*13)*70;g.fillStyle='rgba(255,255,255,'+(0.25+hsh(i)*0.5)*(1-y/70)+')';g.fillRect(x,y,0.7,0.7);}
- // csíkos retró nap
- g.fillStyle=rg(g,cx,hz-4,10,90,[[0,'rgba(255,220,150,0.55)'],[1,'rgba(255,140,90,0)']]);g.fillRect(cx-90,hz-94,180,94);
- g.save();g.beginPath();g.arc(cx,hz-2,34,Math.PI,TAU);g.closePath();g.clip();g.fillStyle=lg(g,0,hz-36,0,hz,[[0,'#fff1a8'],[1,'#ff8a3c']]);g.fillRect(cx-36,hz-38,72,38);
- for(let k=0;k<5;k++)R(g,'#ff9a5a',cx-36,hz-14+k*3.2,72,0.6+k*0.45);g.restore();
- // hegyek két rétegben
- const mtn=(col,base,amp,seed)=>{g.fillStyle=col;g.beginPath();g.moveTo(0,hz);for(let x=0;x<=W;x+=6){const y=base-amp*(0.55+0.45*Math.sin(x*0.021+seed))*(0.6+0.4*Math.sin(x*0.007+seed*2));g.lineTo(x,y);}g.lineTo(W,hz);g.closePath();g.fill();};
- mtn('#5a2f63',hz-6,30,1);mtn('#3a2148',hz,18,4);
- // föld és a horizontba futó út
- g.fillStyle=lg(g,0,hz,0,H,[[0,'#3a2a3a'],[1,'#120d18']]);g.fillRect(0,hz,W,H-hz);
- g.fillStyle=lg(g,0,hz,0,H,[[0,'#4a3f4c'],[1,'#1c1a22']]);g.beginPath();g.moveTo(cx-2,hz);g.lineTo(cx+2,hz);g.lineTo(cx+190,H);g.lineTo(cx-190,H);g.closePath();g.fill();
- g.strokeStyle='rgba(255,210,170,0.55)';g.lineWidth=1;g.beginPath();g.moveTo(cx-2,hz);g.lineTo(cx-176,H);g.moveTo(cx+2,hz);g.lineTo(cx+176,H);g.stroke();
- for(let k=0;k<9;k++){const a=Math.pow(k/9,2),b=Math.pow((k+0.5)/9,2),y1=hz+(H-hz)*a,y2=hz+(H-hz)*b;g.fillStyle='rgba(255,230,180,0.75)';g.beginPath();g.moveTo(cx-0.4-a*3,y1);g.lineTo(cx+0.4+a*3,y1);g.lineTo(cx+0.4+b*3,y2);g.lineTo(cx-0.4-b*3,y2);g.closePath();g.fill();}
- // a fényes út a nap felé
- g.fillStyle=lg(g,0,hz,0,hz+60,[[0,'rgba(255,190,120,0.35)'],[1,'rgba(255,190,120,0)']]);g.beginPath();g.moveTo(cx-2,hz);g.lineTo(cx+2,hz);g.lineTo(cx+40,hz+60);g.lineTo(cx-40,hz+60);g.closePath();g.fill();
- // a családi autó hátulról, a naplemente felé
- const s=1.85,cw=72*s,top=246-55.5*s;g.fillStyle=rg(g,cx,246,6,90,[[0,'rgba(0,0,0,0.55)'],[1,'rgba(0,0,0,0)']]);g.save();g.translate(cx,246);g.scale(1,0.12);g.beginPath();g.arc(0,0,90,0,TAU);g.fill();g.restore();
- g.save();g.translate(cx-cw/2,top);g.scale(s,s);drawRear(g,0,0,{t:0,brake:true,pos:true});g.restore();
- glow(g,cx-cw/2+10*s,top+30*s,18,'rgba(255,60,60,0.45)');glow(g,cx+cw/2-10*s,top+30*s,18,'rgba(255,60,60,0.45)');
+function drawPoster(g){const mR=Math.max(0,Math.min(W*0.6,G.menuR||W*0.36)),cx=Math.round((mR+W)/2),hz=166,road=236;
+ // aranyóra: mély kék égbolt, a horizont felé narancs és barack
+ g.fillStyle=lg(g,0,0,0,hz,[[0,'#0d1b3d'],[0.32,'#2c4377'],[0.62,'#b06a6e'],[0.84,'#f39a5c'],[1,'#ffd9a0']]);g.fillRect(0,0,W,hz+2);
+ for(let i=0;i<60;i++){const x=hsh(i*7)*W,y=hsh(i*13)*55;g.fillStyle='rgba(255,255,255,'+(0.2+hsh(i)*0.5)*(1-y/55)+')';g.fillRect(x,y,0.6,0.6);}
+ // nap a horizont fölött, nagy fénykoronával és sugarakkal
+ const sx=Math.min(W-40,cx+86),sy=hz-16;
+ g.fillStyle=rg(g,sx,sy,4,170,[[0,'rgba(255,236,190,0.75)'],[0.25,'rgba(255,190,120,0.35)'],[1,'rgba(255,140,90,0)']]);g.fillRect(0,0,W,hz+40);
+ g.save();g.globalAlpha=0.08;g.fillStyle='#fff2cc';for(let k=0;k<9;k++){const a=-Math.PI*(0.08+k*0.105),l=260;g.beginPath();g.moveTo(sx,sy);g.lineTo(sx+Math.cos(a-0.03)*l,sy+Math.sin(a-0.03)*l);g.lineTo(sx+Math.cos(a+0.03)*l,sy+Math.sin(a+0.03)*l);g.closePath();g.fill();}g.restore();
+ disc(g,'#fff6dc',sx,sy,11);disc(g,'rgba(255,250,235,0.9)',sx,sy,8);
+ // alulról megvilágított bárányfelhők és fátyolfelhők
+ // hosszú, elnyújtott, alulról megvilágított felhősávok
+ for(let k=0;k<9;k++){const y=34+k*11+hsh(k*5)*6,x=mR-30+hsh(k*7)*(W-mR),w=60+hsh(k*3)*110,h=2.2+hsh(k*11)*3,lit=Math.min(1,0.35+k*0.09);
+  g.fillStyle='rgba(70,55,105,'+(0.45-k*0.02)+')';g.beginPath();g.ellipse(x,y,w,h,0,0,TAU);g.fill();
+  g.fillStyle='rgba(255,'+Math.round(150+lit*60)+','+Math.round(120+lit*40)+','+(0.25+lit*0.35)+')';g.beginPath();g.ellipse(x+w*0.08,y+h*0.45,w*0.86,h*0.5,0,0,TAU);g.fill();}
+ // hegyek: a távolabbiak halványabbak (légperspektíva)
+ const ridge=(col,base,amp,f1,f2,seed)=>{g.fillStyle=col;g.beginPath();g.moveTo(0,hz+2);for(let x=0;x<=W;x+=3){const y=base-amp*(0.5+0.3*Math.sin(x*f1+seed)+0.2*Math.sin(x*f2+seed*3)+0.08*Math.sin(x*0.11+seed));g.lineTo(x,y);}g.lineTo(W,hz+2);g.closePath();g.fill();};
+ ridge('rgba(150,120,160,0.75)',hz-4,34,0.013,0.031,1.3);ridge('rgba(112,92,135,0.85)',hz,24,0.02,0.047,4.1);
+ g.fillStyle=lg(g,0,hz-30,0,hz+2,[[0,'rgba(255,200,150,0)'],[1,'rgba(255,200,150,0.35)']]);g.fillRect(0,hz-30,W,32);
+ // a Balaton: tükröződő ég, csillogó napút
+ const ly=hz+1,lh=30;g.fillStyle=lg(g,0,ly,0,ly+lh,[[0,'#f4b07a'],[0.35,'#b9787e'],[1,'#3b3f66']]);g.fillRect(0,ly,W,lh);
+ for(let k=0;k<70;k++){const yy=ly+1+Math.pow(hsh(k*5),1.4)*(lh-3),spread=6+(yy-ly)*2.2,xx=sx+(hsh(k*11)-0.5)*spread*2,ww=2+hsh(k*3)*6*(1+(yy-ly)/lh);g.fillStyle='rgba(255,240,200,'+(0.35+hsh(k)*0.5)+')';g.fillRect(xx,yy,ww,0.7);}
+ for(let k=0;k<26;k++){const yy=ly+3+hsh(k*9)*(lh-5),xx=hsh(k*17)*W;g.fillStyle='rgba(255,220,200,0.18)';g.fillRect(xx,yy,8+hsh(k)*14,0.5);}
+ // vitorlás a tavon
+ {const vx=sx-70,vy=ly+9;g.fillStyle='rgba(40,30,50,0.85)';g.beginPath();g.moveTo(vx,vy);g.lineTo(vx+1,vy-12);g.lineTo(vx+7,vy);g.closePath();g.fill();g.beginPath();g.moveTo(vx-1,vy-9);g.lineTo(vx-6,vy);g.lineTo(vx-1,vy);g.fill();R(g,'rgba(40,30,50,0.85)',vx-7,vy,15,1.4);}
+ // túlpart: nyárfasor, falu templomtoronnyal, ellenfényben
+ const shore=ly+lh;g.fillStyle='#2b2a3c';g.fillRect(0,shore-3,W,6);
+ for(let k=0;k<40;k++){const x=hsh(k*7+2)*W,h=8+hsh(k*3)*14;g.fillStyle='#262536';g.beginPath();g.ellipse(x,shore-h/2,1.8+hsh(k)*1.6,h/2,0,0,TAU);g.fill();}
+ {const tx=mR+50;R(g,'#24233a',tx,shore-26,5,24);g.fillStyle='#24233a';g.beginPath();g.moveTo(tx-1,shore-26);g.lineTo(tx+2.5,shore-36);g.lineTo(tx+6,shore-26);g.fill();for(let k=0;k<5;k++)R(g,'#2a2940',tx+8+k*11,shore-8-hsh(k)*5,9,10);
+  for(let k=0;k<4;k++)R(g,'rgba(255,200,120,0.8)',tx+11+k*11,shore-5,1.6,1.6);}
+ // rét a nap fényében és a mező szélén szalmabálák
+ g.fillStyle=lg(g,0,shore,0,road-10,[[0,'#5f6a3a'],[0.5,'#8a7f3e'],[1,'#4c5a2c']]);g.fillRect(0,shore+3,W,road-10-shore-3);
+ for(let k=0;k<120;k++){const x=hsh(k*13)*W,y=shore+5+hsh(k*7)*(road-shore-18);g.strokeStyle='rgba(255,214,140,'+(0.25+hsh(k)*0.3)+')';g.lineWidth=0.6;g.beginPath();g.moveTo(x,y);g.lineTo(x+0.8,y-2.5-hsh(k*3)*2);g.stroke();}
+ for(let k=0;k<3;k++){const bx=mR+30+k*64+hsh(k)*20,by=shore+13+k*2;disc(g,'#b8903f',bx,by,4.2);disc(g,'rgba(255,220,150,0.6)',bx+1.2,by-1.2,2);disc(g,'rgba(40,30,20,0.35)',bx-1.5,by+1.5,2.4);}
+ // út: aszfalt meleg csillogással, szalagkorlát, útszéli jelek
+ g.fillStyle='#2a2b31';g.fillRect(0,road-10,W,2);for(let x=-4;x<W;x+=26){R(g,'#5b5d63',x,road-20,1.6,10);}
+ g.fillStyle=lg(g,0,road-17,0,road-12,[[0,'#d9d2c6'],[1,'#8a8378']]);g.fillRect(0,road-17,W,3);
+ g.fillStyle=lg(g,0,road-8,0,H,[[0,'#4a4646'],[0.4,'#33323a'],[1,'#17161d']]);g.fillRect(0,road-8,W,H-road+8);
+ g.fillStyle=lg(g,sx-160,0,sx+60,0,[[0,'rgba(255,190,130,0)'],[0.7,'rgba(255,190,130,0.16)'],[1,'rgba(255,190,130,0)']]);g.fillRect(0,road-8,W,H-road+8);
+ R(g,'rgba(240,236,225,0.85)',0,road-6,W,1.2);for(let x=0;x<W;x+=30)R(g,'rgba(240,236,225,0.75)',x,road+12,16,1.2);
+ // mozgás: elmosott csíkok az úton és a réten
+ for(let k=0;k<26;k++){const y=road-4+hsh(k*5)*24,x=hsh(k*9)*W,w=14+hsh(k)*40;g.fillStyle='rgba(255,230,200,'+(0.05+hsh(k*3)*0.07)+')';g.fillRect(x,y,w,0.6);}
+ // a családi autó (a játékbeli), mindenki benne, menet közben, a nap felé
+ const s=1.62,ax=cx-Math.round(57*s)-8;
+ g.fillStyle=rg(g,ax+57*s-26,road+1,4,90,[[0,'rgba(0,0,0,0.6)'],[1,'rgba(0,0,0,0)']]);g.save();g.translate(ax+57*s-26,road+1);g.scale(1.4,0.1);g.beginPath();g.arc(0,0,80,0,TAU);g.fill();g.restore();
+ g.save();g.translate(ax,road);g.scale(s,s);drawCarSide(g,0,-55.5,-55.5,{t:30,ang:0.7,pos:true,lightsOn:true,spd:90,bounce:false,pitch:0,dirt:0,dmg:0},null);g.restore();
+ // ellenfény: meleg csillanás az autó elején (a nap felől)
+ g.save();g.globalCompositeOperation='lighter';g.fillStyle=rg(g,ax+112*s,road-34*s,2,40*s,[[0,'rgba(255,170,90,0.28)'],[1,'rgba(255,170,90,0)']]);g.beginPath();g.arc(ax+112*s,road-34*s,40*s,0,TAU);g.fill();g.restore();
+ glow(g,ax+114*s,road-16*s,16,'rgba(255,245,210,0.8)');
  // színkorrekció, vignetta, szemcse
- g.fillStyle=rg(g,cx,H*0.5,H*0.35,W*0.75,[[0,'rgba(0,0,0,0)'],[1,'rgba(0,0,0,0.55)']]);g.fillRect(0,0,W,H);g.drawImage(grainTile(),0,0,W+16,H+16);
+ g.fillStyle=rg(g,cx,H*0.5,H*0.3,W*0.75,[[0,'rgba(0,0,0,0)'],[1,'rgba(0,0,0,0.58)']]);g.fillRect(0,0,W,H);
+
+ g.drawImage(grainTile(),0,0,W+16,H+16);
  // cím, alcím, szereplők
  const room=W-mR-16,fw=textW('VAKÁCIÓ',1),ts=Math.min(3.6,room/fw);
  text(g,'A Komárom - Európa - Komárom kör',cx,10,'#ffd9b0',1,'center');
