@@ -141,15 +141,15 @@ function damage(d,why){const T=G.trip;d=Math.round(d);if(d<=0||P.sub!=='drive')r
  flash('Sérült az autó: '+T.hp+'% '+(T.hp<30?'- alig megy, szervizbe kell!':T.hp<50?'- füstöl a motor!':''),T.hp<30?'#ff6b6b':'#ffb347',220);}
 function hpMax(){const h=hpOf(G.trip);return h<15?50:h<30?80:h<50?120:CAR.top;}
 function startTotal(){const T=G.trip;P.inv=0;P.sub='total';P.kmh=0;P.cruise=0;P.auto=null;P.haz=true;P.rev=false;P.tt=0;P.tw={x:W+60,dx:0,tilt:0};P.carOff={x:0,y:0};
- ents=ents.filter(e=>Math.abs(e.x-P.dist)>W*1.5);SFX.hit();G.shake=14;vib([200,80,200]);say('Totálkár... Szerencsére mindenki jól van.','apa');
+ ents=ents.filter(e=>Math.abs(e.x-P.dist)>W*1.5);SFX.hit();G.shake=Math.max(G.shake||0,12);vib([200,80,200]);say('Totálkár... Szerencsére mindenki jól van.','apa');
  const tow=35000+1500*10;book(-tow,'service','Tréler: totálkáros autó elszállítása a szervizbe (10 km)');flash('TOTÁLKÁR! Jön a tréler: '+fmt(tow)+' Ft','#ff6b6b',300);}
 function updTotal(){const f=++P.tt,tw=P.tw,ez=u=>u<0?0:u>1?1:u<0.5?2*u*u:1-Math.pow(-2*u+2,2)/2;
  if(f===80)P.hide={apa:1,anya:1,anna:1,petra:1,atti:1};
- if(f>=90&&f<330){tw.x=lerp(W+60,PX+118,ez((f-90)/240));if(f%30===0)tone(1100,0.12,'square',0.05);}
- else if(f>=330&&f<390)tw.tilt=-0.17*ez((f-330)/60);
- else if(f>=390&&f<570){const u=ez((f-390)/180);P.carOff.x=u*140;P.carOff.y=-25*clamp((u*140-6)/120,0,1);if(f%12===0)noise(0.05,0.05,0,700);}
- else if(f>=570&&f<630)tw.tilt=-0.17*(1-ez((f-570)/60));
- else if(f>=630&&f<800){const dx=Math.pow((f-630)/170,2)*W;tw.dx=dx;P.carOff.x=140+dx;}
+ if(f>=90&&f<330){tw.x=lerp(W+60,PX+196,ez((f-90)/240));if(f%30===0)tone(1100,0.12,'square',0.05);}
+ else if(f>=330&&f<390)tw.tilt=TOW_TILT*ez((f-330)/60);
+ else if(f>=390&&f<570){const u=ez((f-390)/180);P.carOff.x=u*194;if(f%12===0)noise(0.05,0.05,0,700);}
+ else if(f>=570&&f<630)tw.tilt=TOW_TILT*(1-ez((f-570)/60));
+ else if(f>=630&&f<800){const dx=Math.pow((f-630)/170,2)*W;tw.dx=dx;P.carOff.x=194+dx;}
  P.fadeA=f>=720?Math.min(1,(f-720)/70):0;
  if(f>=800)startRepair();}
 function startRepair(){const T=G.trip,px=10/LEG.kmPerPx;P.dist=Math.max(0,P.dist-px);P.sub='repair';P.tw=null;P.carOff=null;P.rp={t:0};P.ws=P.dist-34;P.inv=0;P.bub=null;P.skids=[];P.lane=0;P.y=LANE[0];P.vy=0;ents=[];nextSpawn=P.dist+900;
@@ -209,7 +209,7 @@ function autoDrive(){const A=P.auto,L=LEGS[G.leg];const rem=A.tx-P.dist;let lim=
  let stopAt=rem;for(const l of LEG.lights){const gap=l.x-(P.dist+114);const need=Math.pow(P.kmh*KPX,2)/(2*0.45*KPX)+2;if(gap>need*(lightState(l,G.t)==='yellow'?1:0.6)&&gap<rem&&lightState(l,G.t)!=='green')stopAt=Math.min(stopAt,gap);}
  const dec=0.32*KPX;const vd=Math.sqrt(2*dec*Math.max(0,stopAt))/KPX;return Math.min(lim,vd,stopAt<3?0:999);}
 function lightStage(p){return p.lightMode===2&&(p.fogF||p.fogR)?4:p.lightMode;}
-function updPlay(){if(K.gpsP){K.gpsP=false;if(P&&!MG&&typeof openGPS==='function')openGPS();}
+function updPlay(){if(G.shake>0&&!G.paused)G.shake--;if(K.gpsP){K.gpsP=false;if(P&&!MG&&typeof openGPS==='function')openGPS();}
  if(P&&!G.paused&&!MG&&(K.logP||TAPD&&inRect(TAPD,MONEY_R))){K.logP=false;TAPD=null;if(typeof openLedger==='function')openLedger('play');return;}
  if(P&&!G.paused&&!MG&&P.sub==='drive'&&!P.arriving){if(TAPD){for(const c of (G.chips||[]))if(inRect(TAPD,c.r)){if(c.cancel){P.auto=null;flash('Megállás törölve.','#9fd8ff',80);}else if(!P.flat&&!P.rev)startAuto(c.p);TAPD=null;break;}}
   if(K.stopP){if(P.auto){P.auto=null;flash('Megállás törölve.','#9fd8ff',80);}else{const c=stopChips()[0];if(c)startAuto(c.p);}}}const L=LEGS[G.leg],t=G.t,T=G.trip;if(K.pauseP&&!MG)G.paused=!G.paused;if(G.paused)return;
@@ -350,7 +350,7 @@ function updPlay(){if(K.gpsP){K.gpsP=false;if(P&&!MG&&typeof openGPS==='function
  // fecsegés
  if(P.bub){P.bub.t--;if(P.bub.t<=0)P.bub=null;}
  if(P.famCD>0)P.famCD--;if(--P.chat<=0){chatter();P.chat=rnd(1100,1900)|0;}
- if(G.banner>0)G.banner--;if(G.shake>0)G.shake--;if(G.msg&&G.msg.t<99999)G.msg.t--;if(G.msg&&G.msg.t<=0)G.msg=null;if(G.segInfo&&--G.segInfo.t<=0)G.segInfo=null;
+ if(G.banner>0)G.banner--;if(G.msg&&G.msg.t<99999)G.msg.t--;if(G.msg&&G.msg.t<=0)G.msg=null;if(G.segInfo&&--G.segInfo.t<=0)G.segInfo=null;
  // érkezés
  if(!P.arriving&&P.dist>=LEG.len){P.arriving=true;P.arriveT=0;ents=[];say('Megérkeztünk!','apa');SFX.win();}
  if(P.arriving){if(P.arriveT%6===0)for(let k=0;k<4;k++)parts.push({type:'conf',x:rnd(0,W),y:-5,vx:rnd(-0.5,0.5),vy:rnd(0.5,1.5),life:200,max:200,col:pick(['#ff5a7a','#ffd54f','#4fc3f7','#81c784','#ba68c8']),world:false});
@@ -462,6 +462,12 @@ function drawWeather(g,L,t){if(L.weather==='rain'||L.weather==='storm'){R(g,'rgb
  if(G.flash>0){if(G.flash>8){let x=G.bolt,y=0;g.strokeStyle='#ffffff';g.lineWidth=1.3;g.beginPath();g.moveTo(x,y);for(let k=0;k<9;k++){x+=rnd(-12,12);y+=14;g.lineTo(x,y);}g.stroke();}R(g,'rgba(255,255,255,'+(G.flash/18)+')',0,0,W,H);}}
 function drawSkids(g){if(!P.skids)return;for(const s of P.skids){for(const [wx,dy,al] of [[24,-0.8,0.75],[89,-0.8,0.7],[24,-7,0.35],[89,-7,0.3]]){const a=s.x0+wx-P.dist+PX,b=s.x1+wx-P.dist+PX;if(b<-10||a>W+10||b-a<1)continue;
   g.fillStyle=lg(g,a,0,b,0,[[0,'rgba(20,20,22,0)'],[Math.min(0.3,12/(b-a)),'rgba(20,20,22,'+al+')'],[1,'rgba(20,20,22,'+al+')']]);g.fillRect(a,s.y+dy-1.1,b-a,2.2);}}}
+/* totálkár: az autó kerekei pontosan a tréler (dönthető) platóján állnak */
+function towPose(g){const o=P.carOff,tw=P.tw;g.save();if(!tw){g.translate(o.x,o.y);return;}
+ const B=towBed(tw.x+tw.dx,P.y,tw.tilt),c=Math.cos(B.a),s=Math.sin(B.a),v=-9;
+ const sy=x=>{const u=(x-B.sx+v*s)/c;if(u<-B.dr)return P.y;const uu=Math.min(156-B.dr,u);return B.sy+uu*s+v*c;};
+ const xr=PX+WHEELS[0]+o.x,xf=PX+WHEELS[1]+o.x,yr=sy(xr),yf=sy(xf),ang=Math.atan2(yf-yr,xf-xr);
+ g.translate(xr,yr);g.rotate(ang);g.translate(-(PX+WHEELS[0]),-P.y);}
 function drawPlayer(g,t){const fp=P.sub==='fix'?fixPose():null,fl=P.flat&&!(fp&&(fp.noWheel||P.fix>=478))?P.flat:null,sF=fl==='f'?3.2:0,sR=fl==='r'?3.2:0;
  const gy=P.y,body=gy-55.5+(P.yF+sF+P.yR+sR)/2,pitch=Math.atan2((P.yF+sF)-(P.yR+sR),65);
  g.fillStyle=rg(g,PX+57,gy,4,60,[[0,'rgba(0,0,0,0.38)'],[1,'rgba(0,0,0,0)']]);g.save();g.translate(PX+57,gy);g.scale(1,0.07);g.beginPath();g.arc(0,0,60,0,TAU);g.fill();g.restore();
@@ -599,7 +605,7 @@ function drawPlay(g){const L=LEGS[G.leg],t=G.t;lights=[];const s=seg();
  if(P.sub==='rest'&&P.rest)drawRest(g,t);
  const list=ents.map(e=>({y:e.y,e:e}));list.push({y:P.y+0.01,e:null});list.sort((a,b)=>a.y-b.y);
  if(P.sub==='wash'&&P.wash&&P.wash.step!=='menu')drawWashBack(g,t);
- for(const it of list){const e=it.e;if(!e){if(P.tw)drawTowTruck(g,P.tw.x+P.tw.dx,P.y,P.tw.tilt,t,lights);if(P.carOff){g.save();g.translate(P.carOff.x,P.carOff.y);}drawPlayer(g,t);if(P.carOff)g.restore();if(P.sub==='wash')drawWashFront(g,t);if(P.sparkle>0){P.sparkle--;for(let k=0;k<6;k++){const ph=((t+k*17)%40)/40,sx=PX+10+hsh(k*7+((t/40)|0))*96,sy=P.y-50+hsh(k*3+((t/40)|0))*30,r=Math.sin(ph*Math.PI)*3;if(r>0.3){line(g,'#ffffff',sx-r,sy,sx+r,sy,0.6);line(g,'#ffffff',sx,sy-r,sx,sy+r,0.6);}}}continue;}const ex=e.x-P.dist+PX;if(ex<-140||ex>W+20)continue;
+ for(const it of list){const e=it.e;if(!e){if(P.tw)drawTowTruck(g,P.tw.x+P.tw.dx,P.y,P.tw.tilt,t,lights);if(P.carOff)towPose(g);drawPlayer(g,t);if(P.carOff)g.restore();if(P.sub==='wash')drawWashFront(g,t);if(P.sparkle>0){P.sparkle--;for(let k=0;k<6;k++){const ph=((t+k*17)%40)/40,sx=PX+10+hsh(k*7+((t/40)|0))*96,sy=P.y-50+hsh(k*3+((t/40)|0))*30,r=Math.sin(ph*Math.PI)*3;if(r>0.3){line(g,'#ffffff',sx-r,sy,sx+r,sy,0.6);line(g,'#ffffff',sx,sy-r,sx,sy+r,0.6);}}}continue;}const ex=e.x-P.dist+PX;if(ex<-140||ex>W+20)continue;
   if(e.kind==='traffic'){const cover=it.y>P.y&&ex<PX+112&&ex+e.w>PX&&e.y-P.y<46;e.fa=lerp(e.fa===undefined?1:e.fa,cover?0.38:1,0.12);if(e.fa<0.98)g.globalAlpha=e.fa;drawTraffic(g,e,ex,lights,P.lightMode>=2,t);g.globalAlpha=1;if(e.help){if((t>>4)&1){glow(g,ex+e.w-1,e.y-14,6,'rgba(255,170,30,0.9)');glow(g,ex+1,e.y-16,6,'rgba(255,170,30,0.9)');}
    if(e.help==='truck')for(let k=0;k<5;k++)frr(g,['#b07a42','#c8955a','#8a5a2b'][k%3],ex-30+k*9,e.y-(k%2?16:8),8,8,1);person(g,ex-12,e.y+4,'apa',t,'wave');triangle(g,ex-48,e.y+2);}}else if(e.kind==='animal')drawAnimal(g,e,ex,t);else drawObstacle(g,e,ex,t);}
  for(const w of P.walk)person(g,w.x,w.y,w.w,w.t+(w.out?0:0),w.out&&w.x>=w.tx?'wave':'walk');
@@ -788,6 +794,7 @@ function qualityStep(avg,ra){if(document.hidden)return;
  if(avg>20.5&&QT<QTIERS.length-1){QT=Math.min(QTIERS.length-1,QT+(avg>28?2:1));QUP=0;QCOOL=performance.now()+15000;if(QT===QTIERS.length-1)QBAD++;applyQ(true);}
  else if(avg<17.6&&QT>0&&performance.now()>QCOOL&&wantSC()>QTIERS[QT]+0.2){if(++QUP>=3){QT--;QUP=0;applyQ(true);}}else QUP=0;}
 let RSZ=0;window.addEventListener('resize',()=>{clearTimeout(RSZ);RSZ=setTimeout(()=>{if(QT!==null)applyQ(false);},500);});
-function frame(now){const dt=Math.min(200,now-last);if(dt>48&&dt<200&&G.state==='play'&&!G.paused)LONGF++;acc+=dt;last=now;let n=0;while(acc>=STEP&&n<3){update();acc-=STEP;n++;}if(n>=3)acc=0;FRM++;if(!HALF||FRM%2===0){const r0=performance.now();render();RT+=performance.now()-r0*1;}
+function frame(now){const dt=Math.min(200,now-last);if(dt>48&&dt<200&&G.state==='play'&&!G.paused)LONGF++;acc+=dt;last=now;let n=0;while(acc>=STEP&&n<3){update();acc-=STEP;n++;}if(n>=3)acc=0;FRM++;/* 90/120 Hz kijelzőn csak akkor rajzol, ha a játék tényleg lépett: így nem rajzolja kétszer ugyanazt a képet (fele annyi munka, kevesebb melegedés) */
+ if(n>0&&(!HALF||FRM%2===0)){const r0=performance.now();render();RT+=performance.now()-r0*1;}
  perfT+=dt;perfN++;if(perfN>=(QT===null?15:45)){const avg=perfT/perfN,ra=RT/perfN;perfT=0;perfN=0;RT=0;qualityStep(avg,ra);}requestAnimationFrame(frame);}
 requestAnimationFrame(frame);

@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.13.0
+# 🚐 Családi Vakáció – v2.13.1
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -107,7 +107,7 @@ Az autónak állapota van (100%), a HUD jobb panelján az **Autó** sáv mutatja
 
 Erős ütközésnél kinyílik a **légzsák**, és leeresztve ott lóg a javításig. A sérült autó lassabb: 50% alatt max. 120, 30% alatt 80, 15% alatt 50 km/h.
 
-**Totálkár (0%):** jön a **tréler** (50 000 Ft), az autót felhúzza a platóra és elviszi a legközelebbi **szervizbe 10 km-rel hátrébb**. Ott megjavítják: karosszéria és fényezés 186 000 Ft, fényszóró, lökhárító, tükör 46 500 Ft, légzsák 118 000 Ft. Utána a szerviztől folytatódik az út. Minden tétel bekerül a költségnaplóba.
+**Totálkár (0%):** a kép egyszer, röviden megremeg, aztán jön a **tréler** (50 000 Ft). A billenő plató hátracsúszik és lebillen a földig (nem megy át a tréler kerekein), a csörlő felhúzza rá az autót, amelynek kerekei végig a platón gördülnek, majd a plató visszabillen, és elviszi a legközelebbi **szervizbe 10 km-rel hátrébb**. Ott megjavítják: karosszéria és fényezés 186 000 Ft, fényszóró, lökhárító, tükör 46 500 Ft, légzsák 118 000 Ft. Utána a szerviztől folytatódik az út. Minden tétel bekerül a költségnaplóba.
 
 **Autószerviz:** városokban, országutakon és az autópályák mentén is van (P gombbal, „SZERVIZ” útburkolati jellel, közeledő ikonnal). Csak karosszériát javít: mutatja az autó állapotát, a javítandó részeket (karcok, horpadások, lökhárító, fényszóró, motorháztető, szélvédő, tükör, légzsák) és a költséget (3 200 Ft / %, légzsák 118 000 Ft). Ép autónál kiírja, hogy nincs mit javítani.
 
@@ -260,6 +260,8 @@ A középkonzolon csak három gomb van: **világítás** (egyetlen gomb minden f
 - **Előmelegítés:** a betűképek induláskor és felbontásváltáskor a telefon üresjárati idejében készülnek el, nem játék közben.
 - **Mentés üresjáratban:** az automatikus mentés (10 mp-enként) akkor fut, amikor a telefon épp ráér, így nem okoz döccenést.
 - **Városi házak:** ablakonkénti színátmenet helyett egyszerű kitöltés és csillanás.
+- **90/120 Hz-es kijelzőn:** a játék csak akkor rajzol új képet, ha a játékban tényleg történt valami (60 lépés/mp), így nem rajzolja kétszer ugyanazt: fele annyi munka, kevesebb melegedés és akadás.
+- **Letöltés a főmenüben:** a főmenübe érve a telefon azonnal letölti magának a teljes játékot; a főmenü alján látszik, ha kész („✓ teljes játék letöltve, offline is megy”). Utána internet nélkül is indul és végigjátszható.
 - **Nincs fölösleges oldalfrissítés:** a gombok feliratai csak akkor íródnak újra, ha tényleg változnak.
 - **Gyenge telefonon:** egyszerűbb díszítés, a kijelző minden 3. képkockán rajzolódik újra, végső esetben 30 kép/mp rajzolás 60-as játéklogikával.
 - **A telefonhoz igazodik:** a processzormagok száma és a memória alapján választ kezdő minőséget (2 GB alatt rögtön takarékos mód); figyeli a hosszú, akadó képkockákat is, és ha ilyen többször előfordul, azonnal visszavesz. Erős telefonon élesebb felbontásban rajzol (a kijelzőnél soha nem többet), gyengébbnél automatikusan visszavesz a felbontásból és az effektekből, és ha újra van tartalék, visszaemeli.

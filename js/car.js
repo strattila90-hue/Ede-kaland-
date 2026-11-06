@@ -380,11 +380,14 @@ function drawTraffic(g,e,sx,lights,lightsOn,t){const gy=e.y,c=e.col,ang=e.x/8,L=
  if(e.wreck){disc(g,'rgba(120,120,120,0.4)',L*0.8,-TH[e.tp]-8-Math.sin(t*0.05)*3,8);disc(g,'rgba(150,150,150,0.3)',L*0.7,-TH[e.tp]-18-Math.sin(t*0.04)*4,10);}
  g.restore();if(lightsOn&&lights)lights.push({x:sx+e.w,y:gy-18,r:20});}
 /* ---- tréler (platós autómentő): x = a plató hátsó vége, gy = talaj, tilt = plató dőlése ---- */
-function drawTowTruck(g,x,gy,tilt,t,lights){const bedTop=gy-25,c='#ff8f1f';
+/* billenő plató: a hátsó alvázvégen fekszik fel, rakodáskor hátracsúszik és lebillen, így nem megy át a tréler kerekein */
+const TOW_TILT=-0.24;
+function towBed(X,gy,tilt){const p=clamp(tilt/TOW_TILT,0,1);return {sx:X+14,sy:gy-21,a:tilt,dr:lerp(14,20/Math.sin(-TOW_TILT),p)};}
+function drawTowTruck(g,x,gy,tilt,t,lights){const bedTop=gy-25,c='#ff8f1f',B=towBed(x,gy,tilt);
  // alváz és hidraulika
- frr(g,'#262b32',x+14,gy-19,170,7,1.5);if(tilt<-0.01){line(g,'#9aa3ad',x+120,gy-17,x+126,bedTop+2,3);line(g,'#d9dde1',x+122,gy-17,x+127,bedTop,1.2);}
+ frr(g,'#262b32',x+14,gy-19,170,7,1.5);if(tilt<-0.01){const bx=B.sx+40*Math.cos(B.a),by=B.sy+40*Math.sin(B.a);line(g,'#9aa3ad',x+64,gy-17,bx,by,3);line(g,'#d9dde1',x+66,gy-17,bx+1,by,1.2);}
  // plató oldalsó korláttal, hátul fényvisszaverő csíkokkal, elöl csörlővel
- g.save();g.translate(x+150,bedTop);g.rotate(tilt);
+ g.save();g.translate(B.sx,B.sy);g.rotate(B.a);g.translate(150-B.dr,-4);
   frr(g,lg(g,0,-5,0,5,[[0,'#dfe3e7'],[0.5,'#a7afb7'],[1,'#6b737c']]),-150,-5,156,9,1.5);g.strokeStyle='#0c0f14';g.lineWidth=0.8;rrect(g,-150,-5,156,9,1.5);g.stroke();
   for(let k=-144;k<4;k+=12)R(g,'#5b636d',k,-5,1,9);R(g,'#5b636d',-150,-9,156,1.4);for(let k=-148;k<6;k+=26)R(g,'#5b636d',k,-9,1.4,4);
   for(let k=0;k<4;k++){g.fillStyle=k%2?'#ffffff':'#e8351e';g.beginPath();g.moveTo(-150+k*4,-5);g.lineTo(-146+k*4,-5);g.lineTo(-150+k*4,4);g.lineTo(-154+k*4,4);g.closePath();g.fill();}
