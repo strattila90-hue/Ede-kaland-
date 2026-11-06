@@ -781,24 +781,27 @@ let last=performance.now(),acc=0,perfT=0,perfN=0;const STEP=1000/60;
 document.addEventListener('visibilitychange',()=>{if(document.hidden){if(G.state==='play'&&P){G.paused=true;if(!G.pauseAt)G.pauseAt=Date.now();save(P.dist);}if(AC&&AC.state==='running')AC.suspend();}else{last=performance.now();if(AC)AC.resume();}});
 // minőségi fokozatok: renderfelbontás (SC) és effektek; a kijelző tényleges felbontásánál nem rajzol többet
 // minőségi fokozatok: maximális renderfelbontás (a kijelző valódi pixelszámánál soha nem több) és effektek
-const QTIERS=[3.5,3,2.5,2,1.6,1.35];let QT=null,QUP=0,RT=0,HALF=false,FRM=0,QCOOL=0;
+const QTIERS=[3.5,3,2.5,2,1.6,1.35];let QT=null,QUP=0,RT=0,HALF=false,FRM=0,QCOOL=0,QCAP=0;
 function wantSC(){const c=document.getElementById('c'),dpr=Math.min(window.devicePixelRatio||1,3);return Math.max(1,(c.clientWidth||W)*dpr/W);}
-function applyQ(force){const sc=Math.max(1.25,Math.min(QTIERS[QT],Math.round(wantSC()*4)/4));LOWQ=QT>=4;HALF=QT>=QTIERS.length-1&&QBAD>2;
+function applyQ(force){const sc=Math.max(1.25,Math.min(QTIERS[QT],Math.round(wantSC()*4)/4));LOWQ=QT>=4;HALF=false;
  if(Math.abs(sc-SC)>(force?0.01:0.3)){setSC(sc);TFX=null;HUDC=null;TITLE_DRAWN=null;try{render();}catch(e){}if(typeof warmGlyphs==='function')warmGlyphs();}}
 let QBAD=0,LONGF=0;
-function qualityStep(avg,ra){if(document.hidden)return;
+/* Minőség: csak a valóban késő képkockák számítanak (két kép között >26 ms, azaz 40 kép/mp alatti pillanat).
+   A kijelző saját 60/90/120/144 Hz-es váltogatása nem számít akadásnak. Lassan és ritkán vált, mert minden váltás
+   újraépíti a gyorsítótárakat; ha egy emelés után vissza kellett venni, azt a szintet többé nem próbálja. */
+function qualityStep(slowFrac,ra){if(document.hidden)return;
  if(QT===null){const touch=isTouch,cores=navigator.hardwareConcurrency||4,mem=navigator.deviceMemory||8;QT=touch?(cores>=8?2:3):(cores>=6?1:2);
   if(mem<=2)QT=Math.max(QT,4);else if(mem<=4||cores<=4)QT=Math.max(QT,3);applyQ(true);warmGlyphs();return;}
- if(LONGF>=3&&QT<QTIERS.length-1&&performance.now()>QCOOL-12000){avg=Math.max(avg,21);}LONGF=0;
- if(avg>20.5&&QT<QTIERS.length-1){QT=Math.min(QTIERS.length-1,QT+(avg>28?2:1));QUP=0;QCOOL=performance.now()+15000;if(QT===QTIERS.length-1)QBAD++;applyQ(true);}
- else if(avg<17.6&&QT>0&&performance.now()>QCOOL&&wantSC()>QTIERS[QT]+0.2){if(++QUP>=3){QT--;QUP=0;applyQ(true);}}else QUP=0;}
+ const now=performance.now();
+ if(slowFrac>0.2&&QT<QTIERS.length-1&&now>QCOOL){QT++;QUP=0;QCAP=Math.max(QCAP,QT);QCOOL=now+8000;applyQ(true);}
+ else if(slowFrac<0.02&&!QCAP&&QT>0&&now>QCOOL+30000&&wantSC()>QTIERS[QT]+0.2){if(++QUP>=5){QT--;QUP=0;QCOOL=now;applyQ(true);}}else if(slowFrac>=0.02)QUP=0;}
 let RSZ=0;window.addEventListener('resize',()=>{clearTimeout(RSZ);RSZ=setTimeout(()=>{if(QT!==null)applyQ(false);},500);});
-/* Sima mozgás minden kijelzőn: a játék 60 lépést tesz másodpercenként, de a kép a kijelző frissítéséhez igazodik,
-   és a két lépés közötti helyzetet (út, járművek) arányosan kiszámolja. Így 90/120/144 Hz-en sem ugrál, nem rángat a kép. */
-let HZ=60,MINDT=99,LASTR=0,RIS=0,RIN=0;
+/* Sima mozgás minden kijelzőn: a játék 60 lépést tesz másodpercenként; a kép kb. 60-100 kép/mp-vel rajzolódik
+   (nagy frissítésű kijelzőn minden második frissítésre), és a két lépés közötti helyzetet arányosan kiszámolja. */
+let HZ=60,LASTR=0,DTS=[];
 /* teljesítménymérő (Szünet menüből kapcsolható): kijelző Hz, kép/mp, felbontás, rajzolási idő, akadások */
 const PERF={on:false,t0:0,n:0,rt:0,max:0,jank:0,fps:0,ms:0,mx:0,jk:0};try{PERF.on=localStorage.getItem('cv-perf')==='1';}catch(e){}
-function perfTick(now,ri,rt){if(!PERF.on)return;PERF.n++;PERF.rt+=rt;if(ri>PERF.max)PERF.max=ri;const exp=1000/HZ*((HZ>100?2:1)*(HALF?2:1));if(ri>exp*1.6)PERF.jank++;
+function perfTick(now,ri,rt){if(!PERF.on)return;PERF.n++;PERF.rt+=rt;if(ri>PERF.max)PERF.max=ri;if(ri>26)PERF.jank++;
  if(now-PERF.t0>=1000){PERF.fps=PERF.n*1000/(now-PERF.t0);PERF.ms=PERF.rt/Math.max(1,PERF.n);PERF.mx=PERF.max;PERF.jk=PERF.jank;PERF.t0=now;PERF.n=0;PERF.rt=0;PERF.max=0;PERF.jank=0;}}
 function drawPerf(g){const s=Math.round(HZ)+' Hz  '+Math.round(PERF.fps)+' kép/mp  '+SC.toFixed(2)+'x  rajz '+PERF.ms.toFixed(1)+' ms  max '+Math.round(PERF.mx)+' ms  akad '+PERF.jk+(LOWQ?'  takarékos':'');
  frr(g,'rgba(0,0,0,0.65)',4,57,textW(s.toUpperCase())+8,11,4);text(g,s,8,60,PERF.jk>2?'#ff8a8a':'#9cff9c',1,'left',null);}
@@ -808,13 +811,14 @@ function renderI(a){if(G.state!=='play'||!P||G.paused||P._pd===undefined||MG){re
  P.dist=pd+(d-pd)*a;if(P._py!==undefined&&Math.abs(y-P._py)<6)P.y=P._py+(y-P._py)*a;const pa=P.ang;if(P._pa!==undefined&&Math.abs(pa-P._pa)<3)P.ang=P._pa+(pa-P._pa)*a;
  for(const e of ents){const px=e._px;if(px!==undefined&&Math.abs(e.x-px)<40){sv.push(e,e.x);e.x=px+(e.x-px)*a;}}
  try{render();}finally{P.dist=d;P.y=y;P.ang=pa;for(let i=0;i<sv.length;i+=2)sv[i].x=sv[i+1];}}
-function frame(now){const dt=Math.min(200,now-last);if(dt>48&&dt<200&&G.state==='play'&&!G.paused)LONGF++;acc+=dt;last=now;if(dt>3)MINDT=Math.min(MINDT,dt);
+let SLOWN=0,RENN=0;
+function frame(now){const dt=Math.min(200,now-last);if(dt>48&&dt<200&&G.state==='play'&&!G.paused)LONGF++;acc+=dt;last=now;if(dt>2&&dt<60)DTS.push(dt);
  let n=0;if(document.hidden)LASTR=0;while(acc>=STEP&&n<3){snapPrev();update();acc-=STEP;n++;}if(n>=3)acc=0;FRM++;
- // 100 Hz fölött minden második frissítésre rajzol (120 Hz -> 60, 144 Hz -> 72 kép/mp, egyenletesen); gyenge módban fele ennyire
- const div=(HZ>100?2:1)*(HALF?2:1);
- if(FRM%div===0){const r0=performance.now();renderI(clamp(acc/STEP,0,1));const rt=performance.now()-r0;RT+=rt;if(LASTR){RIS+=Math.min(200,now-LASTR);RIN++;perfTick(now,now-LASTR,rt);}LASTR=now;}
- perfT+=dt;perfN++;if(perfN>=(QT===null?15:60)){
-  // akadás = a képek közti idő hosszabb a kijelző frissítésénél (a kívánt ütemhez képest)
-  const base=MINDT<40?MINDT:16.7,want=base*div,ri=RIN?RIS/RIN:want,ratio=ri/want;HZ=1000/base;MINDT=99;RIS=0;RIN=0;
-  const ra=RT/perfN;perfT=0;perfN=0;RT=0;qualityStep(16.7*ratio,ra);}requestAnimationFrame(frame);}
+ // legfeljebb kb. 100 kép/mp: 60/90 Hz-en minden frissítésre, 120/144 Hz-en minden másodikra rajzol
+ if(!LASTR||now-LASTR>=10.2){const r0=performance.now();renderI(clamp(acc/STEP,0,1));const rt=performance.now()-r0;RT+=rt;
+  if(LASTR&&!document.hidden){const ri=now-LASTR;RENN++;if(ri>26&&ri<200)SLOWN++;perfTick(now,ri,rt);}LASTR=now;}
+ perfT+=dt;perfN++;if(perfN>=(QT===null?15:120)){
+  if(DTS.length){DTS.sort((x,y)=>x-y);HZ=1000/DTS[DTS.length>>1];}DTS=[];
+  const slow=RENN?SLOWN/RENN:0,ra=RT/perfN;perfT=0;perfN=0;RT=0;SLOWN=0;RENN=0;
+  if(G.state==='play'&&!G.paused||QT===null)qualityStep(slow,ra);}requestAnimationFrame(frame);}
 requestAnimationFrame(frame);

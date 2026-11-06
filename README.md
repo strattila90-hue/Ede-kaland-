@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.13.3
+# 🚐 Családi Vakáció – v2.13.4
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -260,10 +260,10 @@ A középkonzolon csak három gomb van: **világítás** (egyetlen gomb minden f
 - **Előmelegítés:** a betűképek induláskor és felbontásváltáskor a telefon üresjárati idejében készülnek el, nem játék közben.
 - **Mentés üresjáratban:** az automatikus mentés (10 mp-enként) akkor fut, amikor a telefon épp ráér, így nem okoz döccenést.
 - **Városi házak:** ablakonkénti színátmenet helyett egyszerű kitöltés és csillanás.
-- **Sima mozgás 90/120/144 Hz-en is:** a játék 60 lépést tesz másodpercenként, a kép viszont a kijelző frissítéséhez igazodik (120 Hz-en 60, 144 Hz-en 72 egyenletes kép/mp), és két lépés között az út, a járművek és a sávváltás helyzetét arányosan kiszámolja. Így gyors menetben sem rángat a kép (korábban a nagy frissítésű kijelzőkön a képek egyenetlen ütemben jöttek, ez tűnt akadásnak).
+- **Sima mozgás 60/90/120/144 Hz-en is:** a játék 60 lépést tesz másodpercenként, a kép a kijelző frissítéséhez igazodik (60 Hz-en 60, 90 Hz-en 90, 120 Hz-en 60, 144 Hz-en 72 egyenletes kép/mp, akkor is, ha a telefon menet közben váltogat), és két lépés között az út, a járművek és a sávváltás helyzetét arányosan kiszámolja. Így gyors menetben sem rángat a kép (korábban a nagy frissítésű kijelzőkön a képek egyenetlen ütemben jöttek, ez tűnt akadásnak).
 - **Rossz úton** a kép egyenletesen, finoman rezeg, nem véletlenszerűen ugrál képkockánként; a kerekek forgása is folyamatos.
 - **Teljesítménymérő:** a Szünet menüben bekapcsolható; a kép tetején mutatja a kijelző frissítését (Hz), a kép/mp-t, a felbontást, a rajzolási időt, a leghosszabb képközt és az akadások számát.
-- **Akadásfigyelés:** a minőség akkor vesz vissza, ha a képek ténylegesen késnek a kijelző üteméhez képest.
+- **Akadásfigyelés:** csak a valóban késő képkocka számít akadásnak (két kép között több mint 26 ms). A telefonok saját 60/120 Hz-es váltogatása nem, így a játék nem veszi vissza feleslegesen a minőséget. Ritkán és csak egy-egy lépést vált (minden váltás újraépíti a képtárakat); ha egyszer vissza kellett vennie, utána nem próbál feljebb lépni. Nincs többé fél sebességű (30 kép/mp) mód.
 - **Letöltés a főmenüben:** a főmenübe érve a telefon azonnal letölti magának a teljes játékot; a főmenü alján látszik, ha kész („✓ teljes játék letöltve, offline is megy”). Utána internet nélkül is indul és végigjátszható.
 - **Nincs fölösleges oldalfrissítés:** a gombok feliratai csak akkor íródnak újra, ha tényleg változnak.
 - **Gyenge telefonon:** egyszerűbb díszítés, a kijelző minden 3. képkockán rajzolódik újra, végső esetben 30 kép/mp rajzolás 60-as játéklogikával.
