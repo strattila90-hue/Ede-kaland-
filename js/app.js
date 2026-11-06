@@ -42,18 +42,20 @@ async function doInstall(){if(isStandalone()){toast('A játék már telepítve v
 
 /* ---- telepítési ablak: megosztott linkről azonnal, böngészőből minden indításkor felajánlja ---- */
 const UA=navigator.userAgent,IOS=/iphone|ipad|ipod/i.test(UA)||(/macintosh/i.test(UA)&&'ontouchend' in document),IPAD=/ipad/i.test(UA)||(/macintosh/i.test(UA)&&'ontouchend' in document),
- INAPP=/FBAN|FBAV|FB_IAB|Instagram|Messenger|Line\/|TikTok|Snapchat|MicroMessenger|; wv\)/i.test(UA),ANDROID=/android/i.test(UA);
+ MIB=/MiuiBrowser|XiaoMi\/|HeyTapBrowser|OppoBrowser|VivoBrowser|UCBrowser/i.test(UA),INAPP=MIB||/FBAN|FBAV|FB_IAB|Instagram|Messenger|Line\/|TikTok|Snapchat|MicroMessenger|; wv\)/i.test(UA),ANDROID=/android/i.test(UA);
+/* Xiaomi (MIUI / HyperOS): a Chrome-ból telepített ikon csak akkor indul, ha a Chrome-nak megvan két extra engedélye */
+const XIAOMI_TIP='Xiaomi / Redmi / POCO telefonon, ha az ikon nem nyílik meg: Beállítások → Alkalmazások → Chrome → Egyéb engedélyek → engedélyezd a „Kezdőképernyő-parancsikonok” és a „Felugró ablakok megjelenítése háttérben futás közben” lehetőséget, aztán töröld és telepítsd újra az ikont.';
 const SHARE_SVG='<svg viewBox="0 0 24 24"><path d="M12 3v12M7 8l5-5 5 5" fill="none" stroke="#7fb2ff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><rect x="5" y="10" width="14" height="11" rx="2.5" fill="none" stroke="#7fb2ff" stroke-width="2"/></svg>';
 const ADD_SVG='<svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4" fill="none" stroke="#7fb2ff" stroke-width="2"/><path d="M12 8v8M8 12h8" stroke="#7fb2ff" stroke-width="2.2" stroke-linecap="round"/></svg>';
 function instSteps(list){const el=$('instSteps');el.innerHTML=list.map((s,i)=>'<div class="st"><b>'+(i+1)+'</b>'+(s[1]||'')+'<span>'+s[0]+'</span></div>').join('');el.classList.add('on');}
 function openInstall(){if(isStandalone()||location.protocol==='file:')return;const go=$('instGo'),arrow=$('instArrow');arrow.classList.remove('on');$('instSteps').classList.remove('on');go.style.display='';
- if(INAPP){$('instSub').textContent='Ez egy alkalmazáson belüli böngésző (pl. Messenger, Facebook), itt nem lehet telepíteni. Nyisd meg a linket a rendes böngészőben!';
+ if(INAPP){$('instSub').textContent=MIB?'Ebből a böngészőből (pl. Xiaomi Mi Böngésző) telepítve az ikon gyakran nem indul el. Nyisd meg a Chrome-ban, és ott telepítsd!':'Ez egy alkalmazáson belüli böngésző (pl. Messenger, Facebook), itt nem lehet telepíteni. Nyisd meg a linket a rendes böngészőben!';
   go.textContent=ANDROID?'Megnyitás Chrome-ban':'Link másolása';instSteps(IOS?[['Koppints a jobb felső ⋯ menüre'],['Válaszd: „Megnyitás Safariban” / „Megnyitás böngészőben”'],['Ott koppints a telepítésre']]:[['Koppints a „Megnyitás Chrome-ban” gombra'],['A Chrome-ban jóváhagyod a telepítést']]);}
  else if(IOS){$('instSub').textContent='iPhone-on és iPaden az Apple nem engedi az automatikus telepítést, de három koppintás az egész:';go.style.display='none';
   instSteps([['Koppints a <b style="display:inline;background:none;width:auto">Megosztás</b> gombra'+(IPAD?' (fent)':' (lent középen; ha nem látod, előbb a ⋯ gombra)'),SHARE_SVG],['Görgess le: „Főképernyőhöz adás”',ADD_SVG],['Jobb fent: „Hozzáadás”. Kész, az ikon a kezdőképernyőn van!']]);
   arrow.textContent=IPAD?'⬆':'⬇';arrow.style.cssText=IPAD?'top:6px;right:120px':'bottom:6px;left:calc(50% - 12px)';arrow.classList.add('on');}
  else{$('instSub').textContent='Egy érintés, és úgy fut, mint egy igazi alkalmazás.';go.textContent='⬇ Telepítés most';
-  if(!deferredPrompt&&!('install' in navigator))instSteps([['Ha nem jön fel az ablak: böngésző menü (⋮ vagy ⋯)'],['„Alkalmazás telepítése” vagy „Hozzáadás a kezdőképernyőhöz”']]);}
+  const st=[];if(!deferredPrompt&&!('install' in navigator))st.push(['Ha nem jön fel az ablak: böngésző menü (⋮ vagy ⋯)'],['„Alkalmazás telepítése” vagy „Hozzáadás a kezdőképernyőhöz”']);if(ANDROID)st.push(['<small style="display:block;opacity:.8;font-weight:500">'+XIAOMI_TIP+'</small>']);if(st.length)instSteps(st);}
  $('inst').classList.add('open');}
 function closeInstall(later){$('inst').classList.remove('open');if(later){try{sessionStorage.setItem('cv-inst-later','1');}catch(e){}}}
 $('instLater').addEventListener('click',e=>{e.stopPropagation();haptic(10);closeInstall(true);});
@@ -63,7 +65,7 @@ $('instGo').addEventListener('click',async e=>{e.stopPropagation();haptic(15);
  if(deferredPrompt){deferredPrompt.prompt();try{const r=await deferredPrompt.userChoice;closeInstall(r.outcome!=='accepted');if(r.outcome==='accepted')toast('Telepítés folyamatban...');}catch(_){}deferredPrompt=null;return;}
  instSteps([['Böngésző menü (⋮ vagy ⋯) jobb fent'],['„Alkalmazás telepítése” vagy „Hozzáadás a kezdőképernyőhöz”']]);toast('A böngésző menüjéből telepítheted.',3500);});
 $('inst').addEventListener('pointerdown',e=>e.stopPropagation());
-window.addEventListener('appinstalled',()=>closeInstall(false));
+window.addEventListener('appinstalled',()=>{closeInstall(false);if(ANDROID)toast('Telepítve! '+XIAOMI_TIP,9000);});
 {const viaLink=/[?&]install=1/.test(location.search);let later=false;try{later=sessionStorage.getItem('cv-inst-later')==='1';}catch(e){}
  if(!isStandalone()&&location.protocol.startsWith('http')&&(viaLink||!later))window.addEventListener('load',()=>setTimeout(()=>{if(!isStandalone())openInstall();},viaLink?900:2200));}
 async function doShare(){const url=location.href.split('#')[0].split('?')[0]+'?install=1';const data={title:'Családi Vakáció',text:'Gyere velünk Európa körútra! Családi autós kalandjáték.',url:url};

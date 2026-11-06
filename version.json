@@ -1,5 +1,5 @@
 {
- "version": "2.13.4",
+ "version": "2.13.5",
  "files": {
   "index.html": 31497,
   "manifest.webmanifest": 695,
@@ -15,7 +15,7 @@
   "js/minigames.js": 16417,
   "js/shops.js": 19419,
   "js/game.js": 112481,
-  "js/app.js": 25193,
+  "js/app.js": 26080,
   "icons/icon-192.png": 27752,
   "icons/icon-512.png": 94753,
   "icons/icon-maskable-512.png": 90587
