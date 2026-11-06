@@ -271,10 +271,10 @@ function updPlay(){if(G.shake>0&&!G.paused)G.shake--;if(K.gpsP){K.gpsP=false;if(
   if(P.ms){P.ms.t++;const u=P.ms.t/P.ms.len;if(u<0.85)P.y+=0.07*(0.4+D)*P.ms.dir;if(P.ms.t>=P.ms.len){P.ms=null;flash('Majdnem elaludtál! Állj meg pihenni!','#ff6b6b',200);vib([60,40,60]);SFX.honk();setTimeout(()=>hornSet(false),10);}}
   else if(D>0&&P.sub==='drive'&&P.kmh>20&&!(P.msCD>0)&&Math.random()<0.0004+D*0.0016)P.msCD=1200,P.ms={t:0,len:Math.round(50+D*70),dir:P.lane===0?1:P.lane===2?-1:pick([-1,1])};
   G.drowsy=D;G.eyelid=P.ms?Math.sin(Math.PI*Math.min(1,P.ms.t/P.ms.len)):0;}
- // satufék: féknyom, gumicsikorgás, az utasok előrebillennek, a gyerekek sikítanak
+ // satufék: féknyom, gumicsikorgás, az utasok előrebillennek (sikoly nélkül)
  {const hard=brake&&!P.rev&&P.kmh>45&&P.sub==='drive';P.brakeT=hard?(P.brakeT||0)+1:0;P.skids=P.skids||[];
   if(hard&&P.kmh>50){if(!P.skid||Math.abs(P.skid.y-P.y)>0.8){P.skid={x0:P.dist,x1:P.dist,y:P.y};P.skids.push(P.skid);if(P.skids.length>30)P.skids.shift();}P.skid.x1=P.dist;if(t%8===0)screech(Math.min(1,P.kmh/100));}else P.skid=null;
-  if(hard&&P.brakeT===6&&P.kmh>55&&!(P.scareCD>0)){P.scare=1;P.scareCD=300;vib([30,20,60]);if(!P.hide.anna)scream(1080,0.85);if(!P.hide.petra)scream(1320,0.75,0.1);if(!P.hide.atti)scream(900,0.6,0.25);say(pick(['Ááááá!','Apaaa!','Jajj, mi volt ez?!','Hűha!']),pick(['anna','petra','anya']));}
+  if(hard&&P.brakeT===6&&P.kmh>55&&!(P.scareCD>0)){P.scare=1;P.scareCD=300;vib([30,20,60]);}/* satufékkor csak a gumi csikorog, sikoly nincs */
   if(P.scareCD>0)P.scareCD--;P.scare=Math.max(0,(P.scare||0)-0.005);
   const lt=P.rev?0:brake&&P.kmh>3?Math.min(1,P.kmh/45)*2.4:gas?-0.5*Math.min(1,P.kmh/60+0.3):0;P.lean=lerp(P.lean||0,lt,lt>(P.lean||0)?0.22:0.08);}P.gasF=gas?a/0.15:0;
  let pxf=P.kmh*KPX;if(P.dist+pxf<0){pxf=-P.dist;P.kmh=0;}P.dist+=pxf;P.ang+=pxf/WR;
@@ -593,7 +593,7 @@ function drawParts(g,world){for(const p of parts){if(!!p.world!==world)continue;
  if(p.type==='puff'){disc(g,p.col,x,y,1+(1-p.life/p.max)*4);}else frr(g,p.col,x,y,2,2,1);}}
 function drawPlay(g){const L=LEGS[G.leg],t=G.t;lights=[];const s=seg();
  g.save();if(G.shake>0)g.translate(rnd(-1.5,1.5),rnd(-1.5,1.5));
- const rough=P.kmh>10?(QAMP[s.q]*P.kmh/400):0;if(rough>0.05)g.translate(0,rnd(-rough,rough));
+ const rough=P.kmh>10?(QAMP[s.q]*P.kmh/400):0;if(rough>0.05){const tm=performance.now()/1000;g.translate(0,rough*0.55*(Math.sin(tm*23)*0.7+Math.sin(tm*37+1.3)*0.3));}/* egyenletes, finom rezgés a rossz úton (nem véletlenszerű ugrálás képkockánként) */
  drawSky(g,L,t);drawClouds(g,L,P.dist,t);drawFar(g,L,s,P.dist,lights);drawMid(g,L,LEG,P.dist,lights);
  if(L.weather==='fog')R(g,'rgba(222,228,234,0.55)',0,0,W,ROADT);
  if(G.leg===0&&P.dist<400){house(g,PX+14-P.dist,ROADT-8,'#f2e2b8','#b5452b',L.time==='night',lights,false,'12');roadSign(g,PX-66-P.dist,ROADT-4,'Táncsics Mihály utca','town');}
@@ -774,7 +774,7 @@ let TITLE_DRAWN=null;
 function render(){if(G.state==='title'&&!G.ledger){const k=SC+'|'+Math.round(G.menuR||0)+'|'+cv.width;if(TITLE_DRAWN===k)return;TITLE_DRAWN=k;}else TITLE_DRAWN=null;
  ctx.setTransform(SC,0,0,SC,0,0);ctx.imageSmoothingEnabled=true;
  if(!window.LAZY_DONE&&G.state!=='title'&&G.state!=='specs'){R(ctx,'#0b0f17',0,0,W,H);text(ctx,'Betöltés...',W/2,H/2-4,'#ffd84a',1.4,'center');return;}
- if(G.state==='title')drawTitle(ctx);else if(G.state==='specs')drawSpecs(ctx);else if(G.state==='map')drawMap(ctx);else if(G.state==='play')drawPlay(ctx);
+ if(G.state==='title')drawTitle(ctx);else if(G.state==='specs')drawSpecs(ctx);else if(G.state==='map')drawMap(ctx);else if(G.state==='play'){drawPlay(ctx);if(PERF.on)drawPerf(ctx);}
  else if(G.state==='postcard')drawPostcard(ctx);else if(G.state==='over')drawOver(ctx);else if(G.state==='win')drawWin(ctx);
  if(typeof appTick==='function')appTick();}
 let last=performance.now(),acc=0,perfT=0,perfN=0;const STEP=1000/60;
@@ -796,17 +796,23 @@ let RSZ=0;window.addEventListener('resize',()=>{clearTimeout(RSZ);RSZ=setTimeout
 /* Sima mozgás minden kijelzőn: a játék 60 lépést tesz másodpercenként, de a kép a kijelző frissítéséhez igazodik,
    és a két lépés közötti helyzetet (út, járművek) arányosan kiszámolja. Így 90/120/144 Hz-en sem ugrál, nem rángat a kép. */
 let HZ=60,MINDT=99,LASTR=0,RIS=0,RIN=0;
-function snapPrev(){if(G.state==='play'&&P){P._pd=P.dist;P._py=P.y;for(const e of ents)e._px=e.x;}}
+/* teljesítménymérő (Szünet menüből kapcsolható): kijelző Hz, kép/mp, felbontás, rajzolási idő, akadások */
+const PERF={on:false,t0:0,n:0,rt:0,max:0,jank:0,fps:0,ms:0,mx:0,jk:0};try{PERF.on=localStorage.getItem('cv-perf')==='1';}catch(e){}
+function perfTick(now,ri,rt){if(!PERF.on)return;PERF.n++;PERF.rt+=rt;if(ri>PERF.max)PERF.max=ri;const exp=1000/HZ*((HZ>100?2:1)*(HALF?2:1));if(ri>exp*1.6)PERF.jank++;
+ if(now-PERF.t0>=1000){PERF.fps=PERF.n*1000/(now-PERF.t0);PERF.ms=PERF.rt/Math.max(1,PERF.n);PERF.mx=PERF.max;PERF.jk=PERF.jank;PERF.t0=now;PERF.n=0;PERF.rt=0;PERF.max=0;PERF.jank=0;}}
+function drawPerf(g){const s=Math.round(HZ)+' Hz  '+Math.round(PERF.fps)+' kép/mp  '+SC.toFixed(2)+'x  rajz '+PERF.ms.toFixed(1)+' ms  max '+Math.round(PERF.mx)+' ms  akad '+PERF.jk+(LOWQ?'  takarékos':'');
+ frr(g,'rgba(0,0,0,0.65)',4,57,textW(s.toUpperCase())+8,11,4);text(g,s,8,60,PERF.jk>2?'#ff8a8a':'#9cff9c',1,'left',null);}
+function snapPrev(){if(G.state==='play'&&P){P._pd=P.dist;P._py=P.y;P._pa=P.ang;for(const e of ents)e._px=e.x;}}
 function renderI(a){if(G.state!=='play'||!P||G.paused||P._pd===undefined||MG){render();return;}
  const d=P.dist,pd=P._pd,y=P.y;if(Math.abs(d-pd)>40){render();return;}const sv=[];
- P.dist=pd+(d-pd)*a;if(P._py!==undefined&&Math.abs(y-P._py)<6)P.y=P._py+(y-P._py)*a;
+ P.dist=pd+(d-pd)*a;if(P._py!==undefined&&Math.abs(y-P._py)<6)P.y=P._py+(y-P._py)*a;const pa=P.ang;if(P._pa!==undefined&&Math.abs(pa-P._pa)<3)P.ang=P._pa+(pa-P._pa)*a;
  for(const e of ents){const px=e._px;if(px!==undefined&&Math.abs(e.x-px)<40){sv.push(e,e.x);e.x=px+(e.x-px)*a;}}
- try{render();}finally{P.dist=d;P.y=y;for(let i=0;i<sv.length;i+=2)sv[i].x=sv[i+1];}}
+ try{render();}finally{P.dist=d;P.y=y;P.ang=pa;for(let i=0;i<sv.length;i+=2)sv[i].x=sv[i+1];}}
 function frame(now){const dt=Math.min(200,now-last);if(dt>48&&dt<200&&G.state==='play'&&!G.paused)LONGF++;acc+=dt;last=now;if(dt>3)MINDT=Math.min(MINDT,dt);
  let n=0;if(document.hidden)LASTR=0;while(acc>=STEP&&n<3){snapPrev();update();acc-=STEP;n++;}if(n>=3)acc=0;FRM++;
  // 100 Hz fölött minden második frissítésre rajzol (120 Hz -> 60, 144 Hz -> 72 kép/mp, egyenletesen); gyenge módban fele ennyire
  const div=(HZ>100?2:1)*(HALF?2:1);
- if(FRM%div===0){const r0=performance.now();renderI(clamp(acc/STEP,0,1));RT+=performance.now()-r0*1;if(LASTR){RIS+=Math.min(200,now-LASTR);RIN++;}LASTR=now;}
+ if(FRM%div===0){const r0=performance.now();renderI(clamp(acc/STEP,0,1));const rt=performance.now()-r0;RT+=rt;if(LASTR){RIS+=Math.min(200,now-LASTR);RIN++;perfTick(now,now-LASTR,rt);}LASTR=now;}
  perfT+=dt;perfN++;if(perfN>=(QT===null?15:60)){
   // akadás = a képek közti idő hosszabb a kijelző frissítésénél (a kívánt ütemhez képest)
   const base=MINDT<40?MINDT:16.7,want=base*div,ri=RIN?RIS/RIN:want,ratio=ri/want;HZ=1000/base;MINDT=99;RIS=0;RIN=0;

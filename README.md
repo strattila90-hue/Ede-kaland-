@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.13.2
+# 🚐 Családi Vakáció – v2.13.3
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -63,7 +63,7 @@ A főmenü egyetlen álló kép, családi road movie plakát: naplemente csíkos
 
 Út közben folyamatosan váltakozik a város, a falu, az országút és az autópálya, a táblákon valós településnevekkel (Ács, Bábolna, Sümeg, Mondsee, Beaune…). A sebességkorlátozás is szakaszonként változik: 50, 90/100 vagy 130 km/h.
 
-**Satufék:** erős fékezésnél csikorognak a gumik, féknyom marad az úton, az utasok előrebillennek, tágra nyílt szemmel ijednek meg, a gyerekek sikítanak. Normál fékezésnél is kicsit előredőlnek.
+**Satufék:** erős fékezésnél csak a gumik csikorognak, féknyom marad az úton, az utasok előrebillennek és tágra nyílt szemmel ijednek meg (sikoly nincs). Normál fékezésnél is kicsit előredőlnek.
 
 **Sávváltás:** az autó fokozatosan, ívben sorol át (kb. 1,5 s, lassan hosszabb, havon és esőben óvatosabb), nincs hirtelen rántás. A forgalom többi járműve is így vált sávot.
 
@@ -261,6 +261,8 @@ A középkonzolon csak három gomb van: **világítás** (egyetlen gomb minden f
 - **Mentés üresjáratban:** az automatikus mentés (10 mp-enként) akkor fut, amikor a telefon épp ráér, így nem okoz döccenést.
 - **Városi házak:** ablakonkénti színátmenet helyett egyszerű kitöltés és csillanás.
 - **Sima mozgás 90/120/144 Hz-en is:** a játék 60 lépést tesz másodpercenként, a kép viszont a kijelző frissítéséhez igazodik (120 Hz-en 60, 144 Hz-en 72 egyenletes kép/mp), és két lépés között az út, a járművek és a sávváltás helyzetét arányosan kiszámolja. Így gyors menetben sem rángat a kép (korábban a nagy frissítésű kijelzőkön a képek egyenetlen ütemben jöttek, ez tűnt akadásnak).
+- **Rossz úton** a kép egyenletesen, finoman rezeg, nem véletlenszerűen ugrál képkockánként; a kerekek forgása is folyamatos.
+- **Teljesítménymérő:** a Szünet menüben bekapcsolható; a kép tetején mutatja a kijelző frissítését (Hz), a kép/mp-t, a felbontást, a rajzolási időt, a leghosszabb képközt és az akadások számát.
 - **Akadásfigyelés:** a minőség akkor vesz vissza, ha a képek ténylegesen késnek a kijelző üteméhez képest.
 - **Letöltés a főmenüben:** a főmenübe érve a telefon azonnal letölti magának a teljes játékot; a főmenü alján látszik, ha kész („✓ teljes játék letöltve, offline is megy”). Utána internet nélkül is indul és végigjátszható.
 - **Nincs fölösleges oldalfrissítés:** a gombok feliratai csak akkor íródnak újra, ha tényleg változnak.
