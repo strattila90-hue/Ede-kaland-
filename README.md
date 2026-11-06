@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.11.2
+# 🚐 Családi Vakáció – v2.11.3
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -80,6 +80,8 @@ A HUD közepén lévő szívek a család kedvét mutatják. Ütközés, piros l�
 - **gyorsétteremben vagy bármelyik boltnál:** legalább 2 szív.
 
 1 szívnél figyelmeztetés jelez előre.
+
+**Félreállás bárhol:** ha a család nyűgös, Apa fáradt (25 perc vezetés felett) vagy kevés a kedv, elég a szélső sávban megállni bárhol (kb. 1,5 mp). A játék pihenőnek veszi: bekapcsol a vészvillogó, a család kiszáll nyújtózni, utána helyreáll a kedv és nullázódik a fáradtság. Közlekedési lámpánál várakozva nem indul.
 
 ## 💥 Sérülés, totálkár, tréler, szerviz
 

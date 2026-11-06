@@ -109,12 +109,16 @@ function evDone(){const ty=P.ev.type;if(ty==='baby'){G.trip.baby=Math.max(0,G.tr
  else if(ty==='sick')flash('Petra jobban van, mehetünk tovább.','#7cff7c');else flash('Mindenki megkönnyebbült!','#7cff7c');
  for(const w of EVDEF[ty].out)P.hide[w]=0;P.ev=null;G.trip.photos++;}
 // kíméletes kedvrendszer: nincs újrakezdés; 0 szívnél a család nyűgös lesz, és pihenőt kér
-function checkMood(){const T=G.trip;if(T.mood<=0){T.mood=0;if(!P.cranky){P.cranky=true;P.crankyT=0;flash('A család nyűgös! Pihenő, étterem vagy bolt segít.','#ff8a5a',360);say('Elég volt, álljunk meg egy kicsit!','anya');if(!P.hide.anna)scream(1000,0.6);vib([40,30,40]);}}
+function checkMood(){const T=G.trip;if(T.mood<=0){T.mood=0;if(!P.cranky){P.cranky=true;P.crankyT=0;flash('A család nyűgös! Állj félre bárhol a szélső sávban.','#ff8a5a',360);say('Elég volt, álljunk meg egy kicsit!','anya');if(!P.hide.anna)scream(1000,0.6);vib([40,30,40]);}}
  else if(T.mood===1&&!P.warn1){P.warn1=true;flash('Már csak 1 szív! Egy fagyi vagy pihenő jót tenne.','#ffcf33',280);}else if(T.mood>1)P.warn1=false;}
 function cheerUp(min,msg){const T=G.trip;const was=P.cranky;P.cranky=false;T.mood=Math.min(5,Math.max(T.mood,min));if(was&&msg)flash(msg,'#7cff7c',240);}
+// félreállás bárhol: ha pihenő kell, a szélső sávban megállva a játék pihenőnek veszi
+function needRest(){const T=G.trip;return !!P.cranky||(T.driveS||0)>=1500||T.mood<=2;}
+function nearLight(){const f=P.dist+112;return LEG.lights.some(l=>Math.abs(l.x-f)<90);}
+function startRoadRest(){P.sub='rest';P.rest={t:0,x:P.dist+30,road:true,haz:P.haz};P.haz=true;P.hide={apa:1,anya:1,anna:1,petra:1,atti:1};P.door=1;P.rsT=0;SFX.click();vib(15);say('Félreálltunk, nyújtózzunk egy kicsit!','apa');}
 function startRest(p){P.sub='rest';P.rest={t:0,x:p.x};P.hide={apa:1,anya:1,anna:1,petra:1,atti:1};P.door=1;SFX.click();vib(15);say('Pihenő! Mindenki ki, nyújtózunk!','apa');}
 function updRest(){const r=P.rest;r.t++;if(r.t===40)P.door=0;
- if((r.t>150&&(K.enterP||TAPD))||r.t>=480){const T=G.trip;const was=P.cranky;cheerUp(3);T.mood=Math.min(5,T.mood+1);
+ if((r.t>150&&(K.enterP||TAPD))||r.t>=(r.road?360:480)){if(r.road)P.haz=!!r.haz;const T=G.trip;const was=P.cranky;cheerUp(3);T.mood=Math.min(5,T.mood+1);
   if(P.ev&&['baby','sick','pee'].includes(P.ev.type))evDone();
   P.hide={};P.door=0;P.sub='drive';P.rest=null;P.stopCD=P.dist;T.photos++;T.driveS=0;flash(was?'Kipihentük magunkat! Kedv: '+T.mood+'/5':'Jólesett a pihenő! (+1 kedv)','#7cff7c',220);SFX.clunk();}}
 function drawRest(g,t){const r=P.rest,sx=r.x-P.dist+PX,b=ROADT-6,k=Math.min(1,r.t/60);
@@ -237,7 +241,7 @@ function updPlay(){if(TAPD&&!G.paused&&!MG&&P&&P.sub==='drive'&&inRect(TAPD,mapR
  if(K.cruiseSet!==undefined&&K.cruiseSet!==null){setCruise(K.cruiseSet);K.cruiseSet=null;}
  if(K.cruiseTap){K.cruiseTap=false;if(P.cruise)setCruise(0);else if(P.kmh<25)flash('A tempomat 30 km/h felett kapcsolható be.','#9fd8ff',120);else setCruise(clamp(Math.round(P.kmh/5)*5,30,130));}
  const rawB=K.brake||K.pump;
- if(!P.rev&&P.sub==='drive'&&!P.auto&&!P.arriving&&rawB&&Math.abs(P.kmh)<0.2&&!P.hb&&P.boarding<0){P.revT=(P.revT||0)+1;if(P.revT===50){P.rev=true;SFX.click();flash('Hátramenet: fékkel tolatsz, gázzal vissza előremenetbe','#9fd8ff',150);}}else if(!rawB)P.revT=0;
+ if(!P.rev&&P.sub==='drive'&&!P.auto&&!P.arriving&&!(P.lane===0&&needRest())&&rawB&&Math.abs(P.kmh)<0.2&&!P.hb&&P.boarding<0){P.revT=(P.revT||0)+1;if(P.revT===50){P.rev=true;SFX.click();flash('Hátramenet: fékkel tolatsz, gázzal vissza előremenetbe','#9fd8ff',150);}}else if(!rawB)P.revT=0;
  if(P.rev&&K.gas&&P.kmh>-0.3){P.rev=false;P.revT=-9999;}
  let brake=rawB;let gas=K.gas&&!P.engineOff&&!P.arriving;let a=0;let autoV=-1;
  if(P.auto&&(K.brake||K.upP||K.dnP||K.revP||P.flat||P.sub!=='drive'||P.arriving)){P.auto=null;if(K.brake||K.upP||K.dnP)flash('Megállás törölve.','#9fd8ff',80);}
@@ -259,7 +263,7 @@ function updPlay(){if(TAPD&&!G.paused&&!MG&&P&&P.sub==='drive'&&inRect(TAPD,mapR
  // fáradás: valós idejű folyamatos vezetés (60 képkocka = 1 mp)
  {if(P.msCD>0)P.msCD--;if(P.sub==='drive'&&Math.abs(P.kmh)>3&&!P.arriving)T.driveS=(T.driveS||0)+1/60;const F=T.driveS||0,D=clamp((F-1800)/900,0,1);
   if(F>=1500&&!P.fw25){P.fw25=true;flash('25 perce vezetsz. Hamarosan tarts pihenőt!','#ffcf33',240);}
-  if(F>=1800&&!P.fw30){P.fw30=true;flash('Apa elfáradt: 30 perce vezet! Állj meg pihenni.','#ff8a5a',320);say('Kezdek elálmosodni...','apa');tone(660,0.15,'sine',0.08);tone(520,0.25,'sine',0.08,0.17);}
+  if(F>=1800&&!P.fw30){P.fw30=true;flash('Apa elfáradt: 30 perce vezet! Állj félre pihenni.','#ff8a5a',320);say('Kezdek elálmosodni...','apa');tone(660,0.15,'sine',0.08);tone(520,0.25,'sine',0.08,0.17);}
   if(F<1500){P.fw25=false;P.fw30=false;}
   if(P.ms){P.ms.t++;const u=P.ms.t/P.ms.len;if(u<0.85)P.y+=0.07*(0.4+D)*P.ms.dir;if(P.ms.t>=P.ms.len){P.ms=null;flash('Majdnem elaludtál! Állj meg pihenni!','#ff6b6b',200);vib([60,40,60]);SFX.honk();setTimeout(()=>hornSet(false),10);}}
   else if(D>0&&P.sub==='drive'&&P.kmh>20&&!(P.msCD>0)&&Math.random()<0.0004+D*0.0016)P.msCD=1200,P.ms={t:0,len:Math.round(50+D*70),dir:P.lane===0?1:P.lane===2?-1:pick([-1,1])};
@@ -333,6 +337,7 @@ function updPlay(){if(TAPD&&!G.paused&&!MG&&P&&P.sub==='drive'&&inRect(TAPD,mapR
  if(++P.saveT>=600&&!P.arriving){P.saveT=0;save(P.dist);}
  // defekt: kerékcsere megállva
  if(P.flat&&P.lane===0&&P.kmh<1&&!P.arriving){P.sub='fix';P.fix=0;P.hide.apa=1;}
+ if(P.sub==='drive'&&!P.flat&&!P.auto&&!P.arriving&&!P.ev&&!P.rev&&P.boarding<0&&P.lane===0&&Math.abs(P.kmh)<0.5&&needRest()&&!nearLight()){P.rsT=(P.rsT||0)+1;if(P.rsT>=90)startRoadRest();}else P.rsT=0;
  if(P.flat&&P.kmh>3&&t%Math.max(5,Math.round(30/Math.max(1,P.kmh/10)))===0)tone(70,0.06,'square',0.07);
  // részecskék
  if(t%8===0&&P.kmh>1&&!P.engineOff)parts.push({type:'puff',x:P.dist+2,y:P.y-6,vx:-0.3,vy:-0.2,life:40,max:40,col:'rgba(200,205,212,0.45)',world:true});
@@ -564,12 +569,13 @@ function drawHUD(g){const L=LEGS[G.leg],T=G.trip,s=seg(),t=G.t,blinkOn=(t%40)<20
     frr(g,'#2e8b57',x+2,y-1.5,9,10,3);text(g,'P',x+6.5,y,'#ffffff',1,'center',null);text(g,it.t.slice(2),x+13,y,'#bff5cf',1,'left',null);G.chips.push({r:[x-2,y-7,it.w+4,21],p:it.c.p});x+=it.w+gap;}y+=16;}}
   const vd=LEG.pois.find(p=>p.type==='veda'&&!p.passed&&(p.x-P.dist)*LEG.kmPerPx>0.05&&(p.x-P.dist)*LEG.kmPerPx<0.6);if(vd)pill('Sebességmérés '+distStr((vd.x-P.dist)*LEG.kmPerPx),'#ffcf33');}
  if(P.flat&&P.sub==='drive')pill('Defekt! Állj meg a szélső (felső) sávban!','#ff6b6b');
- if((T.driveS||0)>=1800&&P.sub==='drive'&&((t>>5)&1))pill('Apa fáradt: tarts pihenőt (P)!','#ffcf33');
+ if((T.driveS||0)>=1800&&P.sub==='drive'&&((t>>5)&1))pill('Apa fáradt: állj félre a szélső sávban!','#ffcf33');
  if(P.sub==='total')pill(P.tt<330?'Totálkár: a tréler úton van...':P.tt<630?'Az autót felhúzzák a trélerre':'Irány a szerviz, 10 km-rel vissza','#ff8a5a');
  if(P.sub==='repair'&&P.rp)pill('Szerviz: javítás '+Math.min(100,Math.round(P.rp.t/420*100))+'%'+(P.rp.t>150?' - koppints a továbbhoz':''),'#ffd84a');
  if(P.sub==='wash'&&P.wash&&P.wash.step==='run'){const pr=WASH_PROGS[P.wash.prog];pill('Autómosó: '+WASH_NAME[P.wash.phase]+' ('+(Math.floor(P.wash.t/110)+1)+'/'+pr.ph.length+')','#7fd1ff');}
- if(P.sub==='rest'&&P.rest)pill('Pihenő: nyújtózkodás, játszótér'+(P.rest.t>150?' - koppints a továbbhoz':''),'#bff5cf');
- if(P.cranky&&P.sub==='drive'&&((t>>5)&1))pill('A család nyűgös: állj meg pihenni!','#ff8a5a');
+ if(P.rsT>0&&P.sub==='drive')pill('Félreállunk pihenni...','#bff5cf');
+ if(P.sub==='rest'&&P.rest)pill((P.rest.road?'Pihenő az út szélén':'Pihenő: nyújtózkodás, játszótér')+(P.rest.t>150?' - koppints a továbbhoz':''),'#bff5cf');
+ if(P.cranky&&P.sub==='drive'&&((t>>5)&1))pill('A család nyűgös: állj félre a szélső sávban!','#ff8a5a');
  if(radio.show>0){g.globalAlpha=Math.min(1,radio.show/30);const nm=radio.on?STATIONS[radio.idx].name:'Rádió kikapcsolva';text(g,nm,W/2,isTouch?140:84,'#ffd84a',1.8,'center','#3a1a00');g.globalAlpha=1;}
  if(G.banner>0&&G.banner<230&&P.boarding<0){const a=Math.min(1,G.banner/30);g.globalAlpha=a;frr(g,'rgba(8,11,18,0.85)',70,100,340,50,8);text(g,L.from+' > '+L.to,W/2,108,'#ffd84a',1.3,'center');
   text(g,fmt(L.km)+' km  -  '+WNAME[L.weather]+TNAME[L.time]+'  -  benzin: '+L.price+' Ft/l',W/2,125,'#ffffff',1,'center');text(g,'Gáz: jobbra nyíl / GÁZ pedál',W/2,137,'#9fb0c2',1,'center');g.globalAlpha=1;}
