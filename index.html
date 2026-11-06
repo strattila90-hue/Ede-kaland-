@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#141822">
+<meta name="theme-color" content="#0b0f17">
 <meta name="description" content="Családi autós kalandjáték: Komáromtól Európán át, valós távolságokkal, fogyasztással és forinttal.">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -14,48 +14,81 @@
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <title>Családi Vakáció</title>
 <style>
-html,body{margin:0;height:100%;background:#141822;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+:root{--glass:rgba(14,18,28,.72);--line:rgba(255,255,255,.16);--hi:rgba(255,255,255,.1);--acc:#ffd84a;--ok:#5bd06a;--blue:#3b8bff}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:radial-gradient(ellipse at 50% 40%,#1c2433 0%,#0b0f17 70%);overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#fff}
 #wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
-#c{display:block;background:#000;image-rendering:pixelated;image-rendering:crisp-edges}
+#c{display:block;background:#000;image-rendering:pixelated;image-rendering:crisp-edges;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.05)}
+/* ---- kezelőszervek ---- */
 #touch{position:fixed;inset:0;pointer-events:none;display:none}
-.tb{position:absolute;pointer-events:auto;width:58px;height:58px;border-radius:16px;background:rgba(20,24,34,.38);border:2px solid rgba(255,255,255,.5);color:#fff;font:700 13px/1 system-ui,sans-serif;display:flex;align-items:center;justify-content:center;text-shadow:0 1px 0 #000;-webkit-tap-highlight-color:transparent}
-.tb.on{background:rgba(255,255,255,.4)}
-.sm{width:44px;height:44px;font-size:12px;border-radius:12px}
-#rot{position:fixed;left:0;right:0;top:12px;display:none;justify-content:center;color:#fff;font:700 15px system-ui;text-align:center;pointer-events:none;z-index:9}
-#rot span{background:rgba(10,12,20,.85);padding:8px 12px;border-radius:10px}
-#appbar{position:fixed;left:12px;top:50%;transform:translateY(-50%);display:none;flex-direction:column;gap:8px;z-index:6;width:178px}
-#appbar button{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.35);background:rgba(16,20,30,.78);color:#fff;border-radius:12px;padding:10px 12px;font:600 14px system-ui,sans-serif;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.ctl{position:absolute;pointer-events:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:#e8eef5;-webkit-tap-highlight-color:transparent;
+ background:linear-gradient(180deg,#2e3543 0%,#171b24 100%);border:1px solid var(--line);box-shadow:inset 0 1px 0 var(--hi),0 6px 14px rgba(0,0,0,.55);transition:transform .06s,box-shadow .15s,background .15s}
+.ctl svg{width:62%;height:62%;pointer-events:none}
+.ctl small{font:700 9px/1 system-ui;letter-spacing:.04em;opacity:.85;pointer-events:none}
+.ctl.on{transform:scale(.94);background:linear-gradient(180deg,#3b4456,#222837)}
+.ctl.act{box-shadow:inset 0 1px 0 var(--hi),0 0 0 2px var(--ok),0 0 14px rgba(91,208,106,.55)}
+.ctl.blue{box-shadow:inset 0 1px 0 var(--hi),0 0 0 2px var(--blue),0 0 16px rgba(59,139,255,.65)}
+.ctl.warn{box-shadow:inset 0 1px 0 var(--hi),0 0 0 2px #ff5a4a,0 0 16px rgba(255,90,74,.6)}
+.round{width:46px;height:46px;border-radius:50%}
+.sq{width:52px;height:52px;border-radius:14px}
+#bUp,#bDn{width:58px;height:50px;border-radius:14px}
+#bHonk{width:62px;height:62px;border-radius:50%;background:radial-gradient(circle at 50% 40%,#3a4252,#12151c 70%)}
+#bHonk svg{width:92%;height:92%}
+.pedal{border-radius:12px;background:linear-gradient(180deg,#3a3f48,#1a1d23);border:1px solid rgba(255,255,255,.22)}
+.pedal svg{width:100%;height:100%}
+#bGas{width:58px;height:104px}
+#bBr{width:86px;height:72px}
+#topctl{position:absolute;right:10px;top:var(--top,74px);display:flex;gap:8px;pointer-events:none}
+#topctl .ctl{position:relative}
+#bHaz{background:linear-gradient(180deg,#5a1e1e,#2a0d0d)}
+/* ---- főmenü gombsor ---- */
+#appbar{position:fixed;left:14px;top:50%;transform:translateY(-50%);display:none;flex-direction:column;gap:10px;z-index:6;width:190px;padding:12px;border-radius:18px;background:var(--glass);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);box-shadow:0 14px 40px rgba(0,0,0,.45)}
+#appbar button{position:relative;overflow:hidden;border:1px solid var(--line);background:linear-gradient(180deg,#2b3240,#181c26);color:#fff;border-radius:12px;padding:11px 12px;font:650 14px system-ui,sans-serif;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent;box-shadow:inset 0 1px 0 var(--hi)}
+#appbar button:hover{filter:brightness(1.12)}
 #appbar button:active{transform:scale(.97)}
-#appbar button .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,#2e8b57,#5bd06a);opacity:.85;transition:width .15s}
+#appbar button .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,#2e8b57,#5bd06a);opacity:.9;transition:width .15s}
 #appbar button .lbl{position:relative}
-#appbar button.new{border-color:#ffd84a;box-shadow:0 0 0 2px rgba(255,216,74,.35)}
+#appbar button.new{border-color:var(--acc);box-shadow:0 0 0 2px rgba(255,216,74,.35)}
 #ver{color:#9fb0c2;font:600 12px system-ui;padding-left:4px}
-#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:rgba(16,20,30,.92);color:#fff;padding:10px 16px;border-radius:12px;font:600 14px system-ui;opacity:0;transition:opacity .25s;pointer-events:none;z-index:10;max-width:86vw;text-align:center}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--glass);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);color:#fff;padding:11px 18px;border-radius:14px;font:600 14px system-ui;opacity:0;transition:opacity .25s;pointer-events:none;z-index:10;max-width:86vw;text-align:center}
+#rot{position:fixed;left:0;right:0;top:12px;display:none;justify-content:center;font:700 15px system-ui;text-align:center;pointer-events:none;z-index:9}
+#rot span{background:var(--glass);border:1px solid var(--line);padding:9px 14px;border-radius:12px}
 </style>
 </head>
 <body>
 <div id="wrap"><canvas id="c"></canvas></div>
 <div id="touch">
- <div class="tb" id="bUp" style="left:14px;bottom:84px">▲</div>
- <div class="tb" id="bDn" style="left:14px;bottom:16px">▼</div>
- <div class="tb" id="bBr" style="left:80px;bottom:16px">FÉK</div>
- <div class="tb" id="bGas" style="right:14px;bottom:16px">GÁZ</div>
- <div class="tb" id="bHonk" style="right:80px;bottom:16px">DUDA</div>
- <div class="tb sm" id="bHaz" style="right:14px;bottom:84px">⚠</div>
- <div class="tb sm" id="bPause" style="right:14px;top:56px">II</div>
- <div class="tb sm" id="bMus" style="right:64px;top:56px">♪</div>
- <div class="tb sm" id="bLight" style="right:114px;top:56px">💡</div>
- <div class="tb sm" id="bFog" style="right:164px;top:56px">KÖD</div>
+ <div class="ctl" id="bUp" style="left:14px;bottom:76px"><svg viewBox="0 0 24 24"><path d="M5 15l7-7 7 7" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+ <div class="ctl" id="bDn" style="left:14px;bottom:16px"><svg viewBox="0 0 24 24"><path d="M5 9l7 7 7-7" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+ <div class="ctl" id="bHonk" style="left:12px;bottom:136px"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="none" stroke="#c9d1db" stroke-width="7"/><circle cx="50" cy="50" r="40" fill="none" stroke="#5a6474" stroke-width="1.5"/>
+  <path d="M10 46h24M66 46h24M50 62v30" stroke="#c9d1db" stroke-width="8" stroke-linecap="round"/><circle cx="50" cy="50" r="17" fill="#232a36" stroke="#c9d1db" stroke-width="3"/>
+  <path d="M41 46h6l7-6v20l-7-6h-6z" fill="#ffd84a"/><path d="M58 44q3 6 0 12" fill="none" stroke="#ffd84a" stroke-width="2.4" stroke-linecap="round"/></svg></div>
+ <div class="ctl pedal" id="bBr" style="right:86px;bottom:16px"><svg viewBox="0 0 86 72"><rect x="8" y="10" width="70" height="50" rx="9" fill="#2b3038" stroke="#8a929c" stroke-width="2"/>
+  <g stroke="#5b636d" stroke-width="3" stroke-linecap="round"><path d="M16 22h54M16 31h54M16 40h54M16 49h54"/></g><text x="43" y="69" fill="#e8eef5" font-size="9" font-weight="700" text-anchor="middle" font-family="system-ui">FÉK</text></svg></div>
+ <div class="ctl pedal" id="bGas" style="right:16px;bottom:16px"><svg viewBox="0 0 58 104"><rect x="9" y="6" width="40" height="84" rx="8" fill="#2b3038" stroke="#8a929c" stroke-width="2"/>
+  <g stroke="#5b636d" stroke-width="3" stroke-linecap="round"><path d="M19 16v64M29 16v64M39 16v64"/></g><text x="29" y="100" fill="#e8eef5" font-size="9" font-weight="700" text-anchor="middle" font-family="system-ui">GÁZ</text></svg></div>
+ <div id="topctl">
+  <div class="ctl round" id="bLight"><svg viewBox="0 0 24 24"><path d="M9 6a6 6 0 0 0 0 12z" fill="#fff"/><path d="M12 8l7 1.5M12 12h7M12 16l7-1.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg><small id="lLight">TOMP</small></div>
+  <div class="ctl round" id="bFlash"><svg viewBox="0 0 24 24"><path d="M9 6a6 6 0 0 0 0 12z" fill="#7fb2ff"/><path d="M12 8h8M12 12h8M12 16h8" stroke="#7fb2ff" stroke-width="1.8" stroke-linecap="round"/></svg><small>VILL</small></div>
+  <div class="ctl round" id="bFog"><svg viewBox="0 0 24 24"><path d="M8 6a6 6 0 0 0 0 12z" fill="#fff"/><path d="M11 8l7 1.5M11 12h7M11 16l7-1.5" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><path d="M14.5 5q-2 3.5 0 7t0 7" fill="none" stroke="#fff" stroke-width="1.5"/></svg><small id="lFog">KÖD</small></div>
+  <div class="ctl round" id="bHaz"><svg viewBox="0 0 24 24"><path d="M12 4l9 16H3z" fill="none" stroke="#ff6b5a" stroke-width="2.4" stroke-linejoin="round"/><path d="M12 9.5l4 7H8z" fill="none" stroke="#ff6b5a" stroke-width="1.6" stroke-linejoin="round"/></svg></div>
+  <div class="ctl round" id="bDoor"><svg viewBox="0 0 24 24"><path d="M5 5h8l4 5v9H5z" fill="none" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/><path d="M5 11h12" stroke="#fff" stroke-width="1.4"/><path d="M13 13h3" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg><small>AJTÓ</small></div>
+  <div class="ctl round" id="bRev"><svg viewBox="0 0 24 24"><text x="12" y="17" fill="#fff" font-size="15" font-weight="800" text-anchor="middle" font-family="system-ui">R</text></svg></div>
+  <div class="ctl round" id="bRadio"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="11" rx="2" fill="none" stroke="#fff" stroke-width="1.8"/><circle cx="15.5" cy="13.5" r="2.6" fill="#fff"/><path d="M6 11h5M6 14h5M6 17h5" stroke="#fff" stroke-width="1.4"/><path d="M5 8l11-4" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg><small>RÁDIÓ</small></div>
+  <div class="ctl round" id="bPause"><svg viewBox="0 0 24 24"><path d="M8 5v14M16 5v14" stroke="#fff" stroke-width="3.2" stroke-linecap="round"/></svg></div>
+ </div>
 </div>
 <div id="appbar">
  <button id="aInstall"><span class="lbl">⬇ Telepítés</span></button>
  <button id="aShare"><span class="lbl">↗ Megosztás</span></button>
  <button id="aUpdate"><span class="fill"></span><span class="lbl">⟳ Frissítés</span></button>
+ <button id="aMusic"><span class="lbl">♪ Zene: be</span></button>
  <div id="ver"></div>
 </div>
 <div id="toast"></div>
 <div id="rot"><span>Fordítsd el a telefont fekvő helyzetbe ↻</span></div>
 <script src="js/core.js"></script>
+<script src="js/radio.js"></script>
 <script src="js/car.js"></script>
 <script src="js/world.js"></script>
 <script src="js/minigames.js"></script>

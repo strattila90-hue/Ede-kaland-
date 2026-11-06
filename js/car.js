@@ -127,10 +127,14 @@ function drawCarSide(g,x,by,wy,o,lights){
  if(o.flap){frr(g,'#16191d',x+11.6,by+29,4,4,2);frr(g,lg(g,0,28,0,34,[[0,CP.hl],[1,CP.d]]),x+7,by+28.6,4.4,4.8,1.8);}
  const L=(dx,dy)=>[x+dx,by+dy];
  if(o.wiping){const a=(Math.sin(t*0.14)+1)/2;line(g,'#14171c',x+86,by+25,x+86-6-a*4,by+25-6-a*6,0.8);}
- if(o.fog){glow(g,...L(108.6,42.2),5,'rgba(255,255,230,0.9)');frr(g,'#ff3030',x+2,by+39,2.4,1.6,0.6);glow(g,...L(3,40),4,'rgba(255,40,40,0.9)');if(lights){lights.push({x:x+109,y:by+42,r:12});}}
- if(o.brake){frr(g,'#ff3b3b',x+1.8,by+20.4,10.4,3.8,1.9);glow(g,...L(5,22),9,'rgba(255,40,40,0.55)');if(lights)lights.push({x:x+4,y:by+22,r:16});}
+ const fogF=o.fogF||o.fog,fogR=o.fogR,pos=o.pos||o.lightsOn||o.high;
+ if(pos){glow(g,x+106,by+31.6,4,'rgba(255,250,230,0.85)');frr(g,'rgba(255,70,70,0.95)',x+1.8,by+21,10.4,2.4,1.2);glow(g,x+4,by+22,6,'rgba(255,40,40,0.5)');if(lights)lights.push({x:x+4,y:by+22,r:9});}
+ if(fogF){disc(g,'#ffffff',x+108.6,by+42.2,1);glow(g,x+108.6,by+42.2,6,'rgba(255,255,230,0.9)');if(lights)lights.push({x:x+112,y:by+44,r:16});}
+ if(fogR){frr(g,'#ff2a2a',x+2,by+38.8,3,1.8,0.8);glow(g,x+3,by+39.6,7,'rgba(255,30,30,0.85)');if(lights)lights.push({x:x+2,y:by+40,r:12});}
+ if(o.rev){frr(g,'#ffffff',x+2,by+35.6,3,1.6,0.8);glow(g,x+3,by+36.4,9,'rgba(255,255,255,0.95)');if(lights)lights.push({x:x,y:by+40,r:26});}
+ if(o.brake){frr(g,'#ff3b3b',x+1.8,by+20.4,10.4,3.8,1.9);glow(g,x+5,by+22,10,'rgba(255,40,40,0.6)');if(lights)lights.push({x:x+4,y:by+22,r:16});}
  if(o.blink){disc(g,CP.amb,x+110.6,by+37.6,1.1);glow(g,x+110.6,by+37.6,5,'rgba(255,170,30,0.8)');disc(g,CP.amb,x+2.6,by+24.6,0.9);glow(g,x+2.6,by+24.6,4,'rgba(255,170,30,0.7)');frr(g,CP.amb,x+74,by+24.6,4,0.9,0.45);}
- if(o.lightsOn){frr(g,'#ffffff',x+98,by+30.2,9,1.2,0.6);glow(g,x+106,by+32.6,6,'rgba(255,255,230,0.9)');if(lights)lights.push({cone:true,x:x+108,y:by+32,g:wy+55});}}
+ if(o.lightsOn||o.high){frr(g,'#ffffff',x+98,by+30.2,9,1.2,0.6);glow(g,x+106,by+32.6,o.high?9:6,o.high?'rgba(220,235,255,0.95)':'rgba(255,255,230,0.9)');if(lights)lights.push({cone:true,high:!!o.high,x:x+108,y:by+32,g:wy+55});}}
 function drawDoors(g,x,y,a,t,hide){for(const [x0,x1] of [[22.9,50.2],[50.6,76.6]]){const Lw=x1-x0,pl=x0+Lw*a,pr=x1+Lw*0.3*a;
   g.save();g.translate(x,y);
   g.fillStyle='#2a2420';g.fillRect(x0,13,pl-x0,14.2);g.fillStyle=lg(g,0,27,0,44,[[0,'#a39280'],[1,'#7a6a5a']]);g.fillRect(x0,27,pl-x0,16.6);

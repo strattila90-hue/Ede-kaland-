@@ -38,7 +38,7 @@ const MINI={
  scratch:{init(m){const amounts=[500,1000,2000,5000,10000,20000,100000];const r=Math.random();let win=0;
    if(r<0.02)win=100000;else if(r<0.07)win=20000;else if(r<0.17)win=5000;else if(r<0.4)win=1000;
    let f=[];if(win){f=[win,win,win];}while(f.length<6){const a=pick(amounts.filter(x=>x!==win));if(f.filter(x=>x===a).length<2)f.push(a);}
-   m.fields=f.sort(()=>Math.random()-0.5);m.win=win;const [c,x]=mk(300,150,SC);m.mask=c;m.mg=x;
+   const mu=m.opt.mult||1;m.fields=f.sort(()=>Math.random()-0.5).map(v=>v*mu);m.win=win*mu;const [c,x]=mk(300,150,SC);m.mask=c;m.mg=x;
    x.fillStyle=lg(x,0,0,300,150,[[0,'#c9ced6'],[0.5,'#eef1f4'],[1,'#aeb5bf']]);x.fillRect(0,0,300,150);for(let i=0;i<40;i++){x.fillStyle='rgba(255,255,255,0.25)';x.fillRect(hsh(i)*300,hsh(i+3)*150,8,1);}
    for(let i=0;i<6;i++){const fx=12+(i%3)*96,fy=10+Math.floor(i/3)*70;text(x,'?',fx+42,fy+22,'#8a929c',3,'left',null);}
    m.cells=new Array(60*30).fill(0);m.cov=0;m.last=null;},

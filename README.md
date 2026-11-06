@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.0.0
+# 🚐 Családi Vakáció – v2.1.0
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -21,7 +21,13 @@ A játék telepíthető alkalmazás (PWA): telefonon a kezdőképernyőre tehet�
 
 A fogyasztás a sebességtől, a gyorsítástól, az út típusától, a hótól és a hegyektől függ. A műszerfal mutatja a pillanatnyi és az átlagfogyasztást.
 
-## 🗺️ Az útvonal (kb. 4 450 km)
+## ⏱️ Valós távolság és idő
+
+A játék valós léptékű: 90 km/h-val 1 km pontosan 40 másodperc, így Komáromtól Bábolnáig kb. negyedóra, Komáromtól Siófokig közel két óra. A teljes út kb. 4 600 km.
+
+A játék kétpercenként automatikusan menti az állást, így az út több napon át is folytatható. A főmenüben választható **Gyorsított (5x)** vagy **Turbó (20x)** utazás is, de alapból valós idővel megy.
+
+## 🗺️ Az útvonal
 
 Komárom → Siófok → Keszthely → Bécs → Salzburg (Alpok) → Velence → Párizs → Provence → haza, Komárom.
 
@@ -30,6 +36,20 @@ Komárom → Siófok → Keszthely → Bécs → Salzburg (Alpok) → Velence �
 **Útminőség:** jó, közepes, rossz (kátyús) és macskaköves utak. A futómű rugózik és csillapít: fékezéskor bólint az autó, gyorsításkor leül, kátyúnál megdobja. Nagy sebességnél a kátyúk defektet okozhatnak.
 
 **Élő időjárás:** a célállomás aktuális időjárása (eső, hó, köd, vihar, napsütés) és napszaka az internetről érkezik, az [Open-Meteo](https://open-meteo.com) szolgáltatásból. Internet nélkül a beépített időjárással fut a játék.
+
+## 🏪 Megállók az úton
+
+A megállókat előjelző tábla jelzi („Benzinkút 500 m”), a következők pedig a kijelző alatt is látszanak:
+
+- **Benzinkút:** tankolás és bolt. Autópályán kb. 40 km-enként.
+- **Kisbolt:** kaja, víz, bébiétel, fagyi.
+- **Hipermarket:** nagybevásárlás, nagy bébicsomag, játék, munka a zöldségesnél.
+- **Trafik:** kaparós sorsjegy, nagy kaparós (négyszeres nyeremény), üdítő.
+- **Újságos:** gyerekújság, autós térkép, sorsjegy.
+
+Megálláshoz állj meg a szélső (felső) sávban az üzlet előtt.
+
+**Sebességmérő kapu (VÉDA):** előtte „Sebességmérés” tábla áll. Ha túl gyorsan haladsz át alatta, villan, és jön a bírság (15 000 – 100 000 Ft).
 
 ## 💰 Pénz: 500 000 Ft kezdő keret
 
@@ -61,6 +81,17 @@ Komárom → Siófok → Keszthely → Bécs → Salzburg (Alpok) → Velence �
 - **Traffipax**, **piros lámpa**, **dugó**, **útépítés**, **őz az úton**.
 - **Kifogyott a benzin:** az autómentő hoz 10 litert.
 
+## 🚗 Az autó kezelése
+
+- **Világításkapcsoló:** kikapcsolva, helyzetjelző, tompított, reflektor.
+- **Fénykürt (villogtatás)** és **duda:** az előtted haladó autó lehúzódik.
+- **Ködlámpa:** első, majd első és hátsó.
+- **Vészvillogó**, **ajtók nyitása és csukása** (csak állva), **hátramenet (R)** tolatólámpával.
+- **Féklámpa** fékezéskor és álló helyzetben.
+- **Rádió:** négy állomás saját szerzésű zenével (Retro FM, Rock Rádió, Pop Hullám, Esti Lounge).
+- **Motorhang:** négyhengeres motor, fordulatszám és terhelés szerint változik.
+- **Mini műszerfal:** sebességmérő, fordulatszámmérő, fokozat, üzemanyagszint, sebességkorlátozás, átlagfogyasztás és visszajelző lámpák.
+
 ## 🎮 Irányítás
 
 | Billentyű | Mobil gomb | Funkció |
@@ -69,11 +100,15 @@ Komárom → Siófok → Keszthely → Bécs → Salzburg (Alpok) → Velence �
 | ← / Space | FÉK | fékezés |
 | ↑ ↓ | ▲ ▼ | sávváltás |
 | H | DUDA | duda |
-| L | 💡 | fényszóró |
+| L | TOMP | világításkapcsoló (fokozatok) |
+| K (tartsd) | VILL | fénykürt |
 | F | KÖD | ködlámpa |
 | V | ⚠ | vészvillogó |
+| O | AJTÓ | ajtók |
+| R | R | hátramenet |
+| Q | RÁDIÓ | rádió: következő állomás |
 | P | II | szünet |
-| M | ♪ | zene |
+| M | Zene (főmenü) | menüzene |
 | 1–5, Enter | érintés | menük és minijátékok |
 
 ## 📱 Telepítés, megosztás, frissítés
@@ -101,6 +136,7 @@ Utána a játék itt érhető el: `https://strattila90-hue.github.io/Ede-kaland-
 |---|---|
 | `index.html` | a játék oldala |
 | `js/core.js` | rajzolás, betűk, hang, irányítás |
+| `js/radio.js` | motorhang, autórádió |
 | `js/car.js` | az autó minden nézetből, a család, a forgalom |
 | `js/world.js` | útvonal, útszakaszok, táj, utak, benzinkút |
 | `js/minigames.js` | minijátékok |

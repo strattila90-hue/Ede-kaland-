@@ -2,10 +2,12 @@
 /* =========================================================
    APP – érintőgombok, telepítés (PWA), megosztás, frissítés
    ========================================================= */
-holdBtn('bGas','gas');holdBtn('bBr','brake');tapBtn('bUp',()=>K.upP=true);tapBtn('bDn',()=>K.dnP=true);tapBtn('bHonk',()=>K.honkP=true);
-tapBtn('bHaz',()=>K.hazP=true);tapBtn('bPause',()=>K.pauseP=true);tapBtn('bMus',toggleMusic);tapBtn('bLight',()=>K.lightP=true);tapBtn('bFog',()=>K.fogP=true);
+holdBtn('bGas','gas');holdBtn('bBr','brake');holdBtn('bFlash','flash');tapBtn('bUp',()=>K.upP=true);tapBtn('bDn',()=>K.dnP=true);tapBtn('bHonk',()=>K.honkP=true);
+tapBtn('bHaz',()=>K.hazP=true);tapBtn('bPause',()=>K.pauseP=true);tapBtn('bLight',()=>K.lightP=true);tapBtn('bFog',()=>K.fogP=true);
+tapBtn('bDoor',()=>K.doorP=true);tapBtn('bRev',()=>K.revP=true);tapBtn('bRadio',()=>K.radioP=true);
 const $=id=>document.getElementById(id);
 $('ver').textContent='Verzió: v'+APP_VERSION;
+$('aMusic').addEventListener('click',()=>{toggleMusic();$('aMusic').querySelector('.lbl').textContent='♪ Zene: '+(musicOn?'be':'ki');});
 function toast(msg,ms){const t=$('toast');t.textContent=msg;t.style.opacity=1;clearTimeout(toast.h);toast.h=setTimeout(()=>t.style.opacity=0,ms||2600);}
 const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true;
 let deferredPrompt=null,appShown=null,touchShown=null;
@@ -41,5 +43,11 @@ $('aUpdate').addEventListener('click',async()=>{if(updating)return;updating=true
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
 setTimeout(checkUpdate,1500);
 /* a gombsor a főmenüben és szünetben látszik, az érintőgombok vezetés közben */
+const setC=(id,cls,on)=>{const el=$(id);if(el&&el.classList.contains(cls)!==!!on)el.classList.toggle(cls,!!on);};
+let lastTop=-1;
 function appTick(){const show=G.state==='title'||G.paused;if(show!==appShown){appShown=show;$('appbar').style.display=show?'flex':'none';}
- const tch=isTouch&&G.state==='play'&&!G.paused&&!MG&&!(P&&P.sub==='pump');if(tch!==touchShown){touchShown=tch;$('touch').style.display=tch?'block':'none';}}
+ const tch=isTouch&&G.state==='play'&&!G.paused&&!MG&&!(P&&(P.sub==='pump'||P.sub==='shop'));if(tch!==touchShown){touchShown=tch;$('touch').style.display=tch?'block':'none';}
+ if(tch&&P){const r=cv.getBoundingClientRect(),top=Math.round(r.top+r.height*56/H);if(top!==lastTop){lastTop=top;$('topctl').style.setProperty('--top',top+'px');}
+  setC('bLight','act',P.lightMode>=1);$('lLight').textContent=['KI','HELYZ','TOMP','REFL'][P.lightMode];setC('bLight','blue',P.lightMode===3);
+  setC('bFog','act',P.fogF||P.fogR);$('lFog').textContent=P.fogR?'KÖD 2':P.fogF?'KÖD 1':'KÖD';setC('bFlash','blue',P.flashOn);setC('bHaz','warn',P.haz);
+  setC('bDoor','warn',P.doorsOpen);setC('bRev','act',P.rev);setC('bRadio','act',radio.on);}}
