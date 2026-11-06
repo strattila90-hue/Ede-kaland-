@@ -279,8 +279,15 @@ body.touchui #topbar #bGps{display:none}
  window.LAZY_DONE=false;function lazy(k){if(k>=later.length){window.LAZY_DONE=true;return;}const sc=document.createElement('script');sc.src=later[k];sc.async=false;sc.onload=()=>lazy(k+1);sc.onerror=()=>setTimeout(()=>lazy(k),1500);document.body.appendChild(sc);}
  const bar=document.getElementById('splbar'),txt=document.getElementById('spltxt');
  function next(){const p=Math.round(i/files.length*100);bar.style.width=p+'%';txt.textContent='Betöltés... '+p+'%';
-  if(i>=files.length){setTimeout(()=>{const s=document.getElementById('splash');s.style.opacity=0;setTimeout(()=>s.remove(),500);},250);(window.requestIdleCallback||setTimeout)(()=>lazy(0),{timeout:600});return;}
-  const sc=document.createElement('script');sc.src=files[i++];sc.async=false;sc.onload=next;sc.onerror=()=>{txt.textContent='Hiba a betöltéskor. Ellenőrizd a kapcsolatot.';};document.body.appendChild(sc);}
+  if(i>=files.length){if(!window.APP_OK){heal();return;}setTimeout(()=>{const s=document.getElementById('splash');s.style.opacity=0;setTimeout(()=>s.remove(),500);},250);(window.requestIdleCallback||setTimeout)(()=>lazy(0),{timeout:600});return;}
+  const sc=document.createElement('script');sc.src=files[i++];sc.async=false;sc.onload=next;sc.onerror=()=>{if(navigator.onLine)heal();else txt.textContent='Hiba a betöltéskor. Ellenőrizd a kapcsolatot.';};document.body.appendChild(sc);}
+ /* önjavítás: ha a menü kódja nem tudott elindulni (pl. félbemaradt frissítés miatt keveredett régi és új fájl), egyszer mindent tisztán újratölt */
+ function heal(){let done=false;try{done=sessionStorage.getItem('cv-heal')==='1';sessionStorage.setItem('cv-heal','1');}catch(e){}
+  if(done||!navigator.onLine){txt.textContent='Hiba az indításkor. Indítsd újra a játékot.';return;}txt.textContent='Frissítés, egy pillanat...';
+  const sw=navigator.serviceWorker?navigator.serviceWorker.getRegistrations().then(rs=>Promise.all(rs.map(r=>r.unregister()))):Promise.resolve();
+  const cc=window.caches?caches.keys().then(ks=>Promise.all(ks.map(k=>caches.delete(k)))):Promise.resolve();
+  Promise.all([sw,cc]).catch(()=>{}).then(()=>location.reload());}
+ window.addEventListener('load',()=>setTimeout(()=>{try{if(window.APP_OK)sessionStorage.removeItem('cv-heal');}catch(e){}},5000));
  next();})();
 </script>
 </body>

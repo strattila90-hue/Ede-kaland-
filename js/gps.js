@@ -127,7 +127,7 @@ function gpsInfo(){const L=LEGS[G.leg],km=gpsKm(),rem=Math.max(0,L.km-km),tot=LE
  const tg=$('gpsInfo').querySelector('.tg');tg.addEventListener('click',()=>{$('gpsInfo').classList.toggle('full');tg.textContent='Következő megállók '+($('gpsInfo').classList.contains('full')?'▴':'▾');});}
 
 /* ---------- megnyitás / bezárás ---------- */
-function openGPS(){if(GV.open||typeof GEO==='undefined'||!G.trip)return;if(G.state==='play'){if(!P||!LEG)return;GV.wasPaused=!!G.paused;G.paused=true;}else if(G.state!=='map')return;GV.open=true;G.gps=true;K.gas=K.brake=false;
+function openGPS(){if(!document.getElementById('gpsv')||GV.open||typeof GEO==='undefined'||!G.trip)return;if(G.state==='play'){if(!P||!LEG)return;GV.wasPaused=!!G.paused;G.paused=true;}else if(G.state!=='map')return;GV.open=true;G.gps=true;K.gas=K.brake=false;
  const el=$('gpsv'),L=LEGS[G.leg];el.classList.toggle('night',L.time==='night'||L.time==='dusk');el.classList.add('open');gpsResize();gpsInfo();
  if(G.state==='map'){gpsMode('leg');GV.anim=null;gpsFit(LEGS[G.leg].pts,false);}else{GV.follow=true;gpsMode('follow');GV.anim=null;const c=gpsCar();GV.cx=c.lon-gpsOff()/GV.z;GV.cy=MY(c.lat);}
  if(SFX&&SFX.click)SFX.click();haptic(12);MENU_SIG='?';GV.last=0;cancelAnimationFrame(GV.raf);GV.raf=requestAnimationFrame(gpsLoop);}

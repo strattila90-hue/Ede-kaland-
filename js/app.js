@@ -3,7 +3,8 @@
    APP – natív menük, haptika, kezelőszervek, telepítés, megosztás,
    frissítés százalékkal, offline működés
    ========================================================= */
-const $=id=>document.getElementById(id);
+/* ha egy elem hiányzik (pl. régi oldal + új szkript keveredése frissítéskor), ne álljon le az egész menü */
+const NOEL=document.createElement('div');const $=id=>document.getElementById(id)||NOEL;
 const haptic=(ms)=>{try{if(navigator.vibrate)navigator.vibrate(ms||12);}catch(e){}};
 holdBtn('bGas','gas');holdBtn('bBr','brake');
 tapBtn('bUp',()=>K.upP=true);tapBtn('bDn',()=>K.dnP=true);holdBtn('bHonk','horn');tapBtn('bHaz',()=>K.hazP=true);tapBtn('bPause',()=>K.pauseP=true);
@@ -85,21 +86,23 @@ async function doUpdate(){if(updating)return;updating=true;
  try{if(location.protocol==='file:'||!('caches' in window)){setUpd(100,'Újratöltés... 100%');setTimeout(()=>location.reload(),400);return;}
   if(!navigator.onLine){updating=false;toast('Nincs internet. A játék offline is működik.');return;}
   setUpd(1,'Ellenőrzés... 1%');const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});const v=await r.json();
-  const files=v.files||{},names=Object.keys(files),total=names.reduce((s,n)=>s+(files[n]||0),0)||1;let done=0;const cache=await caches.open('csaladi-vakacio');
+  const files=v.files||{},names=Object.keys(files),total=names.reduce((s,n)=>s+(files[n]||0),0)||1;let done=0;const cache=await caches.open('csaladi-vakacio'),got=[];/* előbb minden fájl letöltődik és méret szerint ellenőrződik, csak utána cserél: nem keveredhet régi és új */
   for(const n of names){const res=await fetch(n+'?v='+v.version+'&t='+Date.now(),{cache:'no-store'});if(!res.ok)throw new Error(n);const type=res.headers.get('content-type')||'';let blob;
    if(res.body&&res.body.getReader){const rd=res.body.getReader(),ch=[];let got=0;for(;;){const c=await rd.read();if(c.done)break;ch.push(c.value);got+=c.value.length;const p=Math.min(99,Math.floor((done+Math.min(got,files[n]))/total*100));setUpd(p,'Letöltés: '+p+'%');}blob=new Blob(ch,{type:type});}
-   else blob=await res.blob();done+=files[n];await cache.put(new Request(n),new Response(blob,{headers:{'content-type':type}}));if(n==='index.html')await cache.put(new Request('./'),new Response(blob,{headers:{'content-type':type}}));}
+   else blob=await res.blob();done+=files[n];if(files[n]&&blob.size!==files[n])throw new Error('stale');got.push([n,blob,type]);}
+  for(const [n,blob,type] of got){await cache.put(new Request(n),new Response(blob,{headers:{'content-type':type}}));if(n==='index.html')await cache.put(new Request('./'),new Response(blob,{headers:{'content-type':type}}));}
   if('serviceWorker' in navigator){const reg=await navigator.serviceWorker.getRegistration();if(reg){try{await reg.update();}catch(e){}}}
   setUpd(100,'Kész: v'+v.version+' (100%)');haptic([20,40,20]);toast('Frissítve: v'+v.version+'. Újraindul...');if(P&&G.state==='play')save(P.dist);setTimeout(()=>location.reload(),900);}
- catch(e){updating=false;setUpd(0,'Frissítés');toast('Nem sikerült frissíteni. Van internetkapcsolat?');}}
+ catch(e){updating=false;setUpd(0,'Frissítés');toast(e&&e.message==='stale'?'A szerveren még most töltődik fel az új verzió. Próbáld újra 1-2 perc múlva.':'Nem sikerült frissíteni. Van internetkapcsolat?');}}
 /* offline működés automatikusan */
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
 /* automatikus offline: minden fájl letöltése a háttérben, új verzió csendes letöltése */
 async function autoOffline(){if(!('caches' in window)||!location.protocol.startsWith('http')||!navigator.onLine)return;
  try{const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});const v=await r.json();const names=Object.keys(v.files||{});const cache=await caches.open('csaladi-vakacio');
   const newer=verCmp(v.version,APP_VERSION)>0;let got=0;
-  for(const n of names){const have=await cache.match(n,{ignoreSearch:true});if(have&&!newer)continue;const res=await fetch(n+'?v='+v.version,{cache:'no-store'});if(!res.ok)continue;
-   const b=await res.blob(),h={headers:{'content-type':res.headers.get('content-type')||''}};await cache.put(new Request(n),new Response(b,h));if(n==='index.html')await cache.put(new Request('./'),new Response(b,h));got++;}
+  const dl=[];for(const n of names){const have=await cache.match(n,{ignoreSearch:true});if(have&&!newer)continue;const res=await fetch(n+'?v='+v.version+'&t='+Date.now(),{cache:'no-store'});if(!res.ok)throw new Error('net');
+   const b=await res.blob();if(v.files[n]&&b.size!==v.files[n]){setTimeout(autoOffline,90000);return;}/* a szerver még frissül: később újra */dl.push([n,b,res.headers.get('content-type')||'']);}
+  for(const [n,b,ct] of dl){const h={headers:{'content-type':ct}};await cache.put(new Request(n),new Response(b,h));if(n==='index.html')await cache.put(new Request('./'),new Response(b,h));got++;}
   let first=false;try{first=!localStorage.getItem('cv-offline');localStorage.setItem('cv-offline',v.version);}catch(e){}MENU_SIG='?';
   if(newer){newVer=v.version;updLabel='Újraindítás: v'+v.version;MENU_SIG='?';toast('Új verzió letöltve (v'+v.version+'). A következő indításkor érvényes, vagy koppints a frissítésre.',4200);}
   else if(first)toast('Offline mód kész: a játék internet nélkül is fut.',3200);}catch(e){}}
@@ -180,3 +183,4 @@ if(G.ledger&&G.ledger==='play'&&!G.paused)closeLedger();if(G.ledger&&G.state==='
  const tch=isTouch&&G.state==='play'&&!G.paused&&!MG&&!(P&&(P.sub==='pump'||P.sub==='shop'||P.sub==='wash'));if(tch!==touchShown){touchShown=tch;$('touch').style.display=tch?'block':'none';if(!tch)$('cruiseBar').style.display='none';}
  if(tch&&P){const ls=lightStage(P);setC('bLight','act',P.lightMode>=1);setT('lLight',['KI','HELYZ','TOMP','REFL','KÖD'][ls]);setC('bLight','blue',P.lightMode===3||P.flashOn);setC('bLight','fog',ls===4);
   setC('bHaz','warn',P.haz);setC('bRev','act',P.rev);setC('bRadio','act',radio.on);setC('bCruise','blue',!!P.cruise);setT('lCruise',P.cruise?String(P.cruise):'TEMPO');if(appTick.cr!==P.cruise){appTick.cr=P.cruise;document.querySelectorAll('#cruiseBar button').forEach(b=>b.classList.toggle('on',+b.dataset.v===(P.cruise||0)));}setC('bHb','warn',P.hb);}}
+window.APP_OK=true;
