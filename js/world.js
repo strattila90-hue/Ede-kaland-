@@ -109,6 +109,21 @@ function drawClouds(g,L,dist,t){const oc=['rain','storm','snow','cloudy','fog'].
  for(let i=i0;i<i0+7;i++){const h=hsh(i*31+7);if(!oc&&h<0.35)continue;cloud(g,i*slot-o+h*40,14+hsh(i*13+1)*55,s*(0.8+hsh(i*5)*0.5),cA,cB);}birds(g,L,t);}
 function hills(g,o,col,base,amp,f,seed){g.fillStyle=cg(g,'h'+col+base+amp,()=>lg(g,0,base-amp*1.6,0,ROADT,[[0,col],[1,shade(col,0.82)]]));g.beginPath();g.moveTo(0,ROADT);
  for(let x=0,st=LOWQ?5:3;x<=W;x+=st){const X=x+o;g.lineTo(x,base-amp*Math.sin(X*f+seed)-amp*0.6*Math.sin(X*f*2.3+seed*3));}g.lineTo(W,ROADT);g.closePath();g.fill();}
+/* ---- előre megrajzolt képek a sok apró alakzat helyett (telefonon a sok rajzolási művelet a lassú, nem a felbontás) ---- */
+const LTC=new Map(),SPR=new Map();
+function lruGet(m,k){const e=m.get(k);if(e!==undefined){m.delete(k);m.set(k,e);}return e;}
+function lruPut(m,k,e,max){if(m.size>=max)m.delete(m.keys().next().value);m.set(k,e);}
+/* parallax-sáv csempékben: a sáv 'f' sebességgel mozog; egy csempe egy képernyőnyi szélességű, egyszer rajzolódik */
+function layerTiles(g,key,f,dist,y0,h,draw){const Dt=W/f,k=Math.floor(dist/Dt),sh=(dist-k*Dt)*f;
+ for(let j=0;j<2;j++){const kk=k+j,ck=key+'|'+kk+'|'+SC;let c=lruGet(LTC,ck);
+  if(!c){let cv=null,x=null;if(LTC.size>=14){const k0=LTC.keys().next().value,o=LTC.get(k0);LTC.delete(k0);if(o.width===Math.round((W+2)*SC)&&o.height===Math.round(h*SC)){cv=o;x=o.getContext('2d');x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,cv.width,cv.height);x.setTransform(SC,0,0,SC,0,0);}}
+   if(!cv)[cv,x]=mk(W+2,h,SC);x.save();x.translate(0,-y0);draw(x,kk*Dt);x.restore();c=cv;LTC.set(ck,c);}
+  g.drawImage(c,j*W-sh,y0,W+2,h);}}
+/* egy tárgy (ház, fasor, templom...) képe; a fényeket (éjjel) is megjegyzi */
+function sprite(g,key,dx,dy,w,h,lights,draw){const ck=key+'|'+SC;let e=lruGet(SPR,ck);
+ if(!e){let c,x;if(SPR.size>=26){const k0=SPR.keys().next().value,o=SPR.get(k0);SPR.delete(k0);if(o.c.width===Math.round(w*SC)&&o.c.height===Math.round(h*SC)){c=o.c;x=o.x;x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,c.width,c.height);x.setTransform(SC,0,0,SC,0,0);}}
+  if(!c)[c,x]=mk(w,h,SC);const ll=[];draw(x,ll);e={c:c,x:x,l:ll};SPR.set(ck,e);}/* a legrégebbi kép vásznát újrahasznosítja: nem keletkezik folyton új */
+ g.drawImage(e.c,dx,dy,w,h);if(lights)for(const l of e.l)lights.push({x:l.x+dx,y:l.y+dy,r:l.r});}
 function drawFar(g,L,seg,dist,lights){const snow=L.weather==='snow',night=L.time==='night',reg=L.region;
  if(reg==='alps'||(reg==='it'&&seg.type==='motorway')){const o=dist*0.06,slot=120,i0=Math.floor(o/slot)-1;
   for(let i=i0;i<i0+6;i++){const h=hsh(i*17+3),px=i*slot-o+60+(h-0.5)*40,ph=70+h*75,base=ROADT-10;
@@ -116,20 +131,22 @@ function drawFar(g,L,seg,dist,lights){const snow=L.weather==='snow',night=L.time
    g.fillStyle='rgba(30,40,70,0.18)';g.beginPath();g.moveTo(px,base-ph);g.quadraticCurveTo(px+30,base-ph*0.8,px+105,base);g.lineTo(px+20,base);g.closePath();g.fill();
    g.fillStyle='#f5f8fb';g.beginPath();g.moveTo(px,base-ph);g.quadraticCurveTo(px+12,base-ph*0.86,px+26,base-ph*0.7);g.lineTo(px+12,base-ph*0.74);g.lineTo(px+2,base-ph*0.66);g.lineTo(px-10,base-ph*0.75);g.lineTo(px-26,base-ph*0.7);g.quadraticCurveTo(px-12,base-ph*0.86,px,base-ph);g.fill();}
   hills(g,dist*0.18,snow?'#e6edf3':'#5f9a5a',ROADT-24,7,0.012,5);return;}
- if(seg.type==='town'){const o=dist*0.1,slot=22,i0=Math.floor(o/slot)-1;
-  for(let i=i0;i<i0+25;i++){const h=hsh(i*7+1),x=i*slot-o,bh=30+h*80;frr(g,night?'#27315a':'#a7b7cd',x,ROADT-12-bh,slot-2,bh+12,1.5);
-   if(h>0.8)R(g,night?'#27315a':'#a7b7cd',x+8,ROADT-26-bh,1.5,14);
-   for(let wy=ROADT-8-bh,r=0;wy<ROADT-16;wy+=6,r++)for(let wx=x+3,c=0;wx<x+slot-5;wx+=5,c++){const lit=night&&hsh(i*991+r*37+c*7+1)>0.55;R(g,lit?'#ffd77a':(night?'#38446a':'#c3d0df'),wx,wy,2,3);}}return;}
+ if(seg.type==='town'){layerTiles(g,'sky|'+night,0.1,dist,ROADT-142,142,(x,d)=>skyline(x,d,night));return;}
+
  if(reg==='it'&&seg.type!=='country'){g.fillStyle=lg(g,0,ROADT-48,0,ROADT,[[0,night?'#1d3d6b':'#5aa4dc'],[1,night?'#132a4a':'#2f78b8']]);g.fillRect(0,ROADT-48,W,48);
   for(let i=0;i<26;i++){const x=((hsh(i)*W-dist*0.12*(0.5+hsh(i+9)))%W+W)%W;R(g,'rgba(220,240,255,0.7)',x,ROADT-44+hsh(i*5)*30,5,0.6);}
   R(g,'#e8d3a2',0,ROADT-14,W,14);return;}
  const col1=snow?'#dfe7ee':reg==='provence'||reg==='tuscany'?'#a9b46a':reg==='es'?'#c9b27a':reg==='nordic'?'#6f9a6a':'#8cbc72',col2=snow?'#cfd9e2':reg==='provence'||reg==='tuscany'?'#8a9a52':reg==='es'?'#b0955a':reg==='nordic'?'#4f7d55':'#6aa35a';
  hills(g,dist*0.05,snow?'#e9eff4':shade(col1,1.08),ROADT-62,10,0.006,11);if(!night)haze(g,ROADT-80,ROADT-46,0.35);
  hills(g,dist*0.08,col1,ROADT-50,12,0.008,7);if(!night)haze(g,ROADT-62,ROADT-36,0.22);hills(g,dist*0.16,col2,ROADT-32,9,0.014,3);
- const tt=typeof G!=='undefined'?G.t:0;farLand(g,L,seg,dist,tt,snow);fieldBand(g,L,seg,dist,snow);}
+ const tt=typeof G!=='undefined'?G.t:0;farLand(g,L,seg,dist,tt,snow);layerTiles(g,'fb|'+L.region+'|'+(seg.cc||'HU')+'|'+snow+'|'+LOWQ,0.3,dist,ROADT-44,36,(x,d)=>fieldBand(x,L,seg,d,snow));}
 
 
 /* ---- táj részletei: madarak, mezők, szélkerekek, fák ---- */
+function skyline(g,dist,night){const o=dist*0.1,slot=22,i0=Math.floor(o/slot)-1;
+  for(let i=i0;i<i0+25;i++){const h=hsh(i*7+1),x=i*slot-o,bh=30+h*80;frr(g,night?'#27315a':'#a7b7cd',x,ROADT-12-bh,slot-2,bh+12,1.5);
+   if(h>0.8)R(g,night?'#27315a':'#a7b7cd',x+8,ROADT-26-bh,1.5,14);
+   for(let wy=ROADT-8-bh,r=0;wy<ROADT-16;wy+=6,r++)for(let wx=x+3,c=0;wx<x+slot-5;wx+=5,c++){const lit=night&&hsh(i*991+r*37+c*7+1)>0.55;R(g,lit?'#ffd77a':(night?'#38446a':'#c3d0df'),wx,wy,2,3);}}}
 function birds(g,L,t){if(LOWQ||L.time==='night'||['rain','storm','snow','fog'].includes(L.weather))return;const n=L.weather==='cloudy'?3:5;
  for(let i=0;i<n;i++){const sp=0.18+hsh(i*7+3)*0.22,x=((hsh(i*11)*W*1.6+t*sp)%(W*1.6))-W*0.3,y=30+hsh(i*5+1)*60+Math.sin(t*0.02+i)*4,fl=Math.sin(t*0.25+i*2)*1.6,s=0.8+hsh(i*3)*0.6;
   g.strokeStyle='rgba(40,48,60,0.75)';g.lineWidth=0.7;g.beginPath();g.moveTo(x-3*s,y-fl);g.quadraticCurveTo(x-1.4*s,y-1.2*s,x,y);g.quadraticCurveTo(x+1.4*s,y-1.2*s,x+3*s,y-fl);g.stroke();}}
@@ -206,14 +223,18 @@ function roadSign(g,x,b,txt,kind){const t=txt.toUpperCase(),w=textW(t)+10;
  else if(kind==='exit'){line(g,'#7d858d',x+w/2,b,x+w/2,b-22,1.4);frr(g,'#ffffff',x,b-36,w,14,1);g.strokeStyle='#1a1a1a';g.lineWidth=1;rrect(g,x+1,b-35,w-2,12,1);g.stroke();text(g,t,x+5,b-32,'#1a1a1a',1,'left',null);line(g,'#d32f2f',x+2,b-23,x+w-2,b-35,1.6);}
  else{line(g,'#7d858d',x+w/2,b,x+w/2,b-22,1.4);frr(g,'#ffffff',x,b-36,w,14,1);g.strokeStyle='#1a1a1a';g.lineWidth=1;rrect(g,x+1,b-35,w-2,12,1);g.stroke();text(g,t,x+5,b-32,'#1a1a1a',1,'left',null);}}
 function limitSign(g,x,b,v){line(g,'#7d858d',x,b,x,b-20,1.2);disc(g,'#d32f2f',x,b-25,6.2);disc(g,'#ffffff',x,b-25,4.6);text(g,String(v),x+0.3,b-27.4,'#111',v>=100?0.42:0.55,'center',null);}
+function midItem(g,i,x,b,s,h,reg,night,snow,lights){
+  if(s.type==='town'){if(reg==='it'&&h<0.25){palm(g,x+10,b);return;}building(g,x,b,78,60+hsh(i*7)*70,i,night,lights);}
+  else if(s.type==='village'){const tt=typeof G!=='undefined'?G.t:0;if(h<0.08)church(g,x+20,b,night);else if(h>=0.48&&h<0.58){farmyard(g,x+4,b,tt,snow,i);return;}else if(h>=0.58&&h<0.66){gemeskut(g,x+20,b,snow);haystack(g,x+58,b,snow);return;}else if(h>=0.66&&h<0.72){garden(g,x+6,b,snow);return;}else if(h>=0.72&&h<0.8){birch(g,x+14,b,2.6,snow);bush(g,x+34,b,1.6,snow,i);poplar(g,x+64,b,46,snow);return;}else if(h<0.48)house(g,x+18,b,['#f4efe2','#f2e2b8','#e8d6c8','#dfe9ef'][(hsh(i)*4)|0],reg==='provence'?'#c2552f':['#b5452b','#8a3a2a','#a85a2a'][(hsh(i*9)*3)|0],night,lights,snow);else{tree(g,x+10,b,3,snow);tree(g,x+48,b,2,snow);}}
+  else if(s.type==='country'){if(reg==='alps'||reg==='nordic'){pine(g,x+6,b,40+h*20,snow);pine(g,x+40,b,30+h*12,snow);}else if(h<0.3){tree(g,x+18,b,3,snow);bush(g,x+52,b,1.5,snow,i);}else if(h<0.42){for(let k=0;k<4;k++)poplar(g,x+8+k*17,b,48+hsh(i*5+k)*14,snow);}else if(h<0.52){birch(g,x+12,b,2.6,snow);birch(g,x+34,b,2.2,snow);bush(g,x+56,b,1.4,snow,i);}else if(h<0.58&&reg==='hu'){house(g,x+6,b,'#f4efe2','#8a3a2a',night,lights,snow);gemeskut(g,x+66,b,snow);return;}else if(h<0.62){haystack(g,x+20,b,snow);haystack(g,x+46,b,snow);}else if(h<0.7){tree(g,x+6,b,2,snow);tree(g,x+44,b,3,snow);}
+   else if(h<0.85){line(g,'#6b4a2b',x+30,b,x+30,b-70,2.4);line(g,'#6b4a2b',x+21,b-66,x+39,b-66,1.6);}}
+  else{if(h<0.16)tree(g,x+18,b,2.5,snow);else if(h<0.3){poplar(g,x+12,b,44,snow);poplar(g,x+30,b,50,snow);bush(g,x+50,b,1.4,snow,0);}else if(h<0.42&&reg!=='alps'){/* zajvédő fal */frr(g,'#a7b0ba',x,b-22,84,22,1);for(let k=0;k<84;k+=12)R(g,'#8f99a4',x+k,b-22,1,22);}}}
 function drawMid(g,L,leg,dist,lights){const night=L.time==='night',snow=L.weather==='snow',f=0.55,o=dist*f,b=ROADT-8,reg=L.region;
  const slot=84,i0=Math.floor(o/slot)-1;
  for(let i=i0;i<i0+8;i++){const m=i*slot,x=m-o,wx=(m-PX)/f+PX,s=segAtIn(leg.segs,wx),h=hsh(i*13+5);
-  if(s.type==='town'){if(reg==='it'&&h<0.25){palm(g,x+10,b);continue;}building(g,x,b,78,60+hsh(i*7)*70,i,night,lights);}
-  else if(s.type==='village'){const tt=typeof G!=='undefined'?G.t:0;if(h<0.08)church(g,x+20,b,night);else if(h>=0.48&&h<0.58){farmyard(g,x+4,b,tt,snow,i);continue;}else if(h>=0.58&&h<0.66){gemeskut(g,x+20,b,snow);haystack(g,x+58,b,snow);continue;}else if(h>=0.66&&h<0.72){garden(g,x+6,b,snow);continue;}else if(h>=0.72&&h<0.8){birch(g,x+14,b,2.6,snow);bush(g,x+34,b,1.6,snow,i);poplar(g,x+64,b,46,snow);continue;}else if(h<0.48)house(g,x+18,b,['#f4efe2','#f2e2b8','#e8d6c8','#dfe9ef'][(hsh(i)*4)|0],reg==='provence'?'#c2552f':['#b5452b','#8a3a2a','#a85a2a'][(hsh(i*9)*3)|0],night,lights,snow);else{tree(g,x+10,b,3,snow);tree(g,x+48,b,2,snow);}}
-  else if(s.type==='country'){if(reg==='alps'||reg==='nordic'){pine(g,x+6,b,40+h*20,snow);pine(g,x+40,b,30+h*12,snow);}else if(h<0.3){tree(g,x+18,b,3,snow);bush(g,x+52,b,1.5,snow,i);}else if(h<0.42){for(let k=0;k<4;k++)poplar(g,x+8+k*17,b,48+hsh(i*5+k)*14,snow);}else if(h<0.52){birch(g,x+12,b,2.6,snow);birch(g,x+34,b,2.2,snow);bush(g,x+56,b,1.4,snow,i);}else if(h<0.58&&reg==='hu'){house(g,x+6,b,'#f4efe2','#8a3a2a',night,lights,snow);gemeskut(g,x+66,b,snow);continue;}else if(h<0.62){haystack(g,x+20,b,snow);haystack(g,x+46,b,snow);}else if(h<0.7){tree(g,x+6,b,2,snow);tree(g,x+44,b,3,snow);}
-   else if(h<0.85){line(g,'#6b4a2b',x+30,b,x+30,b-70,2.4);line(g,'#6b4a2b',x+21,b-66,x+39,b-66,1.6);}}
-  else{if(h<0.16)tree(g,x+18,b,2.5,snow);else if(h<0.3){poplar(g,x+12,b,44,snow);poplar(g,x+30,b,50,snow);bush(g,x+50,b,1.4,snow,0);}else if(h<0.42&&reg!=='alps'){/* zajvédő fal */frr(g,'#a7b0ba',x,b-22,84,22,1);for(let k=0;k<84;k+=12)R(g,'#8f99a4',x+k,b-22,1,22);}}}}
+  // a tanya (kapirgáló csirkék) mozog, azt élőben rajzolja; minden más egyszer megrajzolt kép
+  if(s.type==='village'&&h>=0.48&&h<0.58){midItem(g,i,x,b,s,h,reg,night,snow,lights);continue;}
+  sprite(g,'mid|'+i+'|'+s.type+'|'+reg+'|'+night+'|'+snow+'|'+LOWQ,x-30,b-150,144,158,lights,(gg,ll)=>midItem(gg,i,30,150,s,h,reg,night,snow,ll));}}
 /* ---- közeli réteg: járda, korlát, táblák (az úttal együtt mozog) ---- */
 function drawNear(g,L,leg,dist,lights,t){const snow=L.weather==='snow',night=L.time==='night',y0=ROADT-10;
  // típusonként sávokban rajzolva

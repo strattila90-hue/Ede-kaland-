@@ -632,8 +632,9 @@ function titleFX(){if(TFX&&TFX.sc===SC)return TFX.c;const [c,x]=mk(W,H,SC);
 function grainTile(){if(TGR)return TGR;const [c,x]=mk(W+16,H+16,1);for(let i=0;i<2600;i++){x.fillStyle=Math.random()>0.5?'rgba(255,255,255,0.07)':'rgba(0,0,0,0.09)';x.fillRect(Math.random()*(W+16),Math.random()*(H+16),1,1);}TGR=c;return c;}
 /* gyenge módban a kijelző csak minden 3. képkockán rajzolódik újra, közben a kész képe másolódik */
 let HUDC=null;
-function drawHUDc(g){if(!LOWQ){drawHUD(g);return;}if(!HUDC||HUDC.sc!==SC){const [c,x]=mk(W,H,SC);HUDC={c:c,x:x,sc:SC,t:-9};}
- if(G.t-HUDC.t>=3||G.t<HUDC.t||TAPD){const x=HUDC.x;x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,HUDC.c.width,HUDC.c.height);x.setTransform(SC,0,0,SC,0,0);drawHUD(x);HUDC.t=G.t;}
+/* a műszerfal egy képbe rajzolódik, és csak minden 2. (takarékos módban 3.) lépésben frissül: így képkockánként 1 művelet ~110 helyett */
+function drawHUDc(g){if(!HUDC||HUDC.sc!==SC){const [c,x]=mk(W,H,SC);HUDC={c:c,x:x,sc:SC,t:-9};}
+ if(G.t-HUDC.t>=(LOWQ?3:2)||G.t<HUDC.t||TAPD||G.paused){const x=HUDC.x;x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,HUDC.c.width,HUDC.c.height);x.setTransform(SC,0,0,SC,0,0);drawHUD(x);HUDC.t=G.t;}
  g.drawImage(HUDC.c,0,0,W,H);}
 function introT(){return 999;}
 function introT_old(){if(G.introSeen)return 999;if(G.st>=170)G.introSeen=true;return G.st;}

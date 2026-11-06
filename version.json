@@ -1,5 +1,5 @@
 {
- "version": "2.13.5",
+ "version": "2.14.0",
  "files": {
   "index.html": 31497,
   "manifest.webmanifest": 695,
@@ -11,10 +11,10 @@
   "js/gps.js": 21833,
   "js/geohd.js": 121325,
   "js/car.js": 44140,
-  "js/world.js": 57374,
+  "js/world.js": 59743,
   "js/minigames.js": 16417,
   "js/shops.js": 19419,
-  "js/game.js": 112481,
+  "js/game.js": 112624,
   "js/app.js": 26080,
   "icons/icon-192.png": 27752,
   "icons/icon-512.png": 94753,
