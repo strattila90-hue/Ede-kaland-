@@ -1,7 +1,7 @@
 {
- "version": "2.16.0",
+ "version": "2.16.1",
  "files": {
-  "index.html": 32455,
+  "index.html": 33411,
   "manifest.webmanifest": 695,
   "sw.js": 1210,
   "js/core.js": 17871,
@@ -15,7 +15,7 @@
   "js/minigames.js": 16417,
   "js/shops.js": 19419,
   "js/game.js": 120287,
-  "js/app.js": 26196,
+  "js/app.js": 26578,
   "icons/icon-192.png": 27752,
   "icons/icon-512.png": 94753,
   "icons/icon-maskable-512.png": 90587

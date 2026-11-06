@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.16.0
+# 🚐 Családi Vakáció – v2.16.1
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -277,7 +277,7 @@ A középkonzolon csak három gomb van: **világítás** (egyetlen gomb minden f
 
 ## 📱 Telepítés, megosztás, frissítés
 
-**Xiaomi / Redmi / POCO (MIUI, HyperOS):** ha telepítés után az ikonra koppintva nem nyílik meg a játék, a Chrome-nak hiányzik két engedélye: Beállítások → Alkalmazások → Chrome → Egyéb engedélyek → „Kezdőképernyő-parancsikonok” és „Felugró ablakok megjelenítése háttérben futás közben” legyen engedélyezve; utána töröld az ikont és telepítsd újra a Chrome-ból. A Xiaomi saját böngészőjéből (Mi Böngésző) telepített ikon gyakran nem indul, ezért a játék ott felajánlja a megnyitást Chrome-ban.
+**Telepítési ablak:** magától csak egyszer jelenik meg, amikor valaki először nyitja meg a megosztott linket az adott készüléken; utána a főmenü mindig szabad, telepíteni a főmenü Telepítés gombjával lehet. A link telepítés nélkül is mindig közvetlenül a játékot nyitja meg. **Xiaomi / Redmi / POCO:** ha a telepített ikon nem indul, az a rendszer tiltása (a Chrome „Kezdőképernyő-parancsikonok” és „Felugró ablakok megjelenítése háttérben futás közben” engedélye); a magyarázat a telepítési ablak alján, egy koppintásra nyílik le. A Xiaomi saját böngészőjéből a játék felajánlja a megnyitást Chrome-ban.
 
 A főmenüben bal oldalt három gomb van:
 

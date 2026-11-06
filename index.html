@@ -229,6 +229,10 @@ body.tab #ctlrow{left:50%}
 #bGpsBig svg{width:46%;height:46%}#bGpsBig small{font:900 clamp(11px,2.6vmin,16px)/1.1 var(--ff);letter-spacing:.08em;opacity:1;color:#fff}
 body.tab #bGpsBig{right:calc(28px + var(--sr) + var(--u)*4.47);bottom:calc(22px + var(--sb) + var(--u)*.95);width:calc(var(--u)*1.3);height:calc(var(--u)*1.15)}
 body.touchui #topbar #bGps{display:none}
+#inst .help{display:block;margin:10px auto 0;background:none;border:0;color:#9fc3ff;font:600 12.5px var(--ff);text-decoration:underline;cursor:pointer}
+#inst .tip{display:none;margin-top:6px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.06);color:#c9d3df;font:500 12px/1.4 var(--ff)}#inst .tip.on{display:block}
+#inst .box{max-height:calc(100dvh - 20px)}
+#inst.open ~ #toast{bottom:auto!important;top:calc(8px + var(--st,0px))!important}
 </style>
 </head>
 <body>
@@ -264,7 +268,7 @@ body.touchui #topbar #bGps{display:none}
 <div id="ledger"><div class="sheet"><header><h3>Költségnapló</h3><button class="x" aria-label="Bezárás">✕</button></header><div class="body"></div></div></div>
 <div id="inst"><div class="box"><div class="top"><img src="icons/icon-192.png" alt=""><div><h3>Telepítsd a Családi Vakációt!</h3><p id="instSub">Egy érintés, és úgy fut, mint egy igazi alkalmazás.</p></div></div>
 <ul><li>📱 Ikon a kezdőképernyőn</li><li>✈️ Internet nélkül is fut</li><li>🖥️ Teljes képernyő</li><li>⟳ Magától frissül</li></ul>
-<div class="steps" id="instSteps"></div>
+<div class="steps" id="instSteps"></div><button class="help" id="instHelp">Telepítés után nem nyílik meg az ikon?</button><div class="tip" id="instTip">Xiaomi / Redmi / POCO készüléken a rendszer alapból tiltja a Chrome-ból telepített ikonok indítását. Beállítások → Alkalmazások → Chrome → Egyéb engedélyek → „Kezdőképernyő-parancsikonok” és „Felugró ablakok megjelenítése háttérben futás közben”. Telepítés nélkül is játszhatsz: a link mindig közvetlenül a játékot nyitja meg.</div>
 <div class="btns"><button class="later" id="instLater">Most nem</button><button class="go" id="instGo">⬇ Telepítés most</button></div></div><div class="arrow" id="instArrow">⬇</div></div>
 <div id="toast"></div>
 <div id="rot"><b>📱</b>Fordítsd el a készüléket fekvő helyzetbe</div>

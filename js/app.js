@@ -55,7 +55,8 @@ function openInstall(){if(isStandalone()||location.protocol==='file:')return;con
   instSteps([['Koppints a <b style="display:inline;background:none;width:auto">Megosztás</b> gombra'+(IPAD?' (fent)':' (lent középen; ha nem látod, előbb a ⋯ gombra)'),SHARE_SVG],['Görgess le: „Főképernyőhöz adás”',ADD_SVG],['Jobb fent: „Hozzáadás”. Kész, az ikon a kezdőképernyőn van!']]);
   arrow.textContent=IPAD?'⬆':'⬇';arrow.style.cssText=IPAD?'top:6px;right:120px':'bottom:6px;left:calc(50% - 12px)';arrow.classList.add('on');}
  else{$('instSub').textContent='Egy érintés, és úgy fut, mint egy igazi alkalmazás.';go.textContent='⬇ Telepítés most';
-  const st=[];if(!deferredPrompt&&!('install' in navigator))st.push(['Ha nem jön fel az ablak: böngésző menü (⋮ vagy ⋯)'],['„Alkalmazás telepítése” vagy „Hozzáadás a kezdőképernyőhöz”']);if(ANDROID)st.push(['<small style="display:block;opacity:.8;font-weight:500">'+XIAOMI_TIP+'</small>']);if(st.length)instSteps(st);}
+  if(!deferredPrompt&&!('install' in navigator))instSteps([['Ha nem jön fel az ablak: böngésző menü (⋮ vagy ⋯)'],['„Alkalmazás telepítése” vagy „Hozzáadás a kezdőképernyőhöz”']]);}
+ $('instHelp').style.display=ANDROID&&!IOS?'':'none';$('instTip').classList.remove('on');
  $('inst').classList.add('open');}
 function closeInstall(later){$('inst').classList.remove('open');if(later){try{sessionStorage.setItem('cv-inst-later','1');}catch(e){}}}
 $('instLater').addEventListener('click',e=>{e.stopPropagation();haptic(10);closeInstall(true);});
@@ -65,9 +66,12 @@ $('instGo').addEventListener('click',async e=>{e.stopPropagation();haptic(15);
  if(deferredPrompt){deferredPrompt.prompt();try{const r=await deferredPrompt.userChoice;closeInstall(r.outcome!=='accepted');if(r.outcome==='accepted')toast('Telepítés folyamatban...');}catch(_){}deferredPrompt=null;return;}
  instSteps([['Böngésző menü (⋮ vagy ⋯) jobb fent'],['„Alkalmazás telepítése” vagy „Hozzáadás a kezdőképernyőhöz”']]);toast('A böngésző menüjéből telepítheted.',3500);});
 $('inst').addEventListener('pointerdown',e=>e.stopPropagation());
-window.addEventListener('appinstalled',()=>{closeInstall(false);if(ANDROID)toast('Telepítve! '+XIAOMI_TIP,9000);});
-{const viaLink=/[?&]install=1/.test(location.search);let later=false;try{later=sessionStorage.getItem('cv-inst-later')==='1';}catch(e){}
- if(!isStandalone()&&location.protocol.startsWith('http')&&(viaLink||!later))window.addEventListener('load',()=>setTimeout(()=>{if(!isStandalone())openInstall();},viaLink?900:2200));}
+window.addEventListener('appinstalled',()=>{closeInstall(false);toast('Telepítve! Az ikon a kezdőképernyőn van.',4000);});
+$('instHelp').addEventListener('click',e=>{e.stopPropagation();haptic(10);$('instTip').classList.toggle('on');});
+/* magától csak egyszer jön fel: ha megosztott linkről nyílik meg a játék először ezen a készüléken. Utána a főmenü mindig szabad, telepíteni a Telepítés gombbal lehet. */
+{const viaLink=/[?&]install=1/.test(location.search);let shown=false;try{shown=localStorage.getItem('cv-inst-auto')==='1';}catch(e){}
+ if(!isStandalone()&&location.protocol.startsWith('http')&&viaLink&&!shown)window.addEventListener('load',()=>setTimeout(()=>{if(!isStandalone()){openInstall();try{localStorage.setItem('cv-inst-auto','1');}catch(e){}}},900));
+ if(viaLink)try{history.replaceState(null,'',location.pathname);}catch(e){}}
 async function doShare(){const url=location.href.split('#')[0].split('?')[0]+'?install=1';const data={title:'Családi Vakáció',text:'Gyere velünk Európa körútra! Családi autós kalandjáték.',url:url};
  try{if(navigator.share){await navigator.share(data);return;}await navigator.clipboard.writeText(url);toast('A link a vágólapra másolva!');}
  catch(e){if(e&&e.name==='AbortError')return;try{window.prompt('Másold ki a linket:',url);}catch(_){}}}
