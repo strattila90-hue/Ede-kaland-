@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.10.0
+# 🚐 Családi Vakáció – v2.11.0
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -35,9 +35,15 @@ A jobb felső sarokban **GPS** mutatja az autó környékét: ráközelít a koc
 
 **Mi közeledik:** a GPS alatt kis ikonok mutatják, mi jön, és hány méterre: benzinkút, bolt, trafik, újságos, sebességmérő, közlekedési lámpa (az aktuális színével), település, autópálya, kátyú, útépítés, baleset, dugó, állat, és a cél. A térkép földrajzilag pontos, [Natural Earth](https://www.naturalearthdata.com) közkincs adatokból készült.
 
-## 🎬 Filmes főmenü
+## 🎬 Főmenü: filmplakát
 
-A főmenü úgy indul, mint egy film: feketéből úszik be a kép, szélesvásznú csíkokkal, a cím középről a helyére úszik. A családi autó egy irányba halad, a jelenetek (Komárom, Balaton, Alpok, olasz tengerpart, Provence, Párizs éjjel) áttűnéssel váltják egymást. Közben lassú kameramozgás, filmes színkorrekció, lencsefény, vignetta és filmszemcse látszik. Az alsó csíkban írógéppel jelenik meg a helyszín, a felsőben a szereplők. Bármilyen érintés átugorja a nyitányt.
+A főmenü egyetlen álló kép, családi road movie plakát: naplemente csíkos nappal, hegyek, a horizontba futó út, rajta hátulról a családi autó csomagokkal a tetőn, nagy „Családi Vakáció” cím, alcím („Öt ember. Egy autó. 5 800 kilométer.”) és alul a szereplők. A kép egyszer rajzolódik meg, utána a főmenüben a játék nem rajzol képkockákat, így a belépés gyors és sima.
+
+## 📐 Minden kijelzőmérethez
+
+- **Felbontás:** a kijelző valódi pixelszámához igazodik (telefonon 2,5×, gépen 3× renderfelbontásról indul), és csak valódi akadásnál vesz vissza; visszavétel után 15 mp-ig nem emel, hogy ne ugráljon.
+- **Széles telefonok (19,5:9):** a kezelőgombok az oldalsó sávokba kerülnek.
+- **Tabletek (4:3, 16:10) és összehajtható telefonok:** a kép felül van, minden gomb (pedálok, tempomat, duda, kapcsolók) a lenti sávban, nem takarja a játékot.
 
 ## 🛣️ Út közben
 

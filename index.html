@@ -183,6 +183,11 @@ html,body{margin:0;height:100%;height:100dvh;width:100%;position:fixed;inset:0;b
 #inst .arrow{position:fixed;z-index:46;display:none;font-size:34px;color:#ffd84a;text-shadow:0 2px 8px rgba(0,0,0,.6);animation:bob 1s ease-in-out infinite}#inst .arrow.on{display:block}
 @keyframes bob{50%{transform:translateY(8px)}}
 @media (max-height:420px){#inst ul{display:none}#inst .box{padding:12px 14px}}
+/* tablet: a kép felül, minden gomb a lenti sávban */
+body.tab #bHonk{left:calc(22px + var(--sl) + var(--u)*1.12);bottom:calc(14px + var(--sb) + var(--u)*.35)}
+body.tab #bCruise{right:calc(28px + var(--sr) + var(--u)*4.47);bottom:calc(12px + var(--sb))}
+body.tab #cruiseBar{right:calc(28px + var(--sr) + var(--u)*4.47)!important;bottom:calc(22px + var(--sb) + var(--u))!important}
+body.tab #ctlrow{left:50%}
 </style>
 </head>
 <body>
@@ -217,7 +222,7 @@ html,body{margin:0;height:100%;height:100dvh;width:100%;position:fixed;inset:0;b
 <div class="steps" id="instSteps"></div>
 <div class="btns"><button class="later" id="instLater">Most nem</button><button class="go" id="instGo">⬇ Telepítés most</button></div></div><div class="arrow" id="instArrow">⬇</div></div>
 <div id="toast"></div>
-<div id="rot"><b>📱</b>Fordítsd el a telefont fekvő helyzetbe</div>
+<div id="rot"><b>📱</b>Fordítsd el a készüléket fekvő helyzetbe</div>
 <div id="splash"><img src="icons/icon-192.png" alt=""><h1>Családi Vakáció</h1><div class="bar"><i id="splbar"></i></div><small id="spltxt">Betöltés... 0%</small></div>
 <script>
 /* betöltő: a játék fájljai sorban, valós százalékkal */

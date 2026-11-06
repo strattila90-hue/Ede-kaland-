@@ -65,7 +65,8 @@ function segAtIn(segs,x){for(const s of segs)if(x<s.x1)return s;return segs[segs
 /* ---- ég, felhők, nap ---- */
 function skyCols(L){if(L.time==='night')return ['#060a24','#22325f'];if(L.weather==='storm')return ['#2f3744','#6f7987'];
  if(['rain','snow','cloudy','fog'].includes(L.weather))return ['#8797ad','#d8dfe6'];if(L.time==='dusk')return ['#2f3b78','#f29a5f'];if(L.time==='sunset')return ['#46589f','#ffb06a'];return ['#3d97e6','#cbeeff'];}
-function drawSky(g,L,t){const [a,b]=skyCols(L);g.fillStyle=lg(g,0,0,0,ROADT,[[0,a],[1,b]]);g.fillRect(0,0,W,ROADT);
+function cg(g,key,make){const m=g.__gc||(g.__gc=new Map());let v=m.get(key);if(!v){if(m.size>60)m.clear();v=make();m.set(key,v);}return v;}
+function drawSky(g,L,t){const [a,b]=skyCols(L);g.fillStyle=cg(g,'sky'+a+b,()=>lg(g,0,0,0,ROADT,[[0,a],[1,b]]));g.fillRect(0,0,W,ROADT);
  if(L.time==='night'){for(let i=0;i<110;i++){const x=hsh(i*3+1)*W,y=hsh(i*7+2)*140,tw=0.4+0.6*Math.abs(Math.sin(t*0.03+i));g.fillStyle='rgba(255,255,255,'+(0.3+0.6*hsh(i)*tw)+')';g.fillRect(x,y,0.6,0.6);}
   glow(g,400,36,30,'rgba(240,240,210,0.25)');disc(g,'#f4f1d8',400,36,9);disc(g,'rgba(200,195,170,0.6)',397,33,2);disc(g,'rgba(200,195,170,0.6)',403,39,1.2);return;}
  if(L.weather!=='sun'&&L.weather!=='clear')return;
@@ -77,8 +78,8 @@ function drawClouds(g,L,dist,t){const oc=['rain','storm','snow','cloudy','fog'].
  const cA=night?'#2a345e':oc?(L.weather==='storm'?'#5b6472':'#cdd4dc'):'#ffffff',cB=night?'#1f2950':oc?(L.weather==='storm'?'#454d5a':'#aeb8c3'):'#e1ecf5';
  const o=dist*0.04+t*0.12,slot=110,i0=Math.floor(o/slot)-1,s=oc?1.4:1;
  for(let i=i0;i<i0+7;i++){const h=hsh(i*31+7);if(!oc&&h<0.35)continue;cloud(g,i*slot-o+h*40,14+hsh(i*13+1)*55,s*(0.8+hsh(i*5)*0.5),cA,cB);}birds(g,L,t);}
-function hills(g,o,col,base,amp,f,seed){g.fillStyle=lg(g,0,base-amp*1.6,0,ROADT,[[0,col],[1,shade(col,0.82)]]);g.beginPath();g.moveTo(0,ROADT);
- for(let x=0;x<=W;x+=3){const X=x+o;g.lineTo(x,base-amp*Math.sin(X*f+seed)-amp*0.6*Math.sin(X*f*2.3+seed*3));}g.lineTo(W,ROADT);g.closePath();g.fill();}
+function hills(g,o,col,base,amp,f,seed){g.fillStyle=cg(g,'h'+col+base+amp,()=>lg(g,0,base-amp*1.6,0,ROADT,[[0,col],[1,shade(col,0.82)]]));g.beginPath();g.moveTo(0,ROADT);
+ for(let x=0,st=LOWQ?5:3;x<=W;x+=st){const X=x+o;g.lineTo(x,base-amp*Math.sin(X*f+seed)-amp*0.6*Math.sin(X*f*2.3+seed*3));}g.lineTo(W,ROADT);g.closePath();g.fill();}
 function drawFar(g,L,seg,dist,lights){const snow=L.weather==='snow',night=L.time==='night',reg=L.region;
  if(reg==='alps'||(reg==='it'&&seg.type==='motorway')){const o=dist*0.06,slot=120,i0=Math.floor(o/slot)-1;
   for(let i=i0;i<i0+6;i++){const h=hsh(i*17+3),px=i*slot-o+60+(h-0.5)*40,ph=70+h*75,base=ROADT-10;

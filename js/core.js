@@ -2,17 +2,20 @@
 /* =========================================================
    CSALÁDI VAKÁCIÓ – alapok: vászon, rajzoló segédek, betűk, hang, bemenet
    ========================================================= */
-const APP_VERSION='2.10.0';
+const APP_VERSION='2.11.0';
 const W=480,H=270,PX=70,ROADT=194,ROADB=262,LANE=[212,232,252];
 const TAU=Math.PI*2;
 let SC=2,LOWQ=false;
 try{if(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=2){SC=1.5;LOWQ=true;}}catch(e){}
-var MG=null;const cv=document.getElementById('c'),ctx=cv.getContext('2d',{alpha:false,desynchronized:true})||cv.getContext('2d');
+var MG=null;const cv=document.getElementById('c'),ctx=cv.getContext('2d',{alpha:false})||cv.getContext('2d');
 cv.width=W*SC;cv.height=H*SC;
 function setSC(v){SC=v;cv.width=Math.round(W*SC);cv.height=Math.round(H*SC);if(typeof onSC==='function')onSC();}
 const isTouch=('ontouchstart' in window)||(navigator.maxTouchPoints>0);
-function resize(){const iw=window.innerWidth,ih=window.innerHeight,s=Math.min(iw/W,ih/H);
- cv.style.width=Math.round(W*s)+'px';cv.style.height=Math.round(H*s)+'px';
+function resize(){const iw=window.innerWidth,ih=window.innerHeight,s=Math.min(iw/W,ih/H),cw=Math.round(W*s),ch=Math.round(H*s);
+ cv.style.width=cw+'px';cv.style.height=ch+'px';
+ // tablet / 16:10 / 4:3: ha alul legalább 60 px hely marad, a kép felülre kerül, a kezelőgombok a sávba
+ const wrap=document.getElementById('wrap'),top=isTouch&&ih-ch>=60;document.body&&document.body.classList.toggle('tab',top);if(wrap){wrap.style.alignItems=top?'flex-start':'center';wrap.style.paddingTop=top?'env(safe-area-inset-top)':'0';}
+ document.documentElement.style.setProperty('--gameb',Math.max(0,ih-(top?ch:(ih+ch)/2))+'px');
  document.getElementById('rot').style.display=(isTouch&&ih>iw)?'flex':'none';}
 window.addEventListener('resize',resize);resize();
 
