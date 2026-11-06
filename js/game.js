@@ -181,7 +181,10 @@ function updPlay(){if(TAPD&&!G.paused&&!MG&&P&&P.sub==='drive'&&inRect(TAPD,mapR
  // sávváltás
  if(!P.arriving){if(K.upP&&P.lane>0){P.lastLane=P.lane;P.lane--;P.blink=60;}if(K.dnP&&P.lane<2){P.lastLane=P.lane;P.lane++;P.blink=60;}
   if(K.honkP){SFX.honk();yieldAhead('duda');for(const e of ents){const d=e.x-(P.dist+110);if(e.kind==='animal'&&d<260&&d>-60&&!e.flee){e.flee=true;e.tp==='cow'?SFX.moo():SFX.baa();}}}}
- const ty=LANE[P.lane],dy=ty-P.y,grip=L.weather==='snow'?0.55:(L.weather==='rain'||L.weather==='storm')?0.7:1;P.y+=clamp(dy*0.14*grip,-2*grip,2*grip);if(Math.abs(dy)<0.3)P.y=ty;
+ const ty=LANE[P.lane],dy=ty-P.y,grip=L.weather==='snow'?0.55:(L.weather==='rain'||L.weather==='storm')?0.7:1;
+ // sima sávváltás: az oldalirányú sebesség fokozatosan nő és csökken (S-görbe), nincs rántás
+ {const sp=Math.min(Math.abs(P.kmh),130)/130,vmax=(0.2+0.2*sp)*grip,amax=(0.012+0.01*sp)*grip;const vd=clamp(dy*0.055,-vmax,vmax);P.vy=(P.vy||0)+clamp(vd-(P.vy||0),-amax,amax);P.y+=P.vy;
+  if(Math.abs(dy)<0.06&&Math.abs(P.vy)<0.015){P.y=ty;P.vy=0;}}
  if(P.blink>0)P.blink--;if(P.inv>0)P.inv--;
  // futómű
  susp(P.gasF,brake?1:0);
@@ -262,7 +265,7 @@ function updEnts(){const pl=P.dist+6,pr=P.dist+112,t=G.t,L=LEGS[G.leg];
   if(e.kind==='traffic'){if(!e.parked){let v=e.kmh;for(const l of LEG.lights){const st=lightState(l,t);if(st!=='green'&&e.x+e.w<l.x&&l.x-(e.x+e.w)<40)v=0;}
     for(const o of ents)if(o!==e&&o.kind==='traffic'&&o.lane===e.lane&&o.x>e.x&&o.x-(e.x+e.w)<14)v=Math.min(v,o.kmh);
     e.cur=lerp(e.cur===undefined?v:e.cur,v,0.05);e.x+=e.cur*KPX;}
-   e.y+=clamp(e.ty-e.y,-0.8,0.8);}
+   {const d=e.ty-e.y,vd=clamp(d*0.05,-0.35,0.35);e.vy=(e.vy||0)+clamp(vd-(e.vy||0),-0.012,0.012);e.y+=e.vy;if(Math.abs(d)<0.06&&Math.abs(e.vy)<0.015){e.y=e.ty;e.vy=0;}}}
   else if(e.kind==='animal'){e.step++;if(e.flee){e.y-=1.4;e.x+=0.6;}else e.y+=e.vy;}
   else if(e.fly){e.fx+=e.fvx;e.fz+=e.fvz;e.fvz+=0.3;if(e.fz>40)e.gone=true;}
   if(e.gone||e.fly||e.done)continue;
