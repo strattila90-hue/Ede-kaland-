@@ -8,6 +8,11 @@ const haptic=(ms)=>{try{if(navigator.vibrate)navigator.vibrate(ms||12);}catch(e)
 holdBtn('bGas','gas');holdBtn('bBr','brake');holdBtn('bFlash','flash');
 tapBtn('bUp',()=>K.upP=true);tapBtn('bDn',()=>K.dnP=true);tapBtn('bHonk',()=>K.honkP=true);tapBtn('bHaz',()=>K.hazP=true);tapBtn('bPause',()=>K.pauseP=true);
 tapBtn('bLight',()=>K.lightP=true);tapBtn('bFog',()=>K.fogP=true);tapBtn('bDoor',()=>K.doorP=true);tapBtn('bRev',()=>K.revP=true);tapBtn('bRadio',()=>K.radioP=true);tapBtn('bHb',()=>K.hbP=true);
+function goHome(){if(G.state!=='play')return;if(MG)endMini();if(P)save(P.dist);G.paused=false;closeLedger&&G.ledger&&closeLedger();G.state='title';G.st=0;G.menu=0;engine(0,0);MENU_SIG='?';
+ toast('Játékállás elmentve: '+fmt(G.trip.km,1)+' km, '+fmt(G.trip.money)+' Ft. A Folytatás gombbal innen indulsz tovább.',3600);}
+function autoSave(){try{if(G.state==='play'&&P)save(P.dist);}catch(e){}}
+document.addEventListener('visibilitychange',()=>{if(document.hidden)autoSave();});window.addEventListener('pagehide',autoSave);
+tapBtn('bHome',goHome);
 tapBtn('bCruise',()=>{const b=$('cruiseBar');b.style.display=b.style.display==='flex'?'none':'flex';});
 document.querySelectorAll('#cruiseBar button').forEach(b=>{const go=e=>{e.preventDefault();haptic(12);K.cruiseSet=+b.dataset.v;$('cruiseBar').style.display='none';};b.addEventListener('touchstart',go,{passive:false});b.addEventListener('mousedown',go);});
 document.querySelectorAll('#touch .ctl').forEach(el=>{el.addEventListener('touchstart',()=>haptic(10),{passive:true});});
@@ -54,36 +59,73 @@ window.addEventListener('offline',()=>toast('Offline mód: a játék internet n�
 setTimeout(checkUpdate,1500);
 /* menük */
 function titleAct(a){const opts=titleOpts();const i=opts.findIndex(o=>o.a===a);if(i>=0){G.menu=i;K.enterP=true;}}
-function menuDef(){const s=G.state;
- if(G.paused&&s==='play')return {cls:'center',title:'Szünet',items:[{a:'resume',l:'Folytatás',ic:'▶',c:'primary'},{a:'radio',l:'Rádió: '+(radio.on?STATIONS[radio.idx].name:'ki'),ic:'📻'},{a:'quit',l:'Mentés és kilépés a főmenübe',ic:'⌂'},{a:'update',l:updLabel,ic:'⟳',fill:1}]};
+function menuDef(){const s=G.state;if(G.ledger)return null;
+ if(G.paused&&s==='play')return {cls:'center',title:'Szünet',items:[{a:'resume',l:'Folytatás',ic:'▶',c:'primary'},{a:'log',l:'Költségnapló: '+fmt(G.trip.money)+' Ft',ic:'📒'},{a:'radio',l:'Rádió: '+(radio.on?STATIONS[radio.idx].name:'ki'),ic:'📻'},{a:'quit',l:'Mentés és kilépés a főmenübe',ic:'⌂'},{a:'update',l:updLabel,ic:'⟳',fill:1}]};
  if(s==='title'){const it=[];if(G.save&&(G.save.leg>0||G.save.dist>0))it.push({a:'cont',l:titleOpts().find(o=>o.a==='cont').l,ic:'▶',c:'primary'});
   it.push({a:'new',l:'Új utazás Komáromból',ic:'🚐',c:it.length?'':'primary'},{a:'color',l:'Autó színe: '+carColor,ic:'🎨'},{a:'ts',l:'Utazás: '+(TS_OPTS.find(q=>q[0]===G.ts)||TS_OPTS[0])[1],ic:'⏱'},{a:'specs',l:'Az autó adatai',ic:'ℹ'});
   if(!isStandalone())it.push({a:'install',l:'Telepítés',ic:'⬇',c:deferredPrompt?'new':''});
   it.push({a:'share',l:'Megosztás',ic:'↗'},{a:'update',l:updLabel,ic:'⟳',fill:1,c:newVer?'new':''},{a:'music',l:'Zene: '+(musicOn?'be':'ki'),ic:'♪'});
-  return {cls:'',title:'',items:it,ver:true};}
- if(s==='map')return {cls:'bottom',items:[{a:'go',l:'Indulás',ic:'▶',c:'primary'},{a:'home',l:'Főmenü',ic:'⌂'}]};
+  if(introT()<150)return null;
+  // filmes elrendezés: nagy főgombok, alattuk csempék
+  for(const x of it){if(x.a==='cont'||x.a==='new'){x.c=(x.c==='primary'?'hero':'hero2');const m=x.l.match(/^(.*?) \((.*)\)$/);if(m){x.l=m[1];x.sub=m[2];}else if(x.a==='new')x.sub='Komárom, Táncsics Mihály utca';}
+   else{x.tile=1;const m=x.l.match(/^(.*?): (.*)$/);if(m){x.l=m[1];x.sub=m[2];}}}
+  return {cls:'cine',title:'',items:it,ver:true};}
+ if(s==='map')return {cls:'bottom',items:[{a:'go',l:'Indulás',ic:'▶',c:'primary'},{a:'log',l:'Napló',ic:'📒'},{a:'home',l:'Főmenü',ic:'⌂'}]};
  if(s==='specs')return {cls:'bottom',items:[{a:'go',l:'Vissza',ic:'◀'}]};
  if(s==='postcard')return {cls:'bottom',items:[{a:'go',l:'Tovább',ic:'▶',c:'primary'}]};
- if(s==='over')return {cls:'bottom',items:[{a:'go',l:'Újrakezdés',ic:'⟳',c:'primary'}]};
- if(s==='win')return {cls:'bottom',items:[{a:'go',l:'Főmenü',ic:'⌂',c:'primary'}]};
+ if(s==='over')return {cls:'bottom',items:[{a:'go',l:'Újrakezdés',ic:'⟳',c:'primary'},{a:'log',l:'Napló',ic:'📒'}]};
+ if(s==='win')return {cls:'bottom',items:[{a:'go',l:'Főmenü',ic:'⌂',c:'primary'},{a:'log',l:'Napló',ic:'📒'}]};
  return null;}
-let MENU_SIG='?';
+
+/* ---- költségnapló ---- */
+let LEDGER_F='all';
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function openLedger(from){if(!G.trip)return;G.ledger=from||'menu';if(from==='play')G.paused=true;haptic(12);renderLedger();$('ledger').classList.add('open');MENU_SIG='?';}
+function closeLedger(){if(!G.ledger)return;const f=G.ledger;G.ledger=null;$('ledger').classList.remove('open');if(f==='play'&&G.state==='play')G.paused=false;MENU_SIG='?';}
+function renderLedger(){const T=G.trip,log=T.log||[],tot=ledgerTotals(T);let out=0,inc=0,nOut=0;for(const e of log){if(e.c==='start')continue;if(e.a<0){out-=e.a;nOut++;}else inc+=e.a;}
+ const start=log.length&&log[0].c==='start'?log[0].a:500000,ok=start-out+inc===T.money&&tot.sum===T.money;
+ let h='<div><div class="card"><div class="row"><span>Egyenleg</span></div><div class="bal '+(T.money<0?'neg':'')+'">'+fmt(T.money)+' Ft</div>'+
+  '<div class="row"><span>Kezdő keret</span><b>'+fmt(start)+' Ft</b></div><div class="row"><span>Kiadások ('+nOut+' tétel)</span><b class="neg">−'+fmt(out)+' Ft</b></div>'+
+  '<div class="row"><span>Bevételek, nyeremények</span><b class="pos">+'+fmt(inc)+' Ft</b></div><div class="row tot"><span>Egyenleg</span><b>'+fmt(start-out+inc)+' Ft</b></div>'+
+  '<span class="ok '+(ok?'':'bad')+'">'+(ok?'✓ Forintra pontosan egyezik':'Eltérés: '+fmt(T.money-(start-out+inc))+' Ft')+'</span></div>';
+ const cats=Object.entries(tot.cats).filter(([c,v])=>v<0).sort((a,b)=>a[1]-b[1]);
+ h+='<div class="card" style="margin-top:12px"><div class="row"><span>Mire ment el a pénz?</span></div>';
+ if(!cats.length)h+='<div class="empty">Még nem költöttünk semmit.</div>';
+ for(const [c,v] of cats){const cd=CATS[c]||CATS.other,pc=out?-v/out*100:0;h+='<div class="cat"><div class="t"><span><i class="dot" style="background:'+cd[1]+'"></i>'+esc(cd[0])+'</span><span>'+fmt(-v)+' Ft <span style="color:#8a96a6">('+fmt(pc,0)+'%)</span></span></div><div class="barw"><i style="width:'+pc.toFixed(1)+'%;background:'+cd[1]+'"></i></div></div>';}
+ const incs=Object.entries(tot.cats).filter(([c,v])=>v>0);for(const [c,v] of incs){const cd=CATS[c]||CATS.income;h+='<div class="cat"><div class="t"><span><i class="dot" style="background:'+cd[1]+'"></i>'+esc(cd[0])+'</span><span class="pos">+'+fmt(v)+' Ft</span></div></div>';}
+ h+='<div class="row" style="margin-top:10px"><span>Tankolt benzin</span><b>'+fmt(T.fuelUsed,1)+' l elfogyott</b></div></div></div>';
+ h+='<div><div class="tabs">'+[['all','Mind'],['out','Kiadások'],['in','Bevételek']].map(([k,l])=>'<button data-f="'+k+'" class="'+(LEDGER_F===k?'on':'')+'">'+l+'</button>').join('')+'</div>';
+ const list=log.filter(e=>e.c!=='start'&&(LEDGER_F==='all'||(LEDGER_F==='out'?e.a<0:e.a>0)));
+ if(!list.length)h+='<div class="empty">Nincs ilyen tétel.</div>';
+ let leg=-1;for(let i=list.length-1;i>=0;i--){const e=list[i];if(e.leg!==leg){leg=e.leg;const L=LEGS[leg];h+='<h4>'+(leg+1)+'. szakasz: '+esc(L?L.from.split(',')[0]+' → '+L.to:'')+'</h4>';}
+  const cd=CATS[e.c]||CATS.other;h+='<div class="e"><i class="dot" style="background:'+cd[1]+'"></i><div class="m"><div class="l">'+esc(e.l)+'</div><div class="s">'+esc(cd[0])+' · '+fmt(e.km,1)+' km'+(e.d?' · '+esc(e.d):'')+'</div></div>'+
+  '<div class="a '+(e.a<0?'neg':'pos')+'">'+(e.a<0?'−':'+')+fmt(Math.abs(e.a))+' Ft<small>marad: '+fmt(e.b)+' Ft</small></div></div>';}
+ h+='</div>';const b=document.querySelector('#ledger .body');const sc=b.scrollTop;b.innerHTML=h;b.scrollTop=sc;
+ b.querySelectorAll('.tabs button').forEach(x=>x.addEventListener('click',ev=>{ev.stopPropagation();LEDGER_F=x.dataset.f;haptic(8);SFX.click();renderLedger();}));}
+$('ledger').addEventListener('click',e=>{if(e.target.id==='ledger'){closeLedger();SFX.click();}});
+document.querySelector('#ledger .x').addEventListener('click',e=>{e.stopPropagation();haptic(10);SFX.click();closeLedger();});
+['pointerdown','touchstart'].forEach(ev=>$('ledger').addEventListener(ev,e=>e.stopPropagation(),{passive:true}));
+window.addEventListener('keydown',e=>{if(G.ledger&&(e.key==='Escape'||e.key==='n'||e.key==='N')){e.stopImmediatePropagation();closeLedger();}},true);
+let MENU_SIG='?',MENU_KIND='';
 function renderMenu(){const d=menuDef(),m=$('menu');const sig=d?JSON.stringify(d):'none';if(sig===MENU_SIG)return;MENU_SIG=sig;
- if(!d){m.style.display='none';return;}m.className=d.cls||'';m.innerHTML='';m.style.display='flex';if(d.title){const h=document.createElement('h2');h.textContent=d.title;m.appendChild(h);}
+ if(!d){m.style.display='none';MENU_KIND='';return;}const kind=G.state+'|'+(d.cls||'')+'|'+(d.title||'');m.className=(d.cls||'')+(kind!==MENU_KIND?' anim':'');MENU_KIND=kind;m.innerHTML='';m.style.display='flex';let grid=null,idx=0;if(d.title){const h=document.createElement('h2');h.textContent=d.title;m.appendChild(h);}
  for(const it of d.items){const b=document.createElement('button');b.className='mb '+(it.c||'');b.dataset.a=it.a;b.innerHTML=(it.fill?'<span class="fill" style="width:'+updPct+'%"></span>':'')+'<span class="ic"></span><span class="lbl"></span>';
-  b.querySelector('.ic').textContent=it.ic||'';b.querySelector('.lbl').textContent=it.l;
-  b.addEventListener('click',e=>{e.stopPropagation();haptic(12);initAudio();SFX.click();menuAction(it.a);});m.appendChild(b);}
+  b.querySelector('.ic').textContent=it.ic||'';b.querySelector('.lbl').textContent=it.l;if(it.sub){const sb=document.createElement('span');sb.className='sub';sb.textContent=it.sub;b.querySelector('.lbl').appendChild(sb);}b.style.setProperty('--i',idx++);if(it.tile)b.classList.add('tile');
+  b.addEventListener('click',e=>{e.stopPropagation();haptic(12);initAudio();SFX.click();menuAction(it.a);});if(it.tile){if(!grid){grid=document.createElement('div');grid.className='grid';m.appendChild(grid);}grid.appendChild(b);}else m.appendChild(b);}
  if(d.ver){const v=document.createElement('div');v.className='ver';v.textContent='Verzió: v'+APP_VERSION+(navigator.onLine?'':'  •  offline');m.appendChild(v);}}
 function menuAction(a){
- if(a==='resume'){G.paused=false;}else if(a==='quit'){if(P)save(P.dist);G.paused=false;G.state='title';G.st=0;engine(0,0);}
- else if(a==='radio'){radioNext();}else if(a==='install')doInstall();else if(a==='share')doShare();else if(a==='update')doUpdate();
+ if(a==='resume'){G.paused=false;}else if(a==='quit'){goHome();}
+ else if(a==='log'){openLedger(G.state==='play'?'pause':'menu');}else if(a==='radio'){radioNext();}else if(a==='install')doInstall();else if(a==='share')doShare();else if(a==='update')doUpdate();
  else if(a==='music'){toggleMusic();}else if(a==='home'){G.state='title';G.st=0;}
  else if(a==='go'){K.enterP=true;G.st=Math.max(G.st,99);}
  else titleAct(a);
  MENU_SIG='?';}
 const setC=(id,cls,on)=>{const el=$(id);if(el&&el.classList.contains(cls)!==!!on)el.classList.toggle(cls,!!on);};
 let touchShown=null;
-function appTick(){renderMenu();
+function appTick(){if(G.state==='title'){const m=$('menu');if(m.style.display!=='none'){const r=m.getBoundingClientRect(),c=document.getElementById('c').getBoundingClientRect();if(c.width)G.menuR=clamp((r.right-c.left)/c.width*W,0,W*0.6);}}
+{const tb=G.state==='play'&&!G.paused&&!MG&&!G.ledger&&!(P&&(P.sub==='pump'||P.sub==='shop'));const el=$('topbar');if(el.dataset.v!==String(tb)){el.dataset.v=tb;el.style.display=tb?'flex':'none';}}
+ if(P&&G.state==='play'){const st=clamp((LANE[P.lane]-P.y)*2.2,-40,40);const v=st.toFixed(0)+'deg';if(appTick.st!==v){appTick.st=v;$('bHonk').style.setProperty('--steer',v);}}
+if(G.ledger&&G.ledger==='play'&&!G.paused)closeLedger();if(G.ledger&&G.state==='title')closeLedger();renderMenu();
  const tch=isTouch&&G.state==='play'&&!G.paused&&!MG&&!(P&&(P.sub==='pump'||P.sub==='shop'));if(tch!==touchShown){touchShown=tch;$('touch').style.display=tch?'block':'none';if(!tch)$('cruiseBar').style.display='none';}
  if(tch&&P){setC('bLight','act',P.lightMode>=1);$('lLight').textContent=['KI','HELYZ','TOMP','REFL'][P.lightMode];setC('bLight','blue',P.lightMode===3);
   setC('bFog','act',P.fogF||P.fogR);$('lFog').textContent=P.fogR?'KÖD 2':P.fogF?'KÖD 1':'KÖD';setC('bFlash','blue',P.flashOn);setC('bHaz','warn',P.haz);

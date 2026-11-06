@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.2.0
+# 🚐 Családi Vakáció – v2.3.0
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -33,9 +33,11 @@ Komárom → Siófok → Keszthely → Bécs → Prága → Berlin → Amszterda
 
 A sarokban **minitérkép** mutatja, merre jár a család (érintésre nagyobb). A térkép földrajzilag pontos, [Natural Earth](https://www.naturalearthdata.com) közkincs adatokból készült.
 
-## 🗺️ Az útvonal
+## 🎬 Filmes főmenü
 
-Komárom → Siófok → Keszthely → Bécs → Salzburg (Alpok) → Velence → Párizs → Provence → haza, Komárom.
+A főmenü úgy indul, mint egy film: feketéből úszik be a kép, szélesvásznú csíkokkal, a cím középről a helyére úszik. A családi autó egy irányba halad, a jelenetek (Komárom, Balaton, Alpok, olasz tengerpart, Provence, Párizs éjjel) áttűnéssel váltják egymást. Közben lassú kameramozgás, filmes színkorrekció, lencsefény, vignetta és filmszemcse látszik. Az alsó csíkban írógéppel jelenik meg a helyszín, a felsőben a szereplők. Bármilyen érintés átugorja a nyitányt.
+
+## 🛣️ Út közben
 
 Út közben folyamatosan váltakozik a város, a falu, az országút és az autópálya, a táblákon valós településnevekkel (Ács, Bábolna, Sümeg, Mondsee, Beaune…). A sebességkorlátozás is szakaszonként változik: 50, 90/100 vagy 130 km/h.
 
@@ -53,11 +55,20 @@ A megállókat előjelző tábla jelzi („Benzinkút 500 m”), a következők 
 - **Trafik:** kaparós sorsjegy, nagy kaparós (négyszeres nyeremény), üdítő.
 - **Újságos:** gyerekújság, autós térkép, sorsjegy.
 
-Megálláshoz állj meg a szélső (felső) sávban az üzlet előtt.
+**Megállás egy érintéssel:** a kijelző alatt zöld „P” gombok mutatják a következő megállókat („P Kisbolt 400 m”). Érintésre (vagy az **E** billentyűre) apa irányjelzővel átsorol a szélső sávba, finoman lassít, és pontosan az üzlet ajtaja, illetve a benzinkútnál a tanksapka a kút előtt áll meg. Utána magától nyílik a bolt vagy a kút. Piros lámpánál és az előttünk haladó autó mögött megvár. Fékkel vagy sávváltással a megállás törölhető. Kézzel is meg lehet állni a szélső sávban az üzlet előtt.
 
 **Sebességmérő kapu (VÉDA):** előtte „Sebességmérés” tábla áll. Ha túl gyorsan haladsz át alatta, villan, és jön a bírság (15 000 – 100 000 Ft).
 
 ## 💰 Pénz: 500 000 Ft kezdő keret
+
+**Pontos könyvelés:** minden kiadás és bevétel egész forintra kerekítve, egy helyen kerül könyvelésre. A tankolás ára a liter (két tizedesre) és az aktuális literár szorzata, így a kijelzőn látott összeg pontosan egyezik a levont összeggel.
+
+**Költségnapló:** a jobb felső sarokban a pénzre koppintva (vagy az **N** billentyűvel, a szünetmenüből és a térképről) megnyílik a napló:
+- egyenleg, kezdő keret, kiadások, bevételek, és ellenőrzés, hogy a végösszeg forintra pontosan egyezik;
+- kategóriák arányokkal: tankolás, élelmiszer, baba, gyerekek, matrica és útdíj, szállás, autó és segélyszolgálat, bírság, sorsjegy;
+- minden tétel szakaszonként, km-rel, dátummal és a maradó egyenleggel; szűrhető kiadásra vagy bevételre.
+
+Minden tranzakció után a pénzkijelző egy pillanatra a levont vagy kapott összeget mutatja.
 
 **Kiadások:**
 - tankolás (országonként eltérő literár),
@@ -93,7 +104,14 @@ Minden jármű valós méretarányban látszik a családi autóhoz képest: kisa
 
 Előfordulhat **baleset** az úton (rendőr, mentő, lezárt sáv). Nagyon ritkán pedig **helyi rendőr** ér utol szirénával: le kell húzódni és megállni, ilyenkor jön az igazoltatás.
 
+## 🌳 Táj
+
+Mezők (búza, napraforgó, repce, kukorica, szántás, levendula) szalmabálákkal, fasorok, nyárfák, nyírfák, bokrok, virágos fű, tanyák silóval, szélerőművek, Hollandiában szélmalmok, madarak, párás távoli dombok, és út menti kilométerkövek valós km-számmal.
+
 ## 🚗 Az autó kezelése
+
+- **Középkonzol:** a kapcsolók LED-del jelzik, mi van bekapcsolva (zöld, kék, borostyán), lenyomásra besüppednek. A pedálok lenyomásra előrebillennek és világítanak, a kormány sávváltáskor elfordul.
+- **Felső sáv:** ⏸ szünet és ⌂ **főmenü**. A főmenü gomb automatikusan elmenti a játékállást, a Folytatás gombbal pontosan onnan lehet továbbmenni. A játék akkor is ment, ha a telefon képernyője lezár vagy az alkalmazás a háttérbe kerül.
 
 - **Világításkapcsoló:** kikapcsolva, helyzetjelző, tompított, reflektor.
 - **Fénykürt (villogtatás)** és **duda:** az előtted haladó autó lehúzódik.
@@ -121,6 +139,8 @@ Előfordulhat **baleset** az úton (rendőr, mentő, lezárt sáv). Nagyon ritk�
 | O | AJTÓ | ajtók |
 | R | R | hátramenet |
 | T | TEMPO | tempomat |
+| E | P gomb | megállás a következő üzletnél |
+| N | pénz | költségnapló |
 | B | KÉZI | kézifék |
 | Q | RÁDIÓ | rádió: következő állomás |
 | P | II | szünet |

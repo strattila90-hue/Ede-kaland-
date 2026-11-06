@@ -38,6 +38,7 @@ const SHOPS={
  ujsag:{title:'Újságos',col:'#2f6b45',items:[{k:'comic',nm:'Gyerekújság',p:1290,mood:1},{k:'color',nm:'Színező',p:990,mood:1},{k:'map',nm:'Autós térkép',p:2490,msg:'Az új térképpel nem tévedünk el!'},{k:'postcard',nm:'Képeslap',p:290,photo:1},{k:'scratch',nm:'Kaparós 1x',p:600,mult:1}]},
  fuel:{title:'Benzinkút - bolt',col:'#2e8b57',items:[{k:'food',nm:'Szendvics',p:4790,food:35},{k:'coffee',nm:'Kávé Apának',p:890,msg:'Apa felfrissült.'},{k:'water',nm:'Ásványvíz',p:690,food:5},{k:'baby',nm:'Bébiétel',p:1990,baby:30},
   {k:'ice',nm:'Fagyi',p:2190,mood:1},{k:'tyre',nm:'Pótkerék',p:28000,tyre:true},{k:'scratch',nm:'Kaparós 1x',p:600,mult:1},{k:'work',nm:'Munka',p:0,work:true}]}};
+const ITEMCAT={food:'food',pastry:'food',fruit:'food',water:'food',drink:'food',coffee:'food',big:'food',basket:'food',gum:'food',baby:'baby',diaper:'baby',babybig:'baby',ice:'fun',toy:'fun',game:'fun',comic:'fun',color:'fun',postcard:'fun',map:'other',tyre:'service',scratch:'lottery',scratch4:'lottery',scratch10:'lottery'};
 const PANEL=[166,50,308,214];
 function shopList(type){const T=G.trip,ps=P.shop;return SHOPS[type].items.filter(it=>(!it.work||!ps.worked)&&(!it.tyre||!T.spare));}
 function cardRect(i){return [PANEL[0]+8+(i%4)*74,PANEL[1]+40+Math.floor(i/4)*60,70,56];}
@@ -47,7 +48,7 @@ function enterShop(type){P.sub='shop';P.shop={type:type,msg:'',worked:false,anim
 function leaveStop(){P.sub='drive';P.hide.apa=0;P.hide.anna=0;P.shop=null;P.pump=null;P.stopCD=P.dist;SFX.clunk();say('Mehetünk tovább!','apa');}
 function updShop(){const T=G.trip,ps=P.shop,items=shopList(ps.type);if(ps.anim>0)ps.anim--;
  for(let i=0;i<items.length;i++){if(K.num===i+1||inRect(TAP,cardRect(i))){const it=items[i];
-  if(T.money<it.p){ps.msg='Nincs elég pénz!';SFX.alarm();continue;}T.money-=it.p;T.spentShop+=it.p;if(it.p)SFX.cash();ps.anim=20;ps.last=i;
+  if(T.money<it.p){ps.msg='Nincs elég pénz!';SFX.alarm();continue;}if(it.p){book(-it.p,ITEMCAT[it.k]||'other',SHOPS[ps.type].title+': '+it.nm);SFX.cash();}ps.anim=20;ps.last=i;
   if(it.food)T.food=Math.min(100,T.food+it.food);if(it.baby)T.baby=Math.min(100,T.baby+it.baby);if(it.mood){T.mood=Math.min(5,T.mood+it.mood);say('Köszönjük, Apa!','anna');}
   if(it.tyre)T.spare=true;if(it.photo)T.photos++;ps.msg=it.msg||('Megvetted: '+it.nm);
   if(it.mult){startMini('scratch',{mult:it.mult,onEnd:r=>{ps.msg=r?'Nyeremény: '+fmt(r)+' Ft!':'Most nem nyert.';}});return;}
@@ -76,13 +77,13 @@ function updPump(){const pm=P.pump,T=G.trip,L=LEGS[G.leg];pm.t=(pm.t||0)+1;
   if(pm.shake>0)pm.shake--;}
  else if(pm.step==='fill'){const hx=PUMP.hold[0]+30,hy=PUMP.hold[1]+30;const on=(K.pump||(HOLD&&Math.hypot(HOLD.x-hx,HOLD.y-hy)<32))&&!pm.full;
   if(on){const add=Math.min(0.22,CAR.tank-T.fuel);T.fuel+=add;pm.liters+=add;if(Math.floor(pm.liters)!==Math.floor(pm.liters-add))SFX.tick();if(pm.t%4===0)noise(0.06,0.05,0,900);if(CAR.tank-T.fuel<0.01){pm.full=true;SFX.clunk();vib(30);pm.msg='KATT! Tele a tank.';}}
-  pm.on=on;if(K.enterKey||inRect(TAP,PUMP.pay)){if(pm.liters>0.01){const cost=Math.round(pm.liters*L.price);T.money-=cost;T.spentFuel+=cost;pm.cost=cost;SFX.cash();vib(20);}enterShop('fuel');P.shop.msg=pm.liters>0.01?'Köszönjük! Jó utat!':'';}}}
+  pm.on=on;if(K.enterKey||inRect(TAP,PUMP.pay)){if(pm.liters>0.01){pm.liters=Math.round(pm.liters*100)/100;const cost=Math.round(pm.liters*L.price);book(-cost,'fuel','Tankolás: '+fmt(pm.liters,2)+' l x '+L.price+' Ft/l');pm.cost=cost;SFX.cash();vib(20);}enterShop('fuel');P.shop.msg=pm.liters>0.01?'Köszönjük! Jó utat!':'';}}}
 function drawPumpUI(g){const pm=P.pump,T=G.trip,L=LEGS[G.leg],r=PANEL;const sh=pm.shake?Math.sin(pm.shake*1.6)*2:0;
  frr(g,'rgba(12,15,24,0.94)',r[0],r[1],r[2],r[3],10);g.strokeStyle='#2e8b57';g.lineWidth=1.4;rrect(g,r[0],r[1],r[2],r[3],10);g.stroke();
  frr(g,'#2e8b57',r[0],r[1],r[2],18,10);R(g,'#2e8b57',r[0],r[1]+9,r[2],9);text(g,'Benzinkút - tankolás',r[0]+10,r[1]+5.5,'#ffffff',1.2,'left',null);text(g,'95: '+L.price+' Ft/l',r[0]+r[2]-8,r[1]+6,'#ffffff',1,'right',null);
  // a kút
  const px=r[0]+10,py=r[1]+26;frr(g,lg(g,px,0,px+62,0,[[0,'#3aa36a'],[1,'#22744a']]),px,py,58,176,8);frr(g,'#0d1a12',px+6,py+8,46,40,4);
- text(g,'LITER',px+9,py+12,'#5bd06a',1,'left',null);text(g,fmt(pm.liters,2),px+48,py+21,'#b7ffcf',1,'right',null);text(g,'FT',px+9,py+31,'#5bd06a',1,'left',null);text(g,fmt(pm.liters*L.price),px+48,py+40,'#b7ffcf',1,'right',null);
+ text(g,'LITER',px+9,py+12,'#5bd06a',1,'left',null);text(g,fmt(pm.liters,2),px+48,py+21,'#b7ffcf',1,'right',null);text(g,'FT',px+9,py+31,'#5bd06a',1,'left',null);text(g,fmt(Math.round(Math.round(pm.liters*100)/100*L.price)),px+48,py+40,'#b7ffcf',1,'right',null);
  frr(g,'#ffcf33',px,py+54,58,6,1);text(g,'95  DIESEL',px+29,py+55,'#1b1f26',0.8,'center',null);
  // pisztolyok a tartóban
  const noz=(rc,col,lbl,inHolster)=>{frr(g,'#1b1f26',rc[0]-2,rc[1]-2,rc[2]+4,rc[3]+4,4);if(inHolster){frr(g,col,rc[0]+3,rc[1]+2,rc[2]-6,rc[3]-8,4);frr(g,'#3a3f47',rc[0]+rc[2]-8,rc[1]+rc[3]-10,10,4,1.5);text(g,lbl,rc[0]+rc[2]/2-1,rc[1]+10,'#ffffff',0.8,'center',null);}else text(g,'-',rc[0]+rc[2]/2,rc[1]+12,'#5a636d',1,'center',null);};
@@ -100,7 +101,7 @@ function drawPumpUI(g){const pm=P.pump,T=G.trip,L=LEGS[G.leg],r=PANEL;const sh=p
   const wv=pm.on?Math.sin(pm.t*0.3)*1.2:0;g.fillStyle=lg(g,0,ty,0,ty+th,[[0,'#ffd75a'],[1,'#e8a01a']]);g.beginPath();g.moveTo(tx,ty+th);g.lineTo(tx,ty+th*(1-0.9)+wv);
   g.lineTo(tx+tw*fl,ty+th*0.1-wv);g.lineTo(tx+tw*fl,ty+th);g.closePath();g.fillRect(tx,ty,tw*fl,th);if(pm.on)for(let i=0;i<5;i++)disc(g,'rgba(255,255,255,0.5)',tx+((pm.t*3+i*37)%Math.max(8,tw*fl)),ty+6+((i*7+pm.t)%14),1);
   g.restore();g.strokeStyle='rgba(255,255,255,0.3)';g.lineWidth=0.8;rrect(g,tx,ty,tw,th,10);g.stroke();text(g,fmt(T.fuel,1)+' / '+CAR.tank+' l',tx+tw/2,ty+9.5,'#1b1f26',1,'center',null);
-  text(g,fmt(pm.liters,2)+' l',tx,ty+36,'#b7ffcf',2,'left',null);text(g,fmt(pm.liters*L.price)+' Ft',tx,ty+58,'#ffd84a',2,'left',null);
+  text(g,fmt(pm.liters,2)+' l',tx,ty+36,'#b7ffcf',2,'left',null);text(g,fmt(Math.round(Math.round(pm.liters*100)/100*L.price))+' Ft',tx,ty+58,'#ffd84a',2,'left',null);
   // nagy tankoló gomb
   const hx=PUMP.hold[0]+30,hy=PUMP.hold[1]+30;disc(g,pm.on?'#3fb06e':'#2e8b57',hx,hy,26);g.strokeStyle='#ffffff';g.lineWidth=2.4;g.beginPath();g.arc(hx,hy,29,-Math.PI/2,-Math.PI/2+TAU*fl);g.stroke();
   itemIcon(g,'water',hx,hy-6);text(g,pm.full?'TELE':isTouch?'TARTSD':'SPACE',hx,hy+6,'#ffffff',1,'center',null);
