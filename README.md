@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.13.1
+# 🚐 Családi Vakáció – v2.13.2
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -260,7 +260,8 @@ A középkonzolon csak három gomb van: **világítás** (egyetlen gomb minden f
 - **Előmelegítés:** a betűképek induláskor és felbontásváltáskor a telefon üresjárati idejében készülnek el, nem játék közben.
 - **Mentés üresjáratban:** az automatikus mentés (10 mp-enként) akkor fut, amikor a telefon épp ráér, így nem okoz döccenést.
 - **Városi házak:** ablakonkénti színátmenet helyett egyszerű kitöltés és csillanás.
-- **90/120 Hz-es kijelzőn:** a játék csak akkor rajzol új képet, ha a játékban tényleg történt valami (60 lépés/mp), így nem rajzolja kétszer ugyanazt: fele annyi munka, kevesebb melegedés és akadás.
+- **Sima mozgás 90/120/144 Hz-en is:** a játék 60 lépést tesz másodpercenként, a kép viszont a kijelző frissítéséhez igazodik (120 Hz-en 60, 144 Hz-en 72 egyenletes kép/mp), és két lépés között az út, a járművek és a sávváltás helyzetét arányosan kiszámolja. Így gyors menetben sem rángat a kép (korábban a nagy frissítésű kijelzőkön a képek egyenetlen ütemben jöttek, ez tűnt akadásnak).
+- **Akadásfigyelés:** a minőség akkor vesz vissza, ha a képek ténylegesen késnek a kijelző üteméhez képest.
 - **Letöltés a főmenüben:** a főmenübe érve a telefon azonnal letölti magának a teljes játékot; a főmenü alján látszik, ha kész („✓ teljes játék letöltve, offline is megy”). Utána internet nélkül is indul és végigjátszható.
 - **Nincs fölösleges oldalfrissítés:** a gombok feliratai csak akkor íródnak újra, ha tényleg változnak.
 - **Gyenge telefonon:** egyszerűbb díszítés, a kijelző minden 3. képkockán rajzolódik újra, végső esetben 30 kép/mp rajzolás 60-as játéklogikával.
