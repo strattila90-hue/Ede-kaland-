@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.21.3
+# 🚐 Családi Vakáció – v2.22.0
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -91,7 +91,7 @@ A főmenü egyetlen álló kép, családi road movie plakát: naplemente csíkos
 
 ## 🛣️ Út közben
 
-Út közben folyamatosan váltakozik a város, a falu, az országút és az autópálya, a táblákon valós településnevekkel (Ács, Bábolna, Sümeg, Mondsee, Beaune…). A sebességkorlátozás is szakaszonként változik: 50, 90/100 vagy 130 km/h.
+Út közben folyamatosan váltakozik a város, a falu, az országút és az autópálya, a táblákon valós településnevekkel (Ács, Bábolna, Sümeg, Mondsee, Beaune…). A sebességkorlátozás is szakaszonként változik: 50, 90/100 vagy 130 km/h. A korlátot nagy, jól olvasható tábla mutatja az út mellett és a műszerfalon is; ha túllépted, a műszerfali tábla sárgán villog.
 
 **Satufék:** erős fékezésnél csak a gumik csikorognak, féknyom marad az úton, az utasok előrebillennek és tágra nyílt szemmel ijednek meg (sikoly nincs). Normál fékezésnél is kicsit előredőlnek.
 
@@ -252,7 +252,7 @@ Mezők (búza, napraforgó, repce, kukorica, szántás, levendula) szalmabálák
 - **Nagy kamion, busz mellett:** ha egy jármű eltakarná az autót, áttetszővé válik, így a családi autó mindig látszik.
 - **Hátsó lámpa:** függőleges, a hátsó oszlop ívét követi, három LED-csíkkal; benne a helyzetjelző, a féklámpa (fékezéskor az egész lámpa felizzik) és az irányjelző.
 - **Féklámpa** fékezéskor és álló helyzetben.
-- **Rádió:** négy állomás saját szerzésű zenével (Retro FM, Rock Rádió, Pop Hullám, Esti Lounge).
+- **Rádió:** öt állomás saját szerzésű zenével. Az első az **Országút Rádió**: lendületes, napsütéses országúti rock (150 BPM, boogie basszus, torzított gitárriffek, gitárdallam és taps a refrénben, gitárszóló húzásokkal, 32 ütemes körben), igazi „indulunk!” zene. Utána: Retro FM, Rock Rádió, Pop Hullám, Esti Lounge.
 - **Motorhang:** négyhengeres motor, fordulatszám és terhelés szerint változik.
 - **Mini műszerfal:** sebességmérő, fordulatszámmérő, fokozat, üzemanyagszint, sebességkorlátozás, átlagfogyasztás és visszajelző lámpák.
 

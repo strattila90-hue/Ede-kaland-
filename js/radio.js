@@ -2,7 +2,7 @@
 /* =========================================================
    MOTORHANG és AUTÓRÁDIÓ
    A motor: 4 hengeres négyütemű, gyújtási frekvencia = fordulat/60*2
-   A rádió: saját, kódból generált zene, 4 állomás (nem jogvédett számok)
+   A rádió: saját, kódból generált zene, 5 állomás (saját szerzemények, nem jogvédett számok)
    ========================================================= */
 let EN=null;
 function engineInit(){if(!AC||EN)return;
@@ -22,13 +22,18 @@ function engine(rpm,load){if(!AC)return;engineInit();if(!EN)return;const t=AC.cu
 
 /* ---- rádió ---- */
 const STATIONS=[
+ {name:'Országút Rádió 96,4',bpm:150,style:'road',key:52,prog:[0,0,5,0,7,5,0,7],minor:false},
  {name:'Retro FM 88,5',bpm:104,style:'synth',key:57,prog:[0,-4,3,-2],minor:true},
  {name:'Rock Rádió 92,1',bpm:132,style:'rock',key:52,prog:[0,3,5,3],minor:true},
  {name:'Pop Hullám 101,3',bpm:118,style:'pop',key:60,prog:[0,7,9,5],minor:false},
  {name:'Esti Lounge 104,7',bpm:84,style:'chill',key:62,prog:[0,5,-3,-5],minor:false}];
 const radio={on:false,idx:-1,step:0,next:0,bus:null,show:0};
 function radioInit(){if(!AC||radio.bus)return;const b=AC.createGain();b.gain.value=0.55;const f1=AC.createBiquadFilter();f1.type='highpass';f1.frequency.value=90;const f2=AC.createBiquadFilter();f2.type='lowpass';f2.frequency.value=7000;
- b.connect(f1);f1.connect(f2);f2.connect(BUS?BUS.radio:master);radio.bus=b;}
+ b.connect(f1);f1.connect(f2);f2.connect(BUS?BUS.radio:master);radio.bus=b;
+ /* torzított gitár: előerősítés -> torzító -> hangláda-szűrő */
+ const pre=AC.createGain();pre.gain.value=1;const ws=AC.createWaveShaper(),cu=new Float32Array(1024);for(let i=0;i<1024;i++){const x=i/512-1;cu[i]=Math.tanh(x*7)*0.8;}ws.curve=cu;ws.oversample='2x';
+ const cab=AC.createBiquadFilter();cab.type='lowpass';cab.frequency.value=3400;cab.Q.value=0.8;const hp=AC.createBiquadFilter();hp.type='highpass';hp.frequency.value=110;const out=AC.createGain();out.gain.value=0.1;
+ pre.connect(ws);ws.connect(cab);cab.connect(hp);hp.connect(out);out.connect(b);radio.gtr=pre;}
 function radioNext(){initAudio();if(!AC)return;radioInit();radio.idx++;if(radio.idx>=STATIONS.length){radio.idx=-1;radio.on=false;}else radio.on=true;radio.show=200;radio.step=0;radio.next=AC.currentTime+0.35;noise(0.3,0.12,0,3500);}
 function rv(f,d,type,v,t0,cut,att){const t=AC.currentTime+t0,o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.setValueAtTime(f,t);
  g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(v,t+(att||0.005));g.gain.exponentialRampToValueAtTime(0.0001,t+d);let node=o;
@@ -37,7 +42,38 @@ function rv(f,d,type,v,t0,cut,att){const t=AC.currentTime+t0,o=AC.createOscillat
 function rnoise(d,v,t0,type,freq){const t=AC.currentTime+t0,n=Math.max(1,AC.sampleRate*d|0),b=AC.createBuffer(1,n,AC.sampleRate),a=b.getChannelData(0);for(let i=0;i<n;i++)a[i]=(Math.random()*2-1)*Math.pow(1-i/n,2);
  const s=AC.createBufferSource();s.buffer=b;const f=AC.createBiquadFilter();f.type=type;f.frequency.value=freq;const g=AC.createGain();g.gain.value=v;s.connect(f);f.connect(g);g.connect(radio.bus);s.start(t);}
 function kick(t0,v){const t=AC.currentTime+t0,o=AC.createOscillator(),g=AC.createGain();o.frequency.setValueAtTime(130,t);o.frequency.exponentialRampToValueAtTime(42,t+0.12);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.25);o.connect(g);g.connect(radio.bus);o.start(t);o.stop(t+0.3);}
-function playStep(st,step,t0,spb){const s16=step%16,bar=Math.floor(step/16),root=st.key+st.prog[bar%4],min=st.minor,third=min?3:4;
+/* ---- Országút Rádió: lendületes országúti rock (saját szerzemény) ----
+   32 ütemes kör: 8 ütem bevezető riff, 8 ütem verze, 8 ütem refrén (gitárdallam + taps), 8 ütem szóló.
+   Boogie basszus, tompított power chord nyolcadok, kiemelt ütések, cintányér a részek elején. */
+function gtr(f,d,v,t0,bend){const t=AC.currentTime+t0,o=AC.createOscillator(),g=AC.createGain();o.type='sawtooth';
+ if(bend){o.frequency.setValueAtTime(f*Math.pow(2,-bend/12),t);o.frequency.exponentialRampToValueAtTime(f,t+Math.min(d*0.5,0.12));}else o.frequency.setValueAtTime(f,t);
+ g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(v,t+0.004);g.gain.setValueAtTime(v,t+d*0.7);g.gain.exponentialRampToValueAtTime(0.0001,t+d);o.connect(g);g.connect(radio.gtr);o.start(t);o.stop(t+d+0.03);}
+function crash(t0,v){rnoise(1.1,v,t0,'highpass',5200);}
+const ROAD_HOOK=[ // refrén gitárdallam (2 ütem, 16-od lépések; fokok a dúr pentaton skálán, null = szünet)
+ [7,null,null,9,null,12,null,null,12,null,14,null,12,null,9,null],
+ [7,null,null,4,null,7,null,null,9,null,null,null,7,null,null,null]];
+const ROAD_SOLO=[ // szóló: rövid, ismétlődő lickek húzással
+ [12,null,15,null,16,null,15,12,null,null,10,null,12,null,null,null],
+ [9,null,12,null,9,7,null,4,null,null,7,null,null,null,null,null]];
+function roadStep(st,step,t0,spb){const s16=step%16,bar=Math.floor(step/16),sec=Math.floor((bar%32)/8),bi=bar%8,root=st.key+st.prog[bi];
+ // dob: egyenes rock ütem, a refrénben duplázott lábdob a végén
+ if(s16===0||s16===8||(s16===10&&sec>=2)||(s16===14&&bi%2===1))kick(t0,0.6);
+ if(s16===4||s16===12){rnoise(0.16,0.4,t0,'bandpass',1900);if(sec===2)rnoise(0.06,0.22,t0+0.008,'bandpass',1200);}
+ if(s16%2===0)rnoise(s16===14?0.16:0.035,s16%4===0?0.09:0.14,t0,'highpass',8000);
+ if(bi===7&&s16>=12)rnoise(0.09,0.28,t0,'bandpass',900+(s16-12)*260); // dobfutam a rész végén
+ if(bi===0&&s16===0&&bar>0)crash(t0,0.22);
+ // basszus: boogie (alap, terc, kvint, szext, kis szept, vissza)
+ if(s16%2===0){const bp=sec===0&&bi<4?[0,0,0,0,0,0,0,0]:[0,4,7,9,10,9,7,4];rv(mf(root-12+bp[s16/2]),spb*1.7,'square',0.09,t0,700);}
+ // ritmusgitár: tompított power chord nyolcadok, ütem elején és a 7. tizenhatodon kiemelve
+ if(s16%2===0||s16===7){const acc=s16===0||s16===7,len=acc?spb*(s16===7?5:3):spb*0.9,v=acc?0.5:0.3;
+  if(!(sec===0&&bi<2&&s16!==0))for(const iv of [0,7,12])gtr(mf(root-12+iv),len,v,t0,0);}
+ // vezető gitár
+ const pent=[0,2,4,7,9,12,14,16];
+ if(sec===0&&bi>=2){const riff=[0,null,3,null,4,null,7,null,9,null,7,null,4,null,3,null];const n=riff[s16];if(n!==null&&bi%2===0)gtr(mf(st.key+n),spb*1.8,0.32,t0,n===3?1:0);}
+ if(sec===2){const n=ROAD_HOOK[bi%2][s16];if(n!==null)gtr(mf(st.key+12+n),spb*(ROAD_HOOK[bi%2][s16+1]===null?3.2:1.6),0.42,t0,n===12||n===9?2:0);}
+ if(sec===3){const n=ROAD_SOLO[bi%2][s16];if(n!==null)gtr(mf(root+12+n),spb*1.9,0.4,t0,(s16===0||n===15)?2:0);}
+ if(sec===1&&bi%2===1&&s16>=8&&s16%2===0){const n=pent[(hsh(bar*17+s16)*5|0)+2];gtr(mf(root+12+n),spb*1.7,0.3,t0,s16===8?1:0);}}
+function playStep(st,step,t0,spb){if(st.style==='road'){roadStep(st,step,t0,spb);return;}const s16=step%16,bar=Math.floor(step/16),root=st.key+st.prog[bar%4],min=st.minor,third=min?3:4;
  const scale=min?[0,3,5,7,10,12,15]:[0,2,4,7,9,12,14];
  // dob
  if(st.style==='synth'||st.style==='pop'){if(s16%4===0)kick(t0,0.5);}else if(st.style==='rock'){if(s16===0||s16===6||s16===8||s16===10)kick(t0,0.55);}else{if(s16===0||s16===10)kick(t0,0.35);}

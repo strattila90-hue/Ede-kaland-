@@ -629,8 +629,8 @@ function drawHUD(g){const L=LEGS[G.leg],T=G.trip,s=seg(),t=G.t,blinkOn=(t%40)<20
  gauge(g,67,27,15,P.rpm||0,7000,7,6/7);text(g,String(P.gear||'N'),67,29,'#ffd84a',1,'center',null);if(P.cruise){frr(g,'#123a5a',52,40,30,9,3);text(g,'T'+P.cruise,67,41,'#7fd1ff',1,'center',null);}
  const fl=T.fuel/CAR.tank;frr(g,'#1b212b',89,8,5,28,2);frr(g,fl>0.25?'#5bd06a':fl>0.12?'#ffcf33':'#ff4d4d',89.6,8.6+26.8*(1-fl),3.8,26.8*fl,1.6);text(g,'F',96,8,'#8a96a6',1,'left',null);text(g,'E',96,29,'#8a96a6',1,'left',null);
  text(g,fmt(T.fuel,0)+'l',93,39,T.fuel<7?'#ff6b6b':'#cfd6df',1,'center',null);
- disc(g,'#d32f2f',117,16,7);disc(g,'#ffffff',117,16,5.4);text(g,String(s.limit),117.4,13.6,'#111',s.limit>=100?0.5:0.62,'center',null);
- const avg=P.avgKm>0.5?P.avgL/P.avgKm*100:0;text(g,'Ø'+(avg?fmt(avg,1):'-'),117,29,'#cfd6df',1,'center',null);
+ {const lv=s.limit,big=lv>=100,ov=P.kmh>lv+5&&((t>>4)&1);disc(g,ov?'#ffeb3b':'#d32f2f',117,16.5,12.2);disc(g,'#ffffff',117,16.5,9.4);const sc=big?0.86:1.15;text(g,String(lv),117.4,16.5-3.5*sc,'#111',sc,'center',null);}
+ const avg=P.avgKm>0.5?P.avgL/P.avgKm*100:0;text(g,'Ø'+(avg?fmt(avg,1):'-'),117,31,'#cfd6df',1,'center',null);
  const lamps=[['pos',P.lightMode>=1],['low',P.lightMode>=2],['high',P.lightMode===3||P.flashOn],['fogF',P.fogF],['fogR',P.fogR],
   ['blL',(P.haz||P.flat||P.blink>0&&P.lastLane>P.lane)&&blinkOn],['blR',(P.haz||P.flat||P.blink>0&&P.lastLane<P.lane)&&blinkOn],['haz',P.haz],['rev',P.rev],['door',P.door>0.05],
   ['fuel',T.fuel<7],['radio',radio.on],['tyre',!!P.flat||!T.spare],['brake',!!P.hb]];
