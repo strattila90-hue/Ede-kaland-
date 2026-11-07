@@ -2,7 +2,7 @@
 /* =========================================================
    CSALÁDI VAKÁCIÓ – alapok: vászon, rajzoló segédek, betűk, hang, bemenet
    ========================================================= */
-const APP_VERSION='2.24.0';
+const APP_VERSION='2.25.0';
 const W=480,H=270,PX=70,ROADT=194,ROADB=262,LANE=[212,232,252];
 const TAU=Math.PI*2;
 let SC=2,LOWQ=false;
@@ -32,6 +32,18 @@ window.addEventListener('unhandledrejection',e=>{const r=e.reason;elog('hiba','K
 var MG=null;const cv=document.getElementById('c'),ctx=cv.getContext('2d',{alpha:false})||cv.getContext('2d');
 cv.width=W*SC;cv.height=H*SC;
 /* a kidobott vásznak grafikus memóriáját azonnal visszaadja (nem vár a böngésző takarítójára) */
+/* Androidon a Chrome memóriahiánykor elveheti a vásznak tartalmát (contextlost), majd ÜRESEN adja vissza (contextrestored).
+   Ilyenkor minden előre megrajzolt kép (betűk, autó, táj, műszerfal) üres lenne: mindet eldobjuk és újrarajzoljuk. */
+let CVLOST=0,CVLOSTN=0;
+function cvLost(){CVLOST=CVLOST||1;}
+function watchCv(c){try{c.addEventListener('contextlost',cvLost);c.addEventListener('contextrestored',()=>{CVLOST=2;});}catch(e){}return c;}
+function ctxLost(x){try{return !!(x&&x.isContextLost&&x.isContextLost());}catch(e){return false;}}
+function flushCaches(why){freeMap(GLC,a=>a.c);freeMap(STC);if(typeof SPR!=='undefined')freeMap(SPR,e=>e.c);if(typeof LTC!=='undefined')freeMap(LTC);if(typeof CARC!=='undefined')freeMap(CARC);
+ if(typeof onSC==='function')onSC();CVLOSTN++;if(typeof elog==='function')elog('info','Képtárak újrarajzolva ('+why+'), '+CVLOSTN+'. alkalom');}
+/* képkockánként olcsó: ha jelzés jött, vagy (másodpercenként) egy minta-vászon elveszett, és már nincs elveszve, mindent újrarajzolunk */
+function cvCheck(frm){if(!CVLOST&&frm%60===0){let lost=false;for(const a of GLC.values()){if(ctxLost(a.x)){lost=true;break;}}if(!lost&&typeof CARC!=='undefined')for(const c of CARC.values()){if(ctxLost(c.getContext('2d'))){lost=true;break;}}if(lost)CVLOST=1;}
+ if(CVLOST&&!ctxLost(ctx)){const w=CVLOST===2?'visszaadott vászon':'elveszett vászon';CVLOST=0;flushCaches(w);}}
+watchCv(cv);
 function freeCv(c){try{if(c&&c.width){c.width=0;c.height=0;}}catch(e){}}
 function freeMap(m,get){try{for(const v of m.values())freeCv(get?get(v):v);m.clear();}catch(e){}}
 function setSC(v){if(v!==SC){freeMap(GLC,a=>a.c);freeMap(STC);if(typeof SPR!=='undefined')freeMap(SPR,e=>e.c);if(typeof LTC!=='undefined')freeMap(LTC);if(typeof CARC!=='undefined')freeMap(CARC);}SC=v;cv.width=Math.round(W*SC);cv.height=Math.round(H*SC);if(typeof onSC==='function')onSC();}
@@ -45,7 +57,7 @@ function resize(){const iw=window.innerWidth,ih=window.innerHeight,s=Math.min(iw
 window.addEventListener('resize',resize);resize();
 
 /* ---------- segédfüggvények ---------- */
-function mk(w,h,sc){sc=sc||1;const c=document.createElement('canvas');c.width=Math.round(w*sc);c.height=Math.round(h*sc);const g=c.getContext('2d');g.setTransform(sc,0,0,sc,0,0);return [c,g];}
+function mk(w,h,sc){sc=sc||1;const c=watchCv(document.createElement('canvas'));c.width=Math.round(w*sc);c.height=Math.round(h*sc);const g=c.getContext('2d');g.setTransform(sc,0,0,sc,0,0);return [c,g];}
 function hsh(n){n=n|0;n=Math.imul(n^(n>>>16),0x45d9f3b);n=Math.imul(n^(n>>>16),0x45d9f3b);n=n^(n>>>16);return (n>>>0)/4294967296;}
 function rnd(a,b){return a+Math.random()*(b-a);}
 function pick(a){return a[Math.random()*a.length|0];}
@@ -90,7 +102,7 @@ const GLC=new Map(),ACOLS=16,AROWS=8;
 function quantCol(col){const m=/^rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*([\d.]+)\s*\)$/.exec(col);return m?'rgba('+m[1]+','+m[2]+','+m[3]+','+(Math.round(+m[4]*20)/20)+')':col;}
 function glyphAtlas(col,s){const k=col+'|'+s+'|'+SC;let a=GLC.get(k);if(a){GLC.delete(k);GLC.set(k,a);return a;}
  if(GLC.size>=40){const k0=GLC.keys().next().value;freeCv(GLC.get(k0).c);GLC.delete(k0);}
- const cw=Math.ceil(6*s+1),ch=Math.ceil(10*s+1),pw=Math.ceil(cw*SC)+2,ph=Math.ceil(ch*SC)+2,c=document.createElement('canvas');c.width=pw*ACOLS;c.height=ph*AROWS;
+ const cw=Math.ceil(6*s+1),ch=Math.ceil(10*s+1),pw=Math.ceil(cw*SC)+2,ph=Math.ceil(ch*SC)+2,c=watchCv(document.createElement('canvas'));c.width=pw*ACOLS;c.height=ph*AROWS;
  a={c:c,x:c.getContext('2d'),cw:cw,ch:ch,pw:pw,ph:ph,map:new Map(),n:0,col:col,s:s};GLC.set(k,a);return a;}
 function glyphCell(a,chr){let i=a.map.get(chr);if(i!==undefined)return i;if(a.n>=ACOLS*AROWS)return -1;i=a.n++;
  a.x.setTransform(SC,0,0,SC,(i%ACOLS)*a.pw+1,((i/ACOLS)|0)*a.ph+1);a.x.fillStyle=a.col;glyph(a.x,chr,0,a.s*3,a.s);a.map.set(chr,i);return i;}
@@ -99,10 +111,10 @@ function drawGlyph(g,chr,col,s,dx,dy){const a=glyphAtlas(col,s),i=glyphCell(a,ch
  g.drawImage(a.c,(i%ACOLS)*a.pw+1,((i/ACOLS)|0)*a.ph+1,a.pw-2,a.ph-2,dx,dy,a.cw,a.ch);}
 // teljes feliratok gyorsítótára: egy felirat egyetlen képmásolással rajzolódik ki
 const STC=new Map();
-function text(g,str,x,y,col,s,align,sh){s=s||1;str=String(str).toUpperCase();const w=textW(str,s);if(align==='center')x-=w/2;else if(align==='right')x-=w;x=Math.round(x);y=Math.round(y);
+function text(g,str,x,y,col,s,align,sh){s=Math.round((s||1)*20)/20||0.05;str=String(str).toUpperCase();const w=textW(str,s);if(align==='center')x-=w/2;else if(align==='right')x-=w;x=Math.round(x);y=Math.round(y);
  // a változó (számot tartalmazó) feliratok betűnként, a már kész betűképekből rajzolódnak: így nem keletkezik másodpercenként sok új vászon
  if(typeof col==='string'&&str.length>1&&!/[0-9]/.test(str)){const k=str+'|'+col+'|'+s+'|'+sh+'|'+SC;let c=STC.get(k);
-  if(!c){if(STC.size>80){const k0=STC.keys().next().value;freeCv(STC.get(k0));STC.delete(k0);}const cw=Math.ceil(w+s*2+2),chh=Math.ceil(10*s+2);c=document.createElement('canvas');c.width=Math.ceil(cw*SC);c.height=Math.ceil(chh*SC);const x2=c.getContext('2d');x2.setTransform(SC,0,0,SC,0,0);textRaw(x2,str,0,s*3,col,s,sh);c.lw=cw;c.lh=chh;STC.set(k,c);}
+  if(!c){if(STC.size>80){const k0=STC.keys().next().value;freeCv(STC.get(k0));STC.delete(k0);}const cw=Math.ceil(w+s*2+2),chh=Math.ceil(10*s+2);c=watchCv(document.createElement('canvas'));c.width=Math.ceil(cw*SC);c.height=Math.ceil(chh*SC);const x2=c.getContext('2d');x2.setTransform(SC,0,0,SC,0,0);textRaw(x2,str,0,s*3,col,s,sh);c.lw=cw;c.lh=chh;STC.set(k,c);}
   g.drawImage(c,x,y-s*3,c.lw,c.lh);return;}
  textRaw(g,str,x,y,col,s,sh);}
 const GLWARM='ABCDEFGHIJKLMNOPQRSTUVWXYZÁÉÍÓÖŐÚÜŰ0123456789.,:-/%+()!?';
@@ -111,10 +123,13 @@ function warmGlyphs(){const cols=['#ffffff','#9fb0c2','#cfd6df','#ffd84a','rgba(
 function idle(fn){if(window.requestIdleCallback)requestIdleCallback(fn,{timeout:1500});else setTimeout(()=>fn(null),60);}
 function textRaw(g,str,x,y,col,s,sh){
  if(typeof col!=='string'){if(sh!==null){g.fillStyle=sh||'rgba(10,12,20,0.85)';for(let i=0;i<str.length;i++)glyph(g,str[i],x+i*6*s+s*0.6,y+s*0.6,s);}g.fillStyle=col;for(let i=0;i<str.length;i++)glyph(g,str[i],x+i*6*s,y,s);return;}
- const shc=sh===null?null:quantCol(sh||'rgba(10,12,20,0.85)'),qc=quantCol(col);
+ const ga=g.globalAlpha,sp=sh===null?null:splitA(sh||'rgba(10,12,20,0.85)'),cp=splitA(col);
  for(let i=0;i<str.length;i++){const ch=str[i];if(ch===' ')continue;const gx=x+i*6*s;
-  if(shc)drawGlyph(g,ch,shc,s,gx+s*0.6,y+s*0.6-s*3);
-  drawGlyph(g,ch,qc,s,gx,y-s*3);}}
+  if(sp){g.globalAlpha=ga*sp[1];drawGlyph(g,ch,sp[0],s,gx+s*0.6,y+s*0.6-s*3);}
+  g.globalAlpha=ga*cp[1];drawGlyph(g,ch,cp[0],s,gx,y-s*3);}g.globalAlpha=ga;}
+/* rgba(r,g,b,a) -> [átlátszatlan szín, a]: így egy áttűnő felirat nem kér minden átlátszósági fokhoz új betűatlaszt */
+const SPLA=new Map();function splitA(col){let r=SPLA.get(col);if(r)return r;const m=/^rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*([\d.]+)\s*\)$/.exec(col);
+ r=m?['rgb('+m[1]+','+m[2]+','+m[3]+')',Math.round(Math.min(1,+m[4])*20)/20]:[col,1];if(SPLA.size>400)SPLA.clear();SPLA.set(col,r);return r;}
 
 /* ---------- hang ---------- */
 let AC=null,master=null,musicOn=true,mStep=0,mNext=0;

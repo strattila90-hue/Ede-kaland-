@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.24.0
+# 🚐 Családi Vakáció – v2.25.0
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -77,6 +77,8 @@ A főmenüben az **Album és rekordok** gomb (a Szünet menüből is elérhető)
 
 **Mentések (💾 a főmenüben):** három külön utazás (például gyerekenként), mindegyik saját névvel, utazással, képeslap-albummal és rekordokkal. Bármelyik **fájlba menthető** vagy **elküldhető** (pl. Messengeren), és másik telefonon vagy tableten a **Betöltés fájlból** gombbal ott folytatható, ahol abbahagytátok. Így az sem baj, ha a telefon takarítója vagy egy böngészőtörlés kitörli a játék adatait.
 
+
+**Eltűnő feliratok és autó javítva:** egyes Android-tableteken a Chrome memóriahiánykor elveszi a játék előre megrajzolt képeit (betűk, autó-karosszéria, táj), majd üresen adja vissza. Ilyenkor eltűnt minden szám és felirat, az autóból csak az ablakok és a kerekek látszottak. A játék most ezt észreveszi (azonnal, és biztonságból másodpercenként ellenőrzi), és mindent újrarajzol; a hibanaplóba „Képtárak újrarajzolva” kerül. A memóriahasználat is kisebb: az áttűnő feliratok nem kérnek külön betűképet minden átlátszósági fokhoz, és 4 GB vagy kevesebb memóriájú készüléken a felbontás menet közben nem emelkedik.
 
 **Hibanapló (🩺 a főmenüben és a Szünet menüben):** a játék rögzíti a hibákat (melyik fájl, melyik sor, milyen állapotban: szakasz, sebesség, felbontás), a fontos eseményeket (indulás, szakasz, totálkár, frissítés, háttérbe kerülés, vissza-gesztus), és ha a játék váratlanul leállt (pl. a telefon kevés memória miatt bezárta), a következő indításkor beírja, mikor, mennyi játék után és milyen állapotban történt. A naplót a **Küldés** gombbal el lehet küldeni (pl. Messengeren), vagy **Másolás**sal kimásolni. Menet közbeni hiba sem állítja le a játékot: a hibát naplózza, és fut tovább.
 
@@ -202,7 +204,7 @@ Minden tranzakció után a pénzkijelző egy pillanatra a levont vagy kapott ös
 - bírságok: traffipax, piros lámpa, matrica nélküli autópálya.
 
 **Pénzszerzés minijátékokkal:**
-- 🎟️ **Kaparós sorsjegy:** ujjal vagy egérrel kell lekaparni.
+- 🎟️ **Kaparós sorsjegy:** ujjal vagy egérrel kell lekaparni. Ha nyer, igazi ünneplés jön: konfettiágyúk lőnek a kártya két oldaláról, felhangzik az ujjongás és a tapsvihar, a telefon rezeg, és a család felkiált („Hurrá! Nyertünk!”, „Juhú!”). A nagy nyereménynél (20 000 Ft-tól) több a konfetti, hosszabb a taps, és Apa is megszólal.
 - 🔋 **Bikázás:** egy lerobbant autósnak segítesz a kábelek helyes sorrendjével.
 - 📦 **Kamionos:** elkapod a leeső dobozokat, és visszapakolod a rakományt.
 - 🥕 **Zöldséges:** a kútnál lévő boltban szín szerint válogatod a zöldséget és a gyümölcsöt.

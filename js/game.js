@@ -494,8 +494,8 @@ function fixPose(){const f=P.fix,k=P.flat,wx=PX+(k==='f'?WHEELS[1]:WHEELS[0]),do
 /* ---------- rajzolás: játék ---------- */
 let [DK,dg]=mk(W,H,SC*0.5);
 // előre elkészített fénykör: a sötétítő rétegből ezzel vágjuk ki a lámpák fényét (nem kell minden lámpához új színátmenet)
-const LSPR=(()=>{const [c,x]=mk(64,64,1);x.fillStyle=rg(x,32,32,0,32,[[0,'rgba(0,0,0,0.9)'],[0.5,'rgba(0,0,0,0.5)'],[1,'rgba(0,0,0,0)']]);x.fillRect(0,0,64,64);return c;})();
-function onSC(){TITLE_DRAWN=null;if(G&&G.state==='title'){try{render();}catch(e){}}[DK,dg]=mk(W,H,SC*0.5);COBBLE=null;for(const k in MAPCACHE)delete MAPCACHE[k];}
+let LSPR=null;const mkLSPR=()=>{const [c,x]=mk(64,64,1);x.fillStyle=rg(x,32,32,0,32,[[0,'rgba(0,0,0,0.9)'],[0.5,'rgba(0,0,0,0.5)'],[1,'rgba(0,0,0,0)']]);x.fillRect(0,0,64,64);return c;};LSPR=mkLSPR();
+function onSC(){TITLE_DRAWN=null;LSPR=mkLSPR();try{HUDC=null;TFX=null;POSTER=null;}catch(e){}try{STARS=null;}catch(e){}if(G&&G.state==='title'){try{render();}catch(e){}}[DK,dg]=mk(W,H,SC*0.5);COBBLE=null;for(const k in MAPCACHE)delete MAPCACHE[k];}
 function darkness(g,L){let a=0;if(L.time==='night')a=0.62;else if(L.time==='dusk')a=0.26;else if(L.weather==='storm')a=0.3;else if(L.time==='sunset')a=0.05;
  if(L.time==='dusk'||L.time==='sunset')R(g,'rgba(255,130,60,0.1)',0,0,W,H);if(a<=0)return;
  dg.setTransform(SC*0.5,0,0,SC*0.5,0,0);dg.globalCompositeOperation='source-over';dg.clearRect(0,0,W,H);dg.fillStyle='rgba(8,12,38,'+a+')';dg.fillRect(0,0,W,H);dg.globalCompositeOperation='destination-out';
@@ -946,7 +946,7 @@ function qualityStep(slowFrac,ra){if(document.hidden)return;
   if(mem<=2)QT=Math.max(QT,4);else if(mem<=4||cores<=4)QT=Math.max(QT,3);applyQ(true);warmGlyphs();return;}
  const now=performance.now();
  if(slowFrac>0.2&&QT<QTIERS.length-1&&now>QCOOL){QT++;QUP=0;QCAP=Math.max(QCAP,QT);QCOOL=now+8000;applyQ(true);}
- else if(slowFrac<0.02&&!QCAP&&QT>0&&now>QCOOL+30000&&wantSC()>QTIERS[QT]+0.2){if(++QUP>=5){QT--;QUP=0;QCOOL=now;applyQ(true);}}else if(slowFrac>=0.02)QUP=0;}
+ else if(slowFrac<0.02&&!QCAP&&QT>0&&(navigator.deviceMemory||8)>4&&now>QCOOL+30000&&wantSC()>QTIERS[QT]+0.2){if(++QUP>=5){QT--;QUP=0;QCOOL=now;applyQ(true);}}else if(slowFrac>=0.02)QUP=0;}
 let RSZ=0;window.addEventListener('resize',()=>{clearTimeout(RSZ);RSZ=setTimeout(()=>{if(QT!==null)applyQ(false);},500);});
 /* Sima mozgás minden kijelzőn: a játék 60 lépést tesz másodpercenként; a kép kb. 60-100 kép/mp-vel rajzolódik
    (nagy frissítésű kijelzőn minden második frissítésre), és a két lépés közötti helyzetet arányosan kiszámolja. */
@@ -964,7 +964,7 @@ function renderI(a){if(G.state!=='play'||!P||G.paused||P._pd===undefined||MG){re
  for(const e of ents){const px=e._px;if(px!==undefined&&Math.abs(e.x-px)<40){sv.push(e,e.x);e.x=px+(e.x-px)*a;}}
  try{render();}finally{P.dist=d;P.y=y;P.ang=pa;for(let i=0;i<sv.length;i+=2)sv[i].x=sv[i+1];}}
 let SLOWN=0,RENN=0;
-function frame(now){if(TTS.on&&TTS.game&&(G.paused||G.state!=='play'))ttsStop();const dt=Math.min(200,now-last);if(dt>48&&dt<200&&G.state==='play'&&!G.paused)LONGF++;acc+=dt;last=now;if(dt>2&&dt<60)DTS.push(dt);
+function frame(now){cvCheck(FRM);if(TTS.on&&TTS.game&&(G.paused||G.state!=='play'))ttsStop();const dt=Math.min(200,now-last);if(dt>48&&dt<200&&G.state==='play'&&!G.paused)LONGF++;acc+=dt;last=now;if(dt>2&&dt<60)DTS.push(dt);
  if(G.state==='play'&&!G.paused&&P&&!document.hidden){PROF.stats.playS=(PROF.stats.playS||0)+dt/1000;if(P.kmh>(PROF.stats.vmax||0)+0.5&&P.sub==='drive')PROF.stats.vmax=Math.round(P.kmh);if((FRM&1023)===0)checkAwards();}
  let n=0;if(document.hidden)LASTR=0;try{while(acc>=STEP&&n<3){snapPrev();update();acc-=STEP;n++;}}catch(e){acc=0;elog('hiba','Játéklogika: '+(e&&e.message)+' | '+String(e&&e.stack||'').split('\n').slice(1,3).join(' ').trim());}if(n>=3)acc=0;FRM++;
  // legfeljebb kb. 100 kép/mp: 60/90 Hz-en minden frissítésre, 120/144 Hz-en minden másodikra rajzol

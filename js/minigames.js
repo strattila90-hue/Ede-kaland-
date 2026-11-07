@@ -8,6 +8,31 @@ cv.addEventListener('pointermove',e=>{if(!HOLD)return;const r=cv.getBoundingClie
 function vib(ms){try{if(navigator.vibrate)navigator.vibrate(ms);}catch(e){}}
 function startMini(type,opt){MG={type:type,t:0,opt:opt||{},phase:'play',reward:0,msg:''};const init=MINI[type].init;if(init)init(MG);}
 function endMini(){const m=MG;MG=null;if(m.reward)book(m.reward,m.type==='scratch'?'lottery':'income',{scratch:'Kaparós sorsjegy nyeremény',jump:'Segítség: bikázás',truck:'Segítség: kamionos rakodás',sort:'Munka: zöldségszortírozás'}[m.type]||'Bevétel');if(m.opt.onEnd)m.opt.onEnd(m.reward,m);}
+/* ---- nyeremény-ünneplés: konfetti, ujjongás, taps, a család felkiált ---- */
+const CONF_COL=['#ff4d6d','#ffd84a','#5bd06a','#4fc3f7','#b388ff','#ff9a3a','#ffffff'];
+function confettiBurst(m,big){m.conf=m.conf||[];const n=big>=2?150:big?110:80;
+ for(let i=0;i<n;i++){const side=i%2,top=i%5===4;const p=top?{x:90+Math.random()*300,y:20-Math.random()*40,vx:(Math.random()-0.5)*0.8,vy:Math.random()*0.8}
+  :{x:side?392:88,y:236,vx:(side?-1:1)*(1.2+Math.random()*3.2),vy:-(4.2+Math.random()*3.6)};
+  p.c=CONF_COL[i%CONF_COL.length];p.w=3.2+Math.random()*3.4;p.h=2.4+Math.random()*2.4;p.r=Math.random()*TAU;p.vr=0.12+Math.random()*0.25;p.ph=Math.random()*TAU;p.d=(i%3)*10;m.conf.push(p);}}
+function confettiUpd(m){if(!m.conf)return;for(const p of m.conf){if(p.d>0){p.d--;continue;}p.vy=Math.min(p.vy+0.07,1.15);p.vx*=0.985;p.x+=p.vx+Math.sin(p.ph+=0.09)*0.35;p.y+=p.vy;p.r+=p.vr;}m.conf=m.conf.filter(p=>p.y<H+6);}
+function confettiDraw(g,m){if(!m.conf)return;for(const p of m.conf){if(p.d>0)continue;const k=Math.abs(Math.cos(p.r));g.fillStyle=p.c;g.fillRect(p.x-p.w*k/2,p.y,Math.max(0.5,p.w*k),p.h);}}
+let CLAPBUF=null;
+function clapSnd(dur,dens){if(!AC)return;const out=sfxOut();if(!CLAPBUF){const n=AC.sampleRate*0.06|0;CLAPBUF=AC.createBuffer(1,n,AC.sampleRate);const a=CLAPBUF.getChannelData(0);for(let i=0;i<n;i++){const e=i<n*0.08?1:Math.pow(1-i/n,3);a[i]=(Math.random()*2-1)*e;}}
+ const t0=AC.currentTime+0.05,N=Math.round(dur*dens);for(let i=0;i<N;i++){const tt=Math.random()*dur,env=Math.min(1,tt/0.35,(dur-tt)/0.9);if(env<=0.05)continue;
+  const s=AC.createBufferSource();s.buffer=CLAPBUF;s.playbackRate.value=0.8+Math.random()*0.5;const f=AC.createBiquadFilter();f.type='bandpass';f.frequency.value=900+Math.random()*1500;f.Q.value=1.1;
+  const g=AC.createGain();g.gain.value=(0.12+Math.random()*0.14)*env;s.connect(f);f.connect(g);g.connect(out);s.start(t0+tt);}}
+function cheerSnd(big){if(!AC)return;const out=sfxOut(),t=AC.currentTime+0.05,nv=big?9:6;
+ for(let i=0;i<nv;i++){const f0=i%3===0?150+Math.random()*50:240+Math.random()*120,st=t+Math.random()*0.25,d=1.3+Math.random()*0.8+(big?0.5:0);
+  const o=AC.createOscillator();o.type='sawtooth';o.frequency.setValueAtTime(f0,st);o.frequency.exponentialRampToValueAtTime(f0*1.6,st+0.35);o.frequency.setValueAtTime(f0*1.6,st+d*0.55);o.frequency.exponentialRampToValueAtTime(f0*1.05,st+d);
+  const vib=AC.createOscillator(),vg=AC.createGain();vib.frequency.value=5+Math.random()*2;vg.gain.value=f0*0.03;vib.connect(vg);vg.connect(o.frequency);
+  const f1=AC.createBiquadFilter();f1.type='bandpass';f1.frequency.setValueAtTime(650,st);f1.frequency.linearRampToValueAtTime(1050,st+0.4);f1.Q.value=3;
+  const g=AC.createGain();g.gain.setValueAtTime(0.0001,st);g.gain.linearRampToValueAtTime(0.05,st+0.15);g.gain.setValueAtTime(0.05,st+d*0.6);g.gain.exponentialRampToValueAtTime(0.0001,st+d);
+  o.connect(f1);f1.connect(g);g.connect(out);o.start(st);vib.start(st);o.stop(st+d+0.05);vib.stop(st+d+0.05);}
+ noise(1.6+(big?0.6:0),0.05,0.05,1800);}
+function celebrateWin(m){const big=m.win>=100000?2:m.win>=20000?1:0;confettiBurst(m,big);SFX.win();vib(big?[80,50,80,50,160]:[60,40,60]);
+ cheerSnd(big);clapSnd(big?4.2:3,big?30:22);setTimeout(()=>{if(MG===m)confettiBurst(m,0);},big?900:1300);if(big)setTimeout(()=>{if(MG===m)confettiBurst(m,1);},1900);
+ if(typeof speak==='function'){const amt=fmt(m.win)+' forint';setTimeout(()=>speak(big?'Hurrá! Nyertünk '+amt+'ot!':'Hurrá! Nyertünk!','anya',false),450);
+  setTimeout(()=>{TTS.last='';speak(pick(['Juhú!','Éljen!','Nyertünk, nyertünk!']),pick(['petra','anna']),false);},big?3200:2100);if(big)setTimeout(()=>{TTS.last='';speak('Ez igen! Ma mi vagyunk a szerencsések!','apa',false);},5000);}}
 function updMini(){MG.t++;MINI[MG.type].upd(MG);}
 function drawMini(g){R(g,'rgba(8,10,18,0.82)',0,0,W,H);MINI[MG.type].draw(g,MG);}
 function mbtn(g,r,l,col,on){frr(g,on?shade(col,1.3):col,r[0],r[1],r[2],r[3],5);g.strokeStyle='rgba(255,255,255,0.35)';g.lineWidth=0.8;rrect(g,r[0],r[1],r[2],r[3],5);g.stroke();text(g,l,r[0]+r[2]/2,r[1]+r[3]/2-3.5,'#ffffff',1,'center');}
@@ -49,14 +74,14 @@ const MINI={
      if(m.t%3===0)noise(0.03,0.04,0,4000);m.last=q;}
     if(!pts.length)m.last=null;
     if(m.cov>60*30*0.72||inRect(TAP,[160,222,160,22])||K.enterKey&&m.t>20)m.phase='reveal',m.rt=0;}
-   else{m.rt++;if(m.rt===1){m.reward=m.win;if(m.win){SFX.win();vib([60,40,60]);}else tone(220,0.3,'triangle',0.06);}
-    if(m.rt>30&&(K.enterP||TAP))endMini();}},
+   else{m.rt++;if(m.rt===1){m.reward=m.win;if(m.win)celebrateWin(m);else tone(220,0.3,'triangle',0.06);}confettiUpd(m);
+    if(m.rt>(m.win?100:30)&&(K.enterP||TAP))endMini();}},
   draw(g,m){panel(g,70,30,340,226,'Kaparós sorsjegy','#ffd84a');text(g,'Három egyforma összeg = nyeremény!',W/2,51,'#ffffff',1,'center');
    frr(g,lg(g,90,62,390,212,[[0,'#ffe082'],[1,'#ffb300']]),90,62,300,150,6);
    m.fields.forEach((a,i)=>{const fx=102+(i%3)*96,fy=72+Math.floor(i/3)*70;frr(g,'#fff8e1',fx,fy,84,60,4);const hit=m.win&&a===m.win&&m.phase==='reveal';text(g,fmt(a),fx+42,fy+18,hit?'#d32f2f':'#5d4037',a>=100000?1.4:1.8,'center',null);text(g,'Ft',fx+42,fy+40,'#8d6e63',1,'center',null);});
    if(m.phase==='play')g.drawImage(m.mask,90,62,300,150);else{const a=Math.max(0,1-m.rt/20);if(a>0){g.globalAlpha=a;g.drawImage(m.mask,90,62,300,150);g.globalAlpha=1;}}
    if(m.phase==='play'){mbtn(g,[160,222,160,22],'Mindet lekaparom','#555c66');text(g,isTouch?'Kapard le az ujjaddal!':'Kapard egérrel, vagy tartsd a Space-t',W/2,250,'#9fb0c2',1,'center');}
-   else{text(g,m.win?'Nyertél '+fmt(m.win)+' Ft-ot!':'Most nem nyert, legközelebb!',W/2,224,m.win?'#7cff7c':'#ff8a8a',1.6,'center');if(m.rt>30)text(g,isTouch?'Érintsd meg: tovább':'Enter: tovább',W/2,246,'#cfd6df',1,'center');}}},
+   else{text(g,m.win?'Nyertél '+fmt(m.win)+' Ft-ot!':'Most nem nyert, legközelebb!',W/2,224,m.win?((m.rt>>3)&1?'#ffd84a':'#7cff7c'):'#ff8a8a',1.6,'center');if(m.rt>(m.win?100:30))text(g,isTouch?'Érintsd meg: tovább':'Enter: tovább',W/2,246,'#cfd6df',1,'center');}confettiDraw(g,m);}},
 
  /* ---- bikázás: lemerült akkumulátor ---- */
  jump:{init(m){m.order=['B+','A+','A-','GND'];m.done=[];m.time=60*25;m.spark=0;m.hold=0;
