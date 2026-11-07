@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.22.0
+# 🚐 Családi Vakáció – v2.23.0
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -25,7 +25,7 @@ A fogyasztás a sebességtől, a gyorsítástól, az út típusától, a hótól
 
 A játék valós léptékű: 90 km/h-val 1 km pontosan 40 másodperc, így Komáromtól Bábolnáig kb. negyedóra, Komáromtól Siófokig közel két óra. A teljes út kb. 9 600 km.
 
-A játék kétpercenként automatikusan menti az állást, így az út több napon át is folytatható. A főmenüben választható **Gyorsított (5x)** vagy **Turbó (20x)** utazás is, de alapból valós idővel megy.
+A játék kétpercenként automatikusan menti az állást, így az út több napon át is folytatható. A főmenüben választható **Gyorsított (5x)** vagy **Turbó (20x)** utazás is, de alapból valós idővel megy. Valós időben a kijelzett megtett út méterre pontos: 90 km/h-val pontosan 25 métert teszel meg másodpercenként (1 km = 40 mp), és a kijelző a métereket is mutatja (pl. 10,305 / 167 km). Gyorsított és turbó módban a táv rövidebbre van sűrítve, ezért ilyenkor a kijelző mellett ott a szorzó (5x, 20x).
 
 ## 🌍 Európa körút (22 szakasz, kb. 9 600 km, 14 ország)
 
@@ -52,6 +52,10 @@ Amíg a GPS nyitva van, a játék áll, de ez nem számít pihenőnek. A térké
 **Jelzőlámpák:** zöld 20 másodperc, sárga 3 másodperc, piros 10 másodperc (egy teljes ciklus 33 mp); a lámpák egymástól függetlenül, eltolva váltanak.
 
 **Lámpafigyelő:** 450 méterrel a jelzőlámpa előtt a jobb oldalon megjelenik egy kis lámpa: mutatja, melyik szín ég (világít), hány másodperc van hátra belőle (fogyó csíkkal), milyen messze van a lámpa, és a jelenlegi sebességed alapján tanácsot ad: **ÁTÉRSZ** (zöldben érsz oda), **LASSÍTS** (sárgában érnél oda), **FÉKEZZ** (pirosban érnél oda), **VÁRJ** (állsz a piros előtt), **ÁLLJ** (közvetlenül a lámpánál, nem zöld).
+
+**Település-előjelző:** 1,5 km-rel a város vagy falu előtt a jobb oldalon megjelenik a helységnévtábla a település nevével, a távolsággal és a korláttal (50), és a sebességed alapján tanácsot ad: **JÓ TEMPÓ**, **LASSÍTS** (még van idő kíméletesen lassítani) vagy **FÉKEZZ** (már erősen kell fékezni, hogy a táblánál 50 legyen). A település vége előtt 500 méterrel az áthúzott tábla jelzi, mennyivel mehetsz utána (**MAJD 90**). Ha lámpa is jön, a lámpa alatt látszik.
+
+**Sávváltási útmutató:** ha egy lassabb jármű vagy útépítés van előtted a sávodban, halvány, kék, „digitális” szaggatott vonal ível az autó orrától abba a szomszédos sávba, ahol most nincs ütközésveszély (előtted és mögötted sincs ott közeli vagy gyorsabban érkező autó). Először a belső, előzősávot ajánlja. Ha egyik szomszéd sáv sem szabad, piros szaggatott vonal mutatja, hol kell lassítani a jármű mögött.
 
 ## 🖼 Album, útinapló, kitüntetések
 
@@ -223,7 +227,7 @@ Előfordulhat **baleset** az úton (rendőr, mentő, lezárt sáv). Nagyon ritk�
 
 ## 🦌 Vadállatok
 
-Országúton és falvak mellett őz, vaddisznó, róka és mezei nyúl kel át az úton, éjjel és szürkületben gyakrabban; „Vadveszély” táblák figyelmeztetnek. Az őz éjjel megbénul a fényszóróban, a nyúl cikázik. A duda elriasztja őket. Ha elütsz egy nagy vadat (őz, vaddisznó), az javítási költséggel (kb. 35–70 ezer Ft) jár, és nagy sebességnél defektet is okozhat. Falvakban birka és tehén is átballaghat.
+Az állatok **csak sötétben** jönnek elő: alkonyattól (napnyugta után) egészen reggel 6 óráig. Nappal és a naplemente fényeiben nincs állat az úton. Élő időjárásnál a város valós helyi ideje számít. Országúton és falvak mellett őz, vaddisznó, róka és mezei nyúl kel át az úton; „Vadveszély” táblák figyelmeztetnek. Az őz éjjel megbénul a fényszóróban, a nyúl cikázik. A duda elriasztja őket. Ha elütsz egy nagy vadat (őz, vaddisznó), az javítási költséggel (kb. 35–70 ezer Ft) jár, és nagy sebességnél defektet is okozhat. Éjjel a falvakban birka és tehén is átballaghat.
 
 ## 🛣️ Útburkolati jelek
 

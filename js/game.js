@@ -81,7 +81,7 @@ function spawnAt(x){const s=segAtIn(LEG.segs,x),L=LEGS[G.leg],r=Math.random(),la
   ents.push({kind:'traffic',tp:tp,x:x,lane:lane,y:LANE[lane],ty:LANE[lane],w:TW[tp],h:TH[tp],kmh:kmh,base:kmh,col:pick(TCOLS)});return;}
  const holeP=s.q==='bad'?0.75:s.q==='medium'?0.35:s.q==='cobble'?0.2:0.06;
  if(Math.random()<holeP){const wet=L.weather==='rain'||L.weather==='storm';ents.push({kind:wet&&Math.random()<0.4?'puddle':'hole',x:x,lane:lane,y:LANE[lane],w:24});return;}
- const dark=L.time==='night'||L.time==='dusk';const wp=s.type==='country'?(dark?0.3:0.17):s.type==='village'?0.14:s.type==='motorway'&&dark?0.025:0;
+ const wp=!animalTime(L)?0:s.type==='country'?0.3:s.type==='village'?0.14:s.type==='motorway'?0.025:0;
  if(Math.random()<wp){let tp;if(s.type==='village'&&Math.random()<0.6)tp=pick(['sheep','cow','sheep']);else tp=L.region==='alps'?pick(['deer','deer','fox','hare']):pick(['deer','boar','fox','hare','deer','hare']);
   const fromBottom=Math.random()<0.4&&tp!=='cow';const sp={cow:0.28,sheep:0.36,deer:0.55,boar:0.42,fox:0.6,hare:0.75}[tp];
   ents.push({kind:'animal',tp:tp,x:x+120,y:fromBottom?ROADB+8:ROADT+2,vy:fromBottom?-sp:sp,w:{cow:32,boar:24,deer:24,sheep:22,fox:18,hare:12}[tp],step:0,wild:['deer','boar','fox','hare'].includes(tp),dir:fromBottom?-1:1});}}
@@ -91,6 +91,8 @@ function drawObstacle(g,e,sx,t){const gy=e.y;let x=sx,y=gy;if(e.fly){x+=e.fx;y+=
  else if(e.kind==='hole'){ell(g,'#2a2c31',x+12,gy,12,3);ell(g,'#141519',x+12,gy+0.6,9,2);ell(g,'rgba(255,255,255,0.08)',x+12,gy-1.6,10,0.8);}
  else if(e.kind==='puddle'){ell(g,'#4f7fae',x+12,gy,13,3);ell(g,'rgba(200,225,250,0.6)',x+9,gy-1,5,0.8);}
  else if(e.kind==='sign'){line(g,'#7d858d',x+6,gy,x+6,gy-16,1.2);g.fillStyle='#ffcc00';g.beginPath();g.moveTo(x+6,gy-30);g.lineTo(x+14,gy-17);g.lineTo(x-2,gy-17);g.closePath();g.fill();g.strokeStyle='#d32f2f';g.lineWidth=1.2;g.stroke();text(g,'!',x+4.6,gy-26,'#111',0.7,'left',null);}}
+/* állatok csak sötétben: alkonyat (napnyugta) után, egészen reggel 6-ig */
+function animalTime(L){if(L.time==='night')return true;const h=L.localTime?+String(L.localTime).slice(0,2):12;return h<6;} // naplemente (dusk) még nem: csak utána, éjjel, és hajnalban 6 óráig
 function drawAnimal(g,e,sx,t){const gy=e.y,x=sx,st=Math.sin((e.step||0)*0.25)*1.4,night=LEGS[G.leg].time==='night'||LEGS[G.leg].time==='dusk';
  const eye=(ex,ey)=>{disc(g,night?'#fff8a8':'#1a1a1a',ex,ey,0.6);if(night&&P.lightMode>=2)glow(g,ex,ey,4,'rgba(255,250,170,0.9)');};
  if(e.tp==='boar'){ell(g,'rgba(0,0,0,0.25)',x+12,gy,13,2);g.fillStyle='#4a3b30';g.beginPath();g.ellipse(x+11,gy-9,11,6.5,0,0,TAU);g.fill();R(g,'#3a2d24',x+3,gy-15,14,2.4);
@@ -605,9 +607,47 @@ function drawStrip(g){const x0=6,x1=W-6,y0=51,h=26,ly=y0+13,cx=x0+14,ax=cx+12,bx
   if(free(it.x-w/2-1,it.x+w/2+1))text(g,ds,it.x,ly+3,o.k==='warn'?'#ffb3a8':o.d<0.2?'#ffd84a':'#dfe6ee',0.8,'center',null);}
  // a sávon túli: következő kút és a cél
  far.sort((a,b)=>a.d-b.d);const fl=far.find(o=>o.k==='flag'),fo=far.find(o=>o.k!=='flag');[fo,fl].forEach((o,i)=>{if(!o)return;const x=bx+15+i*27;if(o.p&&POI_W[o.p.type])G.stripHits.push({x:x,p:o.p});g.save();g.translate(x,ly-7.5);g.scale(1.25,1.25);upIcon(g,o.k,-4.5,-4.5,o.st);g.restore();text(g,(o.d<10?fmt(o.d,1):fmt(o.d))+' km',x,ly+3,'#dfe6ee',0.65,'center',null);});}
+/* ---- település-előjelző: következő város/falu (vagy a vége), távolság, korlát, tanács ---- */
+function nextTown(){const kp=LEG.kmPerPx,front=P.dist+112,segs=LEG.segs;let best=null;
+ for(let k=1;k<segs.length;k++){const s=segs[k],pv=segs[k-1];
+  if((s.type==='town'||s.type==='village')&&s.name&&pv.name!==s.name){const d=(s.x0+30-front)*kp;if(d>-0.005&&d<1.5&&(!best||d<best.d))best={d:d,name:s.name,lim:s.limit,exit:false};}
+  if((pv.type==='town'||pv.type==='village')&&pv.name&&pv.name!==s.name){const d=(s.x0-40-front)*kp;if(d>-0.005&&d<0.5&&(!best||d<best.d))best={d:d,name:pv.name,lim:s.limit,exit:true};}
+  if(s.x0*kp>(P.dist*kp+2))break;}
+ return best;}
+function drawTownAdvisor(g,y){const tw=nextTown();if(!tw)return;const x=W-74,w=68,h=50,dm=Math.max(0,tw.d*1000),v=Math.max(0,P.kmh);
+ let adv,ac;if(tw.exit){adv='MAJD '+tw.lim;ac='#5bd06a';}else if(v<=tw.lim+3){adv='JÓ TEMPÓ';ac='#5bd06a';}
+ else{const dec=(Math.pow(v/3.6,2)-Math.pow(tw.lim/3.6,2))/(2*Math.max(1,dm));if(dec<1.2){adv='LASSÍTS';ac='#ffcf33';}else{adv='FÉKEZZ';ac='#ff8a7a';}}
+ frr(g,'rgba(8,11,18,0.8)',x,y,w,h,8);g.strokeStyle=tw.exit?'#5bd06a':'#ffffff';g.lineWidth=1;rrect(g,x+0.5,y+0.5,w-1,h-1,8);g.stroke();
+ // helységnévtábla (a végén áthúzva)
+ frr(g,'#ffffff',x+4,y+4,w-8,14,2);g.strokeStyle='#111';g.lineWidth=0.8;rrect(g,x+5,y+5,w-10,12,1.5);g.stroke();
+ const nm=String(tw.name).toUpperCase(),sc=Math.min(1,(w-14)/textW(nm));text(g,nm,x+w/2,y+11-3.5*sc,'#111',sc,'center',null);
+ if(tw.exit)line(g,'#d32f2f',x+7,y+16,x+w-7,y+6,1.6);
+ disc(g,'#d32f2f',x+12,y+27,7);disc(g,'#ffffff',x+12,y+27,5.3);{const s2=tw.lim>=100?0.5:0.68;text(g,String(tw.lim),x+12.3,y+27-3.5*s2,'#111',s2,'center',null);}
+ text(g,dm<1000?Math.max(5,Math.round(dm/5)*5)+' m':fmt(tw.d,1)+' km',x+42,y+23.5,'#dfe6ee',1,'center',null);
+ frr(g,ac,x+4,y+36,w-8,11,4);text(g,adv,x+w/2,y+38,'#10141c',adv.length>7?0.9:1,'center',null);}
+/* ---- sávváltási útmutató: halvány, digitális szaggatott vonal az aszfalton a szabad sáv felé ---- */
+function laneAdvice(){const front=P.dist+112,me=P.kmh;let b=null,bg=1e9;
+ for(const e of ents){if(e.kind!=='traffic'&&e.kind!=='cone')continue;if(e.chase||e.lane!==P.lane)continue;const gap=e.x-front;if(gap<-10||gap>bg)continue;
+  const rel=me-(e.kind==='traffic'?(e.cur||0):0);if(rel<4)continue;if(gap>Math.min(300,40+rel*14))continue;b=e;bg=gap;}
+ if(!b)return null;const bw=b.w||24;
+ const free=l=>{if(l<0||l>2)return false;for(const e of ents){if(e===b||(e.kind!=='traffic'&&e.kind!=='cone'))continue;if(e.lane!==l)continue;const x0=e.x,x1=e.x+(e.w||24);
+  if(x1>P.dist-70&&x0<b.x+bw+90)return false;if(e.kind==='traffic'&&(e.cur||0)>me+5&&x1>P.dist-280&&x1<=P.dist-70)return false;}return true;};
+ const to=free(P.lane+1)?P.lane+1:free(P.lane-1)?P.lane-1:null;return {to:to,b:b,bw:bw};}
+function drawLaneGuide(g,t,L){if(!P||P.sub!=='drive'||P.auto||P.arriving||P.rev||P.flat||P.kmh<15){P.lgd=null;return;}
+ if(t%6===0||P.lgd===undefined)P.lgd=laneAdvice();const a=P.lgd;if(!a||ents.indexOf(a.b)<0)return;
+ const al=0.82*(0.8+0.2*Math.sin(t*0.15)),bx=a.b.x-P.dist+PX,x0=PX+114,y0=P.y-6;if(bx<x0-4)return;
+ g.save();g.lineCap='round';
+ if(a.to!==null){const y1=LANE[a.to]-6,x1=Math.max(x0+46,Math.min(bx-6,x0+150)),x2=Math.min(W-6,Math.max(x1+30,bx+a.bw+26)),mx=(x0+x1)/2;
+  const path=()=>{g.beginPath();g.moveTo(x0,y0);g.bezierCurveTo(mx,y0,mx,y1,x1,y1);g.lineTo(x2,y1);};
+  g.setLineDash([]);path();g.strokeStyle='rgba(90,210,255,'+(al*0.3)+')';g.lineWidth=7;g.stroke();
+  g.setLineDash([5,4]);g.lineDashOffset=-(t*0.7)%9;path();g.strokeStyle='rgba(170,240,255,'+al+')';g.lineWidth=2.4;g.stroke();g.setLineDash([]);
+  g.beginPath();g.moveTo(x2-6,y1-5);g.lineTo(x2,y1);g.lineTo(x2-6,y1+5);g.strokeStyle='rgba(170,240,255,'+al+')';g.lineWidth=2.4;g.stroke();}
+ else{const sx=Math.max(x0+20,bx-12),yy=P.y;g.setLineDash([4,3]);g.lineDashOffset=-(t*0.5)%7;g.beginPath();g.moveTo(x0,yy-4);g.lineTo(sx,yy-4);g.strokeStyle='rgba(255,110,90,'+(al*0.8)+')';g.lineWidth=2;g.stroke();g.setLineDash([]);
+  g.beginPath();g.moveTo(sx,yy-11);g.lineTo(sx,yy+3);g.moveTo(sx-5,yy-11);g.lineTo(sx-5,yy+3);g.strokeStyle='rgba(255,90,70,'+al+')';g.lineWidth=2.6;g.stroke();}
+ g.restore();}
 /* ---- lámpafigyelő: a legközelebbi jelzőlámpa állapota, hátralévő ideje, és hogy át fogsz-e érni ---- */
-function drawLightAdvisor(g){if(!LEG||!P)return;const kp=LEG.kmPerPx,front=P.dist+112;let l=null,d=9;
- for(const q of LEG.lights){const dd=(q.x-front)*kp;if(dd>-0.005&&dd<0.45&&dd<d){d=dd;l=q;}}if(!l)return;
+function drawLightAdvisor(g){if(!LEG||!P)return false;const kp=LEG.kmPerPx,front=P.dist+112;let l=null,d=9;
+ for(const q of LEG.lights){const dd=(q.x-front)*kp;if(dd>-0.005&&dd<0.45&&dd<d){d=dd;l=q;}}if(!l)return false;
  const t=G.t,st=lightState(l,t),c=(t+l.ph)%LG_C,rem=st==='green'?LG_G-c:st==='yellow'?LG_G+LG_Y-c:LG_C-c,len=st==='green'?LG_G:st==='yellow'?LG_Y:LG_R,secs=Math.ceil(rem/60);
  const v=Math.max(0,P.kmh)/3.6,dm=Math.max(0,d*1000),eta=v>0.8?dm/v*60:1e9,arr=eta<1e8?lightState(l,t+Math.round(eta)):st;
  let adv,ac;if(dm<6&&st!=='green'){adv='ÁLLJ';ac='#ff5a4a';}else if(st==='red'&&v<0.8){adv='VÁRJ';ac='#ff8a7a';}else if(arr==='green'){adv='ÁTÉRSZ';ac='#5bd06a';}else if(arr==='yellow'){adv='LASSÍTS';ac='#ffcf33';}else{adv='FÉKEZZ';ac='#ff8a7a';}
@@ -621,7 +661,7 @@ function drawLightAdvisor(g){if(!LEG||!P)return;const kp=LEG.kmPerPx,front=P.dis
  text(g,secs+' mp',x+44,y+6,col,1.3,'center',null);frr(g,'#2a2f3a',x+24,y+19,40,3,1.5);frr(g,col,x+24,y+19,40*clamp(rem/len,0,1),3,1.5);
  text(g,dm<1000?Math.round(dm/5)*5+' m':fmt(d,1)+' km',x+44,y+27,'#dfe6ee',1,'center',null);
  frr(g,ac,x+22,y+38,44,13,4);text(g,adv,x+44,y+41,'#10141c',adv.length>6?0.9:1,'center',null);
- }
+ return true;}
 function drawHUD(g){const L=LEGS[G.leg],T=G.trip,s=seg(),t=G.t,blinkOn=(t%40)<20;
  // bal oldal: műszerfal
  frr(g,'rgba(8,11,18,0.85)',3,3,204,46,10);g.strokeStyle='rgba(255,255,255,0.14)';g.lineWidth=0.7;rrect(g,3,3,204,46,10);g.stroke();
@@ -644,7 +684,7 @@ function drawHUD(g){const L=LEGS[G.leg],T=G.trip,s=seg(),t=G.t,blinkOn=(t%40)<20
   text(g,ms,W-13,6,lt&&lt.t<80?'#ffffff':T.money<0?'#ff8a8a':'#b7ffcf',1,'right',null);poly(g,'rgba(255,255,255,0.55)',[[W-10.5,6],[W-7.5,8.5],[W-10.5,11]]);}
  const pr=Math.min(1,P.dist/LEG.len),bx=rx+7,bw=190;frr(g,'#1b212b',bx,18,bw,4,2);frr(g,lg(g,bx,0,bx+bw,0,[[0,'#2f8fd8'],[1,'#4fc3f7']]),bx,18,bw*pr,4,2);
  for(const p of LEG.pois)if(p.type==='fuel')disc(g,'#5bd06a',bx+bw*p.x/LEG.len,20,1.1);disc(g,'#ffd84a',bx+bw*pr,20,2.2);
- text(g,distStr(legKm())+' / '+fmt(L.km)+' km',rx+7,26,'#ffffff',1,'left',null);text(g,'Össz '+fmt(T.km,0)+' km',W-10,26,'#9fb0c2',1,'right',null);
+ {const k=legKm();text(g,(k<1?Math.floor(k*1000)+' m':fmt(Math.floor(k*1000)/1000,3))+' / '+fmt(L.km)+' km'+(LEG.ts>1?'  '+LEG.ts+'x':''),rx+7,26,'#ffffff',1,'left',null);}text(g,'Össz '+fmt(T.km,0)+' km',W-10,26,'#9fb0c2',1,'right',null);
  const bar=(x,lbl,v)=>{text(g,lbl,x,37,'#9fb0c2',1,'left',null);frr(g,'#1b212b',x+textW(lbl)+3,38,30,5,2);frr(g,v<20?'#ff6b6b':v<45?'#ffcf33':'#5bd06a',x+textW(lbl)+3,38,30*v/100,5,2);};
  bar(rx+7,'Kaja',T.food);bar(rx+70,'Baba',T.baby);bar(rx+133,'Autó',hpOf(T));
  // érkező dolgok listája jobb oldalt (a GPS külön gombbal nyílik)
@@ -693,7 +733,7 @@ function drawPlay(g){const L=LEGS[G.leg],t=G.t;lights=[];const s=seg();
    if(e.help==='truck')for(let k=0;k<5;k++)frr(g,['#b07a42','#c8955a','#8a5a2b'][k%3],ex-30+k*9,e.y-(k%2?16:8),8,8,1);person(g,ex-12,e.y+4,'apa',t,'wave');triangle(g,ex-48,e.y+2);}}else if(e.kind==='animal')drawAnimal(g,e,ex,t);else drawObstacle(g,e,ex,t);}
  for(const w of P.walk)person(g,w.x,w.y,w.w,w.t+(w.out?0:0),w.out&&w.x>=w.tx?'wave':'walk');
  for(const p of LEG.pois)if(p.type==='veda')drawVedaFront(g,p,p.x-P.dist+PX);
- drawParts(g,true);drawWeather(g,L,t);darkness(g,L);drawBubble(g);g.restore();drawParts(g,false);drawHUDc(g);if(P.sub==='drive'||P.sub==='total'||P.sub==='fix'){drawStrip(g);drawLightAdvisor(g);}if(P.fadeA>0)R(g,'rgba(0,0,0,'+P.fadeA+')',0,0,W,H);if(G.eyelid>0.02){const k=G.eyelid,hh=H*0.2*k;g.fillStyle=lg(g,0,0,0,hh+12,[[0,'#000'],[Math.max(0.01,hh/(hh+12)),'#000'],[1,'rgba(0,0,0,0)']]);g.fillRect(0,0,W,hh+12);g.fillStyle=lg(g,0,H,0,H-hh-12,[[0,'#000'],[Math.max(0.01,hh/(hh+12)),'#000'],[1,'rgba(0,0,0,0)']]);g.fillRect(0,H-hh-12,W,hh+12);const msg='Apa elbóbiskolt! Fáradt, állj meg pihenni!';const mw=textW(msg.toUpperCase())+16;frr(g,'rgba(120,20,20,0.9)',W/2-mw/2,H/2-8,mw,16,6);text(g,msg,W/2,H/2-3,'#ffffff',1,'center',null);}if(P.sub==='pump')drawPumpUI(g);if(P.sub==='wash')drawWashUI(g);if(P.sub==='shop')drawShopUI(g);if(MG)drawMini(g);}
+ drawParts(g,true);drawWeather(g,L,t);darkness(g,L);drawLaneGuide(g,t,L);drawBubble(g);g.restore();drawParts(g,false);drawHUDc(g);if(P.sub==='drive'||P.sub==='total'||P.sub==='fix'){drawStrip(g);const la=drawLightAdvisor(g);if(P.sub==='drive')drawTownAdvisor(g,la?144:82);}if(P.fadeA>0)R(g,'rgba(0,0,0,'+P.fadeA+')',0,0,W,H);if(G.eyelid>0.02){const k=G.eyelid,hh=H*0.2*k;g.fillStyle=lg(g,0,0,0,hh+12,[[0,'#000'],[Math.max(0.01,hh/(hh+12)),'#000'],[1,'rgba(0,0,0,0)']]);g.fillRect(0,0,W,hh+12);g.fillStyle=lg(g,0,H,0,H-hh-12,[[0,'#000'],[Math.max(0.01,hh/(hh+12)),'#000'],[1,'rgba(0,0,0,0)']]);g.fillRect(0,H-hh-12,W,hh+12);const msg='Apa elbóbiskolt! Fáradt, állj meg pihenni!';const mw=textW(msg.toUpperCase())+16;frr(g,'rgba(120,20,20,0.9)',W/2-mw/2,H/2-8,mw,16,6);text(g,msg,W/2,H/2-3,'#ffffff',1,'center',null);}if(P.sub==='pump')drawPumpUI(g);if(P.sub==='wash')drawWashUI(g);if(P.sub==='shop')drawShopUI(g);if(MG)drawMini(g);}
 
 /* ---------- képernyők ---------- */
 const VIEWS=['side','front','rear','top'],VNAMES=['Oldalnézet','Elölnézet','Hátulnézet','Felülnézet'];
