@@ -1,0 +1,63 @@
+# Családi Vakáció – Android-alkalmazás (APK) építése
+# Minden feltöltéskor (ha a játék fájljai változtak) felépíti az APK-t, és kiadja ide:
+# https://github.com/strattila90-hue/Ede-kaland-/releases/download/apk/csaladi-vakacio.apk
+name: APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'index.html'
+      - 'manifest.webmanifest'
+      - 'version.json'
+      - 'js/**'
+      - 'icons/**'
+      - 'android/**'
+      - '.github/workflows/apk.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: apk
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Játékfájlok és ikon az APK-ba
+        run: |
+          W=android/app/src/main/assets/www
+          rm -rf "$W" && mkdir -p "$W"
+          cp -r index.html manifest.webmanifest version.json js icons "$W"/
+          for d in mdpi:48 hdpi:72 xhdpi:96 xxhdpi:144 xxxhdpi:192; do
+            n=${d%%:*}; mkdir -p android/app/src/main/res/mipmap-$n
+            cp icons/icon-192.png android/app/src/main/res/mipmap-$n/ic_launcher.png
+          done
+          echo "VER=$(grep -o "APP_VERSION='[^']*'" js/core.js | cut -d"'" -f2)" >> "$GITHUB_ENV"
+
+      - name: APK építése
+        run: gradle -p android assembleRelease --no-daemon --stacktrace
+
+      - name: Kiadás
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp android/app/build/outputs/apk/release/app-release.apk csaladi-vakacio.apk
+          ls -la csaladi-vakacio.apk
+          gh release delete apk --yes --cleanup-tag || true
+          gh release create apk csaladi-vakacio.apk --title "Családi Vakáció – Android-alkalmazás v$VER" --latest \
+            --notes "Családi Vakáció v$VER Android-alkalmazásként (APK). Letöltés után koppints a fájlra, engedélyezd az ismeretlen forrásból való telepítést, és telepítsd. A régi verzióra rátelepíthető, a mentés megmarad. Közvetlen link: https://github.com/strattila90-hue/Ede-kaland-/releases/download/apk/csaladi-vakacio.apk"

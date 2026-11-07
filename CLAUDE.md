@@ -50,6 +50,14 @@ python3 tools-version.py && git add -A && git commit -m "vX.Y.Z: ..." \
 
 Betöltési sorrend (`index.html`): kritikus: core, radio, car, world, game, app; utána lusta: geo, map, gps, geohd, minigames, shops (`window.LAZY_DONE`).
 
+## Android-alkalmazás (APK)
+
+- `android/`: WebView-alapú alkalmazás (`MainActivity.java`), a játékot az APK-ba másolt `assets/www`-ből tölti (`WebViewAssetLoader`, https://appassets.androidplatform.net/assets/www/index.html), így első indításkor is offline.
+- Építés: GitHub Actions (`.github/workflows/apk.yml`) minden feltöltéskor, kiadás: `releases/download/apk/csaladi-vakacio.apk`. Itt helyben nincs Android SDK; az eredmény: `gh run list -R strattila90-hue/Ede-kaland-`.
+- Aláírás: `android/csaladi-vakacio.keystore` (jelszó a `app/build.gradle`-ben). Ne cseréld le, különben az új APK nem telepíthető a régire.
+- JS-híd: `window.CVNative` (`NTV` a `core.js`-ben): `speak`, `stopSpeak`, `hasTts`, `saveFile`, `share`, `openUrl`, `exit`, `version`. Alkalmazásban nincs service worker és `autoOffline`, a Frissítés gomb az új APK-t nyitja meg (`apkUpdate`).
+- Új játékfájl (pl. kép, hang) a workflow „Játékfájlok” lépésébe is kell, ha nem a `js/` vagy `icons/` mappában van.
+
 ## Teendők új fájlnál vagy átnevezésnél
 
 Egy új JS fájlt **három helyre** kell felvenni: `index.html` betöltőlista, `sw.js` `ASSETS`, `tools-version.py` `files`. Különben offline vagy frissítéskor hiányzik.

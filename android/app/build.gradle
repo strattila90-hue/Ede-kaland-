@@ -1,0 +1,50 @@
+plugins {
+    id 'com.android.application'
+}
+
+// a verziószám a játék APP_VERSION-jéből jön (js/core.js), a build szám a GitHub futás sorszáma
+def appVersion = (new File(rootDir, '../js/core.js').text =~ /APP_VERSION='([^']+)'/)[0][1]
+def buildNo = (System.getenv('GITHUB_RUN_NUMBER') ?: '1') as int
+
+android {
+    namespace 'hu.csaladivakacio'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'hu.csaladivakacio'
+        minSdk 24
+        targetSdk 34
+        versionCode buildNo
+        versionName appVersion
+    }
+
+    // mindig ugyanaz a kulcs: így az új APK a régire telepíthető, és a mentés megmarad
+    signingConfigs {
+        release {
+            storeFile file('../csaladi-vakacio.keystore')
+            storePassword 'csaladivakacio'
+            keyAlias 'csaladi'
+            keyPassword 'csaladivakacio'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'androidx.webkit:webkit:1.11.0'
+}

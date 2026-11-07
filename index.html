@@ -282,13 +282,20 @@ body.touchui #topbar #bGps{display:none}
 #settings .tg b{font:800 15px var(--ff)}#settings .tg em{font:600 12px var(--ff);color:#9fb0c2;font-style:normal}#settings .tg small{display:block;margin-top:3px;color:#b9c3cf;font:500 12.5px/1.4 var(--ff)}
 #settings .vol{display:grid;grid-template-columns:170px 1fr 48px;align-items:center;gap:10px;padding:6px 2px;font:600 13.5px var(--ff)}#settings .vol input{width:100%;accent-color:#3b8bff;height:28px}#settings .vol b{text-align:right;color:#9fb0c2}
 @media (max-width:560px){#settings .vol{grid-template-columns:110px 1fr 40px}}
+/* v2.26: világítás / vész / rádió a bal szélen, a sávváltó gombok mellett, függőleges oszlopban */
+#ctlrow{left:calc(18px + var(--sl) + var(--u)*1.12)!important;right:auto;transform:none!important;bottom:calc(10px + var(--sb));flex-direction:column;gap:4px;padding:5px;border-radius:16px}
+#ctlrow .ctl{width:calc(var(--u)*1.02)!important;height:calc(var(--u)*.86);border-radius:12px;padding-top:3px}
+body.tab #ctlrow{left:calc(30px + var(--sl) + var(--u)*2.24)!important}
+#bUp.lane,#bDn.lane{gap:0;padding-top:2px}
+#bUp.lane svg,#bDn.lane svg{width:72%;height:56%}
+#bUp.lane small,#bDn.lane small{font:900 clamp(7px,1.7vmin,10px)/1.15 var(--ff);letter-spacing:.04em;color:#ffe27a;opacity:1}
 </style>
 </head>
 <body>
 <div id="wrap"><canvas id="c" style="will-change:transform"></canvas></div>
 <div id="touch">
- <div class="ctl" id="bUp"><svg viewBox="0 0 24 24"><path d="M5 15l7-7 7 7" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
- <div class="ctl" id="bDn"><svg viewBox="0 0 24 24"><path d="M5 9l7 7 7-7" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+ <div class="ctl lane" id="bUp" title="Sávváltás felfelé (W / ↑)"><svg viewBox="0 0 32 24"><path d="M2 12h4M10 12h4M18 12h4M26 12h4" stroke="#ffd84a" stroke-width="2" stroke-linecap="round"/><path d="M7 20c6 0 9-3 11-10" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/><path d="M13.5 7.5L18.5 3.5 21.5 9" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg><small>SÁV ▲</small></div>
+ <div class="ctl lane" id="bDn" title="Sávváltás lefelé (S / ↓)"><svg viewBox="0 0 32 24"><path d="M2 12h4M10 12h4M18 12h4M26 12h4" stroke="#ffd84a" stroke-width="2" stroke-linecap="round"/><path d="M7 4c6 0 9 3 11 10" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/><path d="M13.5 16.5L18.5 20.5 21.5 15" fill="none" stroke="#fff" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg><small>SÁV ▼</small></div>
  <div class="ctl" id="bHonk"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="none" stroke="#c9d1db" stroke-width="7"/><circle cx="50" cy="50" r="40" fill="none" stroke="#5a6474" stroke-width="1.5"/>
   <path d="M10 46h24M66 46h24M50 62v30" stroke="#c9d1db" stroke-width="8" stroke-linecap="round"/><circle cx="50" cy="50" r="17" fill="#232a36" stroke="#c9d1db" stroke-width="3"/>
   <path d="M41 46h6l7-6v20l-7-6h-6z" fill="#ffd84a"/><path d="M58 44q3 6 0 12" fill="none" stroke="#ffd84a" stroke-width="2.4" stroke-linecap="round"/></svg></div>

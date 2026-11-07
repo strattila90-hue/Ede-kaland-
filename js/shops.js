@@ -39,40 +39,104 @@ function itemIcon(g,k,x,y){g.save();g.translate(x,y);const s=(c,a,b,w,h,r)=>frr(
  case 'nuggets':frr(g,'#0e7c7b',-8,-1,16,9,2);for(const [dx,dy] of [[-4,-3],[0,-4],[4,-3],[-2,-1],[2,-1]])ell(g,'#d9a35c',dx,dy,2.4,1.8);break;
  case 'shake':poly(g,'#ffffff',[[-4,-4],[4,-4],[3,9],[-3,9]]);R(g,'#ff9fc4',-3.6,-2,7.2,6);disc(g,'#ff9fc4',0,-5,3.6);line(g,'#ff8c42',1,-5,3,-11,1);break;
  case 'family':frr(g,'#ff8c42',-9,-6,18,14,2);R(g,'#0e7c7b',-9,-1,18,3);for(let k=0;k<4;k++)R(g,'#ffd84a',-7+k*4,-10,2,5);break;
+ case 'kifli':g.strokeStyle='#d9973f';g.lineWidth=5;g.lineCap='round';g.beginPath();g.arc(0,6,9,Math.PI*1.15,Math.PI*1.85);g.stroke();line(g,'#a8682a',-3,-2,-1,1,0.8);line(g,'#a8682a',3,-2,1,1,0.8);break;
+ case 'yogurt':poly(g,'#ffffff',[[-6,-5],[6,-5],[4,8],[-4,8]]);R(g,'#e53935',-6,-7,12,2.5);disc(g,'#f48fb1',0,2,2.6);break;
+ case 'rudi':frr(g,'#d32f2f',-9,-3,18,7,3.5);for(let i=-6;i<=6;i+=3)disc(g,'#ffffff',i,0.5,1);break;
+ case 'choco':frr(g,'#6d3b1f',-8,-6,16,12,1.5);for(let i=0;i<3;i++)for(let j=0;j<2;j++)R(g,'#8d5530',-7+i*5,-5+j*5.5,4,4.5);frr(g,'#1e88e5',-8,1,16,5,0.5);break;
+ case 'chips':poly(g,'#fbc02d',[[-7,-9],[7,-9],[8,9],[-8,9]]);R(g,'#e53935',-7,-6,14,4);ell(g,'#ffe082',0,4,4,2.5);break;
+ case 'banana':g.strokeStyle='#fdd835';g.lineWidth=4.5;g.lineCap='round';g.beginPath();g.arc(0,-6,11,0.5,2.6);g.stroke();disc(g,'#6d4c41',9,-1,1);break;
+ case 'juice':s('#ff9800',-5,-6,10,15,1.5);poly(g,'#ffb74d',[[-5,-6],[5,-6],[0,-10]]);disc(g,'#fff3e0',0,1,2.6);line(g,'#ffffff',3,-10,5,-14,0.9);break;
+ case 'wipes':s('#81d4fa',-9,-5,18,11,3);s('#ffffff',-4,-7,8,4,1.5);disc(g,'#f48fb1',0,1,2);break;
+ case 'cheese':poly(g,'#ffd54f',[[-9,6],[9,6],[9,-2],[-9,-6]]);for(const [dx,dy,r] of [[-4,2,1.4],[3,0,1.8],[6,4,1]])disc(g,'#f9a825',dx,dy,r);break;
+ case 'sausage':g.strokeStyle='#b23b2a';g.lineWidth=5;g.lineCap='round';g.beginPath();g.arc(0,8,10,Math.PI*1.2,Math.PI*1.8);g.stroke();disc(g,'#e57373',-6,-1,0.8);disc(g,'#e57373',2,-2,0.8);break;
+ case 'cereal':s('#43a047',-7,-9,14,18,1.5);s('#ffffff',-5,-6,10,4,0.8);for(const [dx,dy] of [[-2,3],[2,2],[0,5]])disc(g,'#d9973f',dx,dy,1.6);break;
+ case 'pogacsa':for(const [dx,dy] of [[-5,2],[5,2],[0,-4]]){disc(g,'#d9973f',dx,dy,4.2);disc(g,'#f0c070',dx,dy-1,2.2);}break;
+ case 'milk':s('#ffffff',-6,-6,12,14,2.5);s('#90caf9',-6,-9,12,4,1.5);disc(g,'#ffcc80',0,2,2.4);break;
+ case 'sunscreen':s('#ffb300',-4,-8,8,17,3);s('#ffffff',-3,-10,6,3,1);disc(g,'#ff7043',0,1,2.6);break;
+ case 'ring':disc(g,'#ff5252',0,0,9);disc(g,'rgba(31,38,53,1)',0,0,4.2);for(let a=0;a<4;a++){const t=a*Math.PI/2+0.4;disc(g,'#ffffff',Math.cos(t)*6.6,Math.sin(t)*6.6,2);}break;
+ case 'ball':disc(g,'#ffffff',0,0,9);g.fillStyle='#e53935';g.beginPath();g.moveTo(0,0);g.arc(0,0,9,-1.6,-0.4);g.fill();g.fillStyle='#1e88e5';g.beginPath();g.moveTo(0,0);g.arc(0,0,9,0.5,1.7);g.fill();g.fillStyle='#fdd835';g.beginPath();g.moveTo(0,0);g.arc(0,0,9,2.6,3.8);g.fill();break;
+ case 'sand':poly(g,'#29b6f6',[[-8,-2],[4,-2],[2,9],[-6,9]]);R(g,'#0288d1',-8,-3,12,2);g.strokeStyle='#0288d1';g.lineWidth=1.2;g.beginPath();g.arc(-2,-3,5,Math.PI,TAU);g.stroke();s('#ffca28',5,-9,3,12,1);disc(g,'#ffca28',6.5,4,3);break;
+ case 'book':s('#7e57c2',-9,-8,18,16,1.5);s('#ffffff',-7,-6,7,12,0.6);s('#ffffff',1,-6,6,12,0.6);disc(g,'#fdd835',4,-1,2);break;
+ case 'puzzle':for(const [dx,dy,c] of [[-4,-4,'#e53935'],[4,-4,'#1e88e5'],[-4,4,'#43a047'],[4,4,'#fdd835']]){s(c,dx-3.6,dy-3.6,7.2,7.2,1);}disc(g,'#1e88e5',0,-4,1.6);disc(g,'#43a047',-4,0,1.6);break;
+ case 'pillow':g.strokeStyle='#4db6ac';g.lineWidth=5.5;g.lineCap='round';g.beginPath();g.arc(0,-1,6.5,0.15*Math.PI,0.85*Math.PI,true);g.stroke();break;
+ case 'charger':s('#37474f',-4,-6,8,10,2);s('#90a4ae',-2,-9,1.5,3,0.4);s('#90a4ae',0.5,-9,1.5,3,0.4);line(g,'#37474f',0,4,0,9,1.6);disc(g,'#69f0ae',0,-1,1.4);break;
+ case 'cards':g.save();g.rotate(-0.25);s('#ffffff',-7,-8,10,14,1.5);g.restore();s('#ffffff',-2,-7,10,14,1.5);poly(g,'#e53935',[[3,-3],[5,0],[3,3],[1,0]]);break;
+ case 'keyring':g.strokeStyle='#b0bec5';g.lineWidth=1.6;g.beginPath();g.arc(-4,-4,4,0,TAU);g.stroke();s('#e53935',0,-2,8,10,2);text(g,'H',4,1,'#ffffff',0.6,'center',null);break;
+ case 'magazine':s('#1565c0',-8,-9,16,18,1);s('#ffffff',-6,-7,12,3,0.5);frr(g,'#cfd8e0',-5,-1,10,5,1.5);disc(g,'#1b1f26',-3,4.5,1.2);disc(g,'#1b1f26',3,4.5,1.2);break;
+ case 'sunglass':R(g,'#263238',-9,-2,18,1.4);frr(g,'#263238',-9,-2,7.5,6,2.5);frr(g,'#263238',1.5,-2,7.5,6,2.5);frr(g,'rgba(120,200,255,0.5)',-8,-1,3,2,1);break;
+ case 'sticker':disc(g,'#fdd835',-3,-2,6);poly(g,'#ff7043',[[4,-8],[6,-3],[11,-3],[7,0],[9,5],[4,2],[-1,5],[1,0],[-3,-3],[2,-3]]);break;
+ case 'riddle':s('#fff3d6',-8,-9,16,18,1);for(let i=0;i<3;i++)for(let j=0;j<3;j++)if((i+j)%2===0)R(g,'#3a3f47',-6+i*4.5,-6+j*4.5,3.6,3.6);else{g.strokeStyle='#3a3f47';g.lineWidth=0.5;g.strokeRect(-6+i*4.5,-6+j*4.5,3.6,3.6);}break;
+ case 'magnet':s('#4fc3f7',-8,-7,16,13,2);poly(g,'#43a047',[[-8,4],[-2,-2],[3,3],[8,-1],[8,6],[-8,6]]);disc(g,'#fdd835',4,-3,2);break;
+ case 'guide':s('#2e7d32',-8,-9,16,18,1.5);disc(g,'#fdd835',0,-1,4);line(g,'#2e7d32',0,-5,0,3,0.8);line(g,'#2e7d32',-4,-1,4,-1,0.8);break;
+ case 'news':s('#eceff1',-9,-8,18,16,1);R(g,'#37474f',-7,-6,14,3);for(let i=0;i<3;i++)R(g,'#90a4ae',-7,-1+i*3,8,1.2);s('#90a4ae',3,-1,4,7,0.5);break;
+ case 'dburger':disc(g,'#e8a03e',0,-5,7);R(g,'#5b2b14',-7,-2,14,2.4);R(g,'#ffd84a',-7,0.6,14,1.1);R(g,'#5b2b14',-7,2,14,2.4);R(g,'#7cc04a',-7.5,4.4,15,1.4);frr(g,'#e8a03e',-7,5.6,14,3.6,2);break;
+ case 'wrap':g.save();g.rotate(-0.5);frr(g,'#f0d9a0',-4,-9,8,18,3.5);R(g,'#7cc04a',-4,-9,8,3);R(g,'#e57373',-2,-8,4,1.5);g.restore();break;
+ case 'hotdog':frr(g,'#e8a03e',-9,-1,18,6,3);frr(g,'#b23b2a',-10,-3,20,4,2);g.strokeStyle='#fdd835';g.lineWidth=1;g.beginPath();g.moveTo(-7,-1);for(let i=-7;i<=7;i+=2)g.lineTo(i,-1+((i/2)&1?-1:1));g.stroke();break;
+ case 'salad':g.fillStyle='#ffffff';g.beginPath();g.arc(0,1,9,0,Math.PI);g.fill();for(const [dx,dy,c] of [[-5,0,'#7cc04a'],[0,-2,'#43a047'],[5,0,'#7cc04a'],[-2,1,'#e53935'],[3,1,'#fdd835']])disc(g,c,dx,dy,2.6);break;
+ case 'orings':for(const [dx,dy] of [[-4,-2],[4,-1],[0,4]]){g.strokeStyle='#e0a040';g.lineWidth=2.6;g.beginPath();g.arc(dx,dy,3.6,0,TAU);g.stroke();}break;
+ case 'lemonade':poly(g,'rgba(255,255,255,0.85)',[[-5,-7],[5,-7],[4,9],[-4,9]]);R(g,'#fff176',-4.5,-3,9,11);disc(g,'#fdd835',5,-7,3);line(g,'#ff8c42',-1,-7,1,-12,1);break;
+ case 'pancake':ell(g,'#e8b56a',0,2,9,3.2);ell(g,'#e8b56a',0,-1,9,3.2);ell(g,'#e8b56a',0,-4,9,3.2);R(g,'#7b3f1f',-4,-6,8,2);disc(g,'#e53935',0,-7,1.6);break;
+ case 'muffin':poly(g,'#7e57c2',[[-6,0],[6,0],[4,8],[-4,8]]);disc(g,'#8d5530',0,-1,6.5);disc(g,'#5d3420',-2,-3,1);disc(g,'#5d3420',2,-2,1);break;
+ case 'energy':s('#1565c0',-4,-9,8,18,2);s('#b0bec5',-4,-10,8,2,1);poly(g,'#fdd835',[[1,-5],[-2,1],[0,1],[-1,6],[2,-1],[0,-1]]);break;
+ case 'washer':s('#29b6f6',-5,-7,10,15,2);s('#0277bd',-2,-10,4,3,1);for(const [dx,dy] of [[-1,0],[2,3]])disc(g,'rgba(255,255,255,0.8)',dx,dy,1.4);break;
+ case 'fresh':poly(g,'#2e7d32',[[0,-10],[6,-2],[3,-2],[8,5],[-8,5],[-3,-2],[-6,-2]]);R(g,'#6d4c41',-1,5,2,4);break;
+ case 'gummy':for(const [dx,dy,c] of [[-5,2,'#e53935'],[0,-3,'#43a047'],[5,2,'#fdd835']]){disc(g,c,dx,dy,3);disc(g,c,dx-2,dy-3,1.5);disc(g,c,dx+2,dy-3,1.5);}break;
  default:disc(g,'#cfd6df',0,0,6);}
  g.restore();}
 const SHOPS={
  kis:{title:'Kisbolt - ABC',col:'#2e7d4f',items:[{k:'food',nm:'Szendvics',p:4290,food:35},{k:'pastry',nm:'Pékáru',p:1490,food:15},{k:'fruit',nm:'Gyümölcs',p:1990,food:20},{k:'water',nm:'Ásványvíz',p:490,food:5},
-  {k:'baby',nm:'Bébiétel',p:1690,baby:30},{k:'diaper',nm:'Pelenka',p:4990,baby:40},{k:'ice',nm:'Fagyi',p:1990,mood:1},{k:'coffee',nm:'Kávé Apának',p:690,msg:'Apa felfrissült, mehet tovább.'}]},
+  {k:'baby',nm:'Bébiétel',p:1690,baby:30},{k:'diaper',nm:'Pelenka',p:4990,baby:40},{k:'ice',nm:'Fagyi',p:1990,mood:1},{k:'coffee',nm:'Kávé Apának',p:690,msg:'Apa felfrissült, mehet tovább.'},
+  {k:'kifli',nm:'Kifli',p:890,food:12},{k:'yogurt',nm:'Joghurt',p:390,food:6},{k:'rudi',nm:'Túrórudi',p:290,food:6,msg:'A gyerekek imádják a túrórudit!'},{k:'choco',nm:'Csoki',p:790,mood:1},
+  {k:'chips',nm:'Chips',p:990,food:6,msg:'Ropog a chips a hátsó ülésen.'},{k:'banana',nm:'Banán',p:690,food:10},{k:'juice',nm:'Gyümölcslé',p:590,food:6},{k:'wipes',nm:'Popsitörlő',p:1290,baby:15}]},
  hiper:{title:'Hipermarket',col:'#1e4fb5',items:[{k:'big',nm:'Nagybevás.',p:14990,food:100,baby:30},{k:'babybig',nm:'Bébicsomag',p:6990,baby:100},{k:'basket',nm:'Gyüm.kosár',p:3490,food:30},{k:'water',nm:'Víz 6 db',p:1990,food:12},
-  {k:'toy',nm:'Plüssmaci',p:4990,mood:2},{k:'game',nm:'Társasjáték',p:5990,mood:2},{k:'drink',nm:'Üdítő',p:790,food:6},{k:'work',nm:'Munka',p:0,work:true}]},
- trafik:{title:'Trafik',col:'#5a4632',items:[{k:'scratch',nm:'Kaparós 1x',p:600,mult:1},{k:'scratch4',nm:'Kaparós 4x',p:2000,mult:4},{k:'scratch10',nm:'Kaparós 10x',p:5000,mult:10},{k:'drink',nm:'Üdítő',p:690,food:5},{k:'gum',nm:'Rágó',p:350,msg:'A gyerekek boldogan rágóznak.'}]},
- ujsag:{title:'Újságos',col:'#2f6b45',items:[{k:'comic',nm:'Gyerekújság',p:1290,mood:1},{k:'color',nm:'Színező',p:990,mood:1},{k:'map',nm:'Autós térkép',p:2490,msg:'Az új térképpel nem tévedünk el!'},{k:'postcard',nm:'Képeslap',p:290,photo:1},{k:'scratch',nm:'Kaparós 1x',p:600,mult:1}]},
+  {k:'toy',nm:'Plüssmaci',p:4990,mood:2},{k:'game',nm:'Társasjáték',p:5990,mood:2},{k:'drink',nm:'Üdítő',p:790,food:6},{k:'work',nm:'Munka',p:0,work:true},
+  {k:'cheese',nm:'Sajt',p:1890,food:14},{k:'sausage',nm:'Kolbász',p:2490,food:18},{k:'cereal',nm:'Müzli',p:1290,food:10},{k:'pogacsa',nm:'Pogácsa',p:990,food:10},
+  {k:'milk',nm:'Bébitej',p:5490,baby:60},{k:'wipes',nm:'Popsitörlő',p:990,baby:15},{k:'choco',nm:'Csokitábla',p:690,mood:1},{k:'juice',nm:'Gyümölcslé',p:690,food:6},
+  {k:'sunscreen',nm:'Naptej',p:3990,msg:'Naptej bekészítve, jöhet a strand!'},{k:'ring',nm:'Úszógumi',p:2990,mood:1},{k:'ball',nm:'Strandlabda',p:1490,mood:1},{k:'sand',nm:'Homokozó',p:2490,mood:1},
+  {k:'book',nm:'Mesekönyv',p:2990,mood:1},{k:'puzzle',nm:'Kirakós',p:3490,mood:1},{k:'pillow',nm:'Nyakpárna',p:4990,mood:1,msg:'Anya végre kényelmesen szundít.'},{k:'charger',nm:'Autós töltő',p:3990,msg:'A telefonok töltődnek, a GPS nem merül le.'}]},
+ trafik:{title:'Trafik',col:'#5a4632',items:[{k:'scratch',nm:'Kaparós 1x',p:600,mult:1},{k:'scratch4',nm:'Kaparós 4x',p:2000,mult:4},{k:'scratch10',nm:'Kaparós 10x',p:5000,mult:10},{k:'drink',nm:'Üdítő',p:690,food:5},
+  {k:'gum',nm:'Rágó',p:350,msg:'A gyerekek boldogan rágóznak.'},{k:'choco',nm:'Csoki',p:590,mood:1},{k:'water',nm:'Ásványvíz',p:450,food:5},{k:'cards',nm:'Kártya',p:1290,mood:1,msg:'Indulhat a családi kártyaparti!'},
+  {k:'magazine',nm:'Autósújság',p:1490,msg:'Apa elmélyülten olvas a pihenőben.'},{k:'keyring',nm:'Kulcstartó',p:990,msg:'Szép emlék lesz az útról.'},{k:'sunglass',nm:'Napszemüveg',p:3990,msg:'Apa már nem hunyorog a napban.'},{k:'sticker',nm:'Matrica',p:490,mood:1}]},
+ ujsag:{title:'Újságos',col:'#2f6b45',items:[{k:'comic',nm:'Gyerekújság',p:1290,mood:1},{k:'color',nm:'Színező',p:990,mood:1},{k:'map',nm:'Autós térkép',p:2490,msg:'Az új térképpel nem tévedünk el!'},{k:'postcard',nm:'Képeslap',p:290,photo:1},
+  {k:'scratch',nm:'Kaparós 1x',p:600,mult:1},{k:'riddle',nm:'Rejtvény',p:790,msg:'Anya rejtvényt fejt, a gyerekek segítenek.'},{k:'sticker',nm:'Matricás',p:1490,mood:1},{k:'book',nm:'Mesekönyv',p:2490,mood:1},
+  {k:'comic',nm:'Képregény',p:1690,mood:1},{k:'magnet',nm:'Hűtőmágnes',p:1290,msg:'Mehet a hűtőre otthon!'},{k:'guide',nm:'Útikönyv',p:4490,msg:'Most már mindent tudunk a következő városról!'},{k:'news',nm:'Napilap',p:590,msg:'Apa elolvasta a híreket.'}]},
  burger:{title:'Burger Pont - gyorsétterem',col:'#0e7c7b',items:[{k:'burger',nm:'Sajtburger',p:2690,food:30},{k:'kidmeal',nm:'Gyerekmenü',p:2390,food:25,mood:1},{k:'nuggets',nm:'Csirkefalat',p:2190,food:24},{k:'fries',nm:'Sült krumpli',p:990,food:10},
-  {k:'shake',nm:'Shake',p:1290,food:6,mood:1},{k:'coffee',nm:'Kávé Apának',p:690,msg:'Apa felfrissült.'},{k:'family',nm:'Családi menü',p:11990,food:100,mood:1},{k:'ice',nm:'Fagyikehely',p:890,mood:1}]},
+  {k:'shake',nm:'Shake',p:1290,food:6,mood:1},{k:'coffee',nm:'Kávé Apának',p:690,msg:'Apa felfrissült.'},{k:'family',nm:'Családi menü',p:11990,food:100,mood:1},{k:'ice',nm:'Fagyikehely',p:890,mood:1},
+  {k:'dburger',nm:'Duplaburger',p:3490,food:40},{k:'wrap',nm:'Csirkewrap',p:2490,food:28},{k:'hotdog',nm:'Hot dog',p:1290,food:15},{k:'salad',nm:'Saláta',p:1990,food:15},
+  {k:'orings',nm:'Hagymagyűrű',p:1190,food:10},{k:'lemonade',nm:'Limonádé',p:890,food:5},{k:'pancake',nm:'Palacsinta',p:1290,food:12,mood:1},{k:'muffin',nm:'Muffin',p:790,food:8}]},
  garage:{title:'Autószerviz',col:'#c62828',items:[]},
  fuel:{title:'Benzinkút - bolt',col:'#2e8b57',items:[{k:'food',nm:'Szendvics',p:4790,food:35},{k:'coffee',nm:'Kávé Apának',p:890,msg:'Apa felfrissült.'},{k:'water',nm:'Ásványvíz',p:690,food:5},{k:'baby',nm:'Bébiétel',p:1990,baby:30},
-  {k:'ice',nm:'Fagyi',p:2190,mood:1},{k:'tyre',nm:'Pótkerék',p:28000,tyre:true},{k:'scratch',nm:'Kaparós 1x',p:600,mult:1},{k:'work',nm:'Munka',p:0,work:true}]}};
-const ITEMCAT={repair:'service',wash:'service',oil:'service',burger:'food',kidmeal:'food',nuggets:'food',fries:'food',shake:'food',family:'food',food:'food',pastry:'food',fruit:'food',water:'food',drink:'food',coffee:'food',big:'food',basket:'food',gum:'food',baby:'baby',diaper:'baby',babybig:'baby',ice:'fun',toy:'fun',game:'fun',comic:'fun',color:'fun',postcard:'fun',map:'other',tyre:'service',scratch:'lottery',scratch4:'lottery',scratch10:'lottery'};
+  {k:'ice',nm:'Fagyi',p:2190,mood:1},{k:'tyre',nm:'Pótkerék',p:28000,tyre:true},{k:'scratch',nm:'Kaparós 1x',p:600,mult:1},{k:'work',nm:'Munka',p:0,work:true},
+  {k:'hotdog',nm:'Hot dog',p:1590,food:15},{k:'kifli',nm:'Croissant',p:990,food:10},{k:'energy',nm:'Energiaital',p:790,wake:600,msg:'Apa felpörgött, mehet tovább.'},{k:'chips',nm:'Chips',p:990,food:6},
+  {k:'gummy',nm:'Gumicukor',p:690,mood:1},{k:'washer',nm:'Ablakmosó',p:1990,msg:'Tiszta szélvédő, jobban látunk!'},{k:'oil',nm:'Motorolaj',p:4990,msg:'Olajszint rendben, a motor hálás.'},{k:'fresh',nm:'Illatosító',p:990,msg:'Fenyőillat lengi be az autót.'}]}};
+const ITEMCAT={repair:'service',wash:'service',oil:'service',burger:'food',kidmeal:'food',nuggets:'food',fries:'food',shake:'food',family:'food',food:'food',pastry:'food',fruit:'food',water:'food',drink:'food',coffee:'food',big:'food',basket:'food',gum:'food',baby:'baby',diaper:'baby',babybig:'baby',ice:'fun',toy:'fun',game:'fun',comic:'fun',color:'fun',postcard:'fun',map:'other',tyre:'service',scratch:'lottery',scratch4:'lottery',scratch10:'lottery',
+ kifli:'food',yogurt:'food',rudi:'food',choco:'food',chips:'food',banana:'food',juice:'food',cheese:'food',sausage:'food',cereal:'food',pogacsa:'food',dburger:'food',wrap:'food',hotdog:'food',salad:'food',orings:'food',lemonade:'food',pancake:'food',muffin:'food',energy:'food',gummy:'food',
+ wipes:'baby',milk:'baby',ring:'fun',ball:'fun',sand:'fun',book:'fun',puzzle:'fun',cards:'fun',sticker:'fun',riddle:'fun',magnet:'fun',keyring:'fun',magazine:'other',guide:'other',news:'other',sunglass:'other',sunscreen:'other',pillow:'other',charger:'other',washer:'service',fresh:'other'};
 const PANEL=[166,50,308,214];
 // az autószerviz csak karosszériát javít (a légzsák a karosszériajavítás része)
 function garageCost(){const T=G.trip,hp=T.hp===undefined?100:T.hp;return Math.round(((100-hp)*3200+(T.airbag?118000:0))/100)*100;}
 function garageItems(){const T=G.trip,hp=T.hp===undefined?100:T.hp;return hp<100||T.airbag?[{k:'repair',nm:'Karosszéria',p:garageCost(),repair:true,msg:'A karosszéria megjavítva, mint az új!'}]:[];}
 function shopList(type){const T=G.trip,ps=P.shop;if(type==='garage')return garageItems();return SHOPS[type].items.filter(it=>(!it.work||!ps.worked)&&(!it.tyre||!T.spare));}
+/* lapozás: oldalanként 8 kártya (2 sor x 4) */
+const PER_PAGE=8;function shopPages(type){return Math.max(1,Math.ceil(shopList(type).length/PER_PAGE));}
+function shopPage(type){const ps=P.shop,n=shopPages(type);ps.page=Math.max(0,Math.min(n-1,ps.page||0));const all=shopList(type);return all.slice(ps.page*PER_PAGE,ps.page*PER_PAGE+PER_PAGE);}
+const PG_PREV=[PANEL[0]+PANEL[2]-78,PANEL[1]+21,24,15],PG_NEXT=[PANEL[0]+PANEL[2]-32,PANEL[1]+21,24,15];
 function cardRect(i){return [PANEL[0]+8+(i%4)*74,PANEL[1]+40+Math.floor(i/4)*60,70,56];}
 const GO_BTN=[PANEL[0]+8,PANEL[1]+PANEL[3]-26,PANEL[2]-16,20];
 function enterShop(type){stat('shops');G.trip.driveS=Math.max(0,(G.trip.driveS||0)-300);if(typeof cheerUp==='function'&&P.cranky)cheerUp(2,type==='burger'?'A gyerekek imádják a gyorséttermet!':'Jót tett a kis szünet!');P.sub='shop';P.shop={type:type,msg:'',worked:false,anim:0,last:-1};P.hide.apa=1;if(type!=='fuel')P.hide.anna=1;SFX.click();
  if(P.ev&&P.ev.type==='pee'){P.ev=null;flash('Anna elszaladt a mosdóba. Megkönnyebbült!','#7cff7c');}}
 function leaveStop(){P.sub='drive';P.hide.apa=0;P.hide.anna=0;P.shop=null;P.pump=null;P.stopCD=P.dist;SFX.clunk();say('Mehetünk tovább!','apa');}
-function updShop(){const T=G.trip,ps=P.shop,items=shopList(ps.type);if(ps.anim>0)ps.anim--;
+function updShop(){const T=G.trip,ps=P.shop;if(ps.anim>0)ps.anim--;const np=shopPages(ps.type);
+ if(np>1){const pv=K.upP||inRect(TAP,PG_PREV),nx=K.dnP||inRect(TAP,PG_NEXT);if(pv||nx){ps.page=((ps.page||0)+(nx?1:-1)+np)%np;ps.last=-1;SFX.click();K.upP=K.dnP=false;TAP=null;}}
+ const items=shopPage(ps.type);
  for(let i=0;i<items.length;i++){if(K.num===i+1||inRect(TAP,cardRect(i))){const it=items[i];
 if(it.p){book(-it.p,ITEMCAT[it.k]||'other',SHOPS[ps.type].title+': '+it.nm);SFX.cash();}ps.anim=20;ps.last=i;
-  if(it.repair){T.hp=100;T.airbag=0;}if(it.k==='coffee'){T.driveS=Math.max(0,(T.driveS||0)-900);}if(it.food)T.food=Math.min(100,T.food+it.food);if(it.baby)T.baby=Math.min(100,T.baby+it.baby);if(it.mood){T.mood=Math.min(5,T.mood+it.mood);say('Köszönjük, Apa!','anna');}
+  if(it.repair){T.hp=100;T.airbag=0;}if(it.k==='coffee'){T.driveS=Math.max(0,(T.driveS||0)-900);}if(it.wake){T.driveS=Math.max(0,(T.driveS||0)-it.wake);}if(it.food)T.food=Math.min(100,T.food+it.food);if(it.baby)T.baby=Math.min(100,T.baby+it.baby);if(it.mood){T.mood=Math.min(5,T.mood+it.mood);say('Köszönjük, Apa!','anna');}
   if(it.tyre)T.spare=true;if(it.photo)T.photos++;ps.msg=it.msg||('Megvetted: '+it.nm);
   if(it.mult){startMini('scratch',{mult:it.mult,onEnd:r=>{ps.msg=r?'Nyeremény: '+fmt(r)+' Ft!':'Most nem nyert.';}});return;}
   if(it.work){ps.worked=true;startMini('sort',{onEnd:r=>{ps.msg='A zöldséges fizetett: '+fmt(r)+' Ft';}});return;}}}
  if(K.enterKey||inRect(TAP,GO_BTN))leaveStop();}
-function drawShopUI(g){const T=G.trip,ps=P.shop,sh=SHOPS[ps.type],items=shopList(ps.type),r=PANEL;
+function drawShopUI(g){const T=G.trip,ps=P.shop,sh=SHOPS[ps.type],items=shopPage(ps.type),r=PANEL,np=shopPages(ps.type);
  frr(g,'rgba(12,15,24,0.94)',r[0],r[1],r[2],r[3],10);g.strokeStyle=sh.col;g.lineWidth=1.4;rrect(g,r[0],r[1],r[2],r[3],10);g.stroke();
  frr(g,sh.col,r[0],r[1],r[2],18,10);R(g,sh.col,r[0],r[1]+9,r[2],9);text(g,sh.title,r[0]+10,r[1]+5.5,'#ffffff',1.2,'left',null);text(g,fmt(T.money)+' Ft',r[0]+r[2]-8,r[1]+6,'#b7ffcf',1,'right',null);
  if(ps.type==='fuel'&&P.pump&&P.pump.cost)text(g,'Benzin: '+fmt(P.pump.liters,2)+' l = '+fmt(P.pump.cost)+' Ft  (fizetve)',r[0]+10,r[1]+25,'#b7ffcf',1,'left',null);
@@ -83,6 +147,8 @@ function drawShopUI(g){const T=G.trip,ps=P.shop,sh=SHOPS[ps.type],items=shopList
   if(list.length){text(g,'Munkadíj: 3 200 Ft / %'+(T.airbag?' + légzsák 118 000 Ft':''),r[0]+86,y+14,'#9fb0c2',1,'left',null);text(g,'Összesen: '+fmt(garageCost())+' Ft',r[0]+86,y+25,'#ffd84a',1,'left',null);}
   else text(g,'A karosszéria ép, nincs mit javítani.',r[0]+r[2]/2,GO_BTN[1]-24,'#7cff7c',1,'center',null);}
  else text(g,'Kaja '+Math.round(T.food)+'%   Baba '+Math.round(T.baby)+'%   Kedv '+T.mood+'/5',r[0]+10,r[1]+25,'#cfd6df',1,'left',null);
+ if(np>1){const pg=(ps.page||0)+1;for(const [rc,dir] of [[PG_PREV,-1],[PG_NEXT,1]]){frr(g,'#2f6fd0',rc[0],rc[1],rc[2],rc[3],5);const cx=rc[0]+rc[2]/2,cy=rc[1]+rc[3]/2;poly(g,'#ffffff',dir<0?[[cx+3,cy-4],[cx+3,cy+4],[cx-3,cy]]:[[cx-3,cy-4],[cx-3,cy+4],[cx+3,cy]]);}
+  text(g,pg+'/'+np,(PG_PREV[0]+PG_PREV[2]+PG_NEXT[0])/2,PANEL[1]+25,'#ffffff',1,'center',null);}
  items.forEach((it,i)=>{const c=cardRect(i),hot=ps.last===i&&ps.anim>0,can=true;
   frr(g,hot?'#2f4a3a':'#1f2635',c[0],c[1],c[2],c[3],7);g.strokeStyle=hot?'#5bd06a':'rgba(255,255,255,0.12)';g.lineWidth=0.8;rrect(g,c[0],c[1],c[2],c[3],7);g.stroke();
   frr(g,'rgba(255,255,255,0.05)',c[0]+4,c[1]+4,c[2]-8,26,5);itemIcon(g,it.k,c[0]+c[2]/2,c[1]+17-(hot?Math.sin(ps.anim*0.5)*2:0));

@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.25.1
+# 🚐 Családi Vakáció – v2.27.0
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -115,11 +115,14 @@ A főmenü egyetlen álló kép, családi road movie plakát: naplemente csíkos
 
 A megállókat előjelző tábla jelzi („Benzinkút 500 m”), a következők pedig a kijelző alatt is látszanak:
 
-- **Benzinkút:** tankolás és bolt. Autópályán kb. 40 km-enként.
-- **Kisbolt:** kaja, víz, bébiétel, fagyi.
-- **Hipermarket:** nagybevásárlás, nagy bébicsomag, játék, munka a zöldségesnél.
-- **Trafik:** kaparós sorsjegy, nagy kaparós (négyszeres nyeremény), üdítő.
-- **Újságos:** gyerekújság, autós térkép, sorsjegy.
+- **Benzinkút (16 termék):** tankolás és bolt: szendvics, hot dog, croissant, energiaital, chips, gumicukor, pótkerék, ablakmosó, motorolaj, illatosító. Autópályán kb. 40 km-enként.
+- **Kisbolt (16):** szendvics, kifli, pékáru, joghurt, túrórudi, banán, gyümölcslé, csoki, chips, fagyi, bébiétel, pelenka, popsitörlő.
+- **Hipermarket (24):** nagybevásárlás, sajt, kolbász, müzli, pogácsa, bébitej, bébicsomag, naptej, úszógumi, strandlabda, homokozó, mesekönyv, kirakós, plüssmaci, társasjáték, nyakpárna, autós töltő, munka a zöldségesnél.
+- **Trafik (12):** kaparós sorsjegy (1x, 4x, 10x), csoki, kártya, autósújság, kulcstartó, napszemüveg, matrica.
+- **Újságos (12):** gyerekújság, képregény, színező, matricás könyv, mesekönyv, rejtvény, autós térkép, útikönyv, képeslap, hűtőmágnes, napilap.
+- **Burger Pont (16):** sajtburger, duplaburger, csirkewrap, hot dog, saláta, hagymagyűrű, palacsinta, muffin, limonádé, gyerekmenü, családi menü.
+
+A boltokban 8 termék látszik egyszerre; a fejléc **◀ 2/3 ▶** gombjaival (billentyűzeten a sávváltó gombokkal) lehet lapozni.
 
 **Megállás egy érintéssel:** a kijelző alatt zöld „P” gombok mutatják a következő megállókat („P Kisbolt 400 m”). Érintésre (vagy az **E** billentyűre) apa irányjelzővel átsorol a szélső sávba, finoman lassít, és pontosan az üzlet ajtaja, illetve a benzinkútnál a tanksapka a kút előtt áll meg. Utána magától nyílik a bolt vagy a kút. Piros lámpánál és az előttünk haladó autó mögött megvár. Fékkel vagy sávváltással a megállás törölhető. Kézzel is meg lehet állni a szélső sávban az üzlet előtt.
 
@@ -266,6 +269,8 @@ Mezők (búza, napraforgó, repce, kukorica, szántás, levendula) szalmabálák
 
 ## 🎮 Irányítás
 
+Érintőképernyőn bal alul vannak a **SÁV ▲ / SÁV ▼** sávváltó gombok (sávváltás-ikonnal), mellettük függőleges oszlopban a **világítás (HELYZ/TOMP/TÁV), vészvillogó és rádió** gombja, fölöttük a kormány (duda). Jobb oldalon: GPS, tempomat, kézifék, fék- és gázpedál.
+
 A középkonzolon csak három gomb van: **világítás** (egyetlen gomb minden fokozattal, nyomva tartva fénykürt), mellette a **vészvillogó**, és a **rádió**. A **kézifék** a fék- és gázpedál mellett, a fékpedál fölött van. Az **ajtók automatikusak**.
 
 **Billentyűzet (laptop, számítógép):** két választható kiosztás, a főmenüben vagy a Szünet menüben a **⌨ Billentyűzet** gombbal (vagy az **I** / **F1** billentyűvel) nyíló súgóban lehet váltani; az első játéknál magától megjelenik. A WASD a fizikai helyén működik magyar billentyűzeten is.
@@ -320,6 +325,8 @@ Mindkét kiosztásban:
 - **A telefonhoz igazodik:** a processzormagok száma és a memória alapján választ kezdő minőséget (2 GB alatt rögtön takarékos mód); figyeli a hosszú, akadó képkockákat is, és ha ilyen többször előfordul, azonnal visszavesz. Erős telefonon élesebb felbontásban rajzol (a kijelzőnél soha nem többet), gyengébbnél automatikusan visszavesz a felbontásból és az effektekből, és ha újra van tartalék, visszaemeli.
 
 ## 📱 Telepítés, megosztás, frissítés
+
+**Android-alkalmazás (APK) – a legbiztosabb út, ha a telepített ikon nem indul:** töltsd le innen: https://github.com/strattila90-hue/Ede-kaland-/releases/download/apk/csaladi-vakacio.apk, koppints a letöltött fájlra, engedélyezd az „ismeretlen forrásból” telepítést, és telepítsd. Az alkalmazás a Chrome-tól független, a teljes játék benne van, ezért **első indításkor is azonnal offline** megy. Az utasok hangját a telefon saját felolvasója adja, a mentés a Letöltések mappába kerül, a Frissítés gomb az új APK-t tölti le (a régire rátelepíthető, a mentés megmarad). Az APK-t a GitHub minden feltöltéskor magától felépíti (`.github/workflows/apk.yml`, forrás: `android/`). Az alkalmazás mentése külön van a böngészős játékétól: átvinni a Mentések → fájlba mentés / betöltés gombokkal lehet.
 
 **Ha telepítés után az ikon nem indul:** töröld az ikont, nyisd meg a linket a Chrome-ban, ⋮ menü → „Hozzáadás a kezdőképernyőhöz” → **„Parancsikon létrehozása”** (nem „Telepítés”). Ez minden telefonon működik, a játékot a Chrome-ban nyitja meg, és így is offline megy: az első megnyitáskor a játék magától letölti magát. A telepítési leírás (manifest) teljes képernyőt kér, de ha a telefon azt nem támogatja, sima alkalmazás-ablakban indul.
 

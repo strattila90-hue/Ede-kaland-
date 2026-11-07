@@ -2,7 +2,7 @@
 /* =========================================================
    CSALÁDI VAKÁCIÓ – alapok: vászon, rajzoló segédek, betűk, hang, bemenet
    ========================================================= */
-const APP_VERSION='2.25.1';
+const APP_VERSION='2.27.0';
 const W=480,H=270,PX=70,ROADT=194,ROADB=262,LANE=[212,232,252];
 const TAU=Math.PI*2;
 let SC=2,LOWQ=false;
@@ -148,9 +148,16 @@ if(TTS.ok){try{ttsVoices();speechSynthesis.addEventListener('voiceschanged',ttsV
 const VOICE_OF={apa:{g:'m',p:0.9,lp:0.55,r:1},anya:{g:'f',p:1.05,r:1.02},anna:{g:'f',p:1.3,r:1.07},petra:{g:'f',p:1.5,r:1.1},atti:{g:'m',p:1.75,lp:1.85,r:1.14,kid:1}};
 function ttsClean(t){return String(t).replace(/[\u{1F000}-\u{1FFFF}☀-➿️‍]/gu,'').replace(/(\d)\s*km\/h/gi,'$1 kilométer per óra').replace(/km\/h/gi,'kilométer per óra')
  .replace(/(\d)\s*km\b/gi,'$1 kilométer').replace(/(\d)\s*Ft\b/g,'$1 forint').replace(/(\d)\s*m\b/g,'$1 méter').replace(/\s+/g,' ').trim();}
-function ttsStop(){if(!TTS.ok||!TTS.on)return;TTS.on=false;try{speechSynthesis.cancel();}catch(e){}ttsDuck(false);}
+/* Android-alkalmazásban (APK) a beépített böngésző nem tud felolvasni: a telefon saját hangja szól a CVNative hídon át */
+const NTV=(typeof window!=='undefined'&&window.CVNative)||null;
+function speakNative(t,who){try{const pr=VOICE_OF[who]||VOICE_OF.anna,p=Math.min(2,pr.g==='m'&&pr.lp?pr.lp:pr.p);if(NTV.speak(t,p,pr.r,clamp(VOL.voice,0,1))){TTS.on=true;ttsDuck(true);}}catch(e){TTS.on=false;}}
+if(NTV){try{elog('info','Android-alkalmazásként fut (APK '+NTV.version()+')');}catch(e){}}
+if(typeof window!=='undefined')window.ttsNativeDone=()=>{TTS.on=false;ttsDuck(false);};
+if(NTV){try{document.addEventListener('visibilitychange',()=>{if(document.hidden&&TTS.on){try{NTV.stopSpeak();}catch(e){}TTS.on=false;ttsDuck(false);}});}catch(e){}}
+function ttsStop(){if(NTV){if(TTS.on){try{NTV.stopSpeak();}catch(e){}TTS.on=false;ttsDuck(false);}return;}if(!TTS.ok||!TTS.on)return;TTS.on=false;try{speechSynthesis.cancel();}catch(e){}ttsDuck(false);}
 function ttsDuck(on){try{if(typeof radio!=='undefined'&&radio.bus&&AC)radio.bus.gain.setTargetAtTime(on?0.2:0.55,AC.currentTime,0.12);}catch(e){}}
-function speak(txt,who,game){if(!TTS.ok||!(VOL.voice>0))return;const t=ttsClean(txt);if(!t)return;const now=Date.now();if(t===TTS.last&&now-TTS.lastT<4000)return;TTS.last=t;TTS.lastT=now;
+function speak(txt,who,game){if(!(VOL.voice>0)||(!TTS.ok&&!NTV))return;const t=ttsClean(txt);if(!t)return;const now=Date.now();if(t===TTS.last&&now-TTS.lastT<4000)return;TTS.last=t;TTS.lastT=now;
+ if(NTV){TTS.game=!!game;speakNative(t,who);return;}
  try{if(!TTS.m&&!TTS.f)ttsVoices();const pr=VOICE_OF[who]||VOICE_OF.anna,u=new SpeechSynthesisUtterance(t);u.lang='hu-HU';
   let v=pr.g==='m'?TTS.m:TTS.f,low=false;if(!v){v=TTS.f||TTS.m;low=pr.g==='m';}if(pr.kid&&!TTS.m){v=TTS.f;}if(v)u.voice=v;
   u.pitch=Math.min(2,low&&pr.lp?pr.lp:pr.p);u.rate=pr.r;u.volume=clamp(VOL.voice,0,1);

@@ -24,7 +24,8 @@ tapBtn('bHome',goHome);tapBtn('bGps',()=>{if(typeof openGPS==='function')openGPS
 document.querySelectorAll('#cruiseBar button').forEach(b=>{const go=e=>{e.preventDefault();haptic(12);K.cruiseSet=+b.dataset.v;$('cruiseBar').style.display='none';};b.addEventListener('touchstart',go,{passive:false});b.addEventListener('mousedown',go);});
 document.querySelectorAll('#touch .ctl').forEach(el=>{el.addEventListener('touchstart',()=>haptic(10),{passive:true});});
 function toast(msg,ms){const t=$('toast');t.textContent=msg;t.style.opacity=1;clearTimeout(toast.h);toast.h=setTimeout(()=>t.style.opacity=0,ms||2600);}
-const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true;
+const SITE='https://strattila90-hue.github.io/Ede-kaland-/',APK_URL='https://github.com/strattila90-hue/Ede-kaland-/releases/download/apk/csaladi-vakacio.apk';
+const isStandalone=()=>!!NTV||matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches||navigator.standalone===true;
 /* teljes képernyő és fekvő tájolás (ahol a rendszer engedi) */
 let fsTried=false;
 function goFullscreen(){if(fsTried||!isTouch)return;fsTried=true;const el=document.documentElement;
@@ -73,14 +74,15 @@ $('instHelp').addEventListener('click',e=>{e.stopPropagation();haptic(10);$('ins
 {const viaLink=/[?&]install=1/.test(location.search);let shown=false;try{shown=localStorage.getItem('cv-inst-auto')==='1';}catch(e){}
  if(!isStandalone()&&location.protocol.startsWith('http')&&viaLink&&!shown)window.addEventListener('load',()=>setTimeout(()=>{if(!isStandalone()){openInstall();try{localStorage.setItem('cv-inst-auto','1');}catch(e){}}},900));
  if(viaLink)try{history.replaceState(null,'',location.pathname);}catch(e){}}
-async function doShare(){const url=location.href.split('#')[0].split('?')[0]+'?install=1';const data={title:'Családi Vakáció',text:'Gyere velünk Európa körútra! Családi autós kalandjáték.',url:url};
+async function doShare(){const url=NTV?SITE+'?install=1':location.href.split('#')[0].split('?')[0]+'?install=1';
+ if(NTV){try{NTV.share('Gyere velünk Európa körútra! Családi autós kalandjáték.\nBöngészőben: '+url+'\nAndroid-alkalmazás: '+APK_URL);}catch(e){}return;}const data={title:'Családi Vakáció',text:'Gyere velünk Európa körútra! Családi autós kalandjáték.',url:url};
  try{if(navigator.share){await navigator.share(data);return;}await navigator.clipboard.writeText(url);toast('A link a vágólapra másolva!');}
  catch(e){if(e&&e.name==='AbortError')return;try{window.prompt('Másold ki a linket:',url);}catch(_){}}}
 /* frissítés százalékkal */
 let updating=false,updPct=0,updLabel='Frissítés',newVer=null;
 function verCmp(a,b){const x=String(a).split('.').map(Number),y=String(b).split('.').map(Number);for(let i=0;i<3;i++){const d=(x[i]||0)-(y[i]||0);if(d)return d;}return 0;}
 function setUpd(p,l){updPct=p;if(l)updLabel=l;const b=document.querySelector('[data-a="update"]');if(b){b.querySelector('.fill').style.width=p+'%';b.querySelector('.lbl').textContent=updLabel;}}
-async function checkUpdate(){if(location.protocol==='file:'||!navigator.onLine)return;try{const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});const v=await r.json();
+async function checkUpdate(){if((location.protocol==='file:'&&!NTV)||!navigator.onLine)return;try{const r=await fetch((NTV?SITE:'')+'version.json?t='+Date.now(),{cache:'no-store'});const v=await r.json();
  if(verCmp(v.version,APP_VERSION)>0){newVer=v.version;updLabel='Új verzió: v'+v.version;MENU_SIG='?';toast('Új verzió érhető el: v'+v.version);}}catch(e){}}
 /* ---- biztos frissítés ----
    1) az új service worker telepítése (ő a hálózatról tölti le a friss fájlokat a tárolóba),
@@ -94,7 +96,12 @@ async function cleanReinstall(why){elog('info','Tiszta újratelepítés: '+why,t
  try{const rs=await navigator.serviceWorker.getRegistrations();await Promise.all(rs.map(r=>r.unregister()));}catch(e){}
  try{const ks=await caches.keys();await Promise.all(ks.map(k=>caches.delete(k)));}catch(e){}
  location.reload();}
-async function doUpdate(){if(updating)return;updating=true;
+/* APK: a játékfájlok az alkalmazásban vannak; frissítéskor az új APK-t töltjük le (ugyanazzal az aláírással, a mentés megmarad) */
+async function apkUpdate(){if(!navigator.onLine){toast('Nincs internet. A játék offline is működik.');return;}
+ try{const r=await fetch(SITE+'version.json?t='+Date.now(),{cache:'no-store'});const v=await r.json();
+  if(verCmp(v.version,APP_VERSION)>0){toast('Új verzió: v'+v.version+'. Letöltés indul, utána koppints a letöltött fájlra a telepítéshez.',5000);elog('info','APK frissítés: v'+v.version);NTV.openUrl(APK_URL);}
+  else toast('Ez a legújabb verzió (v'+APP_VERSION+').');}catch(e){toast('Most nem sikerült ellenőrizni. Próbáld újra később.');}}
+async function doUpdate(){if(NTV){apkUpdate();return;}if(updating)return;updating=true;
  try{if(location.protocol==='file:'||!('caches' in window)){setUpd(100,'Újratöltés... 100%');setTimeout(()=>location.reload(),400);return;}
   if(!navigator.onLine){updating=false;toast('Nincs internet. A játék offline is működik.');return;}
   setUpd(1,'Ellenőrzés... 1%');const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});const v=await r.json();
@@ -111,10 +118,10 @@ async function doUpdate(){if(updating)return;updating=true;
     setUpd(80,'Tiszta újratelepítés...');await cleanReinstall('a tárolt fájlok nem az új verzióéi');return;}catch(_){}}
   updating=false;setUpd(0,'Frissítés');toast('Nem sikerült frissíteni. Van internetkapcsolat?');}}
 /* offline működés automatikusan */
-if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
+if(!NTV&&'serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
 /* automatikus offline: minden fájl letöltése a háttérben, új verzió csendes letöltése */
 let AO_SW=0;
-async function autoOffline(){if(!('caches' in window)||!location.protocol.startsWith('http')||!navigator.onLine)return;
+async function autoOffline(){if(NTV||!('caches' in window)||!location.protocol.startsWith('http')||!navigator.onLine)return;
  try{const r=await fetch('version.json?t='+Date.now(),{cache:'no-store'});const v=await r.json();const names=Object.keys(v.files||{});const cache=await caches.open('csaladi-vakacio');
   const newer=verCmp(v.version,APP_VERSION)>0;let got=0;
   const dl=[];for(const n of names){const have=await cache.match(n,{ignoreSearch:true});if(have&&!newer)continue;const res=await fetch(n+'?v='+v.version+'&t='+Date.now(),{cache:'no-store'});if(!res.ok)throw new Error('net');
@@ -225,7 +232,7 @@ window.addEventListener('popstate',()=>{if(EXITING)return;armBack();elog('info',
  if(G.gps&&typeof closeGPS==='function')closeGPS();else if(G.ledger)closeLedger();else if(G.confirm){G.confirm=null;}
  else if(G.state==='play'&&!G.paused){G.paused=true;}
  MENU_SIG='?';toast('Kilépni a piros Kilépés gombbal lehet.',2200);});
-function exitGame(){elog('info','Kilépés gomb',true);try{if(G.state==='play'&&P)save(P.dist);}catch(e){}EXITING=true;G.paused=true;try{if(document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen();}catch(e){}
+function exitGame(){elog('info','Kilépés gomb',true);try{if(G.state==='play'&&P)save(P.dist);}catch(e){}if(NTV){try{NTV.exit();return;}catch(e){}}EXITING=true;G.paused=true;try{if(document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen();}catch(e){}
  try{window.close();}catch(e){}
  setTimeout(()=>{if(document.hidden)return;$('bye').classList.add('on');},350);}
 $('byeBack').addEventListener('click',e=>{e.stopPropagation();EXITING=false;$('bye').classList.remove('on');armBack();if(G.state==='play')G.paused=true;MENU_SIG='?';});
@@ -240,7 +247,7 @@ function openElog(){const el=$('elog');G.elogOpen=true;if(G.state==='play')G.pau
 function closeElog(){$('elog').classList.remove('open');G.elogOpen=false;MENU_SIG='?';}
 $('elogClose').addEventListener('click',e=>{e.stopPropagation();closeElog();});
 $('elogCopy').addEventListener('click',async e=>{e.stopPropagation();const t=elogText();try{await navigator.clipboard.writeText(t);toast('Hibanapló kimásolva. Illeszd be az üzenetbe!');}catch(_){window.prompt('Másold ki:',t.slice(0,4000));}});
-$('elogShare').addEventListener('click',async e=>{e.stopPropagation();const t=elogText();try{if(navigator.share){await navigator.share({title:'Családi Vakáció hibanapló',text:t});return;}}catch(_){return;}try{await navigator.clipboard.writeText(t);toast('Hibanapló kimásolva.');}catch(_){}});
+$('elogShare').addEventListener('click',async e=>{e.stopPropagation();const t=elogText();if(NTV){try{NTV.share(t);}catch(_){}return;}try{if(navigator.share){await navigator.share({title:'Családi Vakáció hibanapló',text:t});return;}}catch(_){return;}try{await navigator.clipboard.writeText(t);toast('Hibanapló kimásolva.');}catch(_){}});
 $('elogClear').addEventListener('click',e=>{e.stopPropagation();ELOG.list=[];elog('info','Napló törölve',true);openElog();});
 ['pointerdown','touchstart'].forEach(ev=>$('elog').addEventListener(ev,e=>e.stopPropagation(),{passive:true}));
 /* ---- billentyűzet súgó és kiosztásválasztó (laptop / számítógép) ---- */
@@ -265,8 +272,9 @@ const FINE=!isTouch||matchMedia('(any-pointer: fine)').matches;
 function exportData(n){return {app:'csaladi-vakacio',ver:APP_VERSION,at:Date.now(),slot:n,save:readSave(n),prof:loadProf(n)};}
 function saveFileName(n){const pr=loadProf(n),d=new Date(),pad=x=>String(x).padStart(2,'0');return 'csaladi-vakacio-'+(pr.name||'mentes').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')+'-'+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'.json';}
 function saveBlob(n){return new Blob([JSON.stringify(exportData(n))],{type:'application/json'});}
-function downloadSave(n){if(n===SLOT&&G.state==='play'&&P)save(P.dist);const a=document.createElement('a');a.href=URL.createObjectURL(saveBlob(n));a.download=saveFileName(n);document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},2000);toast('Mentés letöltve: '+saveFileName(n),3500);elog('info','Mentés fájlba ('+n+'. hely)');}
-async function shareSave(n){if(n===SLOT&&G.state==='play'&&P)save(P.dist);const f=new File([saveBlob(n)],saveFileName(n),{type:'application/json'});
+function downloadSave(n){if(n===SLOT&&G.state==='play'&&P)save(P.dist);
+ if(NTV){saveBlob(n).text().then(t=>{let w='';try{w=NTV.saveFile(saveFileName(n),t);}catch(e){}toast(w?'Mentés elmentve: '+w:'Nem sikerült menteni.',4000);elog('info','Mentés fájlba ('+n+'. hely, APK)');});return;}const a=document.createElement('a');a.href=URL.createObjectURL(saveBlob(n));a.download=saveFileName(n);document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},2000);toast('Mentés letöltve: '+saveFileName(n),3500);elog('info','Mentés fájlba ('+n+'. hely)');}
+async function shareSave(n){if(NTV){downloadSave(n);return;}if(n===SLOT&&G.state==='play'&&P)save(P.dist);const f=new File([saveBlob(n)],saveFileName(n),{type:'application/json'});
  try{if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:'Családi Vakáció mentés',text:'Családi Vakáció mentés: '+loadProf(n).name});return;}}catch(e){if(e&&e.name==='AbortError')return;}
  downloadSave(n);}
 let IMPORT_SLOT=1;
