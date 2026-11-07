@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.30.0
+# 🚐 Családi Vakáció – v2.31.0
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -102,6 +102,8 @@ A főmenü egyetlen álló kép, családi road movie plakát: naplemente csíkos
 Út közben folyamatosan váltakozik a város, a falu, az országút és az autópálya, a táblákon valós településnevekkel (Ács, Bábolna, Sümeg, Mondsee, Beaune…). A sebességkorlátozás is szakaszonként változik: 50, 90/100 vagy 130 km/h. A korlátot nagy, jól olvasható tábla mutatja az út mellett és a műszerfalon is; ha túllépted, a műszerfali tábla sárgán villog.
 
 **Satufék:** erős fékezésnél csak a gumik csikorognak, féknyom marad az úton, az utasok előrebillennek és tágra nyílt szemmel ijednek meg (sikoly nincs). Normál fékezésnél is kicsit előredőlnek.
+
+**„Ki lát előbb…?” játék:** út közben (kb. 1–3 percenként) Anna, Petra vagy Anya megkérdezi: „Ki lát előbb tehenet / lovat / szélkereket / gólyát / hőlégballont / piros autót?” (felolvasva és kiírva). A keresett dolog kicsit később felbukkan az út mellett (a hőlégballon az égen); ha időben rákoppintasz, **+1 szív** jár érte, felcsillan, és a gyerekek örülnek. Ha elhaladtatok mellette, csak megjegyzik, büntetés nincs.
 
 **Autópályán a felső sáv mindig szabad:** oda nem kerül forgalom, és az autópályára érő autók átsorolnak belőle. A radaros rendőr és a segítségre váró autó a padkán áll, a baleset, a dugó és az útépítés a másik két sávot zárja le (útépítésnél: „maradj a felső sávban”). Autópályán nincs vadátkelés (vadháló), és nincs kátyú.
 
