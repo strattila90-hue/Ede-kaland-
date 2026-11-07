@@ -24,7 +24,7 @@ function gpsAnchors(i){const L=LEGS[i];if(L._anc)return L._anc;const n=L.path.le
 function gpsPos(i,km){const L=LEGS[i],a=gpsAnchors(i);km=clamp(km,0,L.km);for(let k=1;k<a.length;k++)if(km<=a[k]||k===a.length-1){const u=a[k]>a[k-1]?clamp((km-a[k-1])/(a[k]-a[k-1]),0,1):1;
   return [lerp(L.pts[k-1][0],L.pts[k][0],u),lerp(L.pts[k-1][1],L.pts[k][1],u)];}return L.pts[L.pts.length-1];}
 function gpsLive(){return G.state==='play'&&P&&LEG;}
-function gpsKm(){if(gpsLive())return legKm();const L=LEGS[G.leg];return G.resume&&G.ts?Math.min(L.km,G.resume/(PXKM/G.ts)):0;}
+function gpsKm(){if(gpsLive())return legKm();const L=LEGS[G.leg];return G.resume?Math.min(L.km,G.resume):0;}
 function gpsCar(){const km=gpsKm(),i=G.leg,p=gpsPos(i,km),a=gpsPos(i,km-1.5),b=gpsPos(i,km+1.5);let hd=Math.atan2((b[1]-a[1]),(MY(b[0])-MY(a[0])));if(!isFinite(hd)||(a[0]===b[0]&&a[1]===b[1]))hd=0;return {lat:p[0],lon:p[1],hd:hd};}
 function gpsCountry(i,km){let c='HU';for(let l=0;l<=i;l++){let acc=0;for(const q of LEGS[l].segs){if(l===i&&acc>km)break;if(q[4])c=q[4];acc+=q[3];}}return c;}
 function gpsSegName(i,km){let acc=0;for(const q of LEGS[i].segs){if(km<acc+q[3])return q[0]==='motorway'?q[1]+' autópálya':q[1]?q[1]:q[0]==='country'?'Országút':'';acc+=q[3];}return '';}

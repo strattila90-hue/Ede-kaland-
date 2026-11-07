@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.31.0
+# 🚐 Családi Vakáció – v2.31.1
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -27,7 +27,7 @@ A fogyasztás a sebességtől, a gyorsítástól, az út típusától, a hótól
 
 A játék valós léptékű: 90 km/h-val 1 km pontosan 40 másodperc, így Komáromtól Bábolnáig kb. negyedóra, Komáromtól Siófokig közel két óra. A teljes út kb. 9 600 km.
 
-A játék kétpercenként automatikusan menti az állást, így az út több napon át is folytatható. A főmenüben választható **Gyorsított (5x)** vagy **Turbó (20x)** utazás is, de alapból valós idővel megy. Valós időben a kijelzett megtett út méterre pontos: 90 km/h-val pontosan 25 métert teszel meg másodpercenként (1 km = 40 mp), és a kijelző a métereket is mutatja (pl. 10,305 / 167 km). Gyorsított és turbó módban a táv rövidebbre van sűrítve, ezért ilyenkor a kijelző mellett ott a szorzó (5x, 20x).
+A játék 10 másodpercenként (és háttérbe kerüléskor) automatikusan menti az állást, így az út több napon át is folytatható. A főmenüben választható **Gyorsított (5x)** utazás is (ennél gyorsabb nincs), de alapból valós idővel megy. A megtett utat a mentés kilométerben tárolja, így egy elkezdett utazásban a km és a méter sosem vész el és nem ugrik, akkor sem, ha közben átállítod a gyorsítást. Valós időben a kijelzett megtett út méterre pontos: 90 km/h-val pontosan 25 métert teszel meg másodpercenként (1 km = 40 mp), és a kijelző a métereket is mutatja (pl. 10,305 / 167 km). Gyorsított és turbó módban a táv rövidebbre van sűrítve, ezért ilyenkor a kijelző mellett ott a szorzó (5x, 20x).
 
 ## 🌍 Európa körút (22 szakasz, kb. 9 600 km, 14 ország)
 

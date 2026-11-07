@@ -44,9 +44,9 @@ function setSlot(n){SLOT=n;try{localStorage.setItem('cv-slot',String(n));}catch(
 function loadSave(){try{const sv=JSON.parse(localStorage.getItem(saveKey())||'null');if(sv&&!sv.routeV){// régi (12 szakaszos) mentés átállítása az új, egész Európát bejáró útvonalra
   const OLD=['Komárom','Siófok','Keszthely','Bécs','Prága','Berlin','Amszterdam','Párizs','Barcelona','Nizza','Velence','Salzburg'],nf=OLD[sv.leg]||'Komárom';let k=LEGS.findIndex(L=>L.from.split(',')[0]===nf);if(k<0)k=LEGS.length-1;if(k!==sv.leg)sv.dist=0;sv.leg=k;sv.routeV=2;}
   if(sv&&sv.leg>=LEGS.length)sv.leg=LEGS.length-1;return sv;}catch(e){return null;}}
-function save(dist){try{saveProf();}catch(e){}try{if(G.trip)G.trip.savedAt=Date.now();localStorage.setItem(saveKey(),JSON.stringify({leg:G.leg,trip:G.trip,dist:dist||0,ts:G.ts,routeV:2}));G.save=loadSave();}catch(e){}}
-G.save=loadSave();G.ts=1;try{G.ts=+localStorage.getItem('csaladi-vakacio-ts')||1;}catch(e){}
-const TS_OPTS=[[1,'Valós idő (1x)'],[5,'Gyorsított (5x)'],[20,'Turbó (20x)']];
+function save(dist){try{saveProf();}catch(e){}try{if(G.trip)G.trip.savedAt=Date.now();localStorage.setItem(saveKey(),JSON.stringify({leg:G.leg,trip:G.trip,dist:dist||0,km:dist&&typeof LEG!=='undefined'&&LEG?dist*LEG.kmPerPx:0,ts:G.ts,routeV:2}));G.save=loadSave();}catch(e){}}
+G.save=loadSave();G.ts=1;try{G.ts=+localStorage.getItem('csaladi-vakacio-ts')||1;}catch(e){}if(G.ts!==1)G.ts=5;// legfeljebb 5x (a régi 20x is 5x lesz)
+const TS_OPTS=[[1,'Valós idő (1x)'],[5,'Gyorsított (5x)']];
 const WHO=['apa','anya','anna','petra','atti'],WHO_X={apa:68,anya:63,anna:42,petra:33,atti:27};
 function say(txt,who){P.bub={txt:txt,who:who||'anna',t:170};if(!G.paused&&G.state==='play')speak(txt,who||'anna',true);}
 function flash(msg,col,dur){G.msg={txt:msg,col:col||'#ffd84a',t:dur||200};}
@@ -56,7 +56,7 @@ function distStr(km){return km<1?fmt(km*1000)+' m':fmt(km,1)+' km';}
 
 /* ---------- indulás ---------- */
 function startLeg(i,resume){if(typeof FINE!=='undefined'&&FINE&&!isTouch){let seen=false;try{seen=localStorage.getItem('cv-keys-seen')==='1';localStorage.setItem('cv-keys-seen','1');}catch(e){}if(!seen)setTimeout(()=>{if(G.state==='play'&&!G.paused&&!G.gps&&!G.ledger&&!G.elogOpen&&!MG&&typeof openKeys==='function')openKeys();},1600);}if(typeof elog==='function')elog('info','Szakasz indul: '+(i+1)+'. '+LEGS[i].from.split(',')[0]+' > '+LEGS[i].to+(resume?' (folytatás)':''));G.leg=i;GPS_HD=null;LEG=buildLeg(i,G.ts);const L=LEGS[i];const dark=L.time!=='day'||['rain','storm','fog','snow'].includes(L.weather);
- P={dist:resume||0,kmh:0,lane:i===0&&!resume?0:1,y:LANE[i===0&&!resume?0:1],ang:0,blink:0,inv:0,haz:false,lightMode:dark?2:1,fogF:['fog','snow'].includes(L.weather),fogR:L.weather==='fog',rev:false,doorsOpen:false,saveT:0,
+ P={dist:resume?Math.min(resume,LEGS[i].km-0.05)/LEG.kmPerPx:0,kmh:0,lane:i===0&&!resume?0:1,y:LANE[i===0&&!resume?0:1],ang:0,blink:0,inv:0,haz:false,lightMode:dark?2:1,fogF:['fog','snow'].includes(L.weather),fogR:L.weather==='fog',rev:false,doorsOpen:false,saveT:0,
   yF:0,vF:0,yR:0,vR:0,wF:0,wR:0,flat:null,sub:'drive',fix:0,pump:null,ev:null,evCD:3600,famCD:9000,chat:600,bub:null,arriving:false,arriveT:0,door:0,hide:{},walk:[],stopT:0,
   boarding:i===0&&!resume?0:-1,instCons:0,avgKm:0,avgL:0,lastSeg:null,hungerT:0,brake:false,gasF:0,engineOff:false};
  if(i===0&&!resume){P.hide={apa:1,anya:1,anna:1,petra:1,atti:1};P.door=1;
@@ -947,7 +947,7 @@ function update(){pauseWatch();if(!window.LAZY_DONE&&G.state!=='title'&&G.state!
   if(K.enterP&&!G.confirm){SFX.click();const a=opts[G.menu].a;if(a==='color'){const ns=Object.keys(PALETTES);setColor(ns[(ns.indexOf(carColor)+1)%ns.length]);}
    else if(a==='ts'){const k=TS_OPTS.findIndex(q=>q[0]===G.ts);G.ts=TS_OPTS[(k+1)%TS_OPTS.length][0];try{localStorage.setItem('csaladi-vakacio-ts',G.ts);}catch(e){}}
    else if(a==='specs'){G.state='specs';G.st=0;}
-   else{if(a==='cont'){G.leg=G.save.leg;G.trip=fixLog(G.save.trip);if(G.trip.savedAt)restBreak((Date.now()-G.trip.savedAt)/1000);G.ts=G.save.ts||G.ts;G.resume=G.save.dist||0;}else{G.leg=0;G.trip=newTrip();G.resume=0;}G.state='map';G.st=0;}}}
+   else{if(a==='cont'){G.leg=G.save.leg;G.trip=fixLog(G.save.trip);if(G.trip.savedAt)restBreak((Date.now()-G.trip.savedAt)/1000);/* a megtett út kilométerben jön vissza: a gyorsítás állításától függetlenül pontosan ugyanott folytatódik */G.resume=G.save.km!=null?G.save.km:(G.save.dist||0)*(G.save.ts||1)/PXKM;}else{G.leg=0;G.trip=newTrip();G.resume=0;}G.state='map';G.st=0;}}}
  else if(G.state==='specs'){if(K.enterP&&G.st>10){G.state='title';SFX.click();}}
  else if(G.state==='map'){if(G.st===1)fetchWeather(G.leg);if(K.gpsP){K.gpsP=false;if(typeof openGPS==='function')openGPS();}if(G.gps){K.enterP=false;}if(K.enterP&&G.st>25){SFX.click();startLeg(G.leg,G.resume);G.resume=0;}}
  else if(G.state==='play')updPlay();

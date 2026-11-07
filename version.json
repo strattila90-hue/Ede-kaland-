@@ -1,5 +1,5 @@
 {
- "version": "2.31.0",
+ "version": "2.31.1",
  "apk": 2,
  "files": {
   "index.html": 47792,
@@ -9,13 +9,13 @@
   "js/geo.js": 22119,
   "js/radio.js": 10587,
   "js/map.js": 10735,
-  "js/gps.js": 21961,
+  "js/gps.js": 21943,
   "js/geohd.js": 121325,
   "js/car.js": 56508,
   "js/world.js": 59936,
   "js/minigames.js": 20198,
   "js/shops.js": 31446,
-  "js/game.js": 136948,
+  "js/game.js": 137239,
   "js/app.js": 51673,
   "icons/icon-192.png": 27752,
   "icons/icon-512.png": 94753,
