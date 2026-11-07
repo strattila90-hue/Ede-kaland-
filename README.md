@@ -1,10 +1,12 @@
-# 🚐 Családi Vakáció – v2.23.0
+# 🚐 Családi Vakáció – v2.24.0
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
 A játék telepíthető alkalmazás (PWA): telefonon a kezdőképernyőre tehető és internet nélkül is fut.
 
 ## 👨‍👩‍👧‍👧 A család és az autó
+
+**Felolvasás, nemek szerint:** amit a családtagok mondanak (a szövegbuborékok), azt a telefon saját magyar hangja fel is olvassa. Ha a készüléken van férfi és női magyar hang is, **Apa és kis Atti a férfi**, **Anya, Anna és Petra a női** hangot kapja. Ha csak egy magyar hang van (sok Androidon így van), a hangmagasság választja szét őket: Apa mély, Anya közepes, Anna és Petra magasabb, kis Atti a legmagasabb, a gyerekek kicsit hadarnak is. A számokat és mértékegységeket kiolvassa (130 kilométer per óra, 500 forint). Beszéd közben a rádió lehalkul. Szünetben, menüben és háttérben elhallgat. Offline is megy, ha a telefonon le van töltve a magyar hang (Beállítások > Szövegfelolvasás).
 
 **Utasok:** Apa (sofőr, 177 cm), Anya (174 cm), Anna (5 éves, kb. 110 cm), Petra (3 éves, kb. 96 cm) és kis Atti (10 hónapos, bébiülésben). Az alakok valós arányban látszanak az autóhoz képest. A harmadik sorban a családi csomagok utaznak.
 
@@ -68,7 +70,7 @@ A főmenüben az **Album és rekordok** gomb (a Szünet menüből is elérhető)
 ## ⚙ Beállítások
 
 - **Könnyű mód** (mentési helyenként): kisebbeknek. Nincs sérülés, bírság és fáradás, a család mindig jókedvű.
-- **Hangerő** külön: zene, motor, rádió, hanghatások és duda.
+- **Hangerő** külön: zene, motor, rádió, hanghatások és duda, valamint az **utasok hangja** (0 = felolvasás kikapcsolva). A csúszka húzásakor Anya és Apa bemutatkozik, így hallod, hogy szól-e.
 - **Akkukímélő mód:** hosszú autóúton kb. 30 kép/mp és kisebb felbontás, kevésbé melegszik a telefon és tovább bírja az akku.
 
 ## 🎬 Főmenü: filmplakát

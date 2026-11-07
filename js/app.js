@@ -322,6 +322,6 @@ function closeSettings(){G.setOpen=false;$('settings').classList.remove('open');
 $('setClose').addEventListener('click',e=>{e.stopPropagation();closeSettings();});
 $('setEasy').addEventListener('change',e=>{PROF.easy=e.target.checked;saveProf();elog('info','Könnyű mód: '+(PROF.easy?'be':'ki'));if(PROF.easy&&G.trip){G.trip.driveS=0;G.trip.mood=Math.max(G.trip.mood||0,4);if(typeof P!=='undefined'&&P)P.cranky=false;}MENU_SIG='?';});
 $('setBatt').addEventListener('change',e=>{setBatt(e.target.checked);MENU_SIG='?';});
-document.querySelectorAll('#settings input[type=range]').forEach(r=>r.addEventListener('input',()=>{initAudio();setVol(r.dataset.k,r.value/100);r.nextElementSibling.textContent=r.value+'%';if(r.dataset.k==='sfx')tone(880,0.08,'square',0.08);}));
+document.querySelectorAll('#settings input[type=range]').forEach(r=>r.addEventListener('input',()=>{initAudio();setVol(r.dataset.k,r.value/100);r.nextElementSibling.textContent=r.value+'%';if(r.dataset.k==='sfx')tone(880,0.08,'square',0.08);if(r.dataset.k==='voice'){clearTimeout(window.VTST);window.VTST=setTimeout(()=>{TTS.last='';speak('Szia! Indulhatunk?','anya');setTimeout(()=>{TTS.last='';speak('Mehetünk!','apa');},1500);},350);}}));
 ['pointerdown','touchstart'].forEach(ev=>{$('album').addEventListener(ev,e=>e.stopPropagation(),{passive:true});$('settings').addEventListener(ev,e=>e.stopPropagation(),{passive:true});});
 window.APP_OK=true;

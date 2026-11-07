@@ -48,7 +48,7 @@ function save(dist){try{saveProf();}catch(e){}try{if(G.trip)G.trip.savedAt=Date.
 G.save=loadSave();G.ts=1;try{G.ts=+localStorage.getItem('csaladi-vakacio-ts')||1;}catch(e){}
 const TS_OPTS=[[1,'Valós idő (1x)'],[5,'Gyorsított (5x)'],[20,'Turbó (20x)']];
 const WHO=['apa','anya','anna','petra','atti'],WHO_X={apa:68,anya:63,anna:42,petra:33,atti:27};
-function say(txt,who){P.bub={txt:txt,who:who||'anna',t:170};}
+function say(txt,who){P.bub={txt:txt,who:who||'anna',t:170};if(!G.paused&&G.state==='play')speak(txt,who||'anna',true);}
 function flash(msg,col,dur){G.msg={txt:msg,col:col||'#ffd84a',t:dur||200};}
 function seg(){return segAtIn(LEG.segs,P.dist+PX+40);}
 function legKm(){return Math.min(LEGS[G.leg].km,P.dist*LEG.kmPerPx);}
@@ -964,7 +964,7 @@ function renderI(a){if(G.state!=='play'||!P||G.paused||P._pd===undefined||MG){re
  for(const e of ents){const px=e._px;if(px!==undefined&&Math.abs(e.x-px)<40){sv.push(e,e.x);e.x=px+(e.x-px)*a;}}
  try{render();}finally{P.dist=d;P.y=y;P.ang=pa;for(let i=0;i<sv.length;i+=2)sv[i].x=sv[i+1];}}
 let SLOWN=0,RENN=0;
-function frame(now){const dt=Math.min(200,now-last);if(dt>48&&dt<200&&G.state==='play'&&!G.paused)LONGF++;acc+=dt;last=now;if(dt>2&&dt<60)DTS.push(dt);
+function frame(now){if(TTS.on&&TTS.game&&(G.paused||G.state!=='play'))ttsStop();const dt=Math.min(200,now-last);if(dt>48&&dt<200&&G.state==='play'&&!G.paused)LONGF++;acc+=dt;last=now;if(dt>2&&dt<60)DTS.push(dt);
  if(G.state==='play'&&!G.paused&&P&&!document.hidden){PROF.stats.playS=(PROF.stats.playS||0)+dt/1000;if(P.kmh>(PROF.stats.vmax||0)+0.5&&P.sub==='drive')PROF.stats.vmax=Math.round(P.kmh);if((FRM&1023)===0)checkAwards();}
  let n=0;if(document.hidden)LASTR=0;try{while(acc>=STEP&&n<3){snapPrev();update();acc-=STEP;n++;}}catch(e){acc=0;elog('hiba','Játéklogika: '+(e&&e.message)+' | '+String(e&&e.stack||'').split('\n').slice(1,3).join(' ').trim());}if(n>=3)acc=0;FRM++;
  // legfeljebb kb. 100 kép/mp: 60/90 Hz-en minden frissítésre, 120/144 Hz-en minden másodikra rajzol

@@ -2,7 +2,7 @@
 /* =========================================================
    CSALÁDI VAKÁCIÓ – alapok: vászon, rajzoló segédek, betűk, hang, bemenet
    ========================================================= */
-const APP_VERSION='2.23.0';
+const APP_VERSION='2.24.0';
 const W=480,H=270,PX=70,ROADT=194,ROADB=262,LANE=[212,232,252];
 const TAU=Math.PI*2;
 let SC=2,LOWQ=false;
@@ -119,9 +119,28 @@ function textRaw(g,str,x,y,col,s,sh){
 /* ---------- hang ---------- */
 let AC=null,master=null,musicOn=true,mStep=0,mNext=0;
 /* hangerők: zene, motor, rádió, hanghatások (duda is) – külön csatornák, a beállításokban állíthatók */
-let VOL={music:1,eng:1,radio:1,sfx:1};try{Object.assign(VOL,JSON.parse(localStorage.getItem('cv-vol')||'{}'));}catch(e){}
+let VOL={music:1,eng:1,radio:1,sfx:1,voice:1};try{Object.assign(VOL,JSON.parse(localStorage.getItem('cv-vol')||'{}'));}catch(e){}
 let BUS=null;
 function setVol(k,v){VOL[k]=clamp(+v||0,0,1);try{localStorage.setItem('cv-vol',JSON.stringify(VOL));}catch(e){}if(BUS&&BUS[k])BUS[k].gain.setTargetAtTime(VOL[k],AC.currentTime,0.05);}
+/* ---- felolvasás: az utasok mondatait a készülék saját magyar hangja olvassa fel (Web Speech API, offline is megy, ha a telefonon van magyar hang)
+   Nemek szerint külön hang: ha van férfi és női magyar hang, Apa és kis Atti a férfit, Anya, Anna és Petra a nőit kapja.
+   Ha csak egy hang van (sok telefonon így van), a hangmagasság választja el őket: Apa mély, Anya közepes, a gyerekek magasak. */
+const TTS={ok:typeof window!=='undefined'&&'speechSynthesis' in window&&typeof SpeechSynthesisUtterance!=='undefined',m:null,f:null,hu:0,on:false,last:'',lastT:0};
+const V_M=/szabolcs|tam[aá]s|\bmale\b|f[eé]rfi|\bman\b|-hub-|-hud-/i,V_F=/no[eé]mi|mariska|t[uü]nde|krisztina|eszter|female|\bn[oő]i\b|woman|-kfl-|-hue-/i;
+function ttsVoices(){if(!TTS.ok)return;let vs=[];try{vs=speechSynthesis.getVoices()||[];}catch(e){}const hu=vs.filter(v=>/^hu/i.test(v.lang||''));TTS.hu=hu.length;
+ TTS.m=hu.find(v=>V_M.test(v.name+' '+v.voiceURI))||null;TTS.f=hu.find(v=>v!==TTS.m&&V_F.test(v.name+' '+v.voiceURI))||hu.find(v=>v!==TTS.m)||null;}
+if(TTS.ok){try{ttsVoices();speechSynthesis.addEventListener('voiceschanged',ttsVoices);}catch(e){}try{document.addEventListener('visibilitychange',()=>{if(document.hidden){try{speechSynthesis.cancel();}catch(e){}TTS.on=false;}});window.addEventListener('pagehide',()=>{try{speechSynthesis.cancel();}catch(e){}});}catch(e){}}
+const VOICE_OF={apa:{g:'m',p:0.9,lp:0.55,r:1},anya:{g:'f',p:1.05,r:1.02},anna:{g:'f',p:1.3,r:1.07},petra:{g:'f',p:1.5,r:1.1},atti:{g:'m',p:1.75,lp:1.85,r:1.14,kid:1}};
+function ttsClean(t){return String(t).replace(/[\u{1F000}-\u{1FFFF}☀-➿️‍]/gu,'').replace(/(\d)\s*km\/h/gi,'$1 kilométer per óra').replace(/km\/h/gi,'kilométer per óra')
+ .replace(/(\d)\s*km\b/gi,'$1 kilométer').replace(/(\d)\s*Ft\b/g,'$1 forint').replace(/(\d)\s*m\b/g,'$1 méter').replace(/\s+/g,' ').trim();}
+function ttsStop(){if(!TTS.ok||!TTS.on)return;TTS.on=false;try{speechSynthesis.cancel();}catch(e){}ttsDuck(false);}
+function ttsDuck(on){try{if(typeof radio!=='undefined'&&radio.bus&&AC)radio.bus.gain.setTargetAtTime(on?0.2:0.55,AC.currentTime,0.12);}catch(e){}}
+function speak(txt,who,game){if(!TTS.ok||!(VOL.voice>0))return;const t=ttsClean(txt);if(!t)return;const now=Date.now();if(t===TTS.last&&now-TTS.lastT<4000)return;TTS.last=t;TTS.lastT=now;
+ try{if(!TTS.m&&!TTS.f)ttsVoices();const pr=VOICE_OF[who]||VOICE_OF.anna,u=new SpeechSynthesisUtterance(t);u.lang='hu-HU';
+  let v=pr.g==='m'?TTS.m:TTS.f,low=false;if(!v){v=TTS.f||TTS.m;low=pr.g==='m';}if(pr.kid&&!TTS.m){v=TTS.f;}if(v)u.voice=v;
+  u.pitch=Math.min(2,low&&pr.lp?pr.lp:pr.p);u.rate=pr.r;u.volume=clamp(VOL.voice,0,1);
+  u.onstart=()=>ttsDuck(true);u.onend=u.onerror=()=>{if(!speechSynthesis.speaking){TTS.on=false;ttsDuck(false);}};
+  speechSynthesis.cancel();TTS.on=true;TTS.game=!!game;speechSynthesis.speak(u);}catch(e){TTS.on=false;}}
 function initAudio(){if(AC){if(AC.state==='suspended')AC.resume();return;}try{AC=new (window.AudioContext||window.webkitAudioContext)();master=AC.createGain();master.gain.value=0.5;master.connect(AC.destination);
  BUS={};for(const k of ['music','eng','radio','sfx']){const g=AC.createGain();g.gain.value=VOL[k];g.connect(master);BUS[k]=g;}}catch(e){AC=null;}}
 const sfxOut=()=>BUS?BUS.sfx:master;
