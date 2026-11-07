@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.27.0
+# 🚐 Családi Vakáció – v2.28.0
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -103,6 +103,8 @@ A főmenü egyetlen álló kép, családi road movie plakát: naplemente csíkos
 
 **Satufék:** erős fékezésnél csak a gumik csikorognak, féknyom marad az úton, az utasok előrebillennek és tágra nyílt szemmel ijednek meg (sikoly nincs). Normál fékezésnél is kicsit előredőlnek.
 
+**Élethű forgalom:** a személyautók háromféle karosszériával járnak (ferdehátú, kombi, kis városi terepjáró), mindegyiken ívelt forma, ablakok oszlopokkal, ajtóvonalak, kilincsek, tükör, kerékívek, fényszóró- és hátsólámpa-forma, lökhárítók és fényes tükröződés. Új rajzot kapott a rendőrautó (szedán, kék csík, villogó), a kisbusz (zárt és ablakos), a mentő (sárga-zöld kockás csík, MENTŐ felirat, kék villogó), a lakóautó (alkóv, ablakok redőnnyel, ajtó, tetőklíma, dekorcsíkok) és a traktor (fülke, motorház hűtőráccsal, kipufogó, sárvédők). A karosszériák egyszer, előre rajzolódnak meg, menet közben csak a kerekek forognak, így telefonon sem lassabb.
+
 **Sávváltás:** az autó fokozatosan, ívben sorol át (kb. 1,5 s, lassan hosszabb, havon és esőben óvatosabb), nincs hirtelen rántás. A forgalom többi járműve is így vált sávot.
 
 **Útminőség:** jó, közepes, rossz (kátyús) és macskaköves utak. A futómű rugózik és csillapít: fékezéskor bólint az autó, gyorsításkor leül, kátyúnál megdobja. Nagy sebességnél a kátyúk defektet okozhatnak.
@@ -121,6 +123,8 @@ A megállókat előjelző tábla jelzi („Benzinkút 500 m”), a következők 
 - **Trafik (12):** kaparós sorsjegy (1x, 4x, 10x), csoki, kártya, autósújság, kulcstartó, napszemüveg, matrica.
 - **Újságos (12):** gyerekújság, képregény, színező, matricás könyv, mesekönyv, rejtvény, autós térkép, útikönyv, képeslap, hűtőmágnes, napilap.
 - **Burger Pont (16):** sajtburger, duplaburger, csirkewrap, hot dog, saláta, hagymagyűrű, palacsinta, muffin, limonádé, gyerekmenü, családi menü.
+
+**Boltban felolvasás:** belépéskor Apa bemondja a boltot („Hipermarket. Mit vegyünk?”), vásárláskor Anya felolvassa a terméket, az árát és a megjegyzést („Naptej, 3 990 forint. Naptej bekészítve, jöhet a strand!”); ha a gyerekek kedve javul, utána Anna megköszöni.
 
 A boltokban 8 termék látszik egyszerre; a fejléc **◀ 2/3 ▶** gombjaival (billentyűzeten a sávváltó gombokkal) lehet lapozni.
 

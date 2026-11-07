@@ -2,7 +2,7 @@
 /* =========================================================
    CSALÁDI VAKÁCIÓ – alapok: vászon, rajzoló segédek, betűk, hang, bemenet
    ========================================================= */
-const APP_VERSION='2.27.0';
+const APP_VERSION='2.28.0';
 const W=480,H=270,PX=70,ROADT=194,ROADB=262,LANE=[212,232,252];
 const TAU=Math.PI*2;
 let SC=2,LOWQ=false;
@@ -38,7 +38,7 @@ let CVLOST=0,CVLOSTN=0;
 function cvLost(){CVLOST=CVLOST||1;}
 function watchCv(c){try{c.addEventListener('contextlost',cvLost);c.addEventListener('contextrestored',()=>{CVLOST=2;});}catch(e){}return c;}
 function ctxLost(x){try{return !!(x&&x.isContextLost&&x.isContextLost());}catch(e){return false;}}
-function flushCaches(why){freeMap(GLC,a=>a.c);freeMap(STC);if(typeof SPR!=='undefined')freeMap(SPR,e=>e.c);if(typeof LTC!=='undefined')freeMap(LTC);if(typeof CARC!=='undefined')freeMap(CARC);
+function flushCaches(why){freeMap(GLC,a=>a.c);freeMap(STC);if(typeof SPR!=='undefined')freeMap(SPR,e=>e.c);if(typeof LTC!=='undefined')freeMap(LTC);if(typeof CARC!=='undefined')freeMap(CARC);if(typeof TRC!=='undefined')freeMap(TRC);
  if(typeof onSC==='function')onSC();CVLOSTN++;if(typeof elog==='function')elog('info','Képtárak újrarajzolva ('+why+'), '+CVLOSTN+'. alkalom');}
 /* képkockánként olcsó: ha jelzés jött, vagy (másodpercenként) egy minta-vászon elveszett, és már nincs elveszve, mindent újrarajzolunk */
 function cvCheck(frm){if(!CVLOST&&frm%60===0){let lost=false;for(const a of GLC.values()){if(ctxLost(a.x)){lost=true;break;}}if(!lost&&typeof CARC!=='undefined')for(const c of CARC.values()){if(ctxLost(c.getContext('2d'))){lost=true;break;}}if(lost)CVLOST=1;}
@@ -46,7 +46,7 @@ function cvCheck(frm){if(!CVLOST&&frm%60===0){let lost=false;for(const a of GLC.
 watchCv(cv);
 function freeCv(c){try{if(c&&c.width){c.width=0;c.height=0;}}catch(e){}}
 function freeMap(m,get){try{for(const v of m.values())freeCv(get?get(v):v);m.clear();}catch(e){}}
-function setSC(v){if(v!==SC){freeMap(GLC,a=>a.c);freeMap(STC);if(typeof SPR!=='undefined')freeMap(SPR,e=>e.c);if(typeof LTC!=='undefined')freeMap(LTC);if(typeof CARC!=='undefined')freeMap(CARC);}SC=v;cv.width=Math.round(W*SC);cv.height=Math.round(H*SC);if(typeof onSC==='function')onSC();}
+function setSC(v){if(v!==SC){freeMap(GLC,a=>a.c);freeMap(STC);if(typeof SPR!=='undefined')freeMap(SPR,e=>e.c);if(typeof LTC!=='undefined')freeMap(LTC);if(typeof CARC!=='undefined')freeMap(CARC);if(typeof TRC!=='undefined')freeMap(TRC);}SC=v;cv.width=Math.round(W*SC);cv.height=Math.round(H*SC);if(typeof onSC==='function')onSC();}
 const isTouch=('ontouchstart' in window)||(navigator.maxTouchPoints>0);
 function resize(){const iw=window.innerWidth,ih=window.innerHeight,s=Math.min(iw/W,ih/H),cw=Math.round(W*s),ch=Math.round(H*s);
  cv.style.width=cw+'px';cv.style.height=ch+'px';

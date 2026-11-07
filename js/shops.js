@@ -88,7 +88,7 @@ const SHOPS={
   {k:'baby',nm:'Bébiétel',p:1690,baby:30},{k:'diaper',nm:'Pelenka',p:4990,baby:40},{k:'ice',nm:'Fagyi',p:1990,mood:1},{k:'coffee',nm:'Kávé Apának',p:690,msg:'Apa felfrissült, mehet tovább.'},
   {k:'kifli',nm:'Kifli',p:890,food:12},{k:'yogurt',nm:'Joghurt',p:390,food:6},{k:'rudi',nm:'Túrórudi',p:290,food:6,msg:'A gyerekek imádják a túrórudit!'},{k:'choco',nm:'Csoki',p:790,mood:1},
   {k:'chips',nm:'Chips',p:990,food:6,msg:'Ropog a chips a hátsó ülésen.'},{k:'banana',nm:'Banán',p:690,food:10},{k:'juice',nm:'Gyümölcslé',p:590,food:6},{k:'wipes',nm:'Popsitörlő',p:1290,baby:15}]},
- hiper:{title:'Hipermarket',col:'#1e4fb5',items:[{k:'big',nm:'Nagybevás.',p:14990,food:100,baby:30},{k:'babybig',nm:'Bébicsomag',p:6990,baby:100},{k:'basket',nm:'Gyüm.kosár',p:3490,food:30},{k:'water',nm:'Víz 6 db',p:1990,food:12},
+ hiper:{title:'Hipermarket',col:'#1e4fb5',items:[{k:'big',nm:'Nagybevás.',sp:'Nagybevásárlás',p:14990,food:100,baby:30},{k:'babybig',nm:'Bébicsomag',p:6990,baby:100},{k:'basket',nm:'Gyüm.kosár',sp:'Gyümölcskosár',p:3490,food:30},{k:'water',nm:'Víz 6 db',p:1990,food:12},
   {k:'toy',nm:'Plüssmaci',p:4990,mood:2},{k:'game',nm:'Társasjáték',p:5990,mood:2},{k:'drink',nm:'Üdítő',p:790,food:6},{k:'work',nm:'Munka',p:0,work:true},
   {k:'cheese',nm:'Sajt',p:1890,food:14},{k:'sausage',nm:'Kolbász',p:2490,food:18},{k:'cereal',nm:'Müzli',p:1290,food:10},{k:'pogacsa',nm:'Pogácsa',p:990,food:10},
   {k:'milk',nm:'Bébitej',p:5490,baby:60},{k:'wipes',nm:'Popsitörlő',p:990,baby:15},{k:'choco',nm:'Csokitábla',p:690,mood:1},{k:'juice',nm:'Gyümölcslé',p:690,food:6},
@@ -123,7 +123,9 @@ function shopPage(type){const ps=P.shop,n=shopPages(type);ps.page=Math.max(0,Mat
 const PG_PREV=[PANEL[0]+PANEL[2]-78,PANEL[1]+21,24,15],PG_NEXT=[PANEL[0]+PANEL[2]-32,PANEL[1]+21,24,15];
 function cardRect(i){return [PANEL[0]+8+(i%4)*74,PANEL[1]+40+Math.floor(i/4)*60,70,56];}
 const GO_BTN=[PANEL[0]+8,PANEL[1]+PANEL[3]-26,PANEL[2]-16,20];
-function enterShop(type){stat('shops');G.trip.driveS=Math.max(0,(G.trip.driveS||0)-300);if(typeof cheerUp==='function'&&P.cranky)cheerUp(2,type==='burger'?'A gyerekek imádják a gyorséttermet!':'Jót tett a kis szünet!');P.sub='shop';P.shop={type:type,msg:'',worked:false,anim:0,last:-1};P.hide.apa=1;if(type!=='fuel')P.hide.anna=1;SFX.click();
+/* bolti felolvasás: belépéskor Apa bemondja a boltot, vásárláskor Anya a terméket, az árát és a megjegyzést */
+function shopSay(t,who){if(typeof speak!=='function')return;try{TTS.last='';speak(t,who||'anya',false);}catch(e){}}
+function enterShop(type){stat('shops');G.trip.driveS=Math.max(0,(G.trip.driveS||0)-300);if(typeof cheerUp==='function'&&P.cranky)cheerUp(2,type==='burger'?'A gyerekek imádják a gyorséttermet!':'Jót tett a kis szünet!');P.sub='shop';P.shop={type:type,msg:'',worked:false,anim:0,last:-1};shopSay(type==='garage'?'Autószerviz. Nézzük, mit kell javítani.':type==='fuel'?'Benzinkút bolt. Kell még valami?':SHOPS[type].title.split(' - ')[0]+'. Mit vegyünk?','apa');P.hide.apa=1;if(type!=='fuel')P.hide.anna=1;SFX.click();
  if(P.ev&&P.ev.type==='pee'){P.ev=null;flash('Anna elszaladt a mosdóba. Megkönnyebbült!','#7cff7c');}}
 function leaveStop(){P.sub='drive';P.hide.apa=0;P.hide.anna=0;P.shop=null;P.pump=null;P.stopCD=P.dist;SFX.clunk();say('Mehetünk tovább!','apa');}
 function updShop(){const T=G.trip,ps=P.shop;if(ps.anim>0)ps.anim--;const np=shopPages(ps.type);
@@ -131,8 +133,9 @@ function updShop(){const T=G.trip,ps=P.shop;if(ps.anim>0)ps.anim--;const np=shop
  const items=shopPage(ps.type);
  for(let i=0;i<items.length;i++){if(K.num===i+1||inRect(TAP,cardRect(i))){const it=items[i];
 if(it.p){book(-it.p,ITEMCAT[it.k]||'other',SHOPS[ps.type].title+': '+it.nm);SFX.cash();}ps.anim=20;ps.last=i;
-  if(it.repair){T.hp=100;T.airbag=0;}if(it.k==='coffee'){T.driveS=Math.max(0,(T.driveS||0)-900);}if(it.wake){T.driveS=Math.max(0,(T.driveS||0)-it.wake);}if(it.food)T.food=Math.min(100,T.food+it.food);if(it.baby)T.baby=Math.min(100,T.baby+it.baby);if(it.mood){T.mood=Math.min(5,T.mood+it.mood);say('Köszönjük, Apa!','anna');}
-  if(it.tyre)T.spare=true;if(it.photo)T.photos++;ps.msg=it.msg||('Megvetted: '+it.nm);
+  if(it.repair){T.hp=100;T.airbag=0;}if(it.k==='coffee'){T.driveS=Math.max(0,(T.driveS||0)-900);}if(it.wake){T.driveS=Math.max(0,(T.driveS||0)-it.wake);}if(it.food)T.food=Math.min(100,T.food+it.food);if(it.baby)T.baby=Math.min(100,T.baby+it.baby);if(it.mood){T.mood=Math.min(5,T.mood+it.mood);}
+  if(it.tyre)T.spare=true;if(it.photo)T.photos++;ps.msg=it.msg||('Megvetted: '+it.nm);{const st=(it.sp||it.nm)+(it.p?', '+fmt(it.p)+' forint.':'.')+(it.msg?' '+it.msg:it.work?' Irány a zöldséges!':'');shopSay(st);
+   if(it.mood){const sh=P.shop;setTimeout(()=>{if(P.shop===sh)say('Köszönjük, Apa!','anna');},400+st.length*80);}}
   if(it.mult){startMini('scratch',{mult:it.mult,onEnd:r=>{ps.msg=r?'Nyeremény: '+fmt(r)+' Ft!':'Most nem nyert.';}});return;}
   if(it.work){ps.worked=true;startMini('sort',{onEnd:r=>{ps.msg='A zöldséges fizetett: '+fmt(r)+' Ft';}});return;}}}
  if(K.enterKey||inRect(TAP,GO_BTN))leaveStop();}
