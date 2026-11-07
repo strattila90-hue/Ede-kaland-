@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.28.0
+# 🚐 Családi Vakáció – v2.28.1
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -330,7 +330,7 @@ Mindkét kiosztásban:
 
 ## 📱 Telepítés, megosztás, frissítés
 
-**Android-alkalmazás (APK) – a legbiztosabb út, ha a telepített ikon nem indul:** töltsd le innen: https://github.com/strattila90-hue/Ede-kaland-/releases/download/apk/csaladi-vakacio.apk, koppints a letöltött fájlra, engedélyezd az „ismeretlen forrásból” telepítést, és telepítsd. Az alkalmazás a Chrome-tól független, a teljes játék benne van, ezért **első indításkor is azonnal offline** megy. Az utasok hangját a telefon saját felolvasója adja, a mentés a Letöltések mappába kerül, a Frissítés gomb az új APK-t tölti le (a régire rátelepíthető, a mentés megmarad). Az APK-t a GitHub minden feltöltéskor magától felépíti (`.github/workflows/apk.yml`, forrás: `android/`). Az alkalmazás mentése külön van a böngészős játékétól: átvinni a Mentések → fájlba mentés / betöltés gombokkal lehet.
+**Android-alkalmazás (APK) – a legbiztosabb út, ha a telepített ikon nem indul:** töltsd le innen: https://github.com/strattila90-hue/Ede-kaland-/releases/download/apk/csaladi-vakacio.apk, koppints a letöltött fájlra, engedélyezd az „ismeretlen forrásból” telepítést, és telepítsd. Az alkalmazás a Chrome-tól független, a teljes játék benne van, ezért **első indításkor is azonnal offline** megy. Az utasok hangját a telefon saját felolvasója adja, a mentés a Letöltések mappába kerül, a Frissítés gomb az új APK-t tölti le (a régire rátelepíthető, a mentés megmarad). Az alkalmazás indításkor (és óránként) magától megnézi, van-e újabb verzió; ha igen, kiírja, és a Frissítés gomb kiemelve jelenik meg. Az APK-t a GitHub minden feltöltéskor magától felépíti (`.github/workflows/apk.yml`, forrás: `android/`). Az alkalmazás mentése külön van a böngészős játékétól: átvinni a Mentések → fájlba mentés / betöltés gombokkal lehet.
 
 **Ha telepítés után az ikon nem indul:** töröld az ikont, nyisd meg a linket a Chrome-ban, ⋮ menü → „Hozzáadás a kezdőképernyőhöz” → **„Parancsikon létrehozása”** (nem „Telepítés”). Ez minden telefonon működik, a játékot a Chrome-ban nyitja meg, és így is offline megy: az első megnyitáskor a játék magától letölti magát. A telepítési leírás (manifest) teljes képernyőt kér, de ha a telefon azt nem támogatja, sima alkalmazás-ablakban indul.
 

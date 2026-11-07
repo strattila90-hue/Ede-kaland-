@@ -83,7 +83,7 @@ let updating=false,updPct=0,updLabel='Frissítés',newVer=null;
 function verCmp(a,b){const x=String(a).split('.').map(Number),y=String(b).split('.').map(Number);for(let i=0;i<3;i++){const d=(x[i]||0)-(y[i]||0);if(d)return d;}return 0;}
 function setUpd(p,l){updPct=p;if(l)updLabel=l;const b=document.querySelector('[data-a="update"]');if(b){b.querySelector('.fill').style.width=p+'%';b.querySelector('.lbl').textContent=updLabel;}}
 async function checkUpdate(){if((location.protocol==='file:'&&!NTV)||!navigator.onLine)return;try{const r=await fetch((NTV?SITE:'')+'version.json?t='+Date.now(),{cache:'no-store'});const v=await r.json();
- if(verCmp(v.version,APP_VERSION)>0){newVer=v.version;updLabel='Új verzió: v'+v.version;MENU_SIG='?';toast('Új verzió érhető el: v'+v.version);}}catch(e){}}
+ if(verCmp(v.version,APP_VERSION)>0&&newVer!==v.version){newVer=v.version;updLabel='Új verzió: v'+v.version;MENU_SIG='?';toast(NTV?'Új verzió érhető el: v'+v.version+'. Koppints a Frissítés gombra a főmenüben!':'Új verzió érhető el: v'+v.version,NTV?5000:undefined);}}catch(e){}}
 /* ---- biztos frissítés ----
    1) az új service worker telepítése (ő a hálózatról tölti le a friss fájlokat a tárolóba),
    2) a tároló ellenőrzése a version.json méretei alapján,
@@ -131,6 +131,8 @@ async function autoOffline(){if(NTV||!('caches' in window)||!location.protocol.s
   if(newer){newVer=v.version;updLabel='Újraindítás: v'+v.version;MENU_SIG='?';toast('Új verzió letöltve (v'+v.version+'). A következő indításkor érvényes, vagy koppints a frissítésre.',4200);}
   else if(first)toast('Offline mód kész: a játék internet nélkül is fut.',3200);}catch(e){}}
 window.addEventListener('load',()=>setTimeout(autoOffline,1200));
+/* APK: indításkor és óránként megnézi, van-e újabb verzió (a Frissítés gomb ilyenkor kiemelve jelenik meg) */
+if(NTV){window.addEventListener('load',()=>setTimeout(checkUpdate,2500));setInterval(checkUpdate,3600000);window.addEventListener('online',()=>setTimeout(checkUpdate,1500));}
 window.addEventListener('offline',()=>toast('Offline mód: a játék internet nélkül is fut.'));window.addEventListener('online',()=>{toast('Újra van internet.');autoOffline();});
 setTimeout(checkUpdate,1500);
 /* menük */
