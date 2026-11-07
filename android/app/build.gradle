@@ -4,7 +4,9 @@ plugins {
 
 // a verziószám a játék APP_VERSION-jéből jön (js/core.js), a build szám a GitHub futás sorszáma
 def appVersion = (new File(rootDir, '../js/core.js').text =~ /APP_VERSION='([^']+)'/)[0][1]
-def buildNo = (System.getenv('GITHUB_RUN_NUMBER') ?: '1') as int
+// 1000-től indul: a korábbi APK-k sorszáma tévesen a futásszám karakterkódja lett (pl. 52), ennél nagyobbnak kell lennie
+def buildNo = 1000 + Integer.parseInt(System.getenv('GITHUB_RUN_NUMBER') ?: '1')
+def nativeRev = Integer.parseInt(new File(rootDir, 'NATIVE_REV').text.trim())
 
 android {
     namespace 'hu.csaladivakacio'
@@ -16,6 +18,7 @@ android {
         targetSdk 34
         versionCode buildNo
         versionName appVersion
+        buildConfigField 'int', 'NATIVE_REV', "${nativeRev}"
     }
 
     // mindig ugyanaz a kulcs: így az új APK a régire telepíthető, és a mentés megmarad
@@ -47,4 +50,5 @@ android {
 
 dependencies {
     implementation 'androidx.webkit:webkit:1.11.0'
+    implementation 'androidx.core:core:1.13.1'
 }

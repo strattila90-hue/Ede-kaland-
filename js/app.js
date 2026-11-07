@@ -82,7 +82,20 @@ async function doShare(){const url=NTV?SITE+'?install=1':location.href.split('#'
 let updating=false,updPct=0,updLabel='Frissítés',newVer=null;
 function verCmp(a,b){const x=String(a).split('.').map(Number),y=String(b).split('.').map(Number);for(let i=0;i<3;i++){const d=(x[i]||0)-(y[i]||0);if(d)return d;}return 0;}
 function setUpd(p,l){updPct=p;if(l)updLabel=l;const b=document.querySelector('[data-a="update"]');if(b){b.querySelector('.fill').style.width=p+'%';b.querySelector('.lbl').textContent=updLabel;}}
-async function checkUpdate(){if((location.protocol==='file:'&&!NTV)||!navigator.onLine)return;try{const r=await fetch((NTV?SITE:'')+'version.json?t='+Date.now(),{cache:'no-store'});const v=await r.json();
+/* APK háttérfrissítés (új alkalmazás-kerettől): a telefon magától letölti az új játékfájlokat, és csak szól, ha kész.
+   'content' = új játékfájlok letöltve (újraindításkor életbe lépnek), 'apk' = új alkalmazás-keret letöltve (egy koppintás: telepítés) */
+let UPD='',UPDV='',UPD_MAN=false;
+const NUPD=()=>!!(NTV&&typeof NTV.checkUpdate==='function');
+function nativeUpd(manual){UPD_MAN=!!manual;if(!navigator.onLine){if(manual)toast('Nincs internet. A játék offline is működik.');return;}if(manual)toast('Frissítés keresése…');try{NTV.checkUpdate();}catch(e){}}
+window.cvUpdate=(k,v,m)=>{const man=UPD_MAN;UPD_MAN=false;
+ if(k==='NONE'){if(man)toast('Ez a legújabb verzió (v'+APP_VERSION+').');return;}
+ if(k==='READY'){UPD='content';UPDV=v;newVer=v;updLabel='Kész: v'+v+' – újraindítás';MENU_SIG='?';elog('info','Háttérfrissítés letöltve: v'+v);
+  toast('Frissítés kész (v'+v+')! A következő indításkor már az új verzió fut, vagy koppints a Frissítés gombra.',6000);return;}
+ if(k==='NEED_APK'){elog('info','Új alkalmazás-keret kell: v'+v+', letöltés a háttérben');if(man)toast('Új alkalmazás-verzió, letöltés a háttérben…');try{NTV.downloadApk(v);}catch(e){}return;}
+ if(k==='APK_READY'){UPD='apk';UPDV=v;newVer=v;updLabel='Kész: v'+v+' – telepítés';MENU_SIG='?';elog('info','Új APK letöltve: v'+v);
+  toast('Frissítés letöltve (v'+v+')! Koppints a Frissítés gombra a főmenüben, és telepítsd.',6000);return;}
+ elog('info','Háttérfrissítés most nem sikerült ('+k+'): '+(m||''));if(man)toast('Most nem sikerült frissíteni, később magától újra próbálom.');};
+async function checkUpdate(){if(NUPD()){if(!UPD)nativeUpd(false);return;}if((location.protocol==='file:'&&!NTV)||!navigator.onLine)return;try{const r=await fetch((NTV?SITE:'')+'version.json?t='+Date.now(),{cache:'no-store'});const v=await r.json();
  if(verCmp(v.version,APP_VERSION)>0&&newVer!==v.version){newVer=v.version;updLabel='Új verzió: v'+v.version;MENU_SIG='?';toast(NTV?'Új verzió érhető el: v'+v.version+'. Koppints a Frissítés gombra a főmenüben!':'Új verzió érhető el: v'+v.version,NTV?5000:undefined);}}catch(e){}}
 /* ---- biztos frissítés ----
    1) az új service worker telepítése (ő a hálózatról tölti le a friss fájlokat a tárolóba),
@@ -97,7 +110,9 @@ async function cleanReinstall(why){elog('info','Tiszta újratelepítés: '+why,t
  try{const ks=await caches.keys();await Promise.all(ks.map(k=>caches.delete(k)));}catch(e){}
  location.reload();}
 /* APK: a játékfájlok az alkalmazásban vannak; frissítéskor az új APK-t töltjük le (ugyanazzal az aláírással, a mentés megmarad) */
-async function apkUpdate(){if(!navigator.onLine){toast('Nincs internet. A játék offline is működik.');return;}
+async function apkUpdate(){if(NUPD()){if(UPD==='content'){try{if(G.state==='play'&&P)save(P.dist);}catch(e){}elog('info','Váltás az új verzióra: v'+UPDV,true);NTV.reloadGame();return;}
+  if(UPD==='apk'){NTV.installApk();return;}nativeUpd(true);return;}
+ if(!navigator.onLine){toast('Nincs internet. A játék offline is működik.');return;}
  try{const r=await fetch(SITE+'version.json?t='+Date.now(),{cache:'no-store'});const v=await r.json();
   if(verCmp(v.version,APP_VERSION)>0){toast('Új verzió: v'+v.version+'. Letöltés indul, utána koppints a letöltött fájlra a telepítéshez.',5000);elog('info','APK frissítés: v'+v.version);NTV.openUrl(APK_URL);}
   else toast('Ez a legújabb verzió (v'+APP_VERSION+').');}catch(e){toast('Most nem sikerült ellenőrizni. Próbáld újra később.');}}
@@ -132,7 +147,7 @@ async function autoOffline(){if(NTV||!('caches' in window)||!location.protocol.s
   else if(first)toast('Offline mód kész: a játék internet nélkül is fut.',3200);}catch(e){}}
 window.addEventListener('load',()=>setTimeout(autoOffline,1200));
 /* APK: indításkor és óránként megnézi, van-e újabb verzió (a Frissítés gomb ilyenkor kiemelve jelenik meg) */
-if(NTV){window.addEventListener('load',()=>setTimeout(checkUpdate,2500));setInterval(checkUpdate,3600000);window.addEventListener('online',()=>setTimeout(checkUpdate,1500));}
+if(NTV){setInterval(checkUpdate,3600000);window.addEventListener('online',()=>setTimeout(checkUpdate,1500));}
 window.addEventListener('offline',()=>toast('Offline mód: a játék internet nélkül is fut.'));window.addEventListener('online',()=>{toast('Újra van internet.');autoOffline();});
 setTimeout(checkUpdate,1500);
 /* menük */

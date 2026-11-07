@@ -57,6 +57,8 @@ Betöltési sorrend (`index.html`): kritikus: core, radio, car, world, game, app
 - Aláírás: `android/csaladi-vakacio.keystore` (jelszó a `app/build.gradle`-ben). Ne cseréld le, különben az új APK nem telepíthető a régire.
 - JS-híd: `window.CVNative` (`NTV` a `core.js`-ben): `speak`, `stopSpeak`, `hasTts`, `saveFile`, `share`, `openUrl`, `exit`, `version`. Alkalmazásban nincs service worker és `autoOffline`, a Frissítés gomb az új APK-t nyitja meg (`apkUpdate`).
 - Új játékfájl (pl. kép, hang) a workflow „Játékfájlok” lépésébe is kell, ha nem a `js/` vagy `icons/` mappában van.
+- **Háttérfrissítés:** az alkalmazás (`Updater.java`) magától letölti a weboldalról a `version.json`-ban felsorolt fájlokat a saját tárhelyére (méret-ellenőrzéssel), és a következő indításkor (vagy `reloadGame`) azokból fut. A JS oldalon `cvUpdate(fajta,verzió,üzenet)` jelez (`READY` / `NEED_APK` / `APK_READY` / `FAIL`).
+- **`android/NATIVE_REV`:** az alkalmazás-keret sorszáma (a `version.json` „apk” mezője). **Ha a Java-kódot, a manifestet vagy a JS-hidat (`CVNative` új függvénye) módosítod, növeld eggyel**, különben a régi alkalmazás csak a játékfájlokat frissíti, és az új híd-függvények hiányoznak. Ilyenkor az alkalmazás a háttérben letölti az új APK-t, és egy koppintással telepíthető. A JS mindig nézze meg, létezik-e a híd-függvény (`typeof NTV.x==='function'`).
 
 ## Teendők új fájlnál vagy átnevezésnél
 

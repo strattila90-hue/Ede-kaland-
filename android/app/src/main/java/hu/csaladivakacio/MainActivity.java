@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.view.View;
@@ -23,9 +24,12 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
+import androidx.core.content.FileProvider;
 import androidx.webkit.WebViewAssetLoader;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
@@ -48,6 +52,9 @@ public class MainActivity extends Activity {
     private volatile boolean ttsReady = false;
     private ValueCallback<Uri[]> fileCb;
     private int uttId = 0;
+    /** ebben a futásban ebből a mappából jön a játék (null = az APK-ba épített fájlokból); csak induláskor/újratöltéskor vált */
+    private volatile File live;
+    private volatile boolean busy = false;
 
     @Override
     protected void onCreate(Bundle state) {
@@ -55,9 +62,26 @@ public class MainActivity extends Activity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         hideSystemUi();
 
+        Updater.cleanup(this);
+        live = Updater.liveDir(this);
+        final WebViewAssetLoader.AssetsPathHandler assets = new WebViewAssetLoader.AssetsPathHandler(this);
+        // a háttérben letöltött újabb játékfájlok elsőbbséget kapnak; ami nincs köztük, az APK-ból jön
         final WebViewAssetLoader loader = new WebViewAssetLoader.Builder()
                 .setDomain(HOST)
-                .addPathHandler("/assets/", new WebViewAssetLoader.AssetsPathHandler(this))
+                .addPathHandler("/assets/", path -> {
+                    File d = live;
+                    if (d != null && path.startsWith("www/")) {
+                        File f = new File(d, path.substring(4));
+                        if (f.isFile()) {
+                            try {
+                                String m = Updater.mime(f.getName());
+                                InputStream in = new FileInputStream(f);
+                                return new WebResourceResponse(m, m.startsWith("text") || m.endsWith("javascript") || m.endsWith("json") ? "utf-8" : null, in);
+                            } catch (Exception ignored) { }
+                        }
+                    }
+                    return assets.handle(path);
+                })
                 .build();
 
         web = new WebView(this);
@@ -125,6 +149,12 @@ public class MainActivity extends Activity {
         web.loadUrl(START);
     }
 
+    private void js(String code) {
+        runOnUiThread(() -> { if (web != null) web.evaluateJavascript(code, null); });
+    }
+
+    private static String q(String s) { return s == null ? "null" : "'" + s.replace("\\", "\\\\").replace("'", "\\'").replace("\n", " ").replace("\r", " ") + "'"; }
+
     private void jsDone() {
         runOnUiThread(() -> { if (web != null) web.evaluateJavascript("window.ttsNativeDone&&ttsNativeDone()", null); });
     }
@@ -189,6 +219,21 @@ public class MainActivity extends Activity {
         if (tts != null) tts.shutdown();
         if (web != null) web.destroy();
         super.onDestroy();
+    }
+
+    private void installDownloadedApk() {
+        File f = Updater.apkFile(this);
+        if (!f.isFile()) { Toast.makeText(this, "A frissítés még nincs letöltve.", Toast.LENGTH_LONG).show(); return; }
+        if (Build.VERSION.SDK_INT >= 26 && !getPackageManager().canRequestPackageInstalls()) {
+            Toast.makeText(this, "Engedélyezd a telepítést ennek az alkalmazásnak, majd lépj vissza és koppints újra a Frissítésre.", Toast.LENGTH_LONG).show();
+            try { startActivity(new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:" + getPackageName()))); } catch (ActivityNotFoundException ignored) { }
+            return;
+        }
+        Uri u = FileProvider.getUriForFile(this, getPackageName() + ".files", f);
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setDataAndType(u, "application/vnd.android.package-archive");
+        i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_ACTIVITY_NEW_TASK);
+        try { startActivity(i); } catch (ActivityNotFoundException e) { Toast.makeText(this, "Nem sikerült elindítani a telepítést.", Toast.LENGTH_LONG).show(); }
     }
 
     /** a játékból (JavaScript) hívható függvények */
@@ -256,5 +301,46 @@ public class MainActivity extends Activity {
 
         @JavascriptInterface
         public void exit() { runOnUiThread(MainActivity.this::finishAndRemoveTask); }
+
+        /** az alkalmazás-keret sorszáma: ha a weboldal version.json "apk" száma nagyobb, új APK kell */
+        @JavascriptInterface
+        public int nativeRev() { return BuildConfig.NATIVE_REV; }
+
+        @JavascriptInterface
+        public String contentVersion() { return Updater.contentVersion(MainActivity.this); }
+
+        /** háttérben: megnézi, van-e újabb verzió, és letölti; az eredmény: cvUpdate(fajta, verzió, üzenet) */
+        @JavascriptInterface
+        public void checkUpdate() {
+            if (busy) return;
+            busy = true;
+            new Thread(() -> {
+                Updater.Result r = Updater.check(MainActivity.this);
+                busy = false;
+                js("window.cvUpdate&&cvUpdate(" + q(r.kind.name()) + "," + q(r.version) + "," + q(r.msg) + ")");
+            }).start();
+        }
+
+        /** háttérben letölti az új APK-t; utána cvUpdate('APK_READY'|'APK_FAIL', ...) */
+        @JavascriptInterface
+        public void downloadApk(String version) {
+            if (busy) return;
+            busy = true;
+            new Thread(() -> {
+                String err = Updater.downloadApk(MainActivity.this);
+                busy = false;
+                js("window.cvUpdate&&cvUpdate(" + q(err == null ? "APK_READY" : "APK_FAIL") + "," + q(version) + "," + q(err) + ")");
+            }).start();
+        }
+
+        /** a letöltött APK telepítése (az Android egyszer engedélyt kér, utána a rendszer Telepítés ablaka jön) */
+        @JavascriptInterface
+        public void installApk() { runOnUiThread(MainActivity.this::installDownloadedApk); }
+
+        /** a letöltött új játékfájlokra váltás most, újraindítással (a mentés megmarad) */
+        @JavascriptInterface
+        public void reloadGame() {
+            runOnUiThread(() -> { live = Updater.liveDir(MainActivity.this); if (web != null) web.loadUrl(START); });
+        }
     }
 }
