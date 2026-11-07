@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.25.0
+# 🚐 Családi Vakáció – v2.25.1
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -320,6 +320,8 @@ Mindkét kiosztásban:
 - **A telefonhoz igazodik:** a processzormagok száma és a memória alapján választ kezdő minőséget (2 GB alatt rögtön takarékos mód); figyeli a hosszú, akadó képkockákat is, és ha ilyen többször előfordul, azonnal visszavesz. Erős telefonon élesebb felbontásban rajzol (a kijelzőnél soha nem többet), gyengébbnél automatikusan visszavesz a felbontásból és az effektekből, és ha újra van tartalék, visszaemeli.
 
 ## 📱 Telepítés, megosztás, frissítés
+
+**Ha telepítés után az ikon nem indul:** töröld az ikont, nyisd meg a linket a Chrome-ban, ⋮ menü → „Hozzáadás a kezdőképernyőhöz” → **„Parancsikon létrehozása”** (nem „Telepítés”). Ez minden telefonon működik, a játékot a Chrome-ban nyitja meg, és így is offline megy: az első megnyitáskor a játék magától letölti magát. A telepítési leírás (manifest) teljes képernyőt kér, de ha a telefon azt nem támogatja, sima alkalmazás-ablakban indul.
 
 **Biztonságos frissítés:** a játék előbb minden új fájlt letölt és méret szerint ellenőriz, és csak akkor cseréli le a régieket, ha mind megjött és mind az új verzióé (a GitHub Pages feltöltés után pár percig vegyesen adhat régi és új fájlt; ilyenkor később újrapróbálja). A frissítéshez kért fájlokat a játék mindig a hálózatról tölti, sosem a saját tárolt régi példányából (v2.21.2 előtt ez a hiba miatt a frissítés minden próbálkozáskor elakadt). Ha a letöltött fájlok így sem egyeznek, a háttérben futó offline kezelő (service worker) magától letölti az új verziót, végső esetben a játék a mentés megtartásával tisztán újratelepíti magát. Ha mégis keveredés miatt nem indulna el a menü, a játék egyszer magától tisztán újratölti magát; a menü akkor is megjelenik, ha az oldal és a szkriptek verziója eltér.
 
