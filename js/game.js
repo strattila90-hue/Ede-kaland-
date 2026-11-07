@@ -71,7 +71,9 @@ const QAMP={good:0.12,medium:0.55,bad:1.35,cobble:0.5};
 function roadH(x){const s=segAtIn(LEG.segs,x),A=QAMP[s.q];let h=vnoise(x/14)*A*1.4+vnoise(x/5)*A*0.5;if(s.q==='cobble')h+=Math.sin(x*1.4)*0.32;return h;}
 
 /* ---------- forgalom és akadályok ---------- */
-function spawnAt(x){const s=segAtIn(LEG.segs,x),L=LEGS[G.leg],r=Math.random(),lane=(Math.random()*3)|0;
+/* autópályán a felső sáv mindig szabad: oda nem kerül forgalom, akadály vagy kátyú */
+function isMW(x){const s=segAtIn(LEG.segs,x);return !!s&&s.type==='motorway';}
+function spawnAt(x){const s=segAtIn(LEG.segs,x),L=LEGS[G.leg],r=Math.random(),mw=s.type==='motorway',lane=mw?1+((Math.random()*2)|0):(Math.random()*3)|0;
  for(const p of LEG.pois)if(p.type!=='veda'&&Math.abs(x-p.x-60)<320)return;
  if(x>LEG.len-400)return;
  const trafP=s.type==='motorway'?0.55:s.type==='town'?0.35:0.3;
@@ -79,9 +81,10 @@ function spawnAt(x){const s=segAtIn(LEG.segs,x),L=LEGS[G.leg],r=Math.random(),la
   const types=s.type==='motorway'?['hatch','truck','van','hatch','bus','camper','moto','truck']:s.type==='town'?['hatch','van','bus','hatch','moto']:s.type==='village'?['tractor','hatch','van','moto']:['hatch','van','truck','tractor','moto'];
   const tp=pick(types),lim=s.limit,kmh=tp==='tractor'?25:tp==='truck'?Math.min(85,lim*0.85):tp==='bus'?Math.min(100,lim*0.85):tp==='moto'?lim*rnd(0.9,1.1):lim*rnd(0.72,0.95);
   ents.push({kind:'traffic',tp:tp,x:x,lane:lane,y:LANE[lane],ty:LANE[lane],w:TW[tp],h:TH[tp],kmh:kmh,base:kmh,col:pick(TCOLS)});return;}
- const holeP=s.q==='bad'?0.75:s.q==='medium'?0.35:s.q==='cobble'?0.2:0.06;
- if(Math.random()<holeP){const wet=L.weather==='rain'||L.weather==='storm';ents.push({kind:wet&&Math.random()<0.4?'puddle':'hole',x:x,lane:lane,y:LANE[lane],w:24});return;}
- const wp=!animalTime(L)?0:s.type==='country'?0.3:s.type==='village'?0.14:s.type==='motorway'?0.025:0;
+ const wet=L.weather==='rain'||L.weather==='storm',holeP=s.type!=='town'?0:s.q==='bad'?0.12:s.q==='medium'?0.06:s.q==='cobble'?0.05:0.02;
+ if(Math.random()<holeP){ents.push({kind:'hole',x:x,lane:lane,y:LANE[lane],w:24});return;}
+ if(wet&&Math.random()<0.1){ents.push({kind:'puddle',x:x,lane:lane,y:LANE[lane],w:24});return;}
+ const wp=!animalTime(L)?0:s.type==='country'?0.3:s.type==='village'?0.14:0;
  if(Math.random()<wp){let tp;if(s.type==='village'&&Math.random()<0.6)tp=pick(['sheep','cow','sheep']);else tp=L.region==='alps'?pick(['deer','deer','fox','hare']):pick(['deer','boar','fox','hare','deer','hare']);
   const fromBottom=Math.random()<0.4&&tp!=='cow';const sp={cow:0.28,sheep:0.36,deer:0.55,boar:0.42,fox:0.6,hare:0.75}[tp];
   ents.push({kind:'animal',tp:tp,x:x+120,y:fromBottom?ROADB+8:ROADT+2,vy:fromBottom?-sp:sp,w:{cow:32,boar:24,deer:24,sheep:22,fox:18,hare:12}[tp],step:0,wild:['deer','boar','fox','hare'].includes(tp),dir:fromBottom?-1:1});}}
@@ -123,18 +126,18 @@ function startEvent(){const s=seg(),L=LEGS[G.leg],r=Math.random();let type;
  const famOK=!(P.famCD>0);if(famOK&&r<0.09)type='baby';else if(famOK&&r<0.14)type='sick';else if(famOK&&r<0.21)type='pee';else if(r<0.4)type='police';else if(r<0.6)type='help';else if(r<0.72)type='crash';else if(r<0.84&&s.type==='motorway')type='jam';else type='works';
  if(type==='baby'||type==='sick'||type==='pee')P.famCD=18000;
  if(type==='baby'||type==='sick'||type==='pee'){const d=EVDEF[type];P.ev={type:type,t:d.time,stopT:0};say(type==='baby'?'Atti nagyon sír!':type==='sick'?'Anya, rosszul vagyok...':'Apa, pisilni kell!',d.who);if(type==='baby')SFX.cry();return;}
- if(type==='police'){const x=P.dist+W+60;ents.push({kind:'traffic',tp:'police',x:x,lane:0,y:LANE[0]-3,ty:LANE[0]-3,w:TW.police,h:TH.police,kmh:0,base:0,col:'#ffffff',parked:true,radar:true});P.ev={type:'police',t:99999,x:x};return;}
- if(type==='jam'){const x=P.dist+W+80;for(let k=0;k<12;k++){const tp=pick(['hatch','van','truck','hatch']),lane=k%3;ents.push({kind:'traffic',tp:tp,x:x+Math.floor(k/3)*(TW[tp]+30)+lane*12,lane:lane,y:LANE[lane],ty:LANE[lane],w:TW[tp],h:TH[tp],kmh:12,base:12,col:pick(TCOLS),jam:true});}
+ if(type==='police'){const x=P.dist+W+60,mw=isMW(x),py=mw?ROADT+5:LANE[0]-3;ents.push({kind:'traffic',tp:'police',x:x,lane:mw?-1:0,y:py,ty:py,w:TW.police,h:TH.police,kmh:0,base:0,col:'#ffffff',parked:true,radar:true});P.ev={type:'police',t:99999,x:x};return;}
+ if(type==='jam'){const x=P.dist+W+80,mw=isMW(x);for(let k=0;k<12;k++){const tp=pick(['hatch','van','truck','hatch']),lane=mw?1+(k%2):k%3;ents.push({kind:'traffic',tp:tp,x:x+Math.floor(k/3)*(TW[tp]+30)+lane*12,lane:lane,y:LANE[lane],ty:LANE[lane],w:TW[tp],h:TH[tp],kmh:12,base:12,col:pick(TCOLS),jam:true});}
   P.ev={type:'jam',t:900};flash('Dugó az autópályán! Lassíts!','#ffb347');say('Jaj, dugó...','apa');return;}
- if(type==='help'){const kind=Math.random()<0.5?'jump':'truck',x=P.dist+W+80,tp=kind==='jump'?pick(['hatch','van']):'truck';ents.push({kind:'traffic',tp:tp,x:x,lane:0,y:LANE[0]-3,ty:LANE[0]-3,w:TW[tp],h:TH[tp],kmh:0,base:0,col:pick(TCOLS),parked:true,help:kind});
+ if(type==='help'){const kind=Math.random()<0.5?'jump':'truck',x=P.dist+W+80,tp=kind==='jump'?pick(['hatch','van']):'truck',mw=isMW(x),hy=mw?ROADT+5:LANE[0]-3;ents.push({kind:'traffic',tp:tp,x:x,lane:mw?-1:0,y:hy,ty:hy,w:TW[tp],h:TH[tp],kmh:0,base:0,col:pick(TCOLS),parked:true,help:kind});
   P.ev={type:'help',kind:kind,x:x,t:99999};flash(kind==='jump'?'Lerobbant autó az út szélén! Állj meg mögötte a szélső sávban és segíts!':'Egy kamionosnak leesett a rakománya! Állj meg mögötte a szélső sávban!','#7fd1ff',300);return;}
- if(type==='crash'){const x=P.dist+W+120,lane=Math.random()<0.5?0:1;ents.push({kind:'traffic',tp:'hatch',x:x+130,lane:lane,y:LANE[lane],ty:LANE[lane],w:TW.hatch,h:TH.hatch,kmh:0,base:0,col:pick(TCOLS),parked:true,wreck:1});
+ if(type==='crash'){const x=P.dist+W+120,lane=isMW(x)?(Math.random()<0.5?1:2):(Math.random()<0.5?0:1);ents.push({kind:'traffic',tp:'hatch',x:x+130,lane:lane,y:LANE[lane],ty:LANE[lane],w:TW.hatch,h:TH.hatch,kmh:0,base:0,col:pick(TCOLS),parked:true,wreck:1});
   ents.push({kind:'traffic',tp:'van',x:x+250,lane:lane,y:LANE[lane]+1,ty:LANE[lane]+1,w:TW.van,h:TH.van,kmh:0,base:0,col:pick(TCOLS),parked:true,wreck:2});
   ents.push({kind:'traffic',tp:'police',x:x+20,lane:lane,y:LANE[lane]-1,ty:LANE[lane]-1,w:TW.police,h:TH.police,kmh:0,base:0,col:'#ffffff',parked:true});
   ents.push({kind:'traffic',tp:'ambulance',x:x+400,lane:lane,y:LANE[lane],ty:LANE[lane],w:TW.ambulance,h:TH.ambulance,kmh:0,base:0,col:'#ffffff',parked:true});
   for(let k=0;k<5;k++)ents.push({kind:'cone',x:x-90+k*22,lane:lane,y:LANE[lane]+(k%2)*2,w:14});
   P.ev={type:'works',t:1000};flash('Baleset az úton! Lassíts és kerüld ki a lezárt sávot!','#ff8a5a',300);say('Jaj, baleset történt...','anya');SFX.siren();return;}
- if(type==='works'){const x=P.dist+W+60;ents.push({kind:'sign',x:x-60,lane:-1,y:ROADT+6,w:0});for(let k=0;k<10;k++)for(const ln of [0,1])ents.push({kind:'cone',x:x+k*26,lane:ln,y:LANE[ln],w:14});P.ev={type:'works',t:900};flash('Útépítés! Két sáv lezárva, menj az alsó sávba!','#ffb347');}}
+ if(type==='works'){const x=P.dist+W+60,mw=isMW(x),cl=mw?[1,2]:[0,1];ents.push({kind:'sign',x:x-60,lane:-1,y:ROADT+6,w:0});for(let k=0;k<10;k++)for(const ln of cl)ents.push({kind:'cone',x:x+k*26,lane:ln,y:LANE[ln],w:14});P.ev={type:'works',t:900};flash(mw?'Útépítés! Két sáv lezárva, maradj a felső sávban!':'Útépítés! Két sáv lezárva, menj az alsó sávba!','#ffb347');}}
 function evFail(){const d=EVDEF[P.ev.type];G.trip.mood--;flash(P.ev.type==='baby'?'Atti egész úton sírt... (-1 kedv)':P.ev.type==='sick'?'Petra rosszul lett az autóban... (-1 kedv)':'Nem bírta ki... (-1 kedv)','#ff8a8a');P.ev=null;checkMood();}
 function evDone(){const ty=P.ev.type;if(ty==='baby'){G.trip.baby=Math.max(0,G.trip.baby-20);flash(G.trip.baby>0?'Atti jóllakott és elaludt. Csend van!':'Elfogyott a bébiétel! Vegyél a kútnál!','#7cff7c');}
  else if(ty==='sick')flash('Petra jobban van, mehetünk tovább.','#7cff7c');else flash('Mindenki megkönnyebbült!','#7cff7c');
@@ -159,7 +162,7 @@ function drawRest(g,t){const r=P.rest,sx=r.x-P.dist+PX,b=ROADT-6,k=Math.min(1,r.
 
 /* ---------- ütközés ---------- */
 function setCruise(v){P.cruise=v;SFX.click();vib(12);flash(v?'Tempomat: '+v+' km/h':'Tempomat kikapcsolva','#9fd8ff',100);}
-function yieldAhead(why){let n=0;for(const e of ents){if(e.kind!=='traffic'||e.parked||e.jam)continue;const d=e.x-(P.dist+112);if(e.lane===P.lane&&d>-10&&d<320){const opts=[e.lane-1,e.lane+1].filter(l=>l>=0&&l<3&&!ents.some(o=>o!==e&&o.kind==='traffic'&&o.lane===l&&Math.abs(o.x-e.x)<150));if(opts.length){e.lane=pick(opts);e.ty=LANE[e.lane];n++;}}}
+function yieldAhead(why){let n=0;for(const e of ents){if(e.kind!=='traffic'||e.parked||e.jam)continue;const d=e.x-(P.dist+112);if(e.lane===P.lane&&d>-10&&d<320){const opts=[e.lane-1,e.lane+1].filter(l=>l>=(isMW(e.x)?1:0)&&l<3&&!ents.some(o=>o!==e&&o.kind==='traffic'&&o.lane===l&&Math.abs(o.x-e.x)<150));if(opts.length){e.lane=pick(opts);e.ty=LANE[e.lane];n++;}}}
  if(n)flash(why==='fény'?'Reflektorral jeleztél: az előtted haladó lehúzódik.':'Dudáltál: az előtted haladó lehúzódik.','#9fd8ff',90);}
 /* ---- autó sérülése (HP), légzsák, totálkár, tréler, szerviz ---- */
 const hpOf=T=>T.hp===undefined?100:T.hp;
@@ -424,7 +427,8 @@ function susp(gas,brake){const xR=P.dist+WHEELS[0],xF=P.dist+WHEELS[1];const k=0
  P.vF+=k*(tF-P.yF)-c*P.vF;P.yF+=P.vF;P.vR+=k*(tR-P.yR)-c*P.vR;P.yR+=P.vR;}
 function updEnts(){const pl=P.dist+6,pr=P.dist+112,t=G.t,L=LEGS[G.leg];
  for(const e of ents){
-  if(e.kind==='traffic'){if(!e.parked){let v=e.kmh;for(const l of LEG.lights){const st=lightState(l,t);if(st!=='green'&&e.x+e.w<l.x&&l.x-(e.x+e.w)<40)v=0;}
+  if(e.kind==='traffic'){if(!e.parked&&!e.chase&&e.lane===0&&(G.t+((e.x|0)&15))%16===0&&isMW(e.x+e.w)){const nl=ents.some(o=>o!==e&&o.kind==='traffic'&&o.lane===1&&Math.abs(o.x-e.x)<o.w+60)?2:1;e.lane=nl;e.ty=LANE[nl];}
+   if(!e.parked){let v=e.kmh;for(const l of LEG.lights){const st=lightState(l,t);if(st!=='green'&&e.x+e.w<l.x&&l.x-(e.x+e.w)<40)v=0;}
     for(const o of ents)if(o!==e&&o.kind==='traffic'&&o.lane===e.lane&&o.x>e.x&&o.x-(e.x+e.w)<14)v=Math.min(v,o.kmh);
     e.cur=lerp(e.cur===undefined?v:e.cur,v,0.05);e.x+=e.cur*KPX;}
    {const d=e.ty-e.y,vd=clamp(d*0.05,-0.35,0.35);e.vy=(e.vy||0)+clamp(vd-(e.vy||0),-0.012,0.012);e.y+=e.vy;if(Math.abs(d)<0.06&&Math.abs(e.vy)<0.015){e.y=e.ty;e.vy=0;}}}

@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.28.1
+# 🚐 Családi Vakáció – v2.29.0
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -102,6 +102,10 @@ A főmenü egyetlen álló kép, családi road movie plakát: naplemente csíkos
 Út közben folyamatosan váltakozik a város, a falu, az országút és az autópálya, a táblákon valós településnevekkel (Ács, Bábolna, Sümeg, Mondsee, Beaune…). A sebességkorlátozás is szakaszonként változik: 50, 90/100 vagy 130 km/h. A korlátot nagy, jól olvasható tábla mutatja az út mellett és a műszerfalon is; ha túllépted, a műszerfali tábla sárgán villog.
 
 **Satufék:** erős fékezésnél csak a gumik csikorognak, féknyom marad az úton, az utasok előrebillennek és tágra nyílt szemmel ijednek meg (sikoly nincs). Normál fékezésnél is kicsit előredőlnek.
+
+**Autópályán a felső sáv mindig szabad:** oda nem kerül forgalom, és az autópályára érő autók átsorolnak belőle. A radaros rendőr és a segítségre váró autó a padkán áll, a baleset, a dugó és az útépítés a másik két sávot zárja le (útépítésnél: „maradj a felső sávban”). Autópályán nincs vadátkelés (vadháló), és nincs kátyú.
+
+**Kátyú csak városban:** és ott is ritkán (jó úton kb. 2%, rossz úton kb. 12% eséllyel elhelyezésenként); esőben néhol tócsa lehet.
 
 **Élethű forgalom:** a személyautók háromféle karosszériával járnak (ferdehátú, kombi, kis városi terepjáró), mindegyiken ívelt forma, ablakok oszlopokkal, ajtóvonalak, kilincsek, tükör, kerékívek, fényszóró- és hátsólámpa-forma, lökhárítók és fényes tükröződés. Új rajzot kapott a rendőrautó (szedán, kék csík, villogó), a kisbusz (zárt és ablakos), a mentő (sárga-zöld kockás csík, MENTŐ felirat, kék villogó), a lakóautó (alkóv, ablakok redőnnyel, ajtó, tetőklíma, dekorcsíkok) és a traktor (fülke, motorház hűtőráccsal, kipufogó, sárvédők). A karosszériák egyszer, előre rajzolódnak meg, menet közben csak a kerekek forognak, így telefonon sem lassabb.
 
