@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.31.1
+# 🚐 Családi Vakáció – v2.32.0
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -74,6 +74,8 @@ A főmenüben az **Album és rekordok** gomb (a Szünet menüből is elérhető)
 - **Akkukímélő mód:** hosszú autóúton kb. 30 kép/mp és kisebb felbontás, kevésbé melegszik a telefon és tovább bírja az akku.
 
 ## 🎬 Főmenü: filmplakát
+
+**v2.32:** üveghatású menü forgó, fénylő kerettel, ikoncsipekkel, rugós belépő animációval, lüktető fő gombbal.
 
 **Mentések (💾 a főmenüben):** három külön utazás (például gyerekenként), mindegyik saját névvel, utazással, képeslap-albummal és rekordokkal. Bármelyik **fájlba menthető** vagy **elküldhető** (pl. Messengeren), és másik telefonon vagy tableten a **Betöltés fájlból** gombbal ott folytatható, ahol abbahagytátok. Így az sem baj, ha a telefon takarítója vagy egy böngészőtörlés kitörli a játék adatait.
 
@@ -158,6 +160,12 @@ Az autónak állapota van (100%), a HUD jobb panelján az **Autó** sáv mutatja
 - gyűrődött motorháztető, pókhálósan repedt szélvédő;
 - lelógó visszapillantó, füstölő, majd feketén füstölő motor, az úton szikrázó lökhárító.
 
+**v2.32: részletesebb, zónás sérülés.** Az autó többet kibír (egy ütközésnek a 60%-a számít), és külön sérül az **eleje** (ráfutás, vadbaleset), az **oldala** (sávváltás közben nekimenni a mellettünk haladónak: horpadt, gyűrt ajtók, lepattant fényezés, betört oldalablak, leszakadt tükör) és a **hátulja** (ha hirtelen fékezel, a mögöttünk jövő belénk szalad: gyűrt csomagtérajtó, törött hátsó lámpa, lelógó, szikrázó hátsó lökhárító). Ütközéskor üvegszilánkok, műanyag- és fényezésdarabok repülnek.
+
+**Kiszakadó kerék:** nagy ütésnél (főleg ha az a rész már sérült) leszakadhat egy kerék: elgurul, pattog és eldől, az autó azon a sarkán lebukik, a kerékagyon csúszva szikrázik, és legfeljebb 25 km/h-val megy.
+
+**Sárga SOS gomb (Z / Y billentyű):** a felső sávban, bármikor hívható autómentő. Pulzál, ha nagy a baj (30% alatti állapot, leszakadt kerék, defekt pótkerék nélkül, üres tank). Megmutatja az állapotot zónánként, és ajánlja a segítséget: **tréler a szervizbe** (50 000 Ft, a javítás a sérült zónák szerint), **kerék visszaszerelése** (65 000 Ft), **defektjavítás** (40 000 Ft), **benzin** (10 liter, 25 000 Ft), **gyorsjavítás** (+25%, legfeljebb 85%, 30 000 Ft) vagy **átnézés**. A szervizautóból kiszálló szerelő odasétál és megcsinálja.
+
 Erős ütközésnél kinyílik a **légzsák**, és leeresztve ott lóg a javításig. A sérült autó lassabb: 50% alatt max. 120, 30% alatt 80, 15% alatt 50 km/h.
 
 **Totálkár (0%):** a kép egyszer, röviden megremeg, aztán jön a **tréler** (50 000 Ft). A billenő plató hátracsúszik és lebillen a földig (nem megy át a tréler kerekein), a csörlő felhúzza rá az autót, amelynek kerekei végig a platón gördülnek, majd a plató visszabillen, és elviszi a legközelebbi **szervizbe 10 km-rel hátrébb**. Ott megjavítják: karosszéria és fényezés 186 000 Ft, fényszóró, lökhárító, tükör 46 500 Ft, légzsák 118 000 Ft. Utána a szerviztől folytatódik az út. Minden tétel bekerül a költségnaplóba.
@@ -187,9 +195,12 @@ Az autó menet közben piszkolódik: porréteg és sárfoltok jelennek meg rajta
 
 | Program | Ár | Menet |
 |---|---|---|
-| Alap | 2 490 Ft | előmosás, forgókefés mosás, öblítés |
-| Prémium | 3 990 Ft | + aktív hab, meleg viasz (+1 kedv) |
-| Extra | 5 490 Ft | + alvázmosás, szárítás, polírozás (+1 kedv) |
+| Gyors | 1 490 Ft | előmosás, öblítés |
+| Alap | 2 490 Ft | + forgókefés mosás, szárítás |
+| Prémium (ajánlott) | 3 990 Ft | + aktív hab, meleg viasz (+1 kedv) |
+| Extra | 5 490 Ft | + alvázmosás, felnikefe, polírozás (+1 kedv) |
+
+**Extrák** (a program előtt kapcsolhatók, billentyűzeten 5–8): **Rovarmosó** (590 Ft), **Felnikefe** (690 Ft, forgó sárga kefe a kerekeken), **Kerámia bevonat** (1 490 Ft: 800 km-ig sokkal lassabban piszkolódik), **Porszívó** a belsőnek (1 990 Ft, +1 kedv). Új animációk: futófény a kapun, vizes padló, csöpögő víz, gőzölgő viasz, csillogó kerámia, alvázmosó sugarak.
 
 Látszik a vízsugár, a rózsaszín hab, a forgó oldalsó és felső kefe, a szárító fúvókák, a végén pedig csillog a tiszta autó. A piszkosság a mosóban látszik százalékban.
 

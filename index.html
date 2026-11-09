@@ -139,6 +139,12 @@ html,body{margin:0;height:100%;height:100dvh;width:100%;position:fixed;inset:0;b
 #topbar .ctl svg{width:52%;height:62%}
 #topbar .ctl small{position:absolute;bottom:1px;left:0;right:0;text-align:center;font:800 8px/1 var(--ff);color:#cfe0ff;letter-spacing:.06em}
 #topbar #bGps svg{height:52%;margin-top:-6px}
+#topbar #bSos{width:calc(var(--u)*.98);background:linear-gradient(180deg,#ffe680,#ffc21f 58%,#f0a10a);border:1px solid rgba(255,255,255,.7);box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 4px 14px rgba(255,190,30,.4);color:#1d1405}
+#topbar #bSos svg{height:56%;margin-top:-7px}
+#topbar #bSos small{color:#1d1405;font-weight:900;letter-spacing:.14em}
+#topbar #bSos.need{animation:sosP 1.1s ease-in-out infinite}
+#topbar #bSos.act{box-shadow:inset 0 2px 6px rgba(0,0,0,.35),0 0 0 2px #fff}
+@keyframes sosP{0%,100%{box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 0 0 0 rgba(255,210,40,.85)}50%{box-shadow:inset 0 1px 0 rgba(255,255,255,.8),0 0 0 7px rgba(255,210,40,0)}}
 /* teljes képernyős GPS */
 #gpsv{position:fixed;inset:0;z-index:38;display:none;background:#a9d3f5;touch-action:none;user-select:none;-webkit-user-select:none;color:#1d232b;font-family:var(--ff)}
 #gpsv.open{display:block;animation:gpsIn .18s ease-out}
@@ -187,6 +193,35 @@ html,body{margin:0;height:100%;height:100dvh;width:100%;position:fixed;inset:0;b
 @keyframes bIn{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
 #menu.bottom.anim{animation-name:mInB}@keyframes mInB{from{opacity:0;translate:0 18px}to{opacity:1;translate:0 0}}
 #menu .mb{flex-shrink:0}
+/* v2.32: menőbb főmenü (üveg, fénylő keret, ikoncsipek, rugós belépés) */
+#menu.cine{background:linear-gradient(155deg,rgba(22,26,40,.78),rgba(10,12,20,.62));-webkit-backdrop-filter:blur(12px) saturate(140%);backdrop-filter:blur(12px) saturate(140%);border:1px solid rgba(255,255,255,.12);border-left:1px solid rgba(255,255,255,.12);
+ box-shadow:0 30px 80px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.08);isolation:isolate}
+#menu.cine::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.5px;background:conic-gradient(from var(--ma,0deg),rgba(255,216,74,.9),rgba(255,120,60,.15) 25%,rgba(59,139,255,.55) 50%,rgba(255,255,255,.08) 75%,rgba(255,216,74,.9));
+ -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;z-index:-1;animation:mRing 9s linear infinite}
+@property --ma{syntax:'<angle>';inherits:false;initial-value:0deg}
+@keyframes mRing{to{--ma:360deg}}
+#menu.cine .mb{border-color:rgba(255,255,255,.1);transition:transform .18s cubic-bezier(.2,.8,.2,1),filter .15s,box-shadow .2s,border-color .2s}
+#menu.cine .mb:hover{transform:translateY(-2px);border-color:rgba(255,216,74,.45);box-shadow:0 8px 20px rgba(0,0,0,.35)}
+#menu.cine .mb:active{transform:scale(.96);filter:brightness(1.18)}
+#menu.cine .mb.hero{background:linear-gradient(180deg,#fff0a0,#ffc93a 45%,#ff9a1f);box-shadow:0 10px 28px rgba(255,170,40,.42),inset 0 1px 0 rgba(255,255,255,.85),inset 0 -2px 0 rgba(150,70,0,.25);animation:heroG 2.8s ease-in-out infinite}
+@keyframes heroG{0%,100%{box-shadow:0 10px 28px rgba(255,170,40,.38),inset 0 1px 0 rgba(255,255,255,.85),inset 0 -2px 0 rgba(150,70,0,.25)}50%{box-shadow:0 12px 36px rgba(255,190,60,.62),inset 0 1px 0 rgba(255,255,255,.85),inset 0 -2px 0 rgba(150,70,0,.25)}}
+#menu.cine .mb.hero .ic,#menu.cine .mb.hero2 .ic{display:grid;place-items:center;width:32px;height:32px;flex:none;border-radius:50%;background:rgba(0,0,0,.14);box-shadow:inset 0 1px 0 rgba(255,255,255,.4)}
+#menu.cine .mb.hero2{background:linear-gradient(180deg,rgba(70,82,108,.85),rgba(32,37,52,.85));border-color:rgba(127,209,255,.25)}
+#menu.cine .mb.hero2 .ic{background:rgba(127,209,255,.16)}
+#menu.cine .mb.tile{background:linear-gradient(165deg,rgba(52,60,80,.72),rgba(20,23,32,.78));overflow:hidden}
+#menu.cine .mb.tile::before{content:"";position:absolute;inset:0 0 55% 0;background:linear-gradient(180deg,rgba(255,255,255,.08),transparent);pointer-events:none}
+#menu.cine .mb.tile .ic{display:grid;place-items:center;width:24px;height:24px;border-radius:8px;background:rgba(255,255,255,.08);font-size:13.5px;transition:transform .25s cubic-bezier(.3,1.6,.5,1)}
+#menu.cine .mb.tile:hover .ic{transform:scale(1.15) rotate(-6deg);background:rgba(255,216,74,.2)}
+#menu.cine .mb.tile.new{border-color:var(--acc);box-shadow:0 0 0 2px rgba(255,216,74,.3)}
+#menu.cine .mb.danger{background:linear-gradient(180deg,rgba(214,58,47,.9),rgba(140,28,20,.9))!important}
+#menu.cine.anim .mb{animation:bIn2 .6s cubic-bezier(.2,1.25,.35,1) both;animation-delay:calc(var(--i,0)*40ms + 140ms)}
+@keyframes bIn2{0%{opacity:0;transform:translateX(-14px) scale(.94);filter:blur(3px)}60%{opacity:1;filter:none}100%{opacity:1;transform:none}}
+#menu.cine.anim .mb.hero{animation:bIn2 .6s cubic-bezier(.2,1.25,.35,1) 140ms both,heroG 2.8s ease-in-out 1s infinite}
+#menu.center,#menu:not(.cine):not(.bottom){-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+#menu.center.anim{animation:mInC .35s cubic-bezier(.2,1.2,.35,1) both}@keyframes mInC{from{opacity:0;scale:.92}to{opacity:1;scale:1}}
+@media (max-height:420px){#menu.cine .mb.hero .ic,#menu.cine .mb.hero2 .ic{width:26px;height:26px}#menu.cine .mb.tile .ic{width:20px;height:20px;font-size:12px}}
+@media (prefers-reduced-motion:reduce){#menu.cine::before,#menu.cine .mb.hero{animation:none}#menu.cine.anim .mb{animation-duration:.01s}}
+
 @media (max-height:420px){#menu.cine{padding:9px;gap:6px;width:clamp(250px,43vw,370px);max-height:calc(100dvh - 60px)}#menu.cine .grid{grid-template-columns:repeat(3,1fr);gap:5px}#menu.cine .mb.tile{font-size:11px;gap:2px}#menu.cine .mb.tile .sub{font-size:9.5px}#menu.cine .mb.hero .sub,#menu.cine .mb.hero2 .sub{font-size:10.5px}#menu.cine .mb.hero,#menu.cine .mb.hero2{min-height:44px;font-size:14.5px;padding:7px 13px}#menu.cine .mb.tile{min-height:46px;padding:6px 9px}}
 /* dedikált tempomat gomb a gázpedál fölött */
 #bCruise{right:calc(14px + var(--sr));bottom:calc(22px + var(--sb) + var(--u)*2.25);width:calc(var(--u)*1.3);height:calc(var(--u)*.95);border-radius:14px;flex-direction:row;gap:4px;
@@ -312,7 +347,7 @@ body.tab #ctlrow{left:calc(30px + var(--sl) + var(--u)*2.24)!important}
   <div class="ctl" id="bRadio"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="11" rx="2" fill="none" stroke="#fff" stroke-width="1.8"/><circle cx="15.5" cy="13.5" r="2.6" fill="#fff"/><path d="M6 11h5M6 14h5M6 17h5" stroke="#fff" stroke-width="1.4"/><path d="M5 8l11-4" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg><small>RÁDIÓ</small></div>
  </div>
 </div>
-<div id="topbar"><div class="ctl" id="bPause" title="Szünet (P)"><svg viewBox="0 0 24 24"><path d="M8 5v14M16 5v14" stroke="#fff" stroke-width="3.2" stroke-linecap="round"/></svg></div><div class="ctl" id="bHome" title="Mentés és főmenü"><svg viewBox="0 0 24 24"><path d="M4 11.5L12 5l8 6.5" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.5 10v9h11v-9" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/><path d="M10.5 19v-5h3v5" fill="#ffd84a"/></svg></div><div class="ctl" id="bGps" title="GPS térkép (G)"><svg viewBox="0 0 24 24"><path d="M12 3.5l6.5 16-6.5-3.6-6.5 3.6z" fill="#3b8bff" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/></svg><small>GPS</small></div></div>
+<div id="topbar"><div class="ctl" id="bPause" title="Szünet (P)"><svg viewBox="0 0 24 24"><path d="M8 5v14M16 5v14" stroke="#fff" stroke-width="3.2" stroke-linecap="round"/></svg></div><div class="ctl" id="bHome" title="Mentés és főmenü"><svg viewBox="0 0 24 24"><path d="M4 11.5L12 5l8 6.5" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.5 10v9h11v-9" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/><path d="M10.5 19v-5h3v5" fill="#ffd84a"/></svg></div><div class="ctl" id="bSos" title="SOS: autómentő hívása (Z)"><svg viewBox="0 0 24 24"><path d="M12 2.8l9 16.4H3z" fill="#1d1405" opacity=".18"/><path d="M5 17l2.2-5.2h7.6L17 17" fill="none" stroke="#1d1405" stroke-width="1.9" stroke-linejoin="round"/><path d="M3.6 17h16.8v2.4H3.6z" fill="#1d1405"/><circle cx="7.4" cy="20" r="1.7" fill="#ffd84a" stroke="#1d1405" stroke-width="1.3"/><circle cx="16.6" cy="20" r="1.7" fill="#ffd84a" stroke="#1d1405" stroke-width="1.3"/><path d="M9.6 11.8V8.6h4.8v3.2" fill="none" stroke="#1d1405" stroke-width="1.6"/><path d="M12 3.4v3M9 4.6l1.2 1.4M15 4.6l-1.2 1.4" stroke="#d63a2f" stroke-width="1.6" stroke-linecap="round"/></svg><small>SOS</small></div><div class="ctl" id="bGps" title="GPS térkép (G)"><svg viewBox="0 0 24 24"><path d="M12 3.5l6.5 16-6.5-3.6-6.5 3.6z" fill="#3b8bff" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/></svg><small>GPS</small></div></div>
 <div id="cruiseBar"><button data-v="50">50</button><button data-v="70">70</button><button data-v="90">90</button><button data-v="110">110</button><button data-v="130">130</button><button data-v="0">KI</button></div>
 <div id="gpsv"><canvas id="gpsc"></canvas>
 <div class="gi" id="gpsInfo"></div>

@@ -2,7 +2,7 @@
 /* =========================================================
    CSALÁDI VAKÁCIÓ – alapok: vászon, rajzoló segédek, betűk, hang, bemenet
    ========================================================= */
-const APP_VERSION='2.31.1';
+const APP_VERSION='2.32.0';
 const W=480,H=270,PX=70,ROADT=194,ROADB=262,LANE=[212,232,252];
 const TAU=Math.PI*2;
 let SC=2,LOWQ=false;
@@ -221,7 +221,7 @@ function kRole(e){const c=e.code||'',k=e.key;const inPlay=typeof G!=='undefined'
  if(k==='Enter'||c==='NumpadEnter')return 'enter';if(c==='KeyP'||k==='Escape'||c==='Pause')return 'pause';if(c==='KeyM')return 'music';
  if(c==='KeyL')return 'light';if(c==='KeyF')return 'fog';if(c==='KeyV')return 'haz';if(c==='KeyK')return 'flash';if(c==='KeyO')return 'door';
  if(c==='KeyB'||c==='KeyX'||c==='Numpad5')return 'hb';if(c==='KeyT')return 'cruise';if(c==='KeyE')return 'stop';if(c==='KeyN'||c==='Tab')return 'log';if(c==='KeyR')return 'rev';
- if(c==='KeyG')return 'gps';if(c==='KeyQ'||c==='KeyC')return 'radio';if(c==='KeyI'||k==='F1'||k==='?')return 'help';if(k==='F3')return 'perf';
+ if(c==='KeyZ'||c==='KeyY')return 'sos';if(c==='KeyG')return 'gps';if(c==='KeyQ'||c==='KeyC')return 'radio';if(c==='KeyI'||k==='F1'||k==='?')return 'help';if(k==='F3')return 'perf';
  if(/^Digit[0-9]$/.test(c))return 'num'+c.slice(5);if(/^Numpad[1-9]$/.test(c)&&!up&&!dn&&!lf&&!rt)return 'num'+c.slice(6);
  return null;}
 window.addEventListener('keydown',e=>{initAudio();const r=kRole(e);if(!r)return;const rep=e.repeat;if(e.code)KHELD.add(e.code);
@@ -230,7 +230,7 @@ window.addEventListener('keydown',e=>{initAudio();const r=kRole(e);if(!r)return;
  else if(r==='enter'){K.enterP=true;K.enterKey=true;}else if(r==='pause'){if(typeof G!=='undefined'&&G.keysOpen){if(typeof closeKeys==='function')closeKeys();}else if(typeof G!=='undefined'&&G.albumOpen)closeAlbum();else if(typeof G!=='undefined'&&G.setOpen)closeSettings();else K.pauseP=true;}else if(r==='music'){toggleMusic();}
  else if(r==='light')K.lightP=true;else if(r==='fog')K.fogP=true;else if(r==='haz')K.hazP=true;else if(r==='flash')K.flash=true;else if(r==='door')K.doorP=true;
  else if(r==='hb'){if(!rep)K.hbP=true;}else if(r==='cruise')K.cruiseP=true;else if(r==='stop')K.stopP=true;else if(r==='log')K.logP=true;else if(r==='rev')K.revP=true;
- else if(r==='gps'){if(!rep&&typeof G!=='undefined'&&(G.state==='play'||G.state==='map'))K.gpsP=true;}else if(r==='radio')K.radioP=true;
+ else if(r==='gps'){if(!rep&&typeof G!=='undefined'&&(G.state==='play'||G.state==='map'))K.gpsP=true;}else if(r==='radio')K.radioP=true;else if(r==='sos'){if(!rep)K.sosP=true;}
  else if(r==='help'){if(!rep&&typeof toggleKeys==='function')toggleKeys();}
  else if(r==='perf'){if(!rep&&typeof PERF!=='undefined'){PERF.on=!PERF.on;try{localStorage.setItem('cv-perf',PERF.on?'1':'0');}catch(_){}}}
  else if(r.startsWith('num')){const n=+r.slice(3);

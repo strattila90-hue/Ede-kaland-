@@ -114,8 +114,8 @@ const ITEMCAT={repair:'service',wash:'service',oil:'service',burger:'food',kidme
  wipes:'baby',milk:'baby',ring:'fun',ball:'fun',sand:'fun',book:'fun',puzzle:'fun',cards:'fun',sticker:'fun',riddle:'fun',magnet:'fun',keyring:'fun',magazine:'other',guide:'other',news:'other',sunglass:'other',sunscreen:'other',pillow:'other',charger:'other',washer:'service',fresh:'other'};
 const PANEL=[166,50,308,214];
 // az autószerviz csak karosszériát javít (a légzsák a karosszériajavítás része)
-function garageCost(){const T=G.trip,hp=T.hp===undefined?100:T.hp;return Math.round(((100-hp)*3200+(T.airbag?118000:0))/100)*100;}
-function garageItems(){const T=G.trip,hp=T.hp===undefined?100:T.hp;return hp<100||T.airbag?[{k:'repair',nm:'Karosszéria',p:garageCost(),repair:true,msg:'A karosszéria megjavítva, mint az új!'}]:[];}
+function garageCost(){const T=G.trip,hp=T.hp===undefined?100:T.hp;return Math.round(((100-hp)*3200+(T.airbag?118000:0)+(T.lostW?52000:0))/100)*100;}
+function garageItems(){const T=G.trip,hp=T.hp===undefined?100:T.hp;return hp<100||T.airbag||T.lostW?[{k:'repair',nm:'Karosszéria',p:garageCost(),repair:true,msg:'A karosszéria megjavítva, mint az új!'}]:[];}
 function shopList(type){const T=G.trip,ps=P.shop;if(type==='garage')return garageItems();return SHOPS[type].items.filter(it=>(!it.work||!ps.worked)&&(!it.tyre||!T.spare));}
 /* lapozás: oldalanként 8 kártya (2 sor x 4) */
 const PER_PAGE=8;function shopPages(type){return Math.max(1,Math.ceil(shopList(type).length/PER_PAGE));}
@@ -133,7 +133,7 @@ function updShop(){const T=G.trip,ps=P.shop;if(ps.anim>0)ps.anim--;const np=shop
  const items=shopPage(ps.type);
  for(let i=0;i<items.length;i++){if(K.num===i+1||inRect(TAP,cardRect(i))){const it=items[i];
 if(it.p){book(-it.p,ITEMCAT[it.k]||'other',SHOPS[ps.type].title+': '+it.nm);SFX.cash();}ps.anim=20;ps.last=i;
-  if(it.repair){T.hp=100;T.airbag=0;}if(it.k==='coffee'){T.driveS=Math.max(0,(T.driveS||0)-900);}if(it.wake){T.driveS=Math.max(0,(T.driveS||0)-it.wake);}if(it.food)T.food=Math.min(100,T.food+it.food);if(it.baby)T.baby=Math.min(100,T.baby+it.baby);if(it.mood){T.mood=Math.min(5,T.mood+it.mood);}
+  if(it.repair){T.hp=100;T.airbag=0;T.dz={f:0,s:0,r:0};T.lostW=null;}if(it.k==='coffee'){T.driveS=Math.max(0,(T.driveS||0)-900);}if(it.wake){T.driveS=Math.max(0,(T.driveS||0)-it.wake);}if(it.food)T.food=Math.min(100,T.food+it.food);if(it.baby)T.baby=Math.min(100,T.baby+it.baby);if(it.mood){T.mood=Math.min(5,T.mood+it.mood);}
   if(it.tyre)T.spare=true;if(it.photo)T.photos++;ps.msg=it.msg||('Megvetted: '+it.nm);{const st=(it.sp||it.nm)+(it.p?', '+fmt(it.p)+' forint.':'.')+(it.msg?' '+it.msg:it.work?' Irány a zöldséges!':'');shopSay(st);
    if(it.mood){const sh=P.shop;setTimeout(()=>{if(P.shop===sh)say('Köszönjük, Apa!','anna');},400+st.length*80);}}
   if(it.mult){startMini('scratch',{mult:it.mult,onEnd:r=>{ps.msg=r?'Nyeremény: '+fmt(r)+' Ft!':'Most nem nyert.';}});return;}
@@ -145,7 +145,7 @@ function drawShopUI(g){const T=G.trip,ps=P.shop,sh=SHOPS[ps.type],items=shopPage
  if(ps.type==='fuel'&&P.pump&&P.pump.cost)text(g,'Benzin: '+fmt(P.pump.liters,2)+' l = '+fmt(P.pump.cost)+' Ft  (fizetve)',r[0]+10,r[1]+25,'#b7ffcf',1,'left',null);
  else if(ps.type==='garage'){const hp=T.hp===undefined?100:T.hp;text(g,'Karosszéria állapota: '+hp+'%',r[0]+10,r[1]+25,hp<30?'#ff8a8a':hp<70?'#ffcf33':'#7cff7c',1,'left',null);
   frr(g,'#1b212b',r[0]+86,r[1]+43,r[2]-96,6,3);frr(g,hp<30?'#ff6b6b':hp<70?'#ffcf33':'#5bd06a',r[0]+86,r[1]+43,(r[2]-96)*hp/100,6,3);
-  const d=1-hp/100,list=[];if(d>=0.08)list.push('karcok, horpadások');if(d>0.25)list.push('lökhárító, fényszóró');if(d>0.4)list.push('motorháztető, szélvédő');if(d>0.55)list.push('tükör, ajtó');if(T.airbag)list.push('légzsák');
+  const d=1-hp/100,list=[];if(d>=0.08)list.push('karcok, horpadások');if(d>0.25)list.push('lökhárító, fényszóró');if(d>0.4)list.push('motorháztető, szélvédő');if(d>0.55)list.push('tükör, ajtó');if(T.airbag)list.push('légzsák');if(T.lostW)list.push('kerék');if(T.dz){const z=T.dz,zn=[];if(z.f>0.1)zn.push('eleje');if(z.s>0.1)zn.push('oldala');if(z.r>0.1)zn.push('hátulja');if(zn.length)list.unshift('sérült: '+zn.join(', '));}
   let y=r[1]+56;text(g,list.length?'Javítandó:':'Nincs sérülés.',r[0]+86,y,'#9fb0c2',1,'left',null);for(const l of list){y+=10;text(g,'· '+l,r[0]+90,y,'#ffffff',1,'left',null);}
   if(list.length){text(g,'Munkadíj: 3 200 Ft / %'+(T.airbag?' + légzsák 118 000 Ft':''),r[0]+86,y+14,'#9fb0c2',1,'left',null);text(g,'Összesen: '+fmt(garageCost())+' Ft',r[0]+86,y+25,'#ffd84a',1,'left',null);}
   else text(g,'A karosszéria ép, nincs mit javítani.',r[0]+r[2]/2,GO_BTN[1]-24,'#7cff7c',1,'center',null);}

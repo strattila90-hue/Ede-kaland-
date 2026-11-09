@@ -384,12 +384,22 @@ function drawWashBuilding(g,sx,night,lights,t){const b=ROADT-6;if(sx<-200||sx>W+
  brush(g,sx+40,b-40,b-2,9,t*0.3,'#1e88e5');brush(g,sx+92,b-40,b-2,9,t*0.3,'#e53935');frr(g,'#2a3a48',sx+30,b-44,72,5,2);
  frr(g,'#1b1f26',sx+122,b-40,10,22,2);for(const [k,c] of [[0,'#ff3b30'],[1,'#34c759']])disc(g,(k===1)===(((t>>6)&1)===1)?c:'#333',sx+127,b-34+k*9,3);
  if(night&&lights)lights.push({x:sx+66,y:b-24,r:50});}
-function drawWashBack(g,t){const gy=P.y,top=gy-74;frr(g,'#3b4a58',PX-40,top,200,gy-top-2,4);for(let k=0;k<200;k+=14)R(g,'rgba(255,255,255,0.05)',PX-40+k,top,7,gy-top-2);R(g,'#1e88e5',PX-40,top,200,6);}
+function drawWashBack(g,t){const gy=P.y,top=gy-74,w=P.wash,run=w&&w.step==='run';frr(g,'#3b4a58',PX-40,top,200,gy-top-2,4);for(let k=0;k<200;k+=14)R(g,'rgba(255,255,255,0.05)',PX-40+k,top,7,gy-top-2);R(g,'#1e88e5',PX-40,top,200,6);
+ // futófény a gerendán és a padló vízfilmje
+ for(let k=0;k<10;k++){const on=run&&((t>>3)+k)%10<3;disc(g,on?'#7fd1ff':'#24506e',PX-32+k*20,top+3,1.3);if(on)glow(g,PX-32+k*20,top+3,4,'rgba(127,209,255,0.6)');}
+ if(run){R(g,'rgba(160,210,240,0.18)',PX-40,gy-3,200,3);for(let k=0;k<6;k++){const x=PX-36+((k*37+t*0.6)%196);line(g,'rgba(255,255,255,0.25)',x,gy-1.5,x+6,gy-1.5,0.5);}}}
 function drawWashFront(g,t){const w=P.wash;if(!w||w.step!=='run')return;const gy=P.y,x=w.gx,ph=w.phase,top=gy-70;
  // kapu: oszlop elöl, felső gerenda, kefék
  frr(g,'#1565c0',x-4,top,8,gy-top,2);frr(g,'#1e88e5',x-40,top-6,48,8,3);
  if(ph==='brush'||ph==='polish'){brush(g,x+7,gy-52,gy-4,10,t,ph==='polish'?'#ffd84a':'#e53935');const ty=w.roof;g.save();g.translate(x+2,ty);brush(g,0,-6,6,30,t,'#1e88e5');g.restore();}
  if(ph==='spray'||ph==='rinse'||ph==='foam'){const c=ph==='foam'?'rgba(255,160,210,0.75)':'rgba(170,220,255,0.7)';for(let k=0;k<(LOWQ?6:12);k++){const yy=top+8+k*5,ln=6+((t*3+k*7)%8);line(g,c,x-2,yy,x-2-ln,yy+3,0.8);}}
+ if(ph==='bug'){for(let k=0;k<(LOWQ?5:10);k++){const yy=gy-46+k*3.4,ln=8+((t*2+k*5)%7);line(g,'rgba(180,255,170,0.7)',x+4,yy,x+4+ln,yy+1.5,0.9);}}
+ if(ph==='wheel'){for(const wx of WHEELS){const cx=PX+wx;if(Math.abs(cx-x)<60){g.save();g.translate(cx,gy-WR);g.rotate(t*0.5);for(let k=0;k<8;k++){g.rotate(TAU/8);line(g,'#ffd84a',0,0,WR+2,0,1.1);}g.restore();disc(g,'rgba(255,216,74,0.25)',cx,gy-WR,WR+2.5);}}}
+ if(ph==='wax'||ph==='ceramic'){for(let k=0;k<(LOWQ?4:8);k++){const ph2=((t*0.8+k*13)%40)/40,yy=top+10+k*6-ph2*8;disc(g,ph==='ceramic'?'rgba(170,240,255,'+(0.6*(1-ph2))+')':'rgba(255,230,160,'+(0.5*(1-ph2))+')',x-4-ph2*10,yy,1.2+ph2*2.4);}
+  if(ph==='ceramic'&&((t>>2)&1))for(let k=0;k<3;k++){const sx=PX+10+hsh(k*5+(t>>4))*96,sy=gy-48+hsh(k*9+(t>>4))*30;line(g,'#e6fbff',sx-2,sy,sx+2,sy,0.5);line(g,'#e6fbff',sx,sy-2,sx,sy+2,0.5);}}
+ if(ph==='under'){for(let k=0;k<(LOWQ?4:8);k++){const xx=x-12+k*3,h=4+((t*3+k*5)%5);line(g,'rgba(170,220,255,0.7)',xx,gy,xx+1,gy-h,0.7);}}
  if(ph==='dry'){for(let k=0;k<3;k++){const yy=top+12+k*16;frr(g,'#90a4ae',x-10,yy,10,8,3);for(let j=0;j<3;j++)line(g,'rgba(255,255,255,0.5)',x-12-((t*4+j*5)%14),yy+2+j*2,x-18-((t*4+j*5)%14),yy+2+j*2,0.6);}}
  // hab a kocsin (a kapu mögötti részen), korlátozott számú buborék
+ // csöpögő víz a karosszériáról
+ if(w.drip>0.05){const n=LOWQ?6:12;for(let k=0;k<n;k++){const bx=PX+6+hsh(k*17)*100,ph2=((t*1.4+k*11)%30)/30,by=gy-48+hsh(k*5)*16+ph2*30;if(by<gy-2)line(g,'rgba(190,225,255,'+(0.65*w.drip)+')',bx,by,bx,by+2.4,0.6);}}
  if(w.foam>0){const a=w.foam,n=LOWQ?14:28;for(let k=0;k<n;k++){const bx=PX+4+hsh(k*7)*104,by=gy-50+hsh(k*13)*40;if((w.foamDir>0&&bx<x)||(w.foamDir<0&&bx>x))continue;disc(g,'rgba(255,255,255,'+(0.55*a)+')',bx,by,2+hsh(k)*2.4);disc(g,'rgba(255,190,225,'+(0.35*a)+')',bx+1,by-1,1.2);}}}
