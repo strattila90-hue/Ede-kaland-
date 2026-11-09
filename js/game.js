@@ -48,7 +48,10 @@ function save(dist){try{saveProf();}catch(e){}try{if(G.trip)G.trip.savedAt=Date.
 G.save=loadSave();G.ts=1;try{G.ts=+localStorage.getItem('csaladi-vakacio-ts')||1;}catch(e){}if(G.ts!==1)G.ts=5;// legfeljebb 5x (a régi 20x is 5x lesz)
 const TS_OPTS=[[1,'Valós idő (1x)'],[5,'Gyorsított (5x)']];
 const WHO=['apa','anya','anna','petra','atti'],WHO_X={apa:68,anya:63,anna:42,petra:33,atti:27};
-function say(txt,who){P.bub={txt:txt,who:who||'anna',t:170};if(!G.paused&&G.state==='play')speak(txt,who||'anna',true);}
+/* ki utazik: Apa mindig (ő vezet), a többiek az új játék előtt választhatók (G.trip.crew) */
+const CREW_RX={anya:/\bany[aáu]/i,anna:/\bann[aá]/i,petra:/\bpetr[aá]/i,atti:/\batti/i};
+function crewList(){return WHO.filter(crewHas);}
+function say(txt,who){who=who||'anna';if(!crewHas(who)){const alt=['anya','anna','petra'].filter(crewHas);who=alt.length?pick(alt):'apa';}for(const k in CREW_RX)if(!crewHas(k)&&CREW_RX[k].test(txt))return;P.bub={txt:txt,who:who||'anna',t:170};if(!G.paused&&G.state==='play')speak(txt,who||'anna',true);}
 function flash(msg,col,dur){G.msg={txt:msg,col:col||'#ffd84a',t:dur||200};}
 function seg(){return segAtIn(LEG.segs,P.dist+PX+40);}
 function legKm(){return Math.min(LEGS[G.leg].km,P.dist*LEG.kmPerPx);}
@@ -60,7 +63,7 @@ function startLeg(i,resume){if(typeof FINE!=='undefined'&&FINE&&!isTouch){let se
   yF:0,vF:0,yR:0,vR:0,wF:0,wR:0,flat:null,sub:'drive',fix:0,pump:null,ev:null,evCD:3600,famCD:9000,chat:600,bub:null,arriving:false,arriveT:0,door:0,hide:{},walk:[],stopT:0,
   boarding:i===0&&!resume?0:-1,instCons:0,avgKm:0,avgL:0,lastSeg:null,hungerT:0,brake:false,gasF:0,engineOff:false};
  if(i===0&&!resume){P.hide={apa:1,anya:1,anna:1,petra:1,atti:1};P.door=1;
-  P.walk=[{w:'apa',x:PX+30,y:ROADT+6,tx:PX+60,t:0},{w:'anya',x:PX+20,y:ROADT+4,tx:PX+52,t:0},{w:'anna',x:PX+8,y:ROADT+8,tx:PX+40,t:0},{w:'petra',x:PX-2,y:ROADT+7,tx:PX+32,t:0}];}
+  P.walk=[{w:'apa',x:PX+30,y:ROADT+6,tx:PX+60,t:0},{w:'anya',x:PX+20,y:ROADT+4,tx:PX+52,t:0},{w:'anna',x:PX+8,y:ROADT+8,tx:PX+40,t:0},{w:'petra',x:PX-2,y:ROADT+7,tx:PX+32,t:0}].filter(w=>crewHas(w.w));}
  ents=[];parts=[];G.state='play';G.banner=240;G.paused=false;G.flash=0;G.msg=null;nextSpawn=P.dist+500;if(resume)G.banner=200;
  drops=[];if(['rain','storm','snow'].includes(L.weather)){const n=L.weather==='storm'?190:L.weather==='rain'?130:110;for(let k=0;k<n;k++)drops.push({x:rnd(0,W+80),y:rnd(-H,H),v:L.weather==='snow'?rnd(0.6,1.4):rnd(6,9),ph:rnd(0,7)});}}
 let nextSpawn=0;
@@ -124,6 +127,7 @@ const EVDEF={
  pee:{msg:'Annának pisilni kell! Állj meg a szélső sávban vagy a kútnál!',who:'anna',stop:150,time:2000,out:['anna','apa']}};
 function startEvent(){const s=seg(),L=LEGS[G.leg],r=Math.random();let type;
  const famOK=!(P.famCD>0);if(famOK&&r<0.09)type='baby';else if(famOK&&r<0.14)type='sick';else if(famOK&&r<0.21)type='pee';else if(r<0.4)type='police';else if(r<0.6)type='help';else if(r<0.72)type='crash';else if(r<0.84&&s.type==='motorway')type='jam';else type='works';
+ if((type==='baby'&&!crewHas('atti'))||(type==='sick'&&!crewHas('petra'))||(type==='pee'&&!crewHas('anna')))type='help';
  if(type==='baby'||type==='sick'||type==='pee')P.famCD=18000;
  if(type==='baby'||type==='sick'||type==='pee'){const d=EVDEF[type];P.ev={type:type,t:d.time,stopT:0};say(type==='baby'?'Atti nagyon sír!':type==='sick'?'Anya, rosszul vagyok...':'Apa, pisilni kell!',d.who);if(type==='baby')SFX.cry();return;}
  if(type==='police'){const x=P.dist+W+60,mw=isMW(x),py=mw?ROADT+5:LANE[0]-3;ents.push({kind:'traffic',tp:'police',x:x,lane:mw?-1:0,y:py,ty:py,w:TW.police,h:TH.police,kmh:0,base:0,col:'#ffffff',parked:true,radar:true});P.ev={type:'police',t:99999,x:x};return;}
@@ -483,8 +487,8 @@ function updPlay(){if(G.shake>0&&!G.paused)G.shake--;if(K.gpsP){K.gpsP=false;if(
  if(T.fuel<=0&&!P.engineOff){P.engineOff=true;flash('Kifogyott a benzin! Autómentő hozzon 10 litert: 25 000 Ft (Enter / érintés vagy SOS)','#ff8a8a',99999);say('Elfogyott a benzin...','apa');}
  if(P.engineOff&&K.enterP){book(-25000,'service','Autómentő: 10 liter benzin');T.fuel=10;P.engineOff=false;G.msg=null;flash('Megjött a segítség: 10 liter a tankban.','#7cff7c');SFX.cash();}
  if(T.fuel<7&&t%600===0&&!P.engineOff){flash('Tartalék! Kevés a benzin, tankolj a következő kútnál!','#ffb347');tone(660,0.2,'square',0.05);}
- T.food=Math.max(0,T.food-0.0003*LEG.ts);T.baby=Math.max(0,T.baby-0.00014*LEG.ts);
- if(P.cranky&&P.sub==='drive'){P.crankyT=(P.crankyT||0)+1;if(P.crankyT%540===270){say(pick(['Unatkozom!','Mikor érünk már oda?','Álljunk meg!','Pisilni kell!','Éhes vagyok!']),pick(['anna','petra']));if(!P.hide.atti&&Math.random()<0.5)scream(880,0.5);}}
+ T.food=Math.max(0,T.food-0.0003*LEG.ts);T.baby=crewHas('atti')?Math.max(0,T.baby-0.00014*LEG.ts):100;
+ if(P.cranky&&P.sub==='drive'){P.crankyT=(P.crankyT||0)+1;if(P.crankyT%540===270){say(pick(['Unatkozom!','Mikor érünk már oda?','Álljunk meg!','Pisilni kell!','Éhes vagyok!']),pick(['anna','petra']));if(!P.hide.atti&&crewHas('atti')&&Math.random()<0.5)scream(880,0.5);}}
  if(T.food<=0){if(++P.hungerT%1500===0){(PROF.easy||T.mood--);say('Éhesek vagyunk!','petra');flash('Elfogyott a kaja! A család éhes (-1 kedv). Vásárolj egy boltban!','#ff8a8a');checkMood();}}
  // motorhang
  const gears=[0,20,38,60,90,125,186];let gi=1;while(gi<gears.length-1&&P.kmh>gears[gi])gi++;const av=Math.abs(P.kmh);let gi2=1;while(gi2<gears.length-1&&av>gears[gi2])gi2++;const rpm=P.engineOff?0:850+(av-gears[gi2-1])/(gears[gi2]-gears[gi2-1])*4600;engine(rpm,P.gasF);P.rpm=rpm;P.gear=P.rev?'R':av<1?'N':gi2;
@@ -553,7 +557,7 @@ function updPlay(){if(G.shake>0&&!G.paused)G.shake--;if(K.gpsP){K.gpsP=false;if(
  if(!P.arriving&&P.dist>=LEG.len){P.arriving=true;P.arriveT=0;ents=[];say('Megérkeztünk!','apa');SFX.win();}
  if(P.arriving){if(P.arriveT%6===0)for(let k=0;k<4;k++)parts.push({type:'conf',x:rnd(0,W),y:-5,vx:rnd(-0.5,0.5),vy:rnd(0.5,1.5),life:200,max:200,col:pick(['#ff5a7a','#ffd54f','#4fc3f7','#81c784','#ba68c8']),world:false});
   if(P.kmh<0.5&&P.arriveT>=90&&P.door<1)P.door=Math.min(1,P.door+0.05);
-  if(P.arriveT>=110&&P.walk.length<4&&(P.arriveT-110)%16===0){const w=['apa','anya','anna','petra'][P.walk.length];P.walk.push({w:w,x:PX+(w==='apa'||w==='anya'?60:36),y:P.y+4,tx:PX+150+P.walk.length*15,t:0,out:true});P.hide[w]=1;if(w==='anya')P.hide.atti=1;}
+  if(P.arriveT>=110&&P.walk.length<['apa','anya','anna','petra'].filter(crewHas).length&&(P.arriveT-110)%16===0){const w=['apa','anya','anna','petra'].filter(crewHas)[P.walk.length];P.walk.push({w:w,x:PX+(w==='apa'||w==='anya'?60:36),y:P.y+4,tx:PX+150+P.walk.length*15,t:0,out:true});P.hide[w]=1;if(w==='anya')P.hide.atti=1;}
   for(const w of P.walk){w.t++;if(w.x<w.tx)w.x+=0.8;}
   if(P.arriveT===230)say('Juhééé! Itt vagyunk!','anna');if(P.arriveT>340){G.state='postcard';G.st=0;arriveRefill();
    {const T=G.trip;stat('legs');stat('km',LEGS[G.leg].km);if(T.fineLeg!==G.leg)stat('cleanLegs');PROF.album[G.leg]=PROF.album[G.leg]||Date.now();saveProf();checkAwards();}}}}
@@ -599,7 +603,7 @@ function updEnts(){const pl=P.dist+6,pr=P.dist+112,t=G.t,L=LEGS[G.leg];
     else if(rel< -3&&ec<pc){if(hit('Belénk jöttek hátulról!','anya')){const d=clamp(5+(-rel)*0.5,5,80);P.kmh=Math.max(P.kmh,(e.cur||0)*0.6);e.cur=Math.min(e.cur||0,P.kmh*0.8);P.scare=Math.max(P.scare||0,Math.min(1,-rel/40));damage(d,'traffic','r');}}
     else if(rel>2&&hit()){const d=clamp(6+rel*0.55+(rel>70?rel*0.25:0),6,100);P.kmh=Math.max(0,(e.cur||0)*0.7);P.scare=Math.max(P.scare||0,Math.min(1,rel/40));damage(d,'traffic','f');}}
    else if(e.kind==='animal'&&!e.flee&&!e.dead){if(P.kmh>5&&hit({deer:'Egy őz!',boar:'Vaddisznó!',fox:'Jaj, egy róka!',hare:'Szegény nyuszi!'}[e.tp]||'Bocsánat!','petra')){e.flee=true;wildHit(e);}}}}
- ents=ents.filter(e=>!e.gone&&e.x>P.dist-280&&!(e.kind==='animal'&&(e.y>ROADB+18||e.y<ROADT-40)));}
+ ents=ents.filter(e=>!e.gone&&e.x+(e.w||0)>P.dist-280&&!(e.kind==='animal'&&(e.y>ROADB+18||e.y<ROADT-40)));}
 function weatherUpd(L,t){for(const d of drops){if(L.weather==='snow'){d.y+=d.v;d.x+=Math.sin(t*0.03+d.ph)*0.4-P.kmh*KPX*0.25*d.v;}else{d.y+=d.v;d.x-=d.v*(L.weather==='storm'?0.55:0.3)+P.kmh*KPX*0.3;}
   if(d.y>H){d.y=rnd(-30,-5);d.x=rnd(0,W+80);}if(d.x<-10)d.x+=W+80;}
  if(L.weather==='storm'&&G.flash<=0&&Math.random()<1/280){G.flash=12;G.thunder=22;G.bolt=rnd(60,420);}
@@ -654,7 +658,7 @@ function fixPose(){const f=P.fix,k=P.flat,wx=PX+(k==='f'?WHEELS[1]:WHEELS[0]),do
 let [DK,dg]=mk(W,H,SC*0.5);
 // előre elkészített fénykör: a sötétítő rétegből ezzel vágjuk ki a lámpák fényét (nem kell minden lámpához új színátmenet)
 let LSPR=null;const mkLSPR=()=>{const [c,x]=mk(64,64,1);x.fillStyle=rg(x,32,32,0,32,[[0,'rgba(0,0,0,0.9)'],[0.5,'rgba(0,0,0,0.5)'],[1,'rgba(0,0,0,0)']]);x.fillRect(0,0,64,64);return c;};LSPR=mkLSPR();
-function onSC(){TITLE_DRAWN=null;LSPR=mkLSPR();try{HUDC=null;TFX=null;POSTER=null;}catch(e){}try{STARS=null;}catch(e){}if(G&&G.state==='title'){try{render();}catch(e){}}[DK,dg]=mk(W,H,SC*0.5);COBBLE=null;for(const k in MAPCACHE)delete MAPCACHE[k];}
+function onSC(){TITLE_DRAWN=null;LSPR=mkLSPR();try{HUDC=null;TFX=null;POSTER=null;}catch(e){}try{STARS=null;}catch(e){}try{if(typeof CTBG!=='undefined')CTBG=null;}catch(e){}if(G&&G.state==='title'){try{render();}catch(e){}}[DK,dg]=mk(W,H,SC*0.5);COBBLE=null;for(const k in MAPCACHE)delete MAPCACHE[k];}
 function darkness(g,L){let a=0;if(L.time==='night')a=0.62;else if(L.time==='dusk')a=0.26;else if(L.weather==='storm')a=0.3;else if(L.time==='sunset')a=0.05;
  if(L.time==='dusk'||L.time==='sunset')R(g,'rgba(255,130,60,0.1)',0,0,W,H);if(a<=0)return;
  dg.setTransform(SC*0.5,0,0,SC*0.5,0,0);dg.globalCompositeOperation='source-over';dg.clearRect(0,0,W,H);dg.fillStyle='rgba(8,12,38,'+a+')';dg.fillRect(0,0,W,H);dg.globalCompositeOperation='destination-out';
@@ -892,8 +896,8 @@ function drawPlay(g){const L=LEGS[G.leg],t=G.t;lights=[];const s=seg();
  if(P.sub==='rest'&&P.rest)drawRest(g,t);
  const list=ents.map(e=>({y:e.y,e:e}));list.push({y:P.y+0.01,e:null});list.sort((a,b)=>a.y-b.y);
  if(P.sub==='wash'&&P.wash&&P.wash.step!=='menu')drawWashBack(g,t);
- for(const it of list){const e=it.e;if(!e){if(P.tw)drawTowTruck(g,P.tw.x+P.tw.dx,P.y,P.tw.tilt,t,lights);if(P.looseW)drawLooseW(g);if(P.carOff)towPose(g);drawPlayer(g,t);if(P.carOff)g.restore();if(P.sub==='sos')drawMechanic(g,t);if(P.sub==='wash')drawWashFront(g,t);if(P.sparkle>0){P.sparkle--;for(let k=0;k<6;k++){const ph=((t+k*17)%40)/40,sx=PX+10+hsh(k*7+((t/40)|0))*96,sy=P.y-50+hsh(k*3+((t/40)|0))*30,r=Math.sin(ph*Math.PI)*3;if(r>0.3){line(g,'#ffffff',sx-r,sy,sx+r,sy,0.6);line(g,'#ffffff',sx,sy-r,sx,sy+r,0.6);}}}continue;}const ex=e.x-P.dist+PX;if(ex<-140||ex>W+20)continue;
-  if(e.kind==='traffic'){const cover=it.y>P.y&&ex<PX+112&&ex+e.w>PX&&e.y-P.y<46;e.fa=lerp(e.fa===undefined?1:e.fa,cover?0.38:1,0.12);if(e.fa<0.98)g.globalAlpha=e.fa;drawTraffic(g,e,ex,lights,P.lightMode>=2,t);g.globalAlpha=1;if(e.help){if((t>>4)&1){glow(g,ex+e.w-1,e.y-14,6,'rgba(255,170,30,0.9)');glow(g,ex+1,e.y-16,6,'rgba(255,170,30,0.9)');}
+ for(const it of list){const e=it.e;if(!e){if(P.tw)drawTowTruck(g,P.tw.x+P.tw.dx,P.y,P.tw.tilt,t,lights);if(P.looseW)drawLooseW(g);if(P.carOff)towPose(g);drawPlayer(g,t);if(P.carOff)g.restore();if(P.sub==='sos')drawMechanic(g,t);if(P.sub==='wash')drawWashFront(g,t);if(P.sparkle>0){P.sparkle--;for(let k=0;k<6;k++){const ph=((t+k*17)%40)/40,sx=PX+10+hsh(k*7+((t/40)|0))*96,sy=P.y-50+hsh(k*3+((t/40)|0))*30,r=Math.sin(ph*Math.PI)*3;if(r>0.3){line(g,'#ffffff',sx-r,sy,sx+r,sy,0.6);line(g,'#ffffff',sx,sy-r,sx,sy+r,0.6);}}}continue;}const ex=e.x-P.dist+PX;if(ex+(e.w||40)<-40||ex>W+20)continue;
+  if(e.kind==='traffic'){const cover=it.y>P.y&&ex<PX+112&&ex+e.w>PX&&e.y-P.y<46;e.fa=lerp(e.fa===undefined?1:e.fa,cover?(e.tp==='truck'||e.tp==='bus'?0.74:0.55):1,0.12);if(e.fa<0.98)g.globalAlpha=e.fa;drawTraffic(g,e,ex,lights,P.lightMode>=2,t);g.globalAlpha=1;if(e.help){if((t>>4)&1){glow(g,ex+e.w-1,e.y-14,6,'rgba(255,170,30,0.9)');glow(g,ex+1,e.y-16,6,'rgba(255,170,30,0.9)');}
    if(e.help==='truck')for(let k=0;k<5;k++)frr(g,['#b07a42','#c8955a','#8a5a2b'][k%3],ex-30+k*9,e.y-(k%2?16:8),8,8,1);person(g,ex-12,e.y+4,'apa',t,'wave');triangle(g,ex-48,e.y+2);}}else if(e.kind==='animal')drawAnimal(g,e,ex,t);else if(e.kind==='spot')drawSpot(g,e,ex,t);else drawObstacle(g,e,ex,t);}
  for(const w of P.walk)person(g,w.x,w.y,w.w,w.t+(w.out?0:0),w.out&&w.x>=w.tx?'wave':'walk');
  for(const p of LEG.pois)if(p.type==='veda')drawVedaFront(g,p,p.x-P.dist+PX);
@@ -985,11 +989,11 @@ function drawPoster(g){const mR=Math.max(0,Math.min(W*0.6,G.menuR||W*0.36)),cx=M
  text(g,'A Komárom - Európa - Komárom kör',cx,10,'#ffd9b0',1,'center');
  const y1=19+s1*3,y2=y1+s1*7+3+ts*3;
  text(g,'Családi',cx,y1,'#ffd84a',s1,'center','#5a1d0c');text(g,'Vakáció',cx,y2,'#ffd84a',ts,'center','#5a1d0c');
- const ty=y2+ts*7+7;text(g,'Öt ember. Egy autó. '+fmt(Math.round(LEGS.reduce((a,L)=>a+L.km,0)/100)*100)+' kilométer.',cx,ty,'#ffffff',1,'center');
+ const ty=y2+ts*7+7;text(g,(['Apa egyedül','Két ember','Három ember','Négy ember','Öt ember'][(typeof crewCount==='function'?crewCount():5)-1]||'Öt ember')+'. Egy autó. '+fmt(Math.round(LEGS.reduce((a,L)=>a+L.km,0)/100)*100)+' kilométer.',cx,ty,'#ffffff',1,'center');
  g.fillStyle=lg(g,0,250,0,H,[[0,'rgba(0,0,0,0)'],[1,'rgba(0,0,0,0.85)']]);g.fillRect(0,250,W,H-250);
  const cr='Apa · Anya · Anna · Petra · kis Atti';text(g,cr,cx,257,'#cfd6df',Math.min(1,(room+10)/textW(cr.toUpperCase())),'center',null);}
 let POSTER=null;
-function drawTitle(g){const key=SC+'|'+Math.round(G.menuR||0);if(!POSTER||POSTER.key!==key){const [c,x]=mk(W,H,SC);drawPoster(x);POSTER={c:c,key:key};}g.drawImage(POSTER.c,0,0,W,H);}
+function drawTitle(g){const key=SC+'|'+Math.round(G.menuR||0)+'|'+(typeof crewCount==='function'?crewCount():5);if(!POSTER||POSTER.key!==key){const [c,x]=mk(W,H,SC);drawPoster(x);POSTER={c:c,key:key};}g.drawImage(POSTER.c,0,0,W,H);}
 function drawSpecs(g){R(g,'#141a26',0,0,W,H);g.save();g.translate(250,40);g.scale(1.8,1.8);drawCarSide(g,0,0,0,{t:G.t,ang:G.t*0.05,lightsOn:true},null);g.restore();
  text(g,'Az autó adatai',20,16,'#ffd84a',2);const rows=[['Típus','7 üléses egyterű'],['Motor','1.8 16V benzin'],['Teljesítmény',CAR.hp+' LE'],['Nyomaték',CAR.torque+' Nm'],['Végsebesség',CAR.top+' km/h'],['0-100 km/h',fmt(CAR.acc100,1)+' s'],
   ['Fogyasztás városban',fmt(CAR.urban,1)+' l/100 km'],['Fogyasztás országúton',fmt(CAR.extra,1)+' l/100 km'],['Vegyes fogyasztás',fmt(CAR.comb,1)+' l/100 km'],['Tank',CAR.tank+' l'],['Saját tömeg',fmt(CAR.mass)+' kg'],['Hossz',fmt(CAR.len,2)+' m'],['Gumiméret',CAR.tyre],['Ülések',CAR.seats+' (3. sor: csomagok)']];
@@ -1079,21 +1083,22 @@ function update(){pauseWatch();if(!window.LAZY_DONE&&G.state!=='title'&&G.state!
   if(K.enterP&&!G.confirm){SFX.click();const a=opts[G.menu].a;if(a==='color'){const ns=Object.keys(PALETTES);setColor(ns[(ns.indexOf(carColor)+1)%ns.length]);}
    else if(a==='ts'){const k=TS_OPTS.findIndex(q=>q[0]===G.ts);G.ts=TS_OPTS[(k+1)%TS_OPTS.length][0];try{localStorage.setItem('csaladi-vakacio-ts',G.ts);}catch(e){}}
    else if(a==='specs'){G.state='specs';G.st=0;}
-   else{if(a==='cont'){G.leg=G.save.leg;G.trip=fixLog(G.save.trip);if(G.trip.savedAt)restBreak((Date.now()-G.trip.savedAt)/1000);/* a megtett út kilométerben jön vissza: a gyorsítás állításától függetlenül pontosan ugyanott folytatódik */G.resume=G.save.km!=null?G.save.km:(G.save.dist||0)*(G.save.ts||1)/PXKM;}else{G.leg=0;G.trip=newTrip();G.resume=0;}G.state='map';G.st=0;}}}
+   else{if(a==='cont'){G.leg=G.save.leg;G.trip=fixLog(G.save.trip);if(G.trip.savedAt)restBreak((Date.now()-G.trip.savedAt)/1000);/* a megtett út kilométerben jön vissza: a gyorsítás állításától függetlenül pontosan ugyanott folytatódik */G.resume=G.save.km!=null?G.save.km:(G.save.dist||0)*(G.save.ts||1)/PXKM;}else{G.leg=0;G.trip=newTrip();G.trip.crew=Object.assign({},G.crewPick||PROF.crew||{anya:1,anna:1,petra:1,atti:1});G.resume=0;}G.state='map';G.st=0;}}}
  else if(G.state==='specs'){if(K.enterP&&G.st>10){G.state='title';SFX.click();}}
  else if(G.state==='map'){if(G.st===1)fetchWeather(G.leg);if(K.gpsP){K.gpsP=false;if(typeof openGPS==='function')openGPS();}if(G.gps){K.enterP=false;}if(K.enterP&&G.st>25){SFX.click();startLeg(G.leg,G.resume);G.resume=0;}}
  else if(G.state==='play')updPlay();
+ else if(G.state==='crash'){if(typeof updCrash==='function')updCrash();}
  else if(G.state==='postcard'){for(const p of parts){p.x+=p.vx;p.y+=p.vy;p.life--;}parts=parts.filter(p=>p.life>0);
   if(K.enterP&&G.st>40){SFX.click();G.leg++;if(G.leg>=LEGS.length){G.state='win';G.st=0;stat('wins');saveProf();checkAwards();SFX.win();try{localStorage.removeItem(saveKey());}catch(e){}G.save=null;}else{save(0);G.state='map';G.st=0;}}}
  else if(G.state==='over'){if(K.enterP&&G.st>50){SFX.click();G.trip.mood=3;startLeg(G.leg);}}
  else if(G.state==='win'){if(K.enterP&&G.st>60){SFX.click();G.state='title';G.menu=0;}}
  K.upP=K.dnP=K.honkP=K.enterP=K.pauseP=K.lightP=K.fogP=K.hazP=K.doorP=K.revP=K.radioP=K.hbP=false;K.enterKey=false;K.cruiseP=false;K.stopP=false;K.logP=false;K.sosP=false;TAPD=null;K.num=0;TAP=null;}
 let TITLE_DRAWN=null;
-function render(){if(G.state==='title'&&!G.ledger){const k=SC+'|'+Math.round(G.menuR||0)+'|'+cv.width;if(TITLE_DRAWN===k)return;TITLE_DRAWN=k;}else TITLE_DRAWN=null;
+function render(){if(G.state==='title'&&!G.ledger){const k=SC+'|'+Math.round(G.menuR||0)+'|'+cv.width+'|'+(typeof crewCount==='function'?crewCount():5);if(TITLE_DRAWN===k)return;TITLE_DRAWN=k;}else TITLE_DRAWN=null;
  ctx.setTransform(SC,0,0,SC,0,0);ctx.imageSmoothingEnabled=true;
  if(!window.LAZY_DONE&&G.state!=='title'&&G.state!=='specs'){R(ctx,'#0b0f17',0,0,W,H);text(ctx,'Betöltés...',W/2,H/2-4,'#ffd84a',1.4,'center');return;}
  if(G.state==='title')drawTitle(ctx);else if(G.state==='specs')drawSpecs(ctx);else if(G.state==='map')drawMap(ctx);else if(G.state==='play'){drawPlay(ctx);if(PERF.on)drawPerf(ctx);}
- else if(G.state==='postcard')drawPostcard(ctx);else if(G.state==='over')drawOver(ctx);else if(G.state==='win')drawWin(ctx);
+ else if(G.state==='crash'&&typeof drawCrash==='function')drawCrash(ctx);else if(G.state==='postcard')drawPostcard(ctx);else if(G.state==='over')drawOver(ctx);else if(G.state==='win')drawWin(ctx);
 }
 let last=performance.now(),acc=0,perfT=0,perfN=0;const STEP=1000/60;
 document.addEventListener('visibilitychange',()=>{if(document.hidden){if(G.state==='play'&&P){G.paused=true;if(!G.pauseAt)G.pauseAt=Date.now();save(P.dist);}if(AC&&AC.state==='running')AC.suspend();}else{last=performance.now();if(AC)AC.resume();}});

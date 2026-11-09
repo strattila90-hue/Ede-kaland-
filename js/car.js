@@ -16,6 +16,14 @@ try{const s=localStorage.getItem('csaladi-vakacio-szin');if(s&&PALETTES[s])setCo
 const FAM={apa:{skin:'#efc29a',hair:'#5a3b22',shirt:'#3f7fd9',pants:'#2c3e50',name:'Apa'},anya:{skin:'#f3caa5',hair:'#a5522a',shirt:'#e05a8a',pants:'#4a4a7a',name:'Anya'},
  anna:{skin:'#f6d0ae',hair:'#6b4423',shirt:'#9c6bff',pants:'#35507a',name:'Anna'},petra:{skin:'#f8d6b6',hair:'#f2d16b',shirt:'#ffb13b',pants:'#d8433b',name:'Petra'},
  atti:{skin:'#fbdcc2',hair:'#d9b47a',shirt:'#7fd1ff',pants:'#7fd1ff',name:'kis Atti'}};
+function crewHas(w){if(w==='apa'||!w)return true;const c=typeof G!=='undefined'&&G.trip&&G.trip.crew;return !c||!!c[w];}
+const EYEC={apa:'#6b4a2b',anya:'#3e8a5a',anna:'#3b74c4',petra:'#4f8fd8',atti:'#5a9be0'};
+/* szem oldalnézetből: mandulavágású fehér, színes írisz, pupilla, csillanás, szempilla */
+function eyeSide(g,ex,ey,r,col,big,lash){const w=r*(0.2+big*0.12),h=r*(0.17+big*0.14);
+ g.fillStyle='#ffffff';g.beginPath();g.ellipse(ex,ey,w,h,0,0,TAU);g.fill();
+ const ir=Math.min(w,h)*0.92,ix=ex+w*0.3;disc(g,col,ix,ey+h*0.06,ir);disc(g,'#121212',ix+ir*0.15,ey+h*0.06,ir*0.55);disc(g,'#ffffff',ix-ir*0.22,ey-h*0.32,ir*0.32);
+ g.strokeStyle='#2a1d14';g.lineWidth=r*0.07;g.beginPath();g.ellipse(ex,ey,w,h,0,Math.PI*1.08,Math.PI*1.95);g.stroke();
+ if(lash){g.lineWidth=r*0.05;g.beginPath();g.moveTo(ex+w*0.75,ey-h*0.65);g.lineTo(ex+w*1.15,ey-h*1.05);g.moveTo(ex+w*0.35,ey-h*0.95);g.lineTo(ex+w*0.55,ey-h*1.4);g.stroke();}}
 const WHEELS=[24,89],WR=9.4,WCY=55.5-9.4,ARCH=12.4;
 /* fej oldalnézetből (jobbra néz) – cx,cy a fej közepe */
 function headSide(g,cx,cy,who,t,s,sc){s=s||1;sc=sc||0;const f=FAM[who];const r=(who==='anna'?2.7:who==='petra'?2.4:who==='atti'?2.1:3.2)*s;
@@ -32,14 +40,12 @@ function headSide(g,cx,cy,who,t,s,sc){s=s||1;sc=sc||0;const f=FAM[who];const r=(
  if(who==='petra'){disc(g,f.hair,cx-r*1.05,cy+r*0.2,r*0.45);}
  if(who==='anna'){g.fillStyle=f.hair;g.beginPath();g.ellipse(cx-r*0.7,cy+r*0.6,r*0.5,r*1.0,0.3,0,TAU);g.fill();disc(g,'#ff5a9a',cx-r*0.2,cy-r*0.95,r*0.3);}
  const ex=cx+r*0.56,ey=cy-r*0.12,blink=!sc&&((t+(who.length*37))%233)<5;
- if(who==='apa'){g.fillStyle='#14171c';rrect(g,cx+r*0.15,cy-r*0.25,r*0.95,r*0.38,r*0.12);g.fill();R(g,'rgba(255,255,255,0.35)',cx+r*0.3,cy-r*0.2,r*0.3,r*0.08);
-  if(sc>0.3)line(g,f.hair,cx+r*0.25,cy-r*(0.42+sc*0.25),cx+r*0.9,cy-r*(0.4+sc*0.25),r*0.13);}
- else{// szem: nyugodtan pötty, ijedten nagy fehér szem pupillával
-  if(blink)line(g,'#2a1d14',ex-r*0.14,ey,ex+r*0.12,ey,r*0.09);
-  else if(sc>0.25){const e=r*(0.2+sc*0.14);disc(g,'#ffffff',ex,ey,e);disc(g,'#1a1a1a',ex+e*0.25,ey,e*0.45);}
-  else{disc(g,'#ffffff',ex+r*0.02,ey,r*0.16);disc(g,'#1e1a17',ex+r*0.06,ey,r*0.12);}
-  // szemöldök
-  if(who!=='atti')line(g,shade(f.hair,0.8),ex-r*0.2,ey-r*(0.32+sc*0.22),ex+r*0.18,ey-r*(0.36+sc*0.24),r*0.09);}
+ // szem: csukott (pislogás) ív, nyitva mandulaszem írisszel; ijedten nagyra nyílik
+ if(blink){g.strokeStyle='#2a1d14';g.lineWidth=r*0.09;g.lineCap='round';g.beginPath();g.arc(ex,ey-r*0.08,r*0.17,0.25,Math.PI-0.25);g.stroke();}
+ else eyeSide(g,ex,ey,r,EYEC[who]||'#5a3b22',Math.max(0,sc-0.15),who==='anya'||who==='anna'||who==='petra');
+ // szemöldök (Apánál vastagabb), Apa napszemüvege a feje búbján
+ if(who!=='atti')line(g,shade(f.hair,0.75),ex-r*0.22,ey-r*(0.34+sc*0.22),ex+r*0.2,ey-r*(0.4+sc*0.24),r*(who==='apa'?0.13:0.09));
+ if(who==='apa'){g.fillStyle='#14171c';rrect(g,cx-r*0.05,cy-r*0.98,r*0.85,r*0.3,r*0.12);g.fill();R(g,'rgba(255,255,255,0.4)',cx+r*0.08,cy-r*0.94,r*0.28,r*0.07);}
  // száj: semleges vonal, ijedten nyitott „O”
  const mx=cx+r*0.7,my=cy+r*0.48;
  if(sc>0.3){g.fillStyle='#5a1f1f';g.beginPath();g.ellipse(mx,my+r*0.05,r*(0.13+sc*0.08),r*(0.14+sc*0.16),0,0,TAU);g.fill();}
@@ -52,8 +58,12 @@ function headFront(g,cx,cy,who,s){s=s||1;const f=FAM[who];const r=(who==='apa'||
  if(who==='anya'){g.fillStyle=f.hair;g.beginPath();g.ellipse(cx,cy+r*0.5,r*1.25,r*1.5,0,0,TAU);g.fill();}
  disc(g,f.skin,cx,cy,r);g.fillStyle=f.hair;g.beginPath();g.arc(cx,cy-r*0.05,r*1.03,Math.PI*1.05,Math.PI*1.95);g.closePath();g.fill();
  if(who==='petra'){disc(g,f.hair,cx-r*1.1,cy,r*0.45);disc(g,f.hair,cx+r*1.1,cy,r*0.45);}
- if(who==='apa'){g.fillStyle='#14171c';rrect(g,cx-r*0.85,cy-r*0.15,r*1.7,r*0.4,r*0.15);g.fill();}
- else{disc(g,'#1a1a1a',cx-r*0.35,cy,r*0.13);disc(g,'#1a1a1a',cx+r*0.35,cy,r*0.13);}
+ for(const sx of [-1,1]){const ex=cx+sx*r*0.36,ey=cy+r*0.02;g.fillStyle='#ffffff';g.beginPath();g.ellipse(ex,ey,r*0.2,r*0.17,0,0,TAU);g.fill();
+  disc(g,EYEC[who]||'#5a3b22',ex,ey+r*0.02,r*0.13);disc(g,'#121212',ex,ey+r*0.02,r*0.07);disc(g,'#ffffff',ex-r*0.04,ey-r*0.04,r*0.04);
+  g.strokeStyle='#2a1d14';g.lineWidth=r*0.06;g.beginPath();g.ellipse(ex,ey,r*0.2,r*0.17,0,Math.PI*1.1,Math.PI*1.9);g.stroke();
+  if(who!=='atti')line(g,shade(f.hair,0.75),ex-r*0.17,ey-r*0.3,ex+r*0.17,ey-r*(0.33+(sx>0?0.03:0)),r*(who==='apa'?0.11:0.07));}
+ if(who==='apa'){g.fillStyle='#14171c';rrect(g,cx-r*0.6,cy-r*1.0,r*1.2,r*0.28,r*0.12);g.fill();}
+ if(who!=='apa')disc(g,'rgba(255,120,120,0.25)',cx-r*0.55,cy+r*0.3,r*0.16),disc(g,'rgba(255,120,120,0.25)',cx+r*0.55,cy+r*0.3,r*0.16);
  g.strokeStyle='#a0524a';g.lineWidth=0.45*s;g.beginPath();g.arc(cx,cy+r*0.3,r*0.3,0.2,Math.PI-0.2);g.stroke();}
 /* gyalogos családtag (kiszállás, tankolás, kerékcsere) */
 /* ---- emberalak valós arányokkal (1 m = MPX képpont): Apa 177, Anya 174, Anna 110, Petra 96 cm ----
@@ -89,7 +99,7 @@ function person(g,x,gy,who,t,mode,o){o=o||{};const f=FAM[who],H=(HCM[who]||170)/
  else{const a=-sw*0.5;ex=shX+Math.sin(a)*ua;ey=shY+Math.cos(a)*ua;hx=ex+Math.sin(a+0.3)*ua;hy=ey+Math.cos(a+0.3)*ua;}
  const d=Math.hypot(hx-shX,hy-shY);if(d>arm){const k=arm/d;hx=shX+(hx-shX)*k;hy=shY+(hy-shY)*k;}
  limb(g,shirt,shX,shY+H*0.01,(shX+ex)/2,(shY+ey)/2,(shX+ex)/2,(shY+ey)/2,armW*1.25);limb(g,skin,(shX+ex)/2,(shY+ey)/2,ex,ey,hx,hy,armW);disc(g,skin,hx,hy,armW*0.6);
- if(who==='anya'&&mode!=='work'&&!kneel&&!o.noBaby){frr(g,'#fff1a8',shX+H*0.02,shY+H*0.05,H*0.11,H*0.1,2);headSide(g,shX+H*0.08,shY+H*0.05,'atti',t,0.9);}
+ if(who==='anya'&&mode!=='work'&&!kneel&&!o.noBaby&&crewHas('atti')){frr(g,'#fff1a8',shX+H*0.02,shY+H*0.05,H*0.11,H*0.1,2);headSide(g,shX+H*0.08,shY+H*0.05,'atti',t,0.9);}
  g.restore();return {hx:hx,hy:hy};}
 function wheel(g,cx,cy,ang,flat,r){r=r||WR;g.save();g.translate(cx,cy);
  if(flat){g.translate(0,r*0.34);// a felni lejjebb ül, a gumi alul szétnyomódik
@@ -172,9 +182,10 @@ function drawCarSide(g,x,by,wy,o,lights){
   frr(g,'#d8433b',8.5,19.5,6,7,1.2);frr(g,'#3f7fd9',13.5,17.5,6,9,1.2);frr(g,'#f2c14e',10,15.5,5,4,1);
   // bébiülés kis Attival (menetiránynak háttal)
   const sc=o.scare||0,ln=o.lean||0,jit=w=>sc>0.2&&w!=='apa'?Math.sin(t*1.7+w.length)*0.35*sc:0;
-  if(!hide.atti){frr(g,'#3b4a63',23.6,15.6,6.4,10.4,2.4);headSide(g,27.2+ln*0.4+jit('atti'),19.4+bob,'atti',t,1,sc);}
-  for(const [w,hx,hy] of SEATS)if(!hide[w])headSide(g,hx+ln*(w==='apa'?0.6:1)+jit(w),hy+(w==='petra'||w==='anna'?bob:0)+ln*0.15,w,t,1,w==='apa'?sc*0.6:sc);
-  if(!hide.petra)frr(g,'#d8433b',30,22.6,7,3.6,1.4);
+  if(o.inner)o.inner(g,t);
+  if(!hide.atti&&crewHas('atti')){frr(g,'#3b4a63',23.6,15.6,6.4,10.4,2.4);headSide(g,27.2+ln*0.4+jit('atti'),19.4+bob,'atti',t,1,sc);}
+  for(const [w,hx,hy] of SEATS)if(!hide[w]&&crewHas(w))headSide(g,hx+ln*(w==='apa'?0.6:1)+jit(w),hy+(w==='petra'||w==='anna'?bob:0)+ln*0.15,w,t,1,w==='apa'?sc*0.6:sc);
+  if(!hide.petra&&crewHas('petra'))frr(g,'#d8433b',30,22.6,7,3.6,1.4);
   if(o.airbag)drawAirbag(g,o.airbag);
   g.fillStyle='rgba(16,34,52,0.3)';g.fillRect(0,0,120,30);
   g.fillStyle='rgba(255,255,255,0.15)';for(let k=0;k<6;k++){g.beginPath();g.moveTo(4+k*17,28);g.lineTo(12+k*17,12);g.lineTo(16+k*17,12);g.lineTo(8+k*17,28);g.closePath();g.fill();}
@@ -188,7 +199,7 @@ function drawCarSide(g,x,by,wy,o,lights){
  g.restore();
  if(o.dmg)drawSmoke(g,x+100,by+28,o.dmg,t);
  // kerekek (a felfüggesztés miatt külön mozognak)
- for(const [k,cx] of [['r',WHEELS[0]],['f',WHEELS[1]]]){const dy=k==='f'?wyF:wyR,wx=x+cx,wcy=wy+WCY+dy;
+ for(const [k,cx] of [['r',WHEELS[0]],['f',WHEELS[1]]]){if(o.noWheels)break;const dy=k==='f'?wyF:wyR,wx=x+cx,wcy=wy+WCY+dy;
   if(o.noWheel===k){frr(g,'#7d858d',wx-1.2,wcy-2,2.4,11,0.8);continue;}
   if(o.lostW===k){// kiszakadt kerék: csak a féktárcsa és a kerékagy, az úton csúszik
    const hy=wy+55.5-5.4;disc(g,'#4a4f56',wx,hy,5.4);disc(g,'#7d858d',wx,hy,4.2);disc(g,'#2b3037',wx,hy,1.6);for(let i=0;i<5;i++){const a=i*TAU/5+ang*0.2;disc(g,'#c9d1db',wx+Math.cos(a)*2.8,hy+Math.sin(a)*2.8,0.5);}
@@ -449,50 +460,11 @@ function drawTraffic(g,e,sx,lights,lightsOn,t){const gy=e.y,c=e.col,ang=e.x/8,L=
   if(amb){const on=((t>>3)&1);frr(g,on?'#3b7bff':'#1b3a8a',L-50,-67,6,3,1);frr(g,on?'#1b3a8a':'#3b7bff',L-42,-67,6,3,1);glow(g,on?L-47:L-39,-66,10,'rgba(60,120,255,0.85)');if(lights)lights.push({x:sx+L-44,y:gy-66,r:28});}
   wheel(g,22,-8.5,ang,false,8.8);wheel(g,L-24,-8.5,ang,false,8.8);}
  else if(e.tp==='camper'){trLayer(g,'camp'+c,L,80,gg=>drawCamperBody(gg,L,c));head(L-38,-41.5);wheel(g,22,-8.5,ang,false,8.8);wheel(g,44,-8.5,ang,false,8.8);wheel(g,L-24,-8.5,ang,false,8.8);}
- else if(e.tp==='bus'){const T=-80,B=-11;
-  // karosszéria: lekerekített tető, ívelt homlok
-  g.beginPath();g.moveTo(2,B);g.lineTo(2,T+9);g.quadraticCurveTo(2,T,11,T);g.lineTo(L-30,T);g.quadraticCurveTo(L-9,T,L-5,T+16);g.lineTo(L-1,T+42);g.quadraticCurveTo(L+0.5,B-3,L-4,B);g.closePath();
-  g.fillStyle=lg(g,0,T,0,B,[[0,'#ffffff'],[0.5,'#eef1f4'],[1,'#c3cad2']]);g.fill();outline(g);
-  // színes csík (lendületes ív a busz hátulja felé)
-  g.fillStyle=lg(g,0,-40,0,-18,[[0,shade(c,1.15)],[1,shade(c,0.75)]]);g.beginPath();g.moveTo(2,-40);g.bezierCurveTo(L*0.35,-40,L*0.55,-22,L-2,-26);g.lineTo(L-1.5,-17);g.lineTo(2,-17);g.closePath();g.fill();
-  R(g,shade(c,0.6),2,-17,L-5,1.2);
-  // tetőklíma
-  frr(g,lg(g,0,T-6,0,T,[[0,'#f4f6f8'],[1,'#b9c1c9']]),L*0.3,T-5,70,6,3);g.strokeStyle='#0c0f14';g.lineWidth=0.6;rrect(g,L*0.3,T-5,70,6,3);g.stroke();
-  // sötétített ablaksor utasokkal
-  const wy=T+9,wh=26;frr(g,'#1d2a36',10,wy,L-48,wh,3);
-  for(let k=0;k<11;k++){const px=22+k*23;if(px>L-44)break;disc(g,['#f0c39a','#c99a6e','#e8b48a','#a8754e'][k%4],px,wy+16,3.2);R(g,['#3f7fd9','#e05a8a','#5bd06a','#ffcf33'][k%4],px-4,wy+19,8,7);}
-  for(let k=10;k<L-40;k+=34)R(g,'#0c0f14',k,wy,2,wh);g.fillStyle='rgba(255,255,255,0.14)';for(let k=0;k<7;k++){g.beginPath();g.moveTo(16+k*40,wy+wh);g.lineTo(30+k*40,wy);g.lineTo(38+k*40,wy);g.lineTo(24+k*40,wy+wh);g.closePath();g.fill();}
-  // ajtók
-  for(const dx of [L*0.48,L-50]){frr(g,'#24313c',dx,T+8,17,B-T-9,2);R(g,'#0c0f14',dx+8.2,T+8,0.8,B-T-9);frr(g,'rgba(160,200,225,0.45)',dx+1.5,T+10,6,30,1);frr(g,'rgba(160,200,225,0.45)',dx+9.5,T+10,6,30,1);}
-  // szélvédő, sofőr, viszonylatjelző
-  g.beginPath();g.moveTo(L-30,T+5);g.quadraticCurveTo(L-12,T+5,L-8,T+18);g.lineTo(L-4,T+44);g.lineTo(L-26,T+44);g.closePath();g.fillStyle=lg(g,L-30,T,L,T+40,[[0,'#9cc8e0'],[1,'#3b5d75']]);g.fill();head(L-18,T+30,1);
-  frr(g,'#111',L-30,T+2,24,6,1.5);text(g,(LEGS[G.leg]?LEGS[G.leg].to.split(' (')[0]:'').slice(0,8),L-18,T+3,'#ffb02e',0.5,'center',null);
-  // tükör „nyúlfül”
-  g.strokeStyle='#1b1f26';g.lineWidth=1.4;g.beginPath();g.moveTo(L-6,T+10);g.quadraticCurveTo(L+6,T+6,L+5,T+20);g.stroke();frr(g,'#1b1f26',L+2,T+18,5,9,1.5);
-  // lámpák, kerékívek, kerekek
-  frr(g,'#ffffff',L-9,-27,7,2.4,1.2);glow(g,L-3,-26,4,'rgba(255,250,220,0.7)');frr(g,'#d32f2f',2,T+22,2.6,20,1);frr(g,'#2c333c',L-14,B-3,13,4,1.5);
-  for(const wx of [52,L-62]){disc(g,'#14171b',wx,B,16);wheel(g,wx,-12,ang,false,12);}}
- else if(e.tp==='truck'){const cab=68,tl=L-cab-6,T=-98,B=-20;
-  // pótkocsi: ponyvás, feszítőhevederekkel
-  frr(g,lg(g,0,T,0,B,[[0,'#f6f7f8'],[0.5,'#e3e7eb'],[1,'#c4cbd2']]),0,T,tl,B-T,3);g.beginPath();rrect(g,0,T,tl,B-T,3);outline(g);
-  for(let k=22;k<tl-4;k+=24){R(g,'rgba(0,0,0,0.07)',k-5,T+2,5,B-T-4);R(g,'#8a939c',k,T+2,1.2,B-T-4);frr(g,'#5b636d',k-1,B-5,3.2,3,0.6);}
-  R(g,shade(c,0.95),0,T+4,tl,5);text(g,'TRANS EURÓPA',tl/2,T+28,shade(c,0.85),2,'center',null);text(g,'LOGISZTIKA',tl/2,T+48,'#7d858d',1,'center',null);
-  R(g,'#2a2f36',0,B,tl,6);frr(g,'#3b4149',2,B+6,tl*0.52,5,1);for(let k=6;k<tl*0.5;k+=8)R(g,'#ffd84a',k,B+7,3,2);// oldalsó aláfutásgátló, fényvisszaverők
-  R(g,'#b8c0c8',tl-60,B+6,3,9);R(g,'#5b636d',tl-62,B+14,7,1.6);// támasztóláb
-  frr(g,'#d32f2f',0,B-14,3,10,1);frr(g,'#1b1f26',2,B+6,7,8,1);
-  // vontató fülke: tetőterelő, napellenző, hűtőrács
-  const cx=L-cab;g.beginPath();g.moveTo(cx,B+4);g.lineTo(cx,T+8);g.quadraticCurveTo(cx+6,T-6,cx+34,T-4);g.lineTo(L-14,T+4);g.quadraticCurveTo(L-6,T+6,L-4,T+26);g.lineTo(L,B-6);g.lineTo(L-2,B+4);g.closePath();
-  g.fillStyle=vpaint(g,c,T-4,B+4);g.fill();outline(g);
-  g.beginPath();g.moveTo(cx+2,T+10);g.quadraticCurveTo(cx+8,T-2,cx+34,T-1);g.lineTo(cx+34,T+6);g.lineTo(cx+2,T+16);g.closePath();g.fillStyle='rgba(255,255,255,0.18)';g.fill();
-  frr(g,'#1b1f26',L-26,T+10,22,4,1.5);// napellenző
-  g.beginPath();g.moveTo(L-26,T+15);g.lineTo(L-7,T+15);g.lineTo(L-4,T+40);g.lineTo(L-26,T+40);g.closePath();g.fillStyle=lg(g,L-26,T+15,L,T+40,[[0,'#a6d0e6'],[1,'#3b5d75']]);g.fill();head(L-16,T+28,1.05);
-  frr(g,'rgba(0,0,0,0.25)',cx+8,T+18,26,46,2);g.strokeStyle='rgba(0,0,0,0.35)';g.lineWidth=0.6;rrect(g,cx+8,T+18,26,46,2);g.stroke();frr(g,'#c9ced4',cx+28,T+46,5,1.6,0.8);// ajtó, kilincs
-  for(let k=0;k<5;k++)R(g,'#2a2f36',L-12,B-30+k*4,10,2);frr(g,'#c9ced4',L-14,B-6,14,6,1.5);frr(g,'#ffffff',L-5,B-12,4,3,1.2);glow(g,L-2,B-10,4,'rgba(255,250,220,0.7)');
-  frr(g,'#9aa3ad',cx+4,B+2,24,9,4.5);R(g,'rgba(255,255,255,0.4)',cx+6,B+3,20,1.4);// üzemanyagtartály
-  frr(g,'#1b1f26',cx+8,B-2,8,3,1);frr(g,'#1b1f26',cx+8,B+3,8,2,1);// lépcső
-  g.strokeStyle='#1b1f26';g.lineWidth=1.4;g.beginPath();g.moveTo(L-4,T+18);g.lineTo(L+4,T+20);g.stroke();frr(g,'#1b1f26',L+2,T+18,4,12,1.5);
-  for(const wx of [44,70,96])wheel(g,wx,-12,ang,false,12);wheel(g,cx+18,-12,ang,false,12);wheel(g,L-20,-12,ang,false,12);
-  for(const mx of [tl-2,cx+30])frr(g,'#1b1f26',mx-2,B+4,4,10,1);}
+ else if(e.tp==='bus'){trLayer(g,'bus'+c,L,86,gg=>drawBusBody(gg,L,c));head(L-16,-52,1);
+  frr(g,'#111',L-30,-79,24,6,1.5);text(g,(LEGS[G.leg]?LEGS[G.leg].to.split(' (')[0]:'').slice(0,8),L-18,-78,'#ffb02e',0.5,'center',null);
+  for(const wx of [50,74,L-58])twheel(g,wx,-12,12,ang);}
+ else if(e.tp==='truck'){const cx=L-70;if(e.sty===undefined)e.sty=(Math.random()*3)|0;trLayer(g,'trk'+e.sty+c,L,100,gg=>drawTruckBody(gg,L,c,e.sty));head(L-18,-66,1.05);
+  for(const wx of [36,62,88])twheel(g,wx,-12,12,ang);twheel(g,cx+14,-12,12,ang);twheel(g,L-19,-12,12,ang);}
  else if(e.tp==='tractor'){trLayer(g,'trac',L,76,gg=>drawTractorBody(gg,L));head(28,-55,1);wheel(g,26,-22,ang*0.5,false,22);wheel(g,L-18,-11,ang,false,11);}
  else if(e.tp==='moto'){const r=8.5,rx=9,fx=L-9,wy=-r;
   // váz, kipufogó, villa
@@ -510,6 +482,104 @@ function drawTraffic(g,e,sx,lights,lightsOn,t){const gy=e.y,c=e.col,ang=e.x/8,L=
   frr(g,'#fff3c4',fx-5,wy-19,3,2.4,1);wheel(g,rx,wy,ang,false,r);wheel(g,fx,wy,ang,false,r);disc(g,'#9aa3ad',fx,wy,3);}
  if(e.wreck){disc(g,'rgba(120,120,120,0.4)',L*0.8,-TH[e.tp]-8-Math.sin(t*0.05)*3,8);disc(g,'rgba(150,150,150,0.3)',L*0.7,-TH[e.tp]-18-Math.sin(t*0.04)*4,10);}
  g.restore();if(lightsOn&&lights)lights.push({x:sx+e.w,y:gy-18,r:20});}
+/* nagy jármű kereke (acélfelni, kevés rajzolási művelet) */
+function twheel(g,cx,cy,r,ang){disc(g,'#15181c',cx,cy,r);disc(g,'#2a2f36',cx,cy,r*0.86);disc(g,'#a9b2bb',cx,cy,r*0.6);disc(g,'#6a737c',cx,cy,r*0.44);
+ const a=ang*0.8,c=Math.cos(a)*r*0.44,s=Math.sin(a)*r*0.44;line(g,'#d3dae1',cx-c,cy-s,cx+c,cy+s,r*0.11);line(g,'#d3dae1',cx+s,cy-c,cx-s,cy+c,r*0.11);disc(g,'#e4e9ee',cx,cy,r*0.17);}
+function archDark(g,x,r){g.fillStyle='#101317';g.beginPath();g.arc(x,-12,r,Math.PI,TAU);g.lineTo(x+r,-8);g.lineTo(x-r,-8);g.closePath();g.fill();}
+/* távolsági busz (előre megrajzolt kép: karosszéria, utasok, ablakok) */
+function drawBusBody(g,L,c){const T=-80,B=-12;
+ const body=()=>{g.beginPath();g.moveTo(2,B);g.lineTo(2,T+10);g.quadraticCurveTo(2,T,12,T);g.lineTo(L-30,T);g.quadraticCurveTo(L-7,T,L-3.5,T+20);g.lineTo(L-0.5,B-10);g.quadraticCurveTo(L,B,L-7,B);g.closePath();};
+ body();g.fillStyle=lg(g,0,T,0,B,[[0,'#ffffff'],[0.42,'#f1f4f7'],[0.62,'#dfe5eb'],[1,'#b7c0c9']]);g.fill();
+ g.save();body();g.clip();
+ // lendületes festés: alsó színes mező, előre felfutó ív, vékony díszcsík
+ g.fillStyle=lg(g,0,-44,0,B,[[0,shade(c,1.22)],[0.5,c],[1,shade(c,0.62)]]);g.beginPath();g.moveTo(0,-30);g.bezierCurveTo(L*0.4,-30,L*0.62,-26,L*0.78,-46);g.quadraticCurveTo(L*0.86,-58,L+4,-60);g.lineTo(L+4,B+4);g.lineTo(0,B+4);g.closePath();g.fill();
+ g.strokeStyle=shade(c,1.5);g.lineWidth=1.4;g.beginPath();g.moveTo(0,-34);g.bezierCurveTo(L*0.4,-34,L*0.6,-30,L*0.76,-50);g.quadraticCurveTo(L*0.84,-62,L+4,-64);g.stroke();
+ R(g,'rgba(255,255,255,0.55)',0,T+1.5,L,1.2);g.restore();body();outline(g);
+ // tetőklíma, tetőablak
+ frr(g,lg(g,0,T-6,0,T,[[0,'#f6f8fa'],[1,'#b5bec7']]),L*0.32,T-5,74,6,3);g.strokeStyle='#0c0f14';g.lineWidth=0.6;rrect(g,L*0.32,T-5,74,6,3);g.stroke();R(g,'rgba(0,0,0,0.25)',L*0.32+6,T-3,62,0.8);
+ // panoráma ablaksor sötétített üveggel, utasokkal
+ const wy=T+10,wh=27,wx0=10,wx1=L-46;frr(g,lg(g,0,wy,0,wy+wh,[[0,'#24323f'],[0.55,'#3a5468'],[1,'#17212b']]),wx0,wy,wx1-wx0,wh,4);
+ const SK=['#f0c39a','#c99a6e','#e8b48a','#a8754e','#f6d0ae'],SH=['#3f7fd9','#e05a8a','#5bd06a','#ffcf33','#9c6bff','#f08a3c'],HR=['#3a2a1c','#6b4423','#f2d16b','#1b1b1b','#a5522a'];
+ for(let k=0;k<12;k++){const px=20+k*21.5;if(px>wx1-8)break;if(hsh(k*13+5)<0.18)continue;const hy=wy+15+hsh(k*7)*2;
+  R(g,SH[k%SH.length],px-4.5,hy+3,9,wh-15);disc(g,SK[(k*3)%SK.length],px,hy,3.4);g.fillStyle=HR[(k*2)%HR.length];g.beginPath();g.arc(px-0.4,hy-0.6,3.6,Math.PI*0.95,Math.PI*2.05);g.fill();
+  disc(g,'#14171c',px+1.4,hy-0.2,0.55);}
+ R(g,'rgba(20,28,36,0.35)',wx0,wy,wx1-wx0,wh);for(let k=wx0+30;k<wx1-6;k+=31)R(g,'#0c0f14',k,wy,2.4,wh);
+ g.fillStyle='rgba(255,255,255,0.16)';for(let k=0;k<8;k++){g.beginPath();g.moveTo(14+k*34,wy+wh);g.lineTo(28+k*34,wy);g.lineTo(36+k*34,wy);g.lineTo(22+k*34,wy+wh);g.closePath();g.fill();}
+ R(g,'rgba(255,255,255,0.35)',wx0+2,wy+1,wx1-wx0-4,0.8);
+ // csomagtérajtók
+ for(let k=0;k<3;k++){const x=78+k*44;g.strokeStyle='rgba(0,0,0,0.35)';g.lineWidth=0.7;rrect(g,x,-36,40,20,2);g.stroke();frr(g,'rgba(0,0,0,0.3)',x+17,-22,6,1.6,0.8);}
+ // ajtók (első és középső)
+ for(const dx of [L-48,L*0.5]){frr(g,'#22303b',dx,T+9,17,B-T-11,2.5);frr(g,'rgba(150,195,222,0.5)',dx+1.6,T+11,6.2,36,1.4);frr(g,'rgba(150,195,222,0.5)',dx+9.2,T+11,6.2,36,1.4);R(g,'#0c0f14',dx+8.1,T+9,0.8,B-T-11);R(g,'rgba(255,255,255,0.3)',dx+2,T+12,1,30);}
+ // szélvédő (ívelt, nagy), napellenző, ablaktörlő
+ g.beginPath();g.moveTo(L-30,T+5);g.quadraticCurveTo(L-11,T+5,L-6.5,T+20);g.lineTo(L-3.5,T+46);g.lineTo(L-28,T+46);g.closePath();g.fillStyle=lg(g,L-30,T,L,T+46,[[0,'#b2d7ea'],[0.5,'#6f9bb5'],[1,'#2f4b60']]);g.fill();g.strokeStyle='#0c0f14';g.lineWidth=0.8;g.stroke();
+ g.fillStyle='rgba(255,255,255,0.28)';g.beginPath();g.moveTo(L-24,T+44);g.lineTo(L-16,T+8);g.lineTo(L-11,T+9);g.lineTo(L-19,T+44);g.closePath();g.fill();
+ line(g,'#1b1f26',L-20,T+45,L-9,T+33,0.9);
+ // homlokfal: fényszóró, lökhárító, hűtőrács
+ frr(g,lg(g,L-10,-30,L,-24,[[0,'#dfe7ee'],[1,'#ffffff']]),L-10,-30,8.5,4.6,2);disc(g,'#fffbe8',L-4,-27.7,1.4);
+ frr(g,'#2c333c',L-16,B-4,16,5,2);for(let k=0;k<3;k++)R(g,'rgba(0,0,0,0.4)',L-12,-21+k*2.4,9,1);
+ // hátul: lámpasor, motorrács, létra nélküli sima hát
+ frr(g,lg(g,0,T+24,0,T+52,[[0,'#ff6a5a'],[1,'#8a110c']]),1.5,T+24,3.4,28,1.4);frr(g,'#ffaa22',1.5,T+54,3.4,4,1);
+ for(let k=0;k<5;k++)R(g,'rgba(0,0,0,0.3)',6,-30+k*3,16,1.2);
+ // felirat
+ text(g,'TÚRA EXPRESSZ',L*0.36,-27,'#ffffff',1,'center',null);
+ // kerékívek
+ for(const wx of [50,74,L-58])archDark(g,wx,15);
+ // „nyúlfül” tükör
+ g.strokeStyle='#1b1f26';g.lineWidth=1.6;g.beginPath();g.moveTo(L-6,T+10);g.quadraticCurveTo(L+6,T+5,L+5,T+20);g.stroke();frr(g,"#1b1f26",L+1,T+18,4.5,10,1.5);}
+/* nyerges kamion: 0 ponyvás, 1 hűtős doboz, 2 tartályos; előre megrajzolt kép */
+function drawTruckBody(g,L,c,sty){const cab=70,cx=L-cab,tl=cx-8,T=-98,B=-24;
+ // alváz, nyeregszerkezet, kipufogó
+ R(g,'#1d2228',0,B,cx+cab-20,5);frr(g,'#2a3038',cx-14,B-4,20,5,1.5);
+ if(sty===2){// tartály: lekerekített henger, járópálca, létra, veszélyjel
+  const tT=-84;frr(g,'#2a3038',0,B-6,tl,8,1);g.fillStyle=lg(g,0,tT,0,B-4,[[0,'#f4f7f9'],[0.25,'#c9d1d9'],[0.5,'#8e99a4'],[0.75,'#c9d1d9'],[1,'#6f7a85']]);rrect(g,2,tT,tl-4,B-4-tT,(B-4-tT)/2);g.fill();g.strokeStyle='#0c0f14';g.lineWidth=1;g.stroke();
+  for(let k=40;k<tl-30;k+=56){R(g,'rgba(0,0,0,0.18)',k,tT+1,1.6,B-tT-6);}R(g,'#59616a',20,tT-4,tl-40,2);for(let k=24;k<tl-20;k+=16)R(g,'#59616a',k,tT-4,1,4);
+  for(let k=0;k<6;k++)R(g,'#59616a',tl-30,tT+4+k*7,9,1.2);R(g,'#59616a',tl-30,tT+2,1.2,44);R(g,'#59616a',tl-22,tT+2,1.2,44);
+  frr(g,'#ff8f1f',tl/2-12,tT+20,24,14,1);g.strokeStyle='#111';g.lineWidth=0.8;rrect(g,tl/2-12,tT+20,24,14,1);g.stroke();R(g,'#111',tl/2-12,tT+26.6,24,0.8);
+  text(g,'ÜZEMANYAG',tl/2,tT+40,'#3a434d',1,'center',null);}
+ else{// doboz
+  const white=sty===1,bc=white?'#f4f6f8':'#eef1f4';g.fillStyle=lg(g,0,T,0,B,[[0,'#ffffff'],[0.4,bc],[1,'#c0c8d0']]);rrect(g,0,T,tl,B-T,3);g.fill();outline(g);
+  if(sty===0){// ponyva: feszítőhevederek, enyhe redők, színes sáv, logó
+   for(let k=14;k<tl-6;k+=26){g.fillStyle='rgba(0,0,0,0.06)';g.fillRect(k-8,T+3,7,B-T-6);R(g,'#7d868f',k,T+3,1.3,B-T-6);frr(g,'#4a525b',k-1.2,B-7,3.8,3.4,0.7);}
+   g.fillStyle=lg(g,0,T+4,0,T+16,[[0,shade(c,1.15)],[1,shade(c,0.8)]]);g.fillRect(0,T+4,tl,10);
+   text(g,'TRANS EURÓPA',tl/2,T+30,shade(c,0.8),2,'center',null);text(g,'LOGISZTIKA',tl/2,T+50,'#6d7680',1,'center',null);}
+  else{// hűtős: sima panelek, hűtőgép elöl, hópehely
+   for(let k=40;k<tl-10;k+=40)R(g,'rgba(0,0,0,0.12)',k,T+2,0.8,B-T-4);R(g,'rgba(0,0,0,0.1)',0,T+3,tl,0.8);
+   frr(g,lg(g,tl,T+8,tl+8,T+8,[[0,'#d6dde4'],[1,'#8f9aa5']]),tl-1,T+8,9,30,2);for(let k=0;k<5;k++)R(g,'#59616a',tl+1,T+12+k*5,5,1.4);
+   const sx=tl*0.22,sy=T+36;g.strokeStyle='#3b8be0';g.lineWidth=2;g.lineCap='round';g.beginPath();for(let k=0;k<3;k++){const a=k*Math.PI/3;g.moveTo(sx-Math.cos(a)*11,sy-Math.sin(a)*11);g.lineTo(sx+Math.cos(a)*11,sy+Math.sin(a)*11);}g.stroke();
+   text(g,'FRISS ÁRU',tl*0.58,T+28,shade(c,0.75),2,'center',null);text(g,'HŰTÖTT SZÁLLÍTÁS',tl*0.58,T+48,'#6d7680',1,'center',null);
+   R(g,shade(c,0.9),0,B-8,tl,4);}
+  // hátsó ajtókeret, kontúrjelölés (sárga-piros csíkok)
+  R(g,'#9aa3ad',0,T,2.4,B-T);for(let k=4;k<tl-4;k+=10)R(g,(k/10|0)%2?'#ffd84a':'#e53935',k,B-3.6,6,1.6);}
+ // oldalsó aláfutásgátló, oldalsó jelzőfények, támasztóláb, pótkerék
+ R(g,'#4a525b',108,B+7,tl-150,1.8);R(g,'#4a525b',108,B+12,tl-150,1.8);for(let k=108;k<tl-40;k+=36)R(g,'#3a4048',k,B+5,1.6,9);
+ for(let k=20;k<tl-10;k+=48){disc(g,'#ffaa22',k,B+1.5,1.3);}
+ R(g,'#b8c0c8',tl-58,B+5,3,12);R(g,'#5b636d',tl-60,B+16,7,1.6);
+ disc(g,'#15181c',tl-30,B+9,6);disc(g,'#6a737c',tl-30,B+9,3);
+ frr(g,'#c62a35',0.5,B-12,3,9,1);frr(g,'#ffaa22',0.5,B-3,3,3,1);frr(g,'#1b1f26',0,B+4,9,11,1);// hátsó lámpa, sárvédő gumi
+ // kipufogó kémény a fülke mögött
+ frr(g,lg(g,cx-5,0,cx-1,0,[[0,'#f0f3f6'],[1,'#7d868f']]),cx-5,-90,4,58,1.5);frr(g,'#2a3038',cx-5.5,-92,5,3,1);
+ // fülke (fülke-motor fölött), tetőterelő
+ g.beginPath();g.moveTo(cx+1,-22);g.lineTo(cx+1,-80);g.quadraticCurveTo(cx+1,-86,cx+7,-86);g.lineTo(L-9,-86);g.quadraticCurveTo(L-3.5,-86,L-3,-79);g.lineTo(L-0.5,-30);g.quadraticCurveTo(L,-22,L-6,-22);g.closePath();
+ g.fillStyle=lg(g,0,-86,0,-22,[[0,shade(c,1.35)],[0.12,shade(c,1.12)],[0.5,c],[0.53,shade(c,0.85)],[1,shade(c,0.6)]]);g.fill();outline(g);
+ g.beginPath();g.moveTo(cx+4,-86);g.quadraticCurveTo(cx+6,-99,cx+18,-99.5);g.lineTo(L-34,-97);g.quadraticCurveTo(L-20,-92,L-14,-86);g.closePath();g.fillStyle=lg(g,0,-100,0,-86,[[0,shade(c,1.25)],[1,shade(c,0.8)]]);g.fill();outline(g);
+ for(let k=0;k<4;k++)disc(g,'#ffaa22',L-30+k*6,-87.5,1);// tetőlámpák
+ // napellenző, oldalablak, ajtó, kilincs, lépcső
+ frr(g,'#1b1f26',L-30,-83,28,3.4,1.5);
+ g.beginPath();g.moveTo(cx+30,-79);g.lineTo(L-9,-79);g.lineTo(L-6,-57);g.lineTo(cx+30,-57);g.closePath();g.fillStyle=lg(g,0,-79,0,-57,[[0,'#b2d7ea'],[0.55,'#5f88a2'],[1,'#2a4255']]);g.fill();g.strokeStyle='#0c0f14';g.lineWidth=0.9;g.stroke();
+ g.fillStyle='rgba(255,255,255,0.25)';g.beginPath();g.moveTo(cx+36,-57);g.lineTo(cx+44,-79);g.lineTo(cx+49,-79);g.lineTo(cx+41,-57);g.closePath();g.fill();
+ g.strokeStyle='rgba(0,0,0,0.4)';g.lineWidth=0.7;g.beginPath();g.moveTo(cx+27,-81);g.lineTo(cx+27,-28);g.lineTo(L-6,-28);g.stroke();frr(g,'#d0d6dc',cx+31,-52,7,1.8,0.9);
+ g.fillStyle=lg(g,0,-50,0,-38,[[0,shade(c,0.7)],[1,shade(c,0.5)]]);g.fillRect(cx+2,-47,L-cx-4,6);text(g,'EURO',cx+40,-46,'#ffffff',0.6,'center',null);
+ for(let k=0;k<2;k++)frr(g,'#22272e',cx+29,-24+k*4,16,2.4,0.8);
+ // homlok: hűtőrács, fényszóró, lökhárító
+ for(let k=0;k<5;k++)R(g,'#1d2228',L-4,-54+k*4,3.5,2);frr(g,lg(g,L-12,-36,L,-30,[[0,'#d8e0e8'],[1,'#ffffff']]),L-11,-36,10,5.5,2);disc(g,'#fffbe8',L-4,-33.3,1.6);
+ frr(g,'#2c333c',L-30,-27,30,7,2);frr(g,'#ffaa22',L-3,-40,2.6,3,1);
+ // tükör karral
+ g.strokeStyle='#1b1f26';g.lineWidth=1.4;g.beginPath();g.moveTo(L-5,-76);g.lineTo(L+5,-73);g.stroke();frr(g,"#1b1f26",L+1.5,-79,4,15,1.5);frr(g,"#9fc6dc",L+2.2,-77.6,2.6,6,1);
+ // üzemanyagtartály, oldalburkolat a fülke alatt
+ frr(g,lg(g,0,-34,0,-22,[[0,'#f3f6f9'],[0.5,'#b9c2cb'],[1,'#7a858f']]),cx+24,-33,24,12,5);
+ // sárvédők
+ for(const wx of [cx+14,L-19]){g.fillStyle='#1b1f26';g.beginPath();g.arc(wx,-12,15,Math.PI*1.02,TAU*0.99);g.lineTo(wx+15,-12);g.lineTo(wx+13,-12);g.arc(wx,-12,13,TAU*0.99,Math.PI*1.02,true);g.closePath();g.fill();}
+ archDark(g,L-19,13.5);}
 /* ---- tréler (platós autómentő): x = a plató hátsó vége, gy = talaj, tilt = plató dőlése ---- */
 /* billenő plató: a hátsó alvázvégen fekszik fel, rakodáskor hátracsúszik és lebillen, így nem megy át a tréler kerekein */
 const TOW_TILT=-0.24;

@@ -152,23 +152,27 @@ window.addEventListener('offline',()=>toast('Offline mód: a játék internet n�
 setTimeout(checkUpdate,1500);
 /* menük */
 function titleAct(a){const opts=titleOpts();const i=opts.findIndex(o=>o.a===a);if(i>=0){G.menu=i;K.enterP=true;}}
-function menuDef(){const s=G.state;if(G.ledger||G.gps||G.elogOpen||G.keysOpen||G.savesOpen||G.albumOpen||G.setOpen)return null;
+function menuDef(){const s=G.state;if(G.ledger||G.gps||G.elogOpen||G.keysOpen||G.savesOpen||G.albumOpen||G.setOpen||G.crewOpen)return null;
+ if(s==='crash')return typeof ctMenu==='function'?ctMenu():null;
  if(G.confirm==='new')return {cls:'center',title:'Teljesen új játék?',items:[{a:'newyes',l:'Igen, mindent elölről (a mentett út törlődik)',ic:'↺',c:'danger'},{a:'cancel',l:'Mégse',ic:'✕'}]};
  if(G.confirm==='exit')return {cls:'center',title:'Kilépsz a játékból?',items:[{a:'exityes',l:'Igen, mentés és kilépés',ic:'⏻',c:'danger'},{a:'cancel',l:'Mégse, játszom tovább',ic:'▶',c:'primary'}]};
  if(G.paused&&s==='play')return {cls:'center',title:'Szünet',items:[{a:'resume',l:'Folytatás',ic:'▶',c:'primary'},{a:'gps',l:'GPS térkép',ic:'🧭'},{a:'log',l:'Költségnapló: '+fmt(G.trip.money)+' Ft',ic:'📒'},{a:'radio',l:'Rádió: '+(radio.on?STATIONS[radio.idx].name:'ki'),ic:'📻'},{a:'perf',l:'Teljesítménymérő: '+(PERF.on?'be':'ki'),ic:'📊'},{a:'settings',l:'Beállítások (könnyű mód, hangerő, akku)',ic:'⚙'},{a:'album',l:'Album és rekordok',ic:'🖼'},{a:'elog',l:'Hibanapló',ic:'🩺'},...(typeof FINE!=='undefined'&&FINE?[{a:'keys',l:'Billentyűzet és kiosztás',ic:'⌨'}]:[]),{a:'quit',l:'Mentés és vissza a főmenübe',ic:'⌂'},{a:'exit',l:'Kilépés a játékból',ic:'⏻',c:'danger'},{a:'update',l:updLabel,ic:'⟳',fill:1}]};
- if(s==='title'){const it=[];if(G.save&&(G.save.leg>0||G.save.dist>0))it.push({a:'cont',l:titleOpts().find(o=>o.a==='cont').l,ic:'▶',c:'primary'});
-  it.push({a:'new',l:it.length?'Új játék (teljes újrakezdés)':'Új utazás Komáromból',ic:'🚐',c:it.length?'':'primary'},{a:'color',l:'Autó színe: '+carColor,ic:'🎨'},{a:'ts',l:'Utazás: '+(TS_OPTS.find(q=>q[0]===G.ts)||TS_OPTS[0])[1],ic:'⏱'},{a:'specs',l:'Az autó adatai',ic:'ℹ'});
-  if(!isStandalone())it.push({a:'install',l:'Telepítés',ic:'⬇',c:deferredPrompt?'new':''});
-  it.push({a:'share',l:'Megosztás',ic:'↗'},{a:'update',l:updLabel,ic:'⟳',fill:1,c:newVer?'new':''},{a:'music',l:'Zene: '+(musicOn?'be':'ki'),ic:'♪'});
-  it.push({a:'saves',l:'Mentések: '+(typeof PROF!=='undefined'?PROF.name:''),ic:'💾'});
-  it.push({a:'album',l:'Album és rekordok: '+Object.keys(PROF.album||{}).length+'/'+LEGS.length,ic:'🖼'},{a:'settings',l:'Beállítások: '+(PROF.easy?'könnyű mód':'hang, akku'),ic:'⚙'});
-  if(typeof FINE!=='undefined'&&FINE)it.push({a:'keys',l:'Billentyűzet: '+(KEYMAP==='b'?'Autós':'Klasszikus'),ic:'⌨'});
-  it.push({a:'elog',l:'Hibanapló: '+(ELOG.list.filter(e=>e.k!=='info').length||'nincs hiba'),ic:'🩺'});
-  it.push({a:'exit',l:'Kilépés',ic:'⏻',c:'danger'});
-  if(introT()<150)return null;
-  // filmes elrendezés: nagy főgombok, alattuk csempék
-  for(const x of it){if(x.a==='cont'||x.a==='new'){x.c=(x.c==='primary'?'hero':'hero2');const m=x.l.match(/^(.*?) \((.*)\)$/);if(m){x.l=m[1];x.sub=m[2];}else if(x.a==='new')x.sub=it.some(q=>q.a==='cont')?'Komáromból, minden elölről: pénz, km, napló':'Komárom, Táncsics Mihály utca';}
-   else{x.tile=1;if(x.a==='exit'){x.sub='mentés és bezárás';}const m=x.l.match(/^(.*?): (.*)$/);if(m){x.l=m[1];x.sub=m[2];}}}
+ if(s==='title'){if(introT()<150)return null;
+  if(G.apaOpen){const cn=crewCount();return {cls:'cine apa',title:'',head:'Apa garázsa',items:[
+   {a:'crash',l:'Törésteszt',sub:'Ütközés falnak, bábukkal, csillagos értékelés',ic:'💥',c:'hero apa'},
+   {a:'specs',l:'Az autó adatai',sub:CAR.hp+' LE, '+CAR.seats+' ülés',ic:'ℹ',tile:1},{a:'color',l:'Autó színe',sub:carColor,ic:'🎨',tile:1},
+   {a:'ts',l:'Utazás',sub:(TS_OPTS.find(q=>q[0]===G.ts)||TS_OPTS[0])[1],ic:'⏱',tile:1},{a:'crew',l:'Ki utazik?',sub:cn+' ember (új játéknál)',ic:'👪',tile:1},
+   {a:'apaback',l:'Vissza a főmenübe',ic:'◀',c:'back'}],ver:false};}
+  const it=[],has=!!(G.save&&(G.save.leg>0||G.save.dist>0));
+  if(has){const m=titleOpts().find(o=>o.a==='cont').l.match(/^(.*?) \((.*)\)$/);it.push({a:'cont',l:m?m[1]:'Folytatás',sub:m?m[2]:'',ic:'▶',c:'hero',grp:'hrow'});}
+  it.push({a:'new',l:has?'Új játék':'Új utazás',sub:has?'mindent elölről':'Komárom, Táncsics Mihály utca',ic:'🚐',c:has?'hero2':'hero',grp:'hrow'});
+  it.push({a:'apa',l:'Apa garázsa',sub:'Törésteszt, autó, utasok',ic:'🔧',c:'apa'});
+  it.push({a:'album',l:'Album',sub:Object.keys(PROF.album||{}).length+'/'+LEGS.length+' rekord',ic:'🖼',tile:1},{a:'saves',l:'Mentések',sub:typeof PROF!=='undefined'?PROF.name:'',ic:'💾',tile:1},{a:'settings',l:'Beállítások',sub:PROF.easy?'könnyű mód':'hang, akku',ic:'⚙',tile:1});
+  it.push({a:'music',l:'Zene',sub:musicOn?'be':'ki',ic:'♪',tile:1},{a:'share',l:'Megosztás',ic:'↗',tile:1},{a:'update',l:'Frissítés',sub:updLabel.replace(/^Frissítés:? ?/,''),ic:'⟳',fill:1,tile:1,c:newVer?'new':''});
+  if(!isStandalone())it.push({a:'install',l:'Telepítés',ic:'⬇',tile:1,c:deferredPrompt?'new':''});
+  if(typeof FINE!=='undefined'&&FINE)it.push({a:'keys',l:'Billentyűzet',sub:KEYMAP==='b'?'Autós':'Klasszikus',ic:'⌨',tile:1});
+  it.push({a:'elog',l:'Hibanapló',sub:String(ELOG.list.filter(e=>e.k!=='info').length||'nincs hiba'),ic:'🩺',tile:1});
+  it.push({a:'exit',l:'Kilépés',sub:'mentés és bezárás',ic:'⏻',c:'danger',tile:1});
   return {cls:'cine',title:'',items:it,ver:true};}
  if(s==='map')return {cls:'bottom',items:[{a:'go',l:'Indulás',ic:'▶',c:'primary'},{a:'gps',l:'GPS',ic:'🧭'},{a:'log',l:'Napló',ic:'📒'},{a:'home',l:'Főmenü',ic:'⌂'}]};
  if(s==='specs')return {cls:'bottom',items:[{a:'go',l:'Vissza',ic:'◀'}]};
@@ -177,6 +181,33 @@ function menuDef(){const s=G.state;if(G.ledger||G.gps||G.elogOpen||G.keysOpen||G
  if(s==='win')return {cls:'bottom',items:[{a:'go',l:'Főmenü',ic:'⌂',c:'primary'},{a:'log',l:'Napló',ic:'📒'}]};
  return null;}
 
+/* ---- ki utazik? (utasválasztó az első / új játék előtt) ---- */
+const CREW_INFO=[['apa','Apa','sofőr, mindig jön'],['anya','Anya','navigátor'],['anna','Anna','5 éves'],['petra','Petra','3 éves'],['atti','kis Atti','10 hónapos']];
+const crewDef=()=>Object.assign({anya:1,anna:1,petra:1,atti:1},PROF.crew||{});
+function crewCount(c){c=c||crewDef();return 1+['anya','anna','petra','atti'].filter(w=>c[w]).length;}
+let CREW_NEW=false,CREW_SEL=null;
+function crewPortrait(cv0,who){const d=Math.min(3,window.devicePixelRatio||1),px=Math.round(64*d);if(cv0.width!==px){cv0.width=px;cv0.height=px;}const g=cv0.getContext('2d');g.setTransform(px/24,0,0,px/24,0,0);g.clearRect(0,0,24,24);
+ const f=FAM[who];g.fillStyle=rg(g,12,10,1,13,[[0,shade(f.shirt,1.5)],[1,shade(f.shirt,0.7)]]);g.beginPath();g.arc(12,12,12,0,TAU);g.fill();
+ const kid=who!=='apa'&&who!=='anya',s=who==='atti'?3.3:kid?2.9:2.5,r=(who==='anna'?2.7:who==='petra'?2.4:who==='atti'?2.1:3.2)*s;
+ g.save();g.beginPath();g.arc(12,12,12,0,TAU);g.clip();frr(g,f.shirt,12-r*1.15,12+r*0.75,r*2.3,r*1.6,r*0.6);frr(g,'rgba(0,0,0,0.15)',12-r*1.15,12+r*0.75,r*2.3,r*0.3,r*0.15);headSide(g,11.5,11.2,who,100,s);g.restore();}
+function crewRender(){const el=document.getElementById('crew');if(!el)return;const c=CREW_SEL;
+ el.querySelectorAll('.cc').forEach(b=>{const w=b.dataset.w,on=w==='apa'||!!c[w];b.classList.toggle('on',on);});
+ const n=crewCount(c);el.querySelector('.cnt').textContent=n+' ember utazik'+(n===1?' (Apa egyedül)':n===5?' (az egész család)':'');}
+function openCrew(isNew){CREW_NEW=!!isNew;CREW_SEL=crewDef();G.crewOpen=true;MENU_SIG='?';let el=document.getElementById('crew');
+ if(!el){el=document.createElement('div');el.id='crew';el.innerHTML='<div class="box"><div class="hd"><h3>Ki utazik?</h3><p>Válaszd ki, hányan induljatok neki a nagy útnak. Koppints a családtagokra! Apa vezet, ő mindig jön.</p></div><div class="cards">'+
+  CREW_INFO.map(([w,n,s])=>'<button class="cc" data-w="'+w+'"><canvas></canvas><b>'+n+'</b><small>'+s+'</small><i class="chk">'+(w==='apa'?'🔒':'✓')+'</i></button>').join('')+
+  '</div><div class="cnt"></div><div class="act"><button class="cbk">Mégse</button><button class="cgo">Indulás 🚐</button></div></div>';document.body.appendChild(el);
+  ['pointerdown','touchstart'].forEach(ev=>el.addEventListener(ev,e=>e.stopPropagation(),{passive:true}));
+  el.addEventListener('click',e=>{e.stopPropagation();if(e.target===el){closeCrew();SFX.click();}});
+  el.querySelectorAll('.cc').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();initAudio();const w=b.dataset.w;
+   if(w==='apa'){haptic(30);SFX.alarm();b.classList.remove('nope');void b.offsetWidth;b.classList.add('nope');toast('Apa vezet, nélküle nem megy az autó!');return;}
+   CREW_SEL[w]=CREW_SEL[w]?0:1;haptic(10);SFX.click();b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop');crewRender();}));
+  el.querySelector('.cbk').addEventListener('click',e=>{e.stopPropagation();SFX.click();closeCrew();});
+  el.querySelector('.cgo').addEventListener('click',e=>{e.stopPropagation();haptic(15);initAudio();SFX.pick();PROF.crew=Object.assign({},CREW_SEL);saveProf();G.crewPick=Object.assign({},CREW_SEL);const nw=CREW_NEW;closeCrew();
+   if(nw){G.crewOk=true;menuAction('new');G.crewOk=false;}else toast('Elmentve: '+crewCount(CREW_SEL)+' ember utazik az új játékban.');});}
+ el.querySelector('.cgo').textContent=CREW_NEW?'Indulás 🚐':'Kész ✓';
+ el.querySelectorAll('.cc').forEach(b=>crewPortrait(b.querySelector('canvas'),b.dataset.w));crewRender();el.classList.add('open');}
+function closeCrew(){G.crewOpen=false;const el=document.getElementById('crew');if(el)el.classList.remove('open');MENU_SIG='?';}
 /* ---- költségnapló ---- */
 let LEDGER_F='all';
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -208,14 +239,20 @@ document.querySelector('#ledger .x').addEventListener('click',e=>{e.stopPropagat
 window.addEventListener('keydown',e=>{if(G.ledger&&(e.key==='Escape'||e.key==='n'||e.key==='N')){e.stopImmediatePropagation();closeLedger();}},true);
 let MENU_SIG='?',MENU_KIND='';
 function renderMenu(){const d=menuDef(),m=$('menu');const sig=d?JSON.stringify(d):'none';if(sig===MENU_SIG)return;MENU_SIG=sig;
- if(!d){m.style.display='none';MENU_KIND='';return;}const kind=G.state+'|'+(d.cls||'')+'|'+(d.title||'');m.className=(d.cls||'')+(kind!==MENU_KIND?' anim':'');MENU_KIND=kind;m.innerHTML='';m.style.display='flex';let grid=null,idx=0;if(d.title){const h=document.createElement('h2');h.textContent=d.title;m.appendChild(h);}
+ if(!d){m.style.display='none';MENU_KIND='';return;}const kind=G.state+'|'+(d.cls||'')+'|'+(d.title||'');m.className=(d.cls||'')+(kind!==MENU_KIND?' anim':'');MENU_KIND=kind;m.innerHTML='';m.style.display='flex';let grid=null,grp=null,idx=0;if(d.head){const h=document.createElement('div');h.className='mhead';h.textContent=d.head;m.appendChild(h);}if(d.title){const h=document.createElement('h2');h.textContent=d.title;m.appendChild(h);}
  for(const it of d.items){const b=document.createElement('button');b.className='mb '+(it.c||'');b.dataset.a=it.a;b.innerHTML=(it.fill?'<span class="fill" style="width:'+updPct+'%"></span>':'')+'<span class="ic"></span><span class="lbl"></span>';
-  b.querySelector('.ic').textContent=it.ic||'';b.querySelector('.lbl').textContent=it.l;if(it.sub){const sb=document.createElement('span');sb.className='sub';sb.textContent=it.sub;b.querySelector('.lbl').appendChild(sb);}b.style.setProperty('--i',idx++);if(it.tile)b.classList.add('tile');
+  b.querySelector('.ic').textContent=it.ic||'';b.querySelector('.lbl').textContent=it.l;if(it.sub){const sb=document.createElement('span');sb.className='sub';sb.textContent=it.sub;b.querySelector('.lbl').appendChild(sb);}b.style.setProperty('--i',idx++);if(it.tile)b.classList.add('tile');if(it.grp){if(!grp||grp.className!==it.grp){grp=document.createElement('div');grp.className=it.grp;m.appendChild(grp);}grp.appendChild(b);b.addEventListener('click',e=>{e.stopPropagation();haptic(12);initAudio();SFX.click();menuAction(it.a);});continue;}
   b.addEventListener('click',e=>{e.stopPropagation();haptic(12);initAudio();SFX.click();menuAction(it.a);});if(it.tile){if(!grid){grid=document.createElement('div');grid.className='grid';m.appendChild(grid);}grid.appendChild(b);}else m.appendChild(b);}
  if(d.ver){const v=document.createElement('div');v.className='ver';let ready=false;try{ready=localStorage.getItem('cv-offline')===APP_VERSION;}catch(e){}v.textContent='Verzió: v'+APP_VERSION+(ready?'  •  ✓ teljes játék letöltve, offline is megy':(navigator.onLine?'  •  letöltés a háttérben…':'  •  offline'));m.appendChild(v);}}
 function menuAction(a){
+ if(a==='apa'){G.apaOpen=true;MENU_SIG='?';return;}
+ if(a==='apaback'){G.apaOpen=false;MENU_SIG='?';return;}
+ if(a==='crew'){openCrew(false);return;}
+ if(a==='crash'){if(typeof startCrash==='function')startCrash();else toast('A törésteszt még töltődik, próbáld újra egy pillanat múlva.');MENU_SIG='?';return;}
+ if(a&&a.slice(0,2)==='ct'&&typeof ctAction==='function'){ctAction(a);MENU_SIG='?';return;}
+ if(a==='new'&&G.state==='title'&&!(G.save&&(G.save.leg>0||G.save.dist>0))&&!G.crewOk){openCrew(true);return;}
  if(a==='new'&&G.state==='title'&&G.save&&(G.save.leg>0||G.save.dist>0)&&!G.confirm){G.confirm='new';MENU_SIG='?';return;}
- if(a==='newyes'){G.confirm=null;try{localStorage.removeItem(saveKey());}catch(e){}G.save=null;G.menu=0;MENU_SIG='?';titleAct('new');return;}
+ if(a==='newyes'){G.confirm=null;try{localStorage.removeItem(saveKey());}catch(e){}G.save=null;G.menu=0;MENU_SIG='?';openCrew(true);return;}
  if(a==='cancel'){G.confirm=null;MENU_SIG='?';return;}
  if(a==='exit'){G.confirm='exit';if(G.state==='play')G.paused=true;MENU_SIG='?';return;}
  if(a==='exityes'){G.confirm=null;exitGame();return;}
@@ -247,8 +284,9 @@ let EXITING=false;
 function armBack(){if(EXITING||location.protocol==='file:')return;try{if(!(history.state&&history.state.cv))history.pushState({cv:1},'');}catch(e){}}
 window.addEventListener('pointerdown',armBack,{passive:true});window.addEventListener('keydown',armBack);
 window.addEventListener('popstate',()=>{if(EXITING)return;armBack();elog('info','Vissza gesztus / gomb (elkapva)');
- if(G.gps&&typeof closeGPS==='function')closeGPS();else if(G.ledger)closeLedger();else if(G.confirm){G.confirm=null;}
+ if(G.gps&&typeof closeGPS==='function')closeGPS();else if(G.crewOpen)closeCrew();else if(G.ledger)closeLedger();else if(G.confirm){G.confirm=null;}
  else if(G.state==='play'&&!G.paused){G.paused=true;}
+ else if(G.state==='crash'){G.state='title';G.st=0;}
  MENU_SIG='?';toast('Kilépni a piros Kilépés gombbal lehet.',2200);});
 function exitGame(){elog('info','Kilépés gomb',true);try{if(G.state==='play'&&P)save(P.dist);}catch(e){}if(NTV){try{NTV.exit();return;}catch(e){}}EXITING=true;G.paused=true;try{if(document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen();}catch(e){}
  try{window.close();}catch(e){}
