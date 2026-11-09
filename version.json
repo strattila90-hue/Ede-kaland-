@@ -1,5 +1,5 @@
 {
- "version": "2.32.0",
+ "version": "2.32.1",
  "apk": 2,
  "files": {
   "index.html": 53065,
@@ -15,7 +15,7 @@
   "js/world.js": 61590,
   "js/minigames.js": 20198,
   "js/shops.js": 31707,
-  "js/game.js": 152701,
+  "js/game.js": 152696,
   "js/app.js": 51993,
   "icons/icon-192.png": 27752,
   "icons/icon-512.png": 94753,

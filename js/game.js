@@ -200,8 +200,8 @@ function startTotal(){stat('totals');elog('info','Totálkár');startTow('total')
 function startTow(why){const T=G.trip;P.towWhy=why;P.inv=0;P.sub='total';P.kmh=0;P.cruise=0;P.auto=null;P.haz=true;P.rev=false;P.tt=0;P.tw={x:W+60,dx:0,tilt:0};P.carOff={x:0,y:0};P.sos=null;
  ents=ents.filter(e=>Math.abs(e.x-P.dist)>W*1.5);const tow=35000+1500*10;
  if(why==='total'){SFX.hit();G.shake=Math.max(G.shake||0,12);vib([200,80,200]);say('Totálkár... Szerencsére mindenki jól van.','apa');
-  book(-tow,'service','Tréler: totálkáros autó elszállítása a szervizbe (10 km)');flash('TOTÁLKÁR! Jön a tréler: '+fmt(tow)+' Ft','#ff6b6b',300);}
- else{SFX.siren();say('Hívom az autómentőt, mindjárt itt lesznek.','apa');book(-tow,'service','Autómentő (SOS): tréler a szervizbe (10 km)');flash('SOS: jön a tréler ('+fmt(tow)+' Ft), és bevisz a szervizbe.','#ffd84a',300);}}
+  book(-tow,'service','Tréler: totálkáros autó elszállítása a szervizbe (1 km)');flash('TOTÁLKÁR! Jön a tréler: '+fmt(tow)+' Ft','#ff6b6b',300);}
+ else{SFX.siren();say('Hívom az autómentőt, mindjárt itt lesznek.','apa');book(-tow,'service','Autómentő (SOS): tréler a szervizbe (1 km)');flash('SOS: jön a tréler ('+fmt(tow)+' Ft), és bevisz a szervizbe.','#ffd84a',300);}}
 function updTotal(){const f=++P.tt,tw=P.tw,ez=u=>u<0?0:u>1?1:u<0.5?2*u*u:1-Math.pow(-2*u+2,2)/2;
  if(f===80)P.hide={apa:1,anya:1,anna:1,petra:1,atti:1};
  if(f>=90&&f<330){tw.x=lerp(W+60,PX+196,ez((f-90)/240));if(f%30===0)tone(1100,0.12,'square',0.05);}
@@ -221,9 +221,9 @@ function repairParts(total){const T=G.trip,z=dzOf(T),p=[],r5=v=>Math.round(v/500
  if(T.lostW)p.push(['Új kerék, kerékagy, kerékcsavarok',52000]);
  if(T.airbag)p.push(['Légzsák és övfeszítő csere',118000]);
  if(!p.length)p.push(['Átvizsgálás',8000]);return p;}
-function startRepair(){const T=G.trip,px=10/LEG.kmPerPx,total=P.towWhy!=='sos';P.dist=Math.max(0,P.dist-(total?px:0));P.sub='repair';P.tw=null;P.carOff=null;P.rp={t:0};P.ws=P.dist-34;P.inv=0;P.bub=null;P.skids=[];P.lane=0;P.y=LANE[0];P.vy=0;ents=[];nextSpawn=P.dist+900;P.looseW=null;
+function startRepair(){const T=G.trip,px=1/LEG.kmPerPx,total=P.towWhy!=='sos';P.dist=Math.max(0,P.dist-(total?px:0));P.sub='repair';P.tw=null;P.carOff=null;P.rp={t:0};P.ws=P.dist-34;P.inv=0;P.bub=null;P.skids=[];P.lane=0;P.y=LANE[0];P.vy=0;ents=[];nextSpawn=P.dist+900;P.looseW=null;
  const parts=repairParts(total);for(const [l,c] of parts)book(-c,'service','Szerviz: '+l);P.rp.cost=parts.reduce((a,p)=>a+p[1],0);
- flash((total?'A tréler 10 km-rel visszavitt a legközelebbi szervizbe.':'A tréler beért a szervizbe.')+' Javítás: '+fmt(P.rp.cost)+' Ft','#ffb347',320);}
+ flash((total?'A tréler 1 km-rel visszavitt a legközelebbi szervizbe.':'A tréler beért a szervizbe.')+' Javítás: '+fmt(P.rp.cost)+' Ft','#ffb347',320);}
 function updRepair(){const r=P.rp;r.t++;P.fadeA=Math.max(0,1-r.t/50);if(r.t>60)G.trip.hp=Math.max(G.trip.hp,Math.min(99,Math.round((r.t-60)/300*100)));if(G.trip.hp>60&&G.trip.airbag)G.trip.airbag=0;
  if(r.t>60){const z=dzOf(G.trip),k=0.985;z.f*=k;z.s*=k;z.r*=k;if(r.t===140&&G.trip.lostW){G.trip.lostW=null;SFX.clunk();}}
  if((r.t>150&&(K.enterP||TAPD))||r.t>=420){const T=G.trip;T.hp=100;T.airbag=0;T.dz={f:0,s:0,r:0};T.lostW=null;P.flat=null;P.sub='drive';P.rp=null;P.hide={};P.haz=false;P.door=0;P.ws=null;P.stopCD=P.dist;P.fadeA=0;P.towWhy=null;
@@ -862,7 +862,7 @@ function drawHUD(g){const L=LEGS[G.leg],T=G.trip,s=seg(),t=G.t,blinkOn=(t%40)<20
  if(P.flat&&P.sub==='drive')pill('Defekt! Állj meg a szélső (felső) sávban!','#ff6b6b');
  if((T.driveS||0)>=1800&&P.sub==='drive'&&((t>>5)&1))pill('Apa fáradt: állj félre a szélső sávban!','#ffcf33');
  if(P.sub==='sos'&&P.sos&&P.sos.step==='help')pill('SOS: '+P.sos.nm+(P.sos.t<205?' - a szerelő úton van...':P.sos.t<415?' - dolgozik a szerelő':''),'#ffd84a');
- if(P.sub==='total')pill(P.tt<330?(P.towWhy==='sos'?'SOS: a tréler úton van...':'Totálkár: a tréler úton van...'):P.tt<630?'Az autót felhúzzák a trélerre':'Irány a szerviz, 10 km-rel vissza','#ff8a5a');
+ if(P.sub==='total')pill(P.tt<330?(P.towWhy==='sos'?'SOS: a tréler úton van...':'Totálkár: a tréler úton van...'):P.tt<630?'Az autót felhúzzák a trélerre':'Irány a szerviz, 1 km-rel vissza','#ff8a5a');
  if(P.sub==='repair'&&P.rp)pill('Szerviz: javítás '+Math.min(100,Math.round(P.rp.t/420*100))+'%'+(P.rp.t>150?' - koppints a továbbhoz':''),'#ffd84a');
  if(P.sub==='wash'&&P.wash&&P.wash.step==='run'){const pr=WASH_PROGS[P.wash.prog];pill('Autómosó: '+WASH_NAME[P.wash.phase]+' ('+(Math.floor(P.wash.t/110)+1)+'/'+(P.wash.ph||pr.ph).length+')','#7fd1ff');}
  if(P.rsT>0&&P.sub==='drive')pill('Félreállunk pihenni...','#bff5cf');

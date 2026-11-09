@@ -168,7 +168,7 @@ Az autónak állapota van (100%), a HUD jobb panelján az **Autó** sáv mutatja
 
 Erős ütközésnél kinyílik a **légzsák**, és leeresztve ott lóg a javításig. A sérült autó lassabb: 50% alatt max. 120, 30% alatt 80, 15% alatt 50 km/h.
 
-**Totálkár (0%):** a kép egyszer, röviden megremeg, aztán jön a **tréler** (50 000 Ft). A billenő plató hátracsúszik és lebillen a földig (nem megy át a tréler kerekein), a csörlő felhúzza rá az autót, amelynek kerekei végig a platón gördülnek, majd a plató visszabillen, és elviszi a legközelebbi **szervizbe 10 km-rel hátrébb**. Ott megjavítják: karosszéria és fényezés 186 000 Ft, fényszóró, lökhárító, tükör 46 500 Ft, légzsák 118 000 Ft. Utána a szerviztől folytatódik az út. Minden tétel bekerül a költségnaplóba.
+**Totálkár (0%):** a kép egyszer, röviden megremeg, aztán jön a **tréler** (50 000 Ft). A billenő plató hátracsúszik és lebillen a földig (nem megy át a tréler kerekein), a csörlő felhúzza rá az autót, amelynek kerekei végig a platón gördülnek, majd a plató visszabillen, és elviszi a legközelebbi **szervizbe 1 km-rel hátrébb**. Ott megjavítják: karosszéria és fényezés 186 000 Ft, fényszóró, lökhárító, tükör 46 500 Ft, légzsák 118 000 Ft. Utána a szerviztől folytatódik az út. Minden tétel bekerül a költségnaplóba.
 
 **Autószerviz:** városokban, országutakon és az autópályák mentén is van (P gombbal, „SZERVIZ” útburkolati jellel, közeledő ikonnal). Csak karosszériát javít: mutatja az autó állapotát, a javítandó részeket (karcok, horpadások, lökhárító, fényszóró, motorháztető, szélvédő, tükör, légzsák) és a költséget (3 200 Ft / %, légzsák 118 000 Ft). Ép autónál kiírja, hogy nincs mit javítani.
 
