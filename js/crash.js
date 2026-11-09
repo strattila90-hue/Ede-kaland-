@@ -18,7 +18,7 @@ const ctNose=()=>CT_TESTS[CT.ti].z==='f'?CT.x+112:CT.tx+70;        // a mozgó j
 const ctGap=()=>ctRef()-ctNose();
 function ctDriving(){return !!CT&&G.state==='crash'&&(CT.ph==='run'||CT.ph==='count');}
 function startCrash(){G.state='crash';G.st=0;G.paused=false;const ti=clamp((PROF.ctTest|0),0,CT_TESTS.length-1);CT={ti:ti,v:PROF.ctV||CT_TESTS[ti].v,own:PROF.ctOwn!==false,belt:PROF.ctBelt!==false,surf:clamp(PROF.ctSurf|0,0,2),load:!!PROF.ctLoad,cfg:false};ctReset();elog('info','Törésteszt megnyitva');}
-function ctReset(){const T=CT_TESTS[CT.ti],front=T.z==='f';Object.assign(CT,{ph:'ready',t:0,f:0,x:front?CTBX-112-CT_L*CT_MU:100,vx:0,tx:front?-1e5:100-70-CT_L*CT_MU,tvx:0,cv:0,ang:0,cr:0,hc:0,pitch:0,hd:0,ab:0,parts:[],res:null,flash:0,shake:0,lost:false,slow:1,imp:false,puddle:0,ms:0,
+function ctReset(){const T=CT_TESTS[CT.ti],front=T.z==='f';Object.assign(CT,{ph:'ready',t:0,f:0,x:front?CTBX-112-CT_L*CT_MU:100,vx:0,tx:front?-1e5:100-70-CT_L*CT_MU,tvx:0,cv:0,ang:0,cr:0,hc:0,pitch:0,hd:0,ab:0,parts:[],res:null,flash:0,shake:0,lost:false,slow:1,imp:false,puddle:0,ms:0,fp:[],burst:false,
   sp:0,gear:0,rpm:850,shift:0,still:0,moved:false,vi:0,vmax:0,skid:[],sk:null,bk0:null,bkv:0,brkPrev:false,thud:false,replay:false,box:0,i0:null});
  K.gas=K.brake=false;for(const id of ['bGas','bBr']){const el=document.getElementById(id);if(el)el.classList.remove('on');}MENU_SIG='?';}
 const ctSev=()=>{const T=CT_TESTS[CT.ti];return Math.pow((CT.vi||CT.v)/64,2)*T.m*(T.z==='f'?ctMass()/1450:1);};
@@ -46,7 +46,7 @@ function ctAction(a){if(!CT)return;if(/^wk/.test(a)&&typeof wkAction==='function
  else if(a==='ctload'){CT.load=!CT.load;PROF.ctLoad=CT.load;saveProf();ctReset();toast(CT.load?'Csomaggal: +180 kg (tetőbox, bőröndök). Lassabban gyorsul, ütközéskor több az energia, és a rögzítetlen bőrönd előrerepül!':'Üres csomagtartó.',4000);}
  MENU_SIG='?';}
 /* visszajátszás közeli kamerával: az ütközés újra, a mentett kiinduló állapotból (az értékelés nem változik) */
-function ctReplay(){const i=CT.i0;if(!i)return;Object.assign(CT,{ph:'hit',f:0,t:0,x:i.x,tx:i.tx,ang:i.ang,tvx:i.tvx,x0:i.x,tvx0:i.tvx,cv:0,cr:0,hc:0,pitch:0,hd:0,ab:0,box:0,parts:[],imp:false,lost:false,puddle:0,thud:false,slow:0.08,flash:1,shake:0,replay:true,cfg:false});ctBang();MENU_SIG='?';}
+function ctReplay(){const i=CT.i0;if(!i)return;Object.assign(CT,{ph:'hit',f:0,t:0,x:i.x,tx:i.tx,ang:i.ang,tvx:i.tvx,x0:i.x,tvx0:i.tvx,cv:0,cr:0,hc:0,pitch:0,hd:0,ab:0,box:0,parts:[],imp:false,lost:false,puddle:0,fp:[],burst:false,thud:false,slow:0.08,flash:1,shake:0,replay:true,cfg:false});ctBang();MENU_SIG='?';}
 /* ---- frissítés ---- */
 /* üresben (visszaszámláláskor) a motor felpörgethető */
 function ctIdle(gas){const tg=gas?4300:850;CT.rpm+=(tg-CT.rpm)*(tg>CT.rpm?0.09:0.05);engine(CT.rpm,gas?0.8:0.06);}
@@ -106,12 +106,13 @@ function updCrash(){if(!CT)return;if(CT.dest&&typeof updWreck==='function'){updW
   if(!CT.imp&&f>=0.4){CT.imp=true;ctDebris(sev,front);}
   if(sev>1.15&&front&&!CT.lost&&f>5){CT.lost=true;const wx=ctMap(89);CT.parts.push({k:'wheel',x:CT.x+wx,y:CTF-WR,vx:-1.6-sev*0.4,vy:-3,r:0,vr:-0.25,life:1e9});}
   if(f>dur&&f<200&&CT.t%3===0&&front&&sev>0.15){CT.parts.push({k:'steam',x:CT.x+112-CT.cr-6+rnd(-4,4),y:CTF-36+rnd(-4,4),vx:rnd(-0.3,0.2),vy:-rnd(0.3,0.7),r:2,life:70,max:70});}
-  if(f>dur&&front&&sev>0.15)CT.puddle=Math.min(1,CT.puddle+0.004*sl);
+  if(f>dur)ctLeak(sev,front,Math.max(2,Math.round(12-sev*7)));
+  if(!CT.burst&&f>4&&sev>(front?0.85:1.1)){CT.burst=true;noise(0.5,0.3,0,6000);}
   if(CT.t%32===16&&f<30)CT.flash=1;
   if(CT.load&&front)CT.box=16*clamp((f-1.5)/8,0,1)*Math.min(1,sev*3);
   CT.f+=sl;CT.slow=f<26?(CT.replay?0.08:0.14):Math.min(1,sl+0.025);
   ctParts(sl);if(CT.f>=110){CT.ph='result';if(CT.replay){CT.replay=false;CT.t=100;MENU_SIG='?';}else{CT.t=0;ctScore();}}return;}
- if(CT.ph==='result'){ctParts(1);if(CT.t%3===0&&CT.t<400&&front&&!CT.res.brake&&ctSev()>0.15)CT.parts.push({k:'steam',x:CT.x+112-CT.cr-6+rnd(-4,4),y:CTF-36,vx:rnd(-0.3,0.2),vy:-rnd(0.2,0.5),r:2,life:70,max:70});
+ if(CT.ph==='result'){ctParts(1);if(!CT.res.brake&&CT.t<900)ctLeak(ctSev(),front,10+Math.floor(CT.t/60));if(CT.t%3===0&&CT.t<400&&front&&!CT.res.brake&&ctSev()>0.15)CT.parts.push({k:'steam',x:CT.x+112-CT.cr-6+rnd(-4,4),y:CTF-36,vx:rnd(-0.3,0.2),vy:-rnd(0.2,0.5),r:2,life:70,max:70});
   if(CT.res&&CT.t>=34&&CT.t<=34+14*4&&(CT.t-34)%14===0){const k=(CT.t-34)/14;if(k<CT.res.stars)tone(880+k*170,0.12,'square',0.07);}}}
 function ctImpact(){const sev=ctSev();CT.i0={x:CT.x,tx:CT.tx,ang:CT.ang,tvx:CT.tvx};CT.ph='hit';CT.f=0;CT.t=0;CT.x0=CT.x;CT.tvx0=CT.tvx;CT.slow=0.14;CT.shake=Math.min(6,1+sev*3);CT.flash=1;engine(0,0);ctBang();}
 function ctBang(){const sev=ctSev(),k=clamp(0.3+sev,0.3,1);
@@ -124,7 +125,14 @@ function ctDebris(sev,front){const n=Math.min(70,Math.round(3+sev*40)),ix=front?
  for(let i=0;i<Math.min(8,2+sev*8);i++)CT.parts.push({k:'dust',x:ix+rnd(-6,6),y:CTF-rnd(4,30),vx:rnd(-1,1)*0.6,vy:-rnd(0.1,0.5),r:3,life:90,max:90});
  if(front&&sev>0.45){// lökhárító-darab és fényszóró
   CT.parts.push({k:'bumper',x:ix-14,y:CTF-12,vx:-rnd(0.8,1.8),vy:-rnd(1,2.5),r:0,vr:-0.08,life:1e9});}}
-function ctParts(sl){for(const p of CT.parts){p.life-=sl;
+/* sérült tartályok: motorolaj, hűtőfolyadék, ablakmosó (eleje), benzin (hátsó ütközésnél a tank) csepegése; tócsák a padlón */
+const CT_FLU={oil:'rgba(38,26,14,0.92)',cool:'rgba(60,200,90,0.8)',wash:'rgba(70,140,240,0.75)',fuel:'rgba(215,205,130,0.6)'};
+function ctLeak(sev,front,every){if(CT.t%every)return;const x=CT.x,s=[];
+ if(front){if(sev>0.15){s.push(['oil',x+ctMap(98),CTF-9]);s.push(['cool',x+ctMap(106),CTF-14]);}if(sev>0.45)s.push(['wash',x+ctMap(103),CTF-16]);if(sev>1.2)s.push(['fuel',x+ctMap(30),CTF-8]);}
+ else if(sev>0.7)s.push(['fuel',x+ctMap(30),CTF-8]);
+ const q=s.length?s[(CT.t/every|0)%s.length]:null;if(q)CT.parts.push({k:'fl',c:q[0],x:q[1]+rnd(-1.5,1.5),y:q[2],vx:rnd(-0.05,0.05),vy:0.1,r:0,life:300,max:300});}
+function ctPool(k,x){let p=null;for(const d of CT.fp)if(d.k===k&&Math.abs(d.x-x)<d.w*0.7+2){p=d;break;}if(p){p.w=Math.min(k==='fuel'?24:18,p.w+0.45);p.x+=(x-p.x)*0.05;}else CT.fp.push({k:k,x:x,w:1.6});}
+function ctParts(sl){for(const p of CT.parts){if(p.k==='fl'){p.vy+=0.14*sl;p.y+=p.vy*sl;p.x+=p.vx*sl;if(p.y>=CTF-0.2){p.life=0;ctPool(p.c,p.x);}continue;}p.life-=sl;
   if(p.k==='steam'||p.k==='dust'){p.x+=p.vx*sl;p.y+=p.vy*sl;p.r+=0.12*sl;continue;}
   p.x+=p.vx*sl;p.y+=p.vy*sl;p.r+=(p.vr||0)*sl;if(p.k!=='spark')p.vy+=0.22*sl;else p.vy+=0.12*sl;
   const gy=p.k==='wheel'?CTF-WR:CTF-0.5;if(p.y>gy){p.y=gy;if(p.k==='wheel'){p.vy*=-0.35;p.vx*=0.985;p.vr=p.vx/WR;}else{p.vy*=-0.25;p.vx*=0.55;p.vr*=0.5;}}}
@@ -158,7 +166,7 @@ function ctCar(g,t){const T=CT_TESTS[CT.ti],front=T.z==='f',x=CT.x,by=CTF-55.5,s
  const dm=clamp(sev*0.75*e,0,1),o={t:t,ang:CT.ang,live:true,noWheels:true,hide:{apa:1,anya:1,anna:1,petra:1,atti:1},inner:ctInner,airbag:CT.ab,dmg:dm,dz:front?{f:dm,s:dm*0.35,r:0}:{f:0,s:dm*0.3,r:dm},spd:0,pos:CT.ph==='run'||CT.ph==='count'||CT.ph==='ready'};
  g.save();g.translate(x+56,by+45);g.rotate(CT.pitch);g.translate(-(x+56),-(by+45));
  // olajfolt / hűtőfolyadék a padlón
- if(CT.puddle>0.02){const px=x+ctMap(100);ell(g,'rgba(60,140,90,'+(0.45*CT.puddle)+')',px,CTF+0.6,4+CT.puddle*16,1+CT.puddle*1.6);}
+ for(const d of CT.fp){ell(g,CT_FLU[d.k],d.x,CTF+0.6,d.w,0.8+d.w*0.06);if(d.k==='oil')ell(g,'rgba(255,255,255,0.18)',d.x-d.w*0.3,CTF+0.3,d.w*0.3,0.3);if(d.k==='fuel'){ell(g,'rgba(255,90,200,0.22)',d.x,CTF+0.4,d.w*0.6,0.4);ell(g,'rgba(80,220,255,0.2)',d.x+d.w*0.15,CTF+0.7,d.w*0.4,0.35);}}
  for(const s of ctSlices()){// a vágás a szelet saját (összenyomás előtti) koordinátáiban
   g.save();g.translate(x+s[4],0);g.scale(s[2],1);g.translate(-(x+s[3]),0);g.beginPath();g.rect(x+s[0],-100,s[1]-s[0],400);g.clip();
   drawCarSide(g,x,by,by,o,null);
@@ -169,10 +177,16 @@ function ctCar(g,t){const T=CT_TESTS[CT.ti],front=T.z==='f',x=CT.x,by=CTF-55.5,s
     g.strokeStyle='rgba(255,255,255,0.35)';g.lineWidth=0.5;g.beginPath();for(let j=0;j<=5;j++)g.lineTo(x+ux+1+(j%2?1.8:-1.8),by+30+j*3.4);g.stroke();}
    if(front&&s[0]===86){const k=Math.min(7,CT.cr*0.4);g.fillStyle=CP.m;g.beginPath();g.moveTo(x+88,by+29.4);g.lineTo(x+95,by+29.6-k);g.lineTo(x+100,by+31-k*0.6);g.lineTo(x+106,by+32.6);g.closePath();g.fill();g.strokeStyle='#0c0f14';g.lineWidth=0.6;g.stroke();
     line(g,'rgba(255,255,255,0.5)',x+89,by+29.2,x+95,by+29.4-k,0.4);}}
-  g.restore();}
+ g.restore();}
+ if(front&&sev>0.95&&e>0.2){const k=clamp((sev-0.95)/1.2,0,1)*e,ax=x+ctMap(80),zz=(x0,y0,x1,y1,n,a,col,lw)=>{g.strokeStyle=col;g.lineWidth=lw;g.beginPath();for(let j=0;j<=n;j++)g.lineTo(lerp(x0,x1,j/n)+(j%2?a:-a),lerp(y0,y1,j/n));g.stroke();};
+  zz(ax-1,by+13,ax+3,by+27.5,5,0.6+k*1.6,'rgba(10,12,16,0.75)',0.7);zz(ax,by+13,ax+4,by+27.5,5,0.6+k*1.6,'rgba(255,255,255,0.35)',0.35);
+  g.fillStyle=CP.m;g.beginPath();g.moveTo(x+ctMap(60),by+12.6);g.quadraticCurveTo(x+ctMap(72),by+12.6-k*3.2,ax+1,by+13.4);g.lineTo(x+ctMap(60),by+13.4);g.closePath();g.fill();
+  line(g,'rgba(10,12,16,0.6)',x+ctMap(66),by+12.9-k*1.6,ax,by+13.2,0.5);
+  if(sev>1.5)zz(x+ctMap(52),by+13,x+ctMap(53),by+28,5,0.5+k,'rgba(10,12,16,0.6)',0.55);}
  // kerekek (nem torzulnak, a gyűrődéssel hátrébb tolódnak)
- const wy=by+WCY;wheel(g,x+ctMap(WHEELS[0]),wy,CT.ang,false);
- if(!CT.lost)wheel(g,x+ctMap(WHEELS[1]),wy-Math.min(2.5,Math.max(0,CT.cr-14)*0.2),CT.ang,false);
+ const wy=by+WCY,bF=front?clamp((sev-0.45)/1.1,0,1)*e:0,bR=front?0:clamp((sev-0.6)/1.2,0,1)*e;
+ wheel(g,x+ctMap(WHEELS[0])+bR*2.5,wy-bR*1.5,CT.ang,!front&&CT.burst,undefined,bR);
+ if(!CT.lost)wheel(g,x+ctMap(WHEELS[1])-bF*2.5,wy-Math.min(2.5,Math.max(0,CT.cr-14)*0.2)-bF*1.2,CT.ang,front&&CT.burst,undefined,bF);
  else{const hx=x+ctMap(WHEELS[1]),hy=wy+4;disc(g,'#4a4f56',hx,hy,5);disc(g,'#7d858d',hx,hy,3.8);disc(g,'#2b3037',hx,hy,1.4);}
  g.restore();}
 /* mozgó akadály (hátsó teszthez) */
@@ -236,6 +250,7 @@ function drawCrash(g){if(!CT)return;if(CT.dest&&WK&&typeof drawWreck==='function
  for(const p of CT.parts)if(p.k==='steam'||p.k==='dust'){const a=clamp(p.life/p.max,0,1)*(p.k==='dust'?0.35:0.4);disc(g,p.k==='dust'?'rgba(190,180,165,'+a.toFixed(2)+')':'rgba(235,240,245,'+a.toFixed(2)+')',p.x,p.y,p.r);}
  if(carVis)ctCar(g,t);
  for(const p of CT.parts){if(p.k==='steam'||p.k==='dust')continue;
+  if(p.k==='fl'){disc(g,CT_FLU[p.c],p.x,p.y,0.75);continue;}
   if(p.k==='wheel'){wheel(g,p.x,p.y,p.r,false);continue;}
   if(p.k==='bumper'){g.save();g.translate(p.x,p.y);g.rotate(p.r);frr(g,lg(g,0,-2,0,3,[[0,CP.l],[1,CP.dd]]),-7,-2,14,4.4,1.6);g.restore();continue;}
   if(p.k==='spark'){const a=clamp(p.life/30,0,1);line(g,'rgba(255,214,120,'+a.toFixed(2)+')',p.x,p.y,p.x-p.vx*1.6,p.y-p.vy*1.6,0.7);continue;}

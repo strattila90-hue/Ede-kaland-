@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.38.0
+# 🚐 Családi Vakáció – v2.39.0
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -269,6 +269,7 @@ Minden tranzakció után a pénzkijelző egy pillanatra a levont vagy kapott ös
 - **Útburkolat:** száraz, vizes vagy jeges-havas. A tapadás a fékutat és a gyorsítást is befolyásolja (ABS-szel kb. 9,2 / 6,6 / 2,9 m/s²): 80 km/h-ról szárazon kb. 25 m, vizesen kb. 33 m, jeges úton kb. 69 m a fékút (ehhez jön még a reakcióidő alatt megtett út). A padló vizesen csillog, jegesen fehér.
 - **Csomag:** +180 kg (tetőbox és bőröndök). Az autó lassabban gyorsul, ütközéskor nagyobb az energia és a gyűrődés, a **rögzítetlen bőrönd** pedig a csomagtartóból előrerepül a gyerekülések háttámlájának, ezért a gyermekvédelem pontszáma csökken.
 - **Visszajátszás közeli kamerával:** az eredmény után az „Ismétlés” gombbal az ütközés újra lejátszódik, még lassabban, 1,8-szoros nagyításban (az értékelés nem változik).
+- **Élethűbb törés (v2.39):** az első kerék a gyűrődéssel hátratolódik és feljebb csúszik, a futómű elgörbül (a kerék megdől), nagy sebességnél a gumi szétdurran (hátsó ütközésnél a hátsó). A sérült motortérből olaj, hűtőfolyadék és ablakmosó-folyadék csöpög, nagyon erős ütésnél (és hátsó ütközésnél) a benzintank is szivárog. A cseppekből a padlón színes tócsák terülnek szét. Nagy sebességnél az A-oszlop megtörik, a tető felgyűrődik, és a B-oszlop is meggyűrődik.
 - **Csillagos értékelés (0–5):** felnőtt és gyermek utasok védelme, biztonsági rendszerek százalékban, bábu-ábra testtájanként színezve (zöld = jó … piros = rossz), lassulás, fejsérülési érték (HIC), utastér-behatolás. A legjobb eredmény tesztenként és sebességenként megmarad.
 
 ## 🔨 Roncsoló műhely (Apa garázsa, v2.37)
@@ -283,6 +284,13 @@ Az Apa garázsából (vagy a törésteszt „Roncsolás” gombjával) nyílik. 
 - **Prés:** a hidraulikus prés lenyomja az autót. Közben kitörnek az ablakok, és a fém meggyűrődik. Újabb koppintásra felemelkedik.
 - **Lőfegyverek (v2.38):** **Pisztoly** (koppintás: kerek golyónyom lepattant festékkel, az üvegen pókhálós repedés, sok találatra kitörik, a gumi kidurran), **Sörétes puska** (egy lövés 9 sörét egy csomóban, utána csőretöltés hangja), **Géppuska** (nyomva tartva és húzva sorozatlövés). A fegyver jobbra lent a néző oldalán látszik, a célpont felé fordul, torkolattűz, nyomjelző lövedék, kirepülő és a padlón csilingelve pattogó hüvelyek, időnként golyó-lepattanás hangja.
 - **Robbantás:** a töltet villogva, gyorsuló sípolással 1,5 másodperc múlva felrobban: kormos égésnyom, horpadások, tűz és füst. A közeli részek leszakadnak és elrepülnek.
+
+**Élethűbb sérülések (v2.39):**
+- **Gyűrődés:** a horpadásoknak fényes felső és árnyékos alsó pereme van (térhatás). A nagy ütések (bontógolyó, robbantás, sok kalapácsütés a szélen) a **körvonalat is benyomják**: a tetőn, az orron vagy a farán behorpad a karosszéria széle, körülötte gyűrődési ráncokkal.
+- **Defekt:** a golyó csak kilyukasztja a gumit, ami **sziszegve, lassan ereszt le**, és az autó arra az oldalra fokozatosan lesüllyed. Az ágyú, a flex, a lézer és a robbanás szétdurrantja a gumit.
+- **Futómű:** az ütés (kalapács, bontógolyó, robbanás) **elgörbíti a futóművet**: a kerék megdől, a kerékívbe tolódik, és a felni is behorpad.
+- **Folyadékok:** hat tartály van: motorolaj, hűtőfolyadék, fékfolyadék, ablakmosó-folyadék, váltóolaj és benzin (a hátsó ülés alatt). Ha egy sérülés eléri, **csöpögni kezd**, a cseppekből a padlón szétterülő, saját színű tócsa lesz (az olaj fényes, a benzin szivárványos). Ha a tartályt tartalmazó rész leszakad, a folyadék kiömlik.
+- **Benzintűz:** a benzintócsát meggyújthatja a láng, az izzó fém, az olvadt csepp, a szikra vagy a robbanás. A tócsa ilyenkor füstölve ég, és melegíti az autó alját.
 
 **Szakadás:** az autó öt részből áll (eleje, hátulja, tető, két ajtó), mindegyiknek van életereje. Ha elfogy, a rész **töredezett széllel leszakad**, leesik, a magas darabok eldőlnek a padlón. A kerék kidurranhat, majd leszakadhat, ilyenkor a karosszéria arra az oldalra lesüllyed. A sarokban látszik a kár forintban és a leszakadt részek száma. Az „Új autó” gomb hoz egy épet.
 

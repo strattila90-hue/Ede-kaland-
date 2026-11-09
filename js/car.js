@@ -101,7 +101,8 @@ function person(g,x,gy,who,t,mode,o){o=o||{};const f=FAM[who],H=(HCM[who]||170)/
  limb(g,shirt,shX,shY+H*0.01,(shX+ex)/2,(shY+ey)/2,(shX+ex)/2,(shY+ey)/2,armW*1.25);limb(g,skin,(shX+ex)/2,(shY+ey)/2,ex,ey,hx,hy,armW);disc(g,skin,hx,hy,armW*0.6);
  if(who==='anya'&&mode!=='work'&&!kneel&&!o.noBaby&&crewHas('atti')){frr(g,'#fff1a8',shX+H*0.02,shY+H*0.05,H*0.11,H*0.1,2);headSide(g,shX+H*0.08,shY+H*0.05,'atti',t,0.9);}
  g.restore();return {hx:hx,hy:hy};}
-function wheel(g,cx,cy,ang,flat,r){r=r||WR;g.save();g.translate(cx,cy);
+function wheel(g,cx,cy,ang,flat,r,bent){r=r||WR;g.save();g.translate(cx,cy);
+ if(bent>0.02){g.rotate(bent*0.2);g.scale(1-bent*0.32,1);}// elgörbült futómű: a kerék megdől (kerékdőlés), oldalról keskenyebbnek látszik
  if(flat){g.translate(0,r*0.34);// a felni lejjebb ül, a gumi alul szétnyomódik
   const w=Math.sin(ang*3)*r*0.03;g.fillStyle='#14171b';g.beginPath();g.arc(0,0,r,Math.PI*1.08,Math.PI*1.92);g.bezierCurveTo(r*1.02,-r*0.1,r*1.2+w,r*0.3,r*1.02,r*0.62);g.lineTo(-r*1.02,r*0.62);g.bezierCurveTo(-r*1.2-w,r*0.3,-r*1.02,-r*0.1,Math.cos(Math.PI*1.08)*r,Math.sin(Math.PI*1.08)*r);g.closePath();g.fill();
   g.strokeStyle='rgba(255,255,255,0.12)';g.lineWidth=r*0.05;for(let k=-1;k<=1;k++){g.beginPath();g.moveTo(k*r*0.45,r*0.36);g.quadraticCurveTo(k*r*0.45+r*0.12,r*0.5,k*r*0.45,r*0.6);g.stroke();}}
@@ -110,7 +111,7 @@ function wheel(g,cx,cy,ang,flat,r){r=r||WR;g.save();g.translate(cx,cy);
  const q=r*0.72;g.fillStyle=rg(g,-q*0.3,-q*0.3,q*0.1,q*1.2,[[0,'#f6f8fa'],[1,'#8d98a3']]);g.beginPath();g.arc(0,0,q,0,TAU);g.fill();
  disc(g,'#262c33',0,0,q*0.86);disc(g,'#59616a',0,0,q*0.56);
  g.rotate(ang);g.fillStyle='#e3e8ec';for(let i=0;i<6;i++){g.rotate(TAU/6);g.fillRect(q*0.2,-q*0.17,q*0.68,q*0.1);g.fillRect(q*0.2,q*0.07,q*0.68,q*0.1);}
- disc(g,'#cfd6dc',0,0,q*0.24);disc(g,'#7f8a95',0,0,q*0.09);g.restore();}
+ disc(g,'#cfd6dc',0,0,q*0.24);disc(g,'#7f8a95',0,0,q*0.09);if(bent>0.25){g.rotate(-ang);g.strokeStyle='rgba(10,12,14,0.85)';g.lineWidth=r*0.12;g.beginPath();g.arc(0,0,r*0.7,-0.5,0.4);g.stroke();line(g,'rgba(255,255,255,0.4)',r*0.5,-r*0.35,r*0.62,r*0.2,r*0.05);}g.restore();}
 
 /* ---- oldalnézet ---- */
 /* függőleges hátsó lámpa a hátsó oszlop ívén (saját forma: karcsú, lekerekített, három vízszintes LED-csíkkal) */
@@ -204,7 +205,7 @@ function drawCarSide(g,x,by,wy,o,lights){
   if(o.lostW===k){// kiszakadt kerék: csak a féktárcsa és a kerékagy, az úton csúszik
    const hy=wy+55.5-5.4;disc(g,'#4a4f56',wx,hy,5.4);disc(g,'#7d858d',wx,hy,4.2);disc(g,'#2b3037',wx,hy,1.6);for(let i=0;i<5;i++){const a=i*TAU/5+ang*0.2;disc(g,'#c9d1db',wx+Math.cos(a)*2.8,hy+Math.sin(a)*2.8,0.5);}
    frr(g,'#c62a35',wx+2.2,hy-3.8,3.2,4.4,1);continue;}
-  wheel(g,wx,wcy,ang,o.flat===k);}
+  const zd=o.dz?(o.dz[k]||0):0;wheel(g,wx,wcy,ang,o.flat===k,undefined,o.dmg?clamp((zd-0.62)/0.38,0,1):0);}
  if(o.jack){const jx=x+(o.jack==='f'?WHEELS[1]-13:WHEELS[0]+13),gy=wy+55.5;frr(g,'#c62a35',jx-4,gy-3,8,3,1);frr(g,'#8e1c24',jx-1.2,gy-6-lift,2.4,6+lift,0.8);}
  // nyitott ajtók
  if(o.door>0)drawDoors(g,x,by-lift,o.door,t,hide);
@@ -254,6 +255,16 @@ function drawDamage(g,d,t,spd,dz){if(d<0.05)return;const F=dz?dz.f||0:d,S=dz?dz.
   g.strokeStyle='rgba(255,220,220,0.8)';g.lineWidth=0.3;g.beginPath();g.moveTo(4.2,23);g.lineTo(2.4,20.4);g.moveTo(4.2,23);g.lineTo(6,26.6);g.moveTo(4.2,23);g.lineTo(6.2,21);g.stroke();}
  if(Rr>0.4){const sw=-(0.18+Rr*0.32+Math.sin(t*0.27)*(0.04+Math.min(1,spd/80)*0.09));R(g,'#16191d',0,40.2,11,4.6);
   g.save();g.translate(11.6,40.6);g.rotate(sw);frr(g,lg(g,0,0,0,5,[[0,CP.l],[1,CP.dd]]),-12.6,0,12.6,4.4,1.6);g.strokeStyle='#0c0f14';g.lineWidth=0.5;rrect(g,-12.6,0,12.6,4.4,1.6);g.stroke();g.restore();}
+ // ELEJE: gyűrődési redők a sárvédőn (hullámos, árnyékolt hajtások), elcsúszott ajtórés
+ if(F>0.45){const k=Math.min(1,(F-0.45)/0.45);g.save();bodyPath(g);g.clip();for(let i=0;i<3+Math.round(k*3);i++){const x=88+i*3.4;
+   g.strokeStyle='rgba(8,10,14,'+(0.35+k*0.35).toFixed(2)+')';g.lineWidth=0.6;g.beginPath();for(let j=0;j<=5;j++)g.lineTo(x+(j%2?1.4:-1.4)*k,30+j*2.6);g.stroke();
+   g.strokeStyle='rgba(255,255,255,'+(0.2+k*0.2).toFixed(2)+')';g.lineWidth=0.35;g.beginPath();for(let j=0;j<=5;j++)g.lineTo(x+0.9+(j%2?1.4:-1.4)*k,30+j*2.6);g.stroke();}
+  if(F>0.6){g.fillStyle='rgba(0,0,0,0.55)';g.beginPath();g.moveTo(79.6,28);g.lineTo(81.6+k*1.6,28.4);g.lineTo(80.4+k*1.2,44);g.lineTo(79,44);g.closePath();g.fill();}g.restore();}
+ if(S>0.55||Rr>0.55){const k=Math.min(1,(Math.max(S,Rr)-0.55)/0.45);g.save();bodyPath(g);g.clip();g.fillStyle='rgba(0,0,0,0.5)';g.beginPath();g.moveTo(25.6,28.6);g.lineTo(27+k*1.8,29);g.lineTo(26.6+k*1.4,44);g.lineTo(25.4,44);g.closePath();g.fill();g.restore();}
+ // csöpögő folyadékok a sérült motortérből (olaj, hűtőfolyadék) és a hátsó tankból (benzin)
+ if(F>0.55){const n=F>0.8?3:2;for(let i=0;i<n;i++){const ph=((t*0.035+i*0.37)%1),c=i===1?'rgba(70,200,100,0.85)':'rgba(40,28,16,0.9)',dx=96+i*4;disc(g,c,dx,46+ph*9,0.55+(1-ph)*0.25);}
+  if(spd<2){ell(g,'rgba(30,22,14,0.55)',99,55.6,4+F*4,0.8);ell(g,'rgba(70,200,100,0.35)',104,55.7,2+F*2,0.5);}}
+ if(Rr>0.7){const ph=(t*0.03)%1;disc(g,'rgba(210,200,130,0.7)',26,47+ph*8,0.5);if(spd<2)ell(g,'rgba(210,200,130,0.3)',26,55.7,3+Rr*3,0.6);}
  // ELEJE: lógó, lengő első lökhárító
  if(F>0.25){const sw=0.22+F*0.35+Math.sin(t*0.25)*(0.05+Math.min(1,spd/80)*0.1);R(g,'#16191d',100,40.2,12.6,4.6);
   g.save();g.translate(100.4,40.6);g.rotate(sw);frr(g,lg(g,0,0,0,5,[[0,CP.l],[1,CP.dd]]),0,0,13.6,4.4,1.6);frr(g,'#191d22',3,1.2,7,2,1);g.strokeStyle='#0c0f14';g.lineWidth=0.5;rrect(g,0,0,13.6,4.4,1.6);g.stroke();g.restore();}

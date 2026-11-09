@@ -24,7 +24,7 @@ async def main():
             for q in path[1:]:
                 x,y=await pt(*q);await pg.mouse.move(x,y,steps=steps);await pg.wait_for_timeout(20)
             await pg.mouse.up()
-        st="(()=>({gone:WK.parts.filter(p=>p.gone).map(p=>p.k).concat(WK.wh.filter(w=>w.gone).map(()=> 'kerék')),ops:WK.ops.length,hot:WK.hot.length,pud:WK.pud.length,cost:Math.round(WK.cost),sq:WK.sq.toFixed(2),flat:WK.wh.map(w=>w.flat)}))()"
+        st="(()=>({gone:WK.parts.filter(p=>p.gone).map(p=>p.k).concat(WK.wh.filter(w=>w.gone).map(()=> 'kerék')),ops:WK.ops.length,hot:WK.hot.length,pud:WK.pud.length,cost:Math.round(WK.cost),sq:WK.sq.toFixed(2),flat:WK.wh.map(w=>w.flat),air:WK.wh.map(w=>w.air.toFixed(2)),susp:WK.wh.map(w=>w.susp.toFixed(2)),leak:WK.res.filter(r=>r.leak>0).map(r=>r.k),fp:WK.fp.map(d=>d.k+(d.burn?'*':'')+Math.round(d.w))}))()"
         await tool(0)
         for i in range(10):await tap(70,36,260)
         await tap(40,20,300);await tap(40,20,300)
@@ -52,6 +52,14 @@ async def main():
         for uv in [(45,35),(75,30)]:await tap(*uv,700)
         print('sörétes:',await pg.evaluate(st))
         await tool(10);await drag([(20,40),(100,30)],steps=60,hold=300);await pg.wait_for_timeout(200);await pg.screenshot(path=OUT+'wreck_guns.png');print('géppuska:',await pg.evaluate(st))
+        # folyadékok és benzintűz: új autó, a benzintank kilövése, majd lángvágó a tócsa fölött
+        await pg.click('#menu button[data-a="wknew"]');await pg.wait_for_timeout(300)
+        await tool(8)
+        for uv in [(42,45),(43,44),(41,46),(89,47)]:await tap(*uv,200)
+        await tool(1);await tap(96,40,1800)
+        await pg.wait_for_timeout(3500);print('szivárgás, defekt, futómű:',await pg.evaluate(st));await pg.screenshot(path=OUT+'wreck_fluids.png')
+        await tool(4);await drag([(42,48),(42.2,48)],steps=2,hold=3000);await pg.wait_for_timeout(1500)
+        await pg.screenshot(path=OUT+'wreck_fire.png');print('benzintűz:',await pg.evaluate(st))
         # felbontásváltás: a sérült kép újraépül a műveletlistából
         await pg.evaluate("QT=QT===4?1:4;applyQ(true);window.dispatchEvent(new Event('resize'))");await pg.wait_for_timeout(800);await pg.screenshot(path=OUT+'wreck_rebuild.png')
         await pg.click('#menu button[data-a="wknew"]');await pg.wait_for_timeout(300);print('új autó:',await pg.evaluate(st))
