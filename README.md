@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.33.0
+# 🚐 Családi Vakáció – v2.34.0
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -7,6 +7,8 @@ A játék telepíthető alkalmazás (PWA): telefonon a kezdőképernyőre tehet�
 ## 👨‍👩‍👧‍👧 A család és az autó
 
 **Felolvasás, nemek szerint:** amit a családtagok mondanak (a szövegbuborékok), azt a telefon saját magyar hangja fel is olvassa. Ha a készüléken van férfi és női magyar hang is, **Apa és kis Atti a férfi**, **Anya, Anna és Petra a női** hangot kapja. Ha csak egy magyar hang van (sok Androidon így van), a hangmagasság választja szét őket: Apa mély, Anya közepes, Anna és Petra magasabb, kis Atti a legmagasabb, a gyerekek kicsit hadarnak is. A számokat és mértékegységeket kiolvassa (130 kilométer per óra, 500 forint). Beszéd közben a rádió lehalkul. Szünetben, menüben és háttérben elhallgat. Offline is megy, ha a telefonon le van töltve a magyar hang (Beállítások > Szövegfelolvasás).
+
+**Ki utazik? (v2.34)** Az első (és minden új) játék előtt kiválasztható, hányan indulnak útnak: Apa mindig jön (ő vezet), Anya, Anna, Petra és kis Atti egyenként be- és kikapcsolható a kártyájukra koppintva (1–5 ember). Aki otthon marad, az nem ül az autóban, nem száll ki a megállóknál, nem szól bele az útba, és az ő bajai (Atti sír, Petrának rossz, Anna pisilne) sem fordulnak elő. A választás az **Apa garázsa > Ki utazik?** pontban is beállítható. A szemek új rajzot kaptak: mandulaszem, színes írisz (Apa és Anya barna/zöld, a gyerekek kék), pupilla, csillanás, a lányoknak szempilla; Apa napszemüvege a feje búbjára került.
 
 **Utasok:** Apa (sofőr, 177 cm), Anya (174 cm), Anna (5 éves, kb. 110 cm), Petra (3 éves, kb. 96 cm) és kis Atti (10 hónapos, bébiülésben). Az alakok valós arányban látszanak az autóhoz képest. A harmadik sorban a családi csomagok utaznak.
 
@@ -74,6 +76,8 @@ A főmenüben az **Album és rekordok** gomb (a Szünet menüből is elérhető)
 - **Akkukímélő mód:** hosszú autóúton kb. 30 kép/mp és kisebb felbontás, kevésbé melegszik a telefon és tovább bírja az akku.
 
 ## 🎬 Főmenü: filmplakát
+
+**v2.34:** a **Folytatás** és az **Új játék** gomb **egymás mellett** van, nagy hellyel köztük (nem lehet véletlenül a rosszat megnyomni; az új játék úgyis rákérdez). Alattuk a **narancssárga Apa garázsa gomb**: benne a **Törésteszt**, az autó adatai, az autó színe, az utazás tempója és a „Ki utazik?” választó. A többi gomb rendezett, négyoszlopos csempékben, a Kilépés a jobb alsó sarokban.
 
 **v2.33.0:** új „📲 APK megosztása” gomb a főmenüben: az alkalmazásban magát az APK-fájlt küldi el (internet nélkül is), böngészőben a letöltési linket.
 
@@ -251,9 +255,16 @@ Minden tranzakció után a pénzkijelző egy pillanatra a levont vagy kapott ös
 - **Traffipax**, **piros lámpa**, **dugó**, **útépítés**, **őz az úton**.
 - **Kifogyott a benzin:** az autómentő hoz 10 litert.
 
+## 💥 Törésteszt (Apa garázsa)
+
+Ütközésvizsgáló csarnok a családi autóval, a bevett biztonsági vizsgálatok mintájára: mérőcsíkos fal, nagysebességű kamerák, betontömb méhsejt-alumínium homlokkal. A székekben **törésteszt-bábuk** ülnek (sárga fej, fekete-sárga célkör, biztonsági öv, a gyerekek ülésmagasítóban).
+- **Három teszt:** frontális ütközés részleges átfedéssel (64 km/h), teljes szélességű merev fal (50 km/h), hátulról ütközés mozgó akadállyal (50 km/h). A sebesség 30 és 130 km/h között állítható.
+- **Látványos törés:** visszaszámlálás után az autó nekifut, az ütközés **lassított felvételen** látszik (ezredmásodperc-számlálóval, vakuvillanásokkal). Az autó eleje (nagy sebességnél az utastér is) összegyűrődik, a motorháztető felgyűrődik, a szélvédő megreped, kinyílik a légzsák, a bábuk feje előrecsapódik (hátsó ütközésnél hátra: ostorcsapás), üvegszilánkok, fényezés- és műanyagdarabok, szikrák repülnek, leesik a lökhárító, gőzöl a hűtő, folyadékfolt lesz a padlón; nagyon gyorsan a kerék is leszakad és elgurul.
+- **Csillagos értékelés (0–5):** felnőtt és gyermek utasok védelme, biztonsági rendszerek százalékban, bábu-ábra testtájanként színezve (zöld = jó … piros = rossz), lassulás, fejsérülési érték (HIC), utastér-behatolás. A legjobb eredmény tesztenként és sebességenként megmarad.
+
 ## 🚦 Forgalom
 
-Minden jármű valós méretarányban, részletesen kidolgozva látszik (a busz utasokkal, ajtókkal, viszonylatjelzővel és tükrökkel; a kamion ponyvás pótkocsival, terelős fülkével, üzemanyagtartállyal; a motoros bukósisakban, idomos géppel; a tréler fényhíddal és lebillenő platóval) a családi autóhoz képest: kisautó, rendőrautó, mentő, furgon, lakóautó, busz (12 m), kamion (16,5 m), traktor és motor.
+Minden jármű valós méretarányban, részletesen kidolgozva látszik (v2.34: új, szebb távolsági busz panorámaablakokkal, utasokkal, lendületes festéssel, csomagtérajtókkal és ívelt szélvédővel; háromféle nyerges kamion: ponyvás, hűtős és tartályos, terelős fülkével, kipufogókéménnyel, oldalsó aláfutásgátlóval, jelzőfényekkel; a nagy járművek előre megrajzolt képből rajzolódnak, így gyorsabbak. A mellettünk haladó hosszú kamion előzéskor sem tűnik el, és takaráskor is csak kicsit lesz áttetsző; a motoros bukósisakban, idomos géppel; a tréler fényhíddal és lebillenő platóval) a családi autóhoz képest: kisautó, rendőrautó, mentő, furgon, lakóautó, busz (12 m), kamion (16,5 m), traktor és motor.
 
 Előfordulhat **baleset** az úton (rendőr, mentő, lezárt sáv). Nagyon ritkán pedig **helyi rendőr** ér utol szirénával: le kell húzódni és megállni, ilyenkor jön az igazoltatás.
 

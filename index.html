@@ -324,6 +324,57 @@ body.tab #ctlrow{left:calc(30px + var(--sl) + var(--u)*2.24)!important}
 #bUp.lane,#bDn.lane{gap:0;padding-top:2px}
 #bUp.lane svg,#bDn.lane svg{width:72%;height:56%}
 #bUp.lane small,#bDn.lane small{font:900 clamp(7px,1.7vmin,10px)/1.15 var(--ff);letter-spacing:.04em;color:#ffe27a;opacity:1}
+/* v2.33: főmenü – Folytatás és Új játék egymás mellett (nem lehet véletlenül mellényomni), narancs Apa gomb, rendezettebb csempék */
+#menu.cine{width:clamp(300px,40vw,420px);padding:14px;gap:10px;scrollbar-width:none}
+#menu.cine::-webkit-scrollbar{display:none}
+#menu.cine .hrow{display:flex;gap:14px;align-items:stretch}
+#menu.cine .hrow .mb{flex:1 1 0;min-width:0;flex-direction:column;align-items:flex-start;justify-content:center;gap:6px;min-height:84px;padding:11px 13px;border-radius:17px}
+#menu.cine .hrow .mb.hero{flex-grow:1.45}
+#menu.cine .hrow .mb.hero2{background:linear-gradient(180deg,rgba(66,78,104,.9),rgba(30,35,50,.9));border:1px solid rgba(127,209,255,.3)}
+#menu.cine .hrow .mb .lbl{font:800 16.5px/1.1 var(--ff)}
+#menu.cine .hrow .mb .sub{font-size:11px;line-height:1.25;white-space:normal;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+#menu.cine .hrow .mb.hero .ic,#menu.cine .hrow .mb.hero2 .ic{width:30px;height:30px}
+#menu.cine .hrow .mb:only-child{flex-direction:row;align-items:center;justify-content:flex-start;gap:12px;min-height:62px}
+#menu.cine .mb.tile.danger{grid-column:-2/-1}
+#menu.cine .mb.apa{min-height:52px;border-radius:16px;padding:9px 14px;color:#fff;font:800 15.5px/1.15 var(--ff);border:1px solid rgba(255,214,160,.6);
+ background:linear-gradient(180deg,#ffb257,#ff8a1f 55%,#e2620a);box-shadow:0 8px 22px rgba(255,130,30,.35),inset 0 1px 0 rgba(255,255,255,.55),inset 0 -2px 0 rgba(120,40,0,.3);text-shadow:0 1px 2px rgba(120,40,0,.45)}
+#menu.cine .mb.apa .ic{display:grid;place-items:center;width:30px;height:30px;flex:none;border-radius:50%;background:rgba(255,255,255,.22);box-shadow:inset 0 1px 0 rgba(255,255,255,.5);font-size:16px}
+#menu.cine .mb.apa .sub{opacity:.9}
+#menu.cine .mb.apa.hero{min-height:64px;animation:none}
+#menu.cine .mb.back{min-height:42px;justify-content:center;background:rgba(255,255,255,.06)}
+#menu.cine .mhead{font:900 13px/1 var(--ff);letter-spacing:.14em;text-transform:uppercase;color:#ffb257;padding:2px 4px 0}
+#menu.cine .grid{grid-template-columns:repeat(3,1fr);gap:7px}
+#menu.cine .mb.tile{min-height:56px;padding:8px 9px;gap:3px}
+#menu.cine .mb.tile .lbl{font:750 12.5px/1.15 var(--ff)}
+#menu.cine .mb.tile .sub{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+#menu.cine .mb.tile .lbl{min-width:0;max-width:100%}
+#menu.cine .mb.danger.tile{background:linear-gradient(180deg,rgba(150,40,34,.85),rgba(92,22,18,.85))!important;border-color:rgba(255,120,110,.35)}
+#menu.cine.apa .grid{grid-template-columns:1fr 1fr}
+#menu.cine.apa::before{background:conic-gradient(from var(--ma,0deg),rgba(255,160,60,.95),rgba(255,120,60,.15) 30%,rgba(255,216,74,.6) 55%,rgba(255,255,255,.08) 80%,rgba(255,160,60,.95))}
+@media (max-height:420px){#menu.cine{width:clamp(300px,44vw,420px);gap:7px;padding:10px}#menu.cine .hrow{gap:12px}#menu.cine .hrow .mb{min-height:64px;padding:8px 11px;gap:4px}#menu.cine .hrow .mb .lbl{font-size:15px}
+ #menu.cine .hrow .mb .sub{font-size:10px;-webkit-line-clamp:1}#menu.cine .hrow .mb.hero .ic,#menu.cine .hrow .mb.hero2 .ic{width:24px;height:24px;font-size:13px}#menu.cine .mb.apa{min-height:42px;padding:6px 12px;font-size:14px}#menu.cine .mb.apa .ic{width:24px;height:24px;font-size:13px}#menu.cine .grid{grid-template-columns:repeat(4,1fr);gap:6px}#menu.cine.apa .grid{grid-template-columns:1fr 1fr}#menu.cine .mb.tile{min-height:44px;padding:6px 7px}#menu.cine .mb.tile .lbl{font-size:11.5px}#menu.cine .mb.tile .sub{font-size:9.5px}}
+@media (max-height:420px){#menu.cine .grid{grid-template-columns:repeat(4,1fr)}}@media (max-height:420px) and (max-width:760px){#menu.cine .grid{grid-template-columns:repeat(3,1fr)}}
+@media (max-height:420px){#menu.cine .mb.tile{min-height:36px;flex-direction:row;align-items:center;gap:6px}#menu.cine .mb.tile .sub{display:none}#menu.cine .mb.tile .ic{display:none}#menu.cine .mb.tile{justify-content:center;text-align:center;padding:6px 4px}#menu.cine .mb.tile .lbl{font-size:11.5px}}
+/* utasválasztó */
+#crew{position:fixed;inset:0;z-index:46;display:none;align-items:center;justify-content:center;background:radial-gradient(ellipse at 50% 30%,rgba(40,30,10,.55),rgba(3,5,9,.82));padding:calc(10px + var(--st,0px)) calc(12px + var(--sr)) calc(10px + var(--sb)) calc(12px + var(--sl))}
+#crew.open{display:flex;animation:lgIn .25s ease-out}
+#crew .box{width:min(640px,100%);max-height:100%;overflow:auto;border-radius:24px;padding:16px 16px 14px;background:linear-gradient(160deg,rgba(30,36,52,.97),rgba(12,15,22,.97));border:1px solid rgba(255,216,74,.3);box-shadow:0 30px 80px rgba(0,0,0,.6);color:#fff;font-family:var(--ff)}
+#crew h3{margin:0;font:900 21px/1.15 var(--ff);color:#ffd84a}#crew p{margin:4px 0 0;color:#b9c3cf;font:500 13px/1.4 var(--ff)}
+#crew .cards{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-top:12px}
+#crew .cc{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px 9px;border-radius:16px;border:2px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:#fff;cursor:pointer;font-family:var(--ff);opacity:.5;filter:grayscale(.85);transition:opacity .2s,filter .2s,border-color .2s,transform .15s}
+#crew .cc.on{opacity:1;filter:none;border-color:#5bd06a;background:linear-gradient(180deg,rgba(91,208,106,.18),rgba(91,208,106,.04))}
+#crew .cc[data-w=apa]{border-color:#ff9a3c;background:linear-gradient(180deg,rgba(255,154,60,.2),rgba(255,154,60,.04))}
+#crew .cc:active{transform:scale(.95)}
+#crew .cc canvas{width:min(64px,13vw);height:min(64px,13vw);border-radius:50%;box-shadow:0 6px 14px rgba(0,0,0,.45)}
+#crew .cc b{font:800 14px/1.1 var(--ff);margin-top:3px}#crew .cc small{font:600 10.5px/1.2 var(--ff);color:#b9c3cf;text-align:center}
+#crew .cc .chk{position:absolute;top:6px;right:6px;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font:900 12px/1 var(--ff);font-style:normal;background:#2a3140;color:#7d8794}
+#crew .cc.on .chk{background:#5bd06a;color:#0b2a12}#crew .cc[data-w=apa] .chk{background:#ff9a3c;color:#3a1600;font-size:10px}
+#crew .cc.pop{animation:ccPop .3s cubic-bezier(.3,1.6,.5,1)}@keyframes ccPop{50%{transform:scale(1.08)}}
+#crew .cc.nope{animation:ccNo .35s}@keyframes ccNo{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+#crew .cnt{margin-top:12px;text-align:center;font:800 15px/1.2 var(--ff);color:#ffd84a}
+#crew .act{display:flex;gap:16px;margin-top:12px}#crew .act button{flex:1;min-height:48px;border-radius:14px;border:1px solid var(--line);color:#fff;font:800 15px var(--ff);cursor:pointer;background:rgba(255,255,255,.08)}
+#crew .act .cgo{flex:1.6;color:#1d1405;border-color:rgba(255,255,255,.5);background:linear-gradient(180deg,#fff0a0,#ffc93a 45%,#ff9a1f);box-shadow:0 8px 22px rgba(255,170,40,.35)}
+@media (max-height:420px){#crew .box{padding:11px 12px 10px}#crew h3{font-size:17px}#crew p{font-size:11.5px}#crew .cards{margin-top:8px;gap:7px}#crew .cc{padding:7px 3px 6px}#crew .cc canvas{width:min(50px,11vw);height:min(50px,11vw)}#crew .cnt{margin-top:7px;font-size:13.5px}#crew .act{margin-top:8px}#crew .act button{min-height:40px}}
 </style>
 </head>
 <body>
@@ -384,7 +435,7 @@ body.tab #ctlrow{left:calc(30px + var(--sl) + var(--u)*2.24)!important}
 <div id="splash"><img src="icons/icon-192.png" alt=""><h1>Családi Vakáció</h1><div class="bar"><i id="splbar"></i></div><small id="spltxt">Betöltés... 0%</small></div>
 <script>
 /* betöltő: a játék fájljai sorban, valós százalékkal */
-(function(){const files=['js/core.js','js/radio.js','js/car.js','js/world.js','js/game.js','js/app.js'],later=['js/geo.js','js/map.js','js/gps.js','js/geohd.js','js/minigames.js','js/shops.js'];let i=0;
+(function(){const files=['js/core.js','js/radio.js','js/car.js','js/world.js','js/game.js','js/app.js'],later=['js/geo.js','js/map.js','js/gps.js','js/geohd.js','js/minigames.js','js/shops.js','js/crash.js'];let i=0;
  window.LAZY_DONE=false;function lazy(k){if(k>=later.length){window.LAZY_DONE=true;return;}const sc=document.createElement('script');sc.src=later[k];sc.async=false;sc.onload=()=>lazy(k+1);sc.onerror=()=>setTimeout(()=>lazy(k),1500);document.body.appendChild(sc);}
  const bar=document.getElementById('splbar'),txt=document.getElementById('spltxt');
  function next(){const p=Math.round(i/files.length*100);bar.style.width=p+'%';txt.textContent='Betöltés... '+p+'%';
