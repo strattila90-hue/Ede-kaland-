@@ -236,6 +236,36 @@ public class MainActivity extends Activity {
         try { startActivity(i); } catch (ActivityNotFoundException e) { Toast.makeText(this, "Nem sikerült elindítani a telepítést.", Toast.LENGTH_LONG).show(); }
     }
 
+    /** a telepített alkalmazás saját APK-fájlját küldi el (Quick Share, Bluetooth, üzenet), internet nélkül is */
+    private void shareOwnApk() {
+        new Thread(() -> {
+            try {
+                File src = new File(getApplicationInfo().sourceDir);
+                File dir = new File(getCacheDir(), "share");
+                dir.mkdirs();
+                File out = new File(dir, "csaladi-vakacio.apk");
+                if (!out.isFile() || out.length() != src.length() || out.lastModified() < src.lastModified()) {
+                    try (InputStream in = new FileInputStream(src); OutputStream os = new FileOutputStream(out)) {
+                        byte[] b = new byte[65536]; int n;
+                        while ((n = in.read(b)) > 0) os.write(b, 0, n);
+                    }
+                }
+                Uri u = FileProvider.getUriForFile(this, getPackageName() + ".files", out);
+                runOnUiThread(() -> {
+                    Intent i = new Intent(Intent.ACTION_SEND);
+                    i.setType("application/vnd.android.package-archive");
+                    i.putExtra(Intent.EXTRA_STREAM, u);
+                    i.putExtra(Intent.EXTRA_SUBJECT, "Családi Vakáció (Android-alkalmazás)");
+                    i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    try { startActivity(Intent.createChooser(i, "APK megosztása")); }
+                    catch (ActivityNotFoundException e) { Toast.makeText(this, "Nincs alkalmazás a megosztáshoz.", Toast.LENGTH_LONG).show(); }
+                });
+            } catch (Exception e) {
+                runOnUiThread(() -> Toast.makeText(this, "Nem sikerült az APK megosztása.", Toast.LENGTH_LONG).show());
+            }
+        }).start();
+    }
+
     /** a játékból (JavaScript) hívható függvények */
     private class Bridge {
         @JavascriptInterface
@@ -295,6 +325,9 @@ public class MainActivity extends Activity {
                 try { startActivity(Intent.createChooser(i, "Megosztás")); } catch (ActivityNotFoundException ignored) { }
             });
         }
+
+        @JavascriptInterface
+        public void shareApk() { shareOwnApk(); }
 
         @JavascriptInterface
         public void openUrl(String url) { runOnUiThread(() -> openExternal(url)); }

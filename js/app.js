@@ -82,6 +82,13 @@ async function doShare(){const url=NTV?SITE+'?install=1':location.href.split('#'
 let updating=false,updPct=0,updLabel='Frissítés',newVer=null;
 function verCmp(a,b){const x=String(a).split('.').map(Number),y=String(b).split('.').map(Number);for(let i=0;i<3;i++){const d=(x[i]||0)-(y[i]||0);if(d)return d;}return 0;}
 function setUpd(p,l){updPct=p;if(l)updLabel=l;const b=document.querySelector('[data-a="update"]');if(b){b.querySelector('.fill').style.width=p+'%';b.querySelector('.lbl').textContent=updLabel;}}
+/* APK megosztása: az alkalmazásban magát a telepített APK-fájlt küldi el (internet nélkül is, pl. Quick Share), máshol a letöltési linket */
+async function shareApk(){elog('info','APK megosztása');
+ if(NTV&&typeof NTV.shareApk==='function'){try{NTV.shareApk();return;}catch(e){}}
+ const t='Családi Vakáció Android-alkalmazás. Letöltés után koppints a fájlra a telepítéshez: '+APK_URL;
+ if(NTV){try{NTV.share(t);}catch(e){}return;}
+ try{if(navigator.share){await navigator.share({title:'Családi Vakáció APK',text:'Családi Vakáció Android-alkalmazás. Letöltés után koppints a fájlra a telepítéshez.',url:APK_URL});return;}}catch(e){if(e&&e.name==='AbortError')return;}
+ try{await navigator.clipboard.writeText(APK_URL);toast('Az APK letöltési linkje a vágólapra másolva!');}catch(e){toast(APK_URL,6000);}}
 /* APK háttérfrissítés (új alkalmazás-kerettől): a telefon magától letölti az új játékfájlokat, és csak szól, ha kész.
    'content' = új játékfájlok letöltve (újraindításkor életbe lépnek), 'apk' = új alkalmazás-keret letöltve (egy koppintás: telepítés) */
 let UPD='',UPDV='',UPD_MAN=false;
@@ -159,7 +166,7 @@ function menuDef(){const s=G.state;if(G.ledger||G.gps||G.elogOpen||G.keysOpen||G
  if(s==='title'){const it=[];if(G.save&&(G.save.leg>0||G.save.dist>0))it.push({a:'cont',l:titleOpts().find(o=>o.a==='cont').l,ic:'▶',c:'primary'});
   it.push({a:'new',l:it.length?'Új játék (teljes újrakezdés)':'Új utazás Komáromból',ic:'🚐',c:it.length?'':'primary'},{a:'color',l:'Autó színe: '+carColor,ic:'🎨'},{a:'ts',l:'Utazás: '+(TS_OPTS.find(q=>q[0]===G.ts)||TS_OPTS[0])[1],ic:'⏱'},{a:'specs',l:'Az autó adatai',ic:'ℹ'});
   if(!isStandalone())it.push({a:'install',l:'Telepítés',ic:'⬇',c:deferredPrompt?'new':''});
-  it.push({a:'share',l:'Megosztás',ic:'↗'},{a:'update',l:updLabel,ic:'⟳',fill:1,c:newVer?'new':''},{a:'music',l:'Zene: '+(musicOn?'be':'ki'),ic:'♪'});
+  it.push({a:'share',l:'Megosztás',ic:'↗'},{a:'shareapk',l:'APK megosztása',ic:'📲'},{a:'update',l:updLabel,ic:'⟳',fill:1,c:newVer?'new':''},{a:'music',l:'Zene: '+(musicOn?'be':'ki'),ic:'♪'});
   it.push({a:'saves',l:'Mentések: '+(typeof PROF!=='undefined'?PROF.name:''),ic:'💾'});
   it.push({a:'album',l:'Album és rekordok: '+Object.keys(PROF.album||{}).length+'/'+LEGS.length,ic:'🖼'},{a:'settings',l:'Beállítások: '+(PROF.easy?'könnyű mód':'hang, akku'),ic:'⚙'});
   if(typeof FINE!=='undefined'&&FINE)it.push({a:'keys',l:'Billentyűzet: '+(KEYMAP==='b'?'Autós':'Klasszikus'),ic:'⌨'});
@@ -225,7 +232,7 @@ function menuAction(a){
  if(a==='settings'){openSettings();return;}
  if(a==='saves'){openSaves();return;}
  if(a==='resume'){G.paused=false;}else if(a==='quit'){goHome();}
- else if(a==='perf'){PERF.on=!PERF.on;try{localStorage.setItem('cv-perf',PERF.on?'1':'0');}catch(e){}MENU_SIG='?';}else if(a==='gps'){if(typeof openGPS==='function')openGPS();}else if(a==='log'){openLedger(G.state==='play'?'pause':'menu');}else if(a==='radio'){radioNext();}else if(a==='install')doInstall();else if(a==='share')doShare();else if(a==='update')doUpdate();
+ else if(a==='perf'){PERF.on=!PERF.on;try{localStorage.setItem('cv-perf',PERF.on?'1':'0');}catch(e){}MENU_SIG='?';}else if(a==='gps'){if(typeof openGPS==='function')openGPS();}else if(a==='log'){openLedger(G.state==='play'?'pause':'menu');}else if(a==='radio'){radioNext();}else if(a==='install')doInstall();else if(a==='share')doShare();else if(a==='shareapk')shareApk();else if(a==='update')doUpdate();
  else if(a==='music'){toggleMusic();}else if(a==='home'){G.state='title';G.st=0;}
  else if(a==='go'){K.enterP=true;G.st=Math.max(G.st,99);}
  else titleAct(a);

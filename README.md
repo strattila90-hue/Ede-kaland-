@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.32.2
+# 🚐 Családi Vakáció – v2.33.0
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -74,6 +74,8 @@ A főmenüben az **Album és rekordok** gomb (a Szünet menüből is elérhető)
 - **Akkukímélő mód:** hosszú autóúton kb. 30 kép/mp és kisebb felbontás, kevésbé melegszik a telefon és tovább bírja az akku.
 
 ## 🎬 Főmenü: filmplakát
+
+**v2.33.0:** új „📲 APK megosztása” gomb a főmenüben: az alkalmazásban magát az APK-fájlt küldi el (internet nélkül is), böngészőben a letöltési linket.
 
 **v2.32.2:** a címben az ékezetek nem lógnak bele a felső sorba (a sorköz számol az ékezettel).
 
@@ -362,6 +364,7 @@ A főmenüben bal oldalt három gomb van:
 
 - **⬇ Telepítés:** a kezdőképernyőre teszi a játékot. iPhone-on Safariban: Megosztás, majd „Főképernyőhöz adás”.
 - **↗ Megosztás:** elküldi a játék linkjét.
+- **📲 APK megosztása:** az Android-alkalmazásban magát a telepített APK-fájlt küldi el (Quick Share, Bluetooth, Messenger, e-mail…), így a másik telefonra internet nélkül is átkerül; ott a fájlra koppintva telepíthető. Böngészőben (és a régebbi alkalmazásban) az APK letöltési linkjét küldi el.
 - **Telepítés megosztott linkről:** a Megosztás gomb olyan linket küld, amelyet megnyitva a játék azonnal felajánlja a telepítést, és amíg nincs telepítve, minden böngészős indításkor újra rákérdez.
 - **Android, Chrome/Edge (gépen is):** egy gombnyomás a „Telepítés most”, a böngésző saját telepítő ablaka jön fel.
 - **iPhone, iPad:** az Apple nem engedi az automatikus telepítést, ezért a játék megmutatja a három lépést (Megosztás → Főképernyőhöz adás → Hozzáadás), nyíllal a gomb felé.
