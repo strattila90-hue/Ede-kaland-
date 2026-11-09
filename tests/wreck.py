@@ -1,4 +1,4 @@
-# Roncsoló műhely: mind a 8 eszköz valódi egér-koppintással / húzással. Elvárt: ERR [], leszakadt részek > 0, olvadt tócsa, képek: tests/out/wreck_*.png
+# Roncsoló műhely: mind a 11 eszköz (a gombsor valódi kattintásával) egér-koppintással / húzással, Új autó és Vissza gomb. Elvárt: ERR [], leszakadt részek > 0, olvadt tócsa, képek: tests/out/wreck_*.png
 import os,asyncio
 ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 URL='file://'+ROOT+'/index.html'
@@ -13,7 +13,9 @@ async def main():
         await pg.goto(URL);await pg.wait_for_function("window.LAZY_DONE&&typeof startWreck==='function'",timeout=20000)
         await pg.evaluate("G.apaOpen=true;menuAction('wreck')");await pg.wait_for_timeout(500)
         async def pt(u,v): return await pg.evaluate(P2C,[u,v])
-        async def tool(i): await pg.evaluate(f"wkAction('wk{i}')")
+        async def tool(i):
+            await pg.click(f'#menu button[data-a="wk{i}"]');await pg.wait_for_timeout(150)
+            assert await pg.evaluate("WK.tool")==i,"a(z) %d. eszköz gombja nem működik"%i
         async def tap(u,v,wait=120):
             x,y=await pt(u,v);await pg.mouse.click(x,y);await pg.wait_for_timeout(wait)
         async def drag(path,steps=12,hold=0):
@@ -41,9 +43,18 @@ async def main():
         await tool(6);await tap(56,20,7000);await pg.screenshot(path=OUT+'wreck_press.png');print('prés:',await pg.evaluate(st))
         await tool(7);await tap(12,36,1800);await pg.wait_for_timeout(300);await pg.screenshot(path=OUT+'wreck_bomb.png')
         await pg.wait_for_timeout(3000);await pg.screenshot(path=OUT+'wreck_after.png');print('robbantás:',await pg.evaluate(st))
+        # lőfegyverek új autón
+        await pg.click('#menu button[data-a="wknew"]');await pg.wait_for_timeout(300)
+        await tool(8)
+        for uv in [(30,20),(30,21),(31,20),(30,19),(31,21),(60,38),(70,40),(89,46)]:await tap(*uv,250)
+        print('pisztoly:',await pg.evaluate(st))
+        await tool(9)
+        for uv in [(45,35),(75,30)]:await tap(*uv,700)
+        print('sörétes:',await pg.evaluate(st))
+        await tool(10);await drag([(20,40),(100,30)],steps=60,hold=300);await pg.wait_for_timeout(200);await pg.screenshot(path=OUT+'wreck_guns.png');print('géppuska:',await pg.evaluate(st))
         # felbontásváltás: a sérült kép újraépül a műveletlistából
         await pg.evaluate("QT=QT===4?1:4;applyQ(true);window.dispatchEvent(new Event('resize'))");await pg.wait_for_timeout(800);await pg.screenshot(path=OUT+'wreck_rebuild.png')
-        await pg.evaluate("wkAction('wknew')");await pg.wait_for_timeout(300);print('új autó:',await pg.evaluate(st))
-        await pg.evaluate("wkAction('wkback')");await pg.wait_for_timeout(300);print('vissza:',await pg.evaluate("G.state+' '+G.apaOpen"))
+        await pg.click('#menu button[data-a="wknew"]');await pg.wait_for_timeout(300);print('új autó:',await pg.evaluate(st))
+        await pg.click('#menu button[data-a="wkback"]');await pg.wait_for_timeout(300);print('vissza:',await pg.evaluate("G.state+' '+G.apaOpen"))
         print('ERR',errs[:3]);await b.close()
 asyncio.run(main())

@@ -16,11 +16,15 @@ const WK_TOOLS=[
  {k:'torch',n:'Lángvágó',ic:'🔥',tip:'Tartsd egy helyen: a fém felizzik, megolvad, és lecsöpög.'},
  {k:'laser',n:'Lézer',ic:'🔴',tip:'Tartsd és húzd: a lézer izzó vágást hagy, és olvasztja a fémet.'},
  {k:'press',n:'Prés',ic:'🗜',tip:'Koppints: a hidraulikus prés lenyomja az autót. Újabb koppintás: felemeli.'},
- {k:'bomb',n:'Robbantás',ic:'🧨',tip:'Koppints az autóra: a töltet 1,5 másodperc múlva felrobban.'}];
+ {k:'bomb',n:'Robbantás',ic:'🧨',tip:'Koppints az autóra: a töltet 1,5 másodperc múlva felrobban.'},
+ {k:'pistol',n:'Pisztoly',ic:'🔫',tip:'Koppints: golyó üt lyukat a lemezen, az üveg megpókhálósodik, a gumi kidurran.'},
+ {k:'shotgun',n:'Sörétes',ic:'💥',tip:'Koppints: a sörétek egy csomóban sok kis lyukat ütnek.'},
+ {k:'mg',n:'Géppuska',ic:'⚡',tip:'Tartsd az ujjad az autón és húzd: sorozatlövés.'}];
+const WK_HOLDT={flex:1,torch:1,laser:1,mg:1};
 const WK_Z=1.6,WK_OX=8,WK_OY=10,WK_DW=128,WK_DH=66,WK_CX=0;
 let WK=null;
 const wkBy=()=>CTF-55.5;
-const wkCam=()=>WK_CX+56-(W*0.6)/(CTS*WK_Z);
+const wkCam=()=>WK_CX+56-(W*0.63)/(CTS*WK_Z);
 function wkRand(seed){let a=seed>>>0;return ()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296;};}
 /* téglalap töredezett élekkel (a szakadás vonala) */
 function wkJag(pts,seed,amp){const r=wkRand(seed),o=[];
@@ -31,7 +35,7 @@ function wkPartsNew(){const P=[['front','az autó eleje',130,[[92,-4],[118,-4],[
  return P.map((q,i)=>({k:q[0],n:q[1],hp:q[2],h:q[2],gone:false,r:q[3],p:wkJag(q[3],31+i*7,1.7)}));}
 function startWreck(home){if(!CT)startCrash();CT.dest=true;CT.wkHome=!!home;CT.cfg=false;CT.parts=[];
  WK={tool:clamp(PROF.wkTool|0,0,WK_TOOLS.length-1),ops:[],parts:wkPartsNew(),wh:[{x:WHEELS[0],h:60,flat:false,gone:false},{x:WHEELS[1],h:60,flat:false,gone:false}],
-  hot:[],pud:[],pcs:[],holes:[],ps:[],hits:{},sq:0,press:null,act:null,cost:0,shake:0,flash:0,prev:null,t:0,sag:0,tilt:0,msg:null,dc:null,lost:0,sfx:0};
+  hot:[],pud:[],pcs:[],holes:[],ps:[],tr:[],gun:null,hits:{},sq:0,press:null,act:null,cost:0,shake:0,flash:0,prev:null,t:0,sag:0,tilt:0,msg:null,dc:null,lost:0,sfx:0};
  engine(0,0);MENU_SIG='?';elog('info','Roncsoló műhely');}
 function wkMenu(){const it=WK_TOOLS.map((t,i)=>({a:'wk'+i,l:t.n,ic:t.ic,c:i===WK.tool?'primary':''}));it.push({a:'wknew',l:'Új autó',ic:'🚗'},{a:'wkback',l:'Vissza',ic:'◀'});return {cls:'ctside',items:it};}
 function wkAction(a){if(a==='wknew'){const t=WK.tool;startWreck(CT.wkHome);WK.tool=t;toast('Új autó a műhelyben.');}
@@ -76,6 +80,10 @@ function wkOp(g,o){const R=wkRand(o.s);g.save();
   g.strokeStyle='rgba(235,245,255,0.8)';g.lineWidth=0.3;g.beginPath();
   for(let i=0;i<9;i++){let a=R()*TAU,x=o.u,y=o.v;g.moveTo(x,y);for(let j=0;j<3;j++){a+=(R()-0.5)*0.6;const l=o.r*(0.4+R()*0.5);x+=Math.cos(a)*l;y+=Math.sin(a)*l;g.lineTo(x,y);}}
   for(let j=1;j<3;j++){const rr=o.r*0.45*j;for(let i=0;i<5;i++){const a=R()*TAU;g.moveTo(o.u+Math.cos(a)*rr,o.v+Math.sin(a)*rr);g.arc(o.u,o.v,rr,a,a+0.5+R()*0.6);}}g.stroke();}
+ else if(o.k==='bullet'){g.globalCompositeOperation='source-atop';const r=o.r;disc(g,'rgba(28,28,30,0.85)',o.u,o.v,r*2.1);
+  g.strokeStyle='rgba(205,210,218,0.85)';g.lineWidth=r*0.7;g.beginPath();g.arc(o.u,o.v,r*1.6,0,TAU);g.stroke();
+  g.strokeStyle='rgba(20,22,26,0.6)';g.lineWidth=0.25;g.beginPath();for(let i=0;i<5;i++){const a=R()*TAU,l=r*(2.4+R()*2);g.moveTo(o.u+Math.cos(a)*r*1.8,o.v+Math.sin(a)*r*1.8);g.lineTo(o.u+Math.cos(a)*l,o.v+Math.sin(a)*l);}g.stroke();
+  g.globalCompositeOperation='destination-out';g.fillStyle='#000';g.beginPath();g.arc(o.u,o.v,r,0,TAU);g.fill();}
  else if(o.k==='crease'){g.globalCompositeOperation='source-atop';g.strokeStyle='rgba(12,14,18,0.7)';g.lineWidth=0.7;g.beginPath();
   for(let j=0;j<=6;j++){const y=o.v0+(o.v1-o.v0)*j/6;g.lineTo(o.u+(j%2?1.6:-1.6),y);}g.stroke();g.strokeStyle='rgba(255,255,255,0.35)';g.lineWidth=0.4;g.beginPath();
   for(let j=0;j<=6;j++){const y=o.v0+(o.v1-o.v0)*j/6;g.lineTo(o.u+0.8+(j%2?1.6:-1.6),y);}g.stroke();}
@@ -113,15 +121,16 @@ function updWreck(){const w=WK;if(!w)return;w.t++;engine(0,0);if(K.pauseP){wkAct
  if(w.shake>0)w.shake*=0.85;if(w.flash>0)w.flash*=0.8;if(w.msg&&--w.msg.life<=0)w.msg=null;
  const tool=WK_TOOLS[w.tool].k;
  if(TAPD)wkTap(tool,wkLoc(TAPD));
- if(HOLD&&(tool==='flex'||tool==='torch'||tool==='laser')){const L=wkLoc(HOLD);wkHold(tool,L,w.prev);w.prev=L;w.hp=L;}else{w.prev=null;w.hp=null;}
+ if(HOLD&&WK_HOLDT[tool]){const L=wkLoc(HOLD);wkHold(tool,L,w.prev);w.prev=L;w.hp=L;}else{w.prev=null;w.hp=null;}
  wkActs();wkPressUpd();
  for(const h of w.hot){if(h.on>0)h.on--;else h.T-=0.007;}
  for(let i=w.hot.length-1;i>=0;i--){const h=w.hot[i];if(h.T<0.15){wkDo({k:'tint',u:h.u,v:h.v,r:3+h.m*1.6});w.hot.splice(i,1);}}
  // olvadt cseppek, tűz, füst
- for(const p of w.ps){if(p.k==='drop'){p.vy+=0.16;p.x+=p.vx;p.y+=p.vy;p.T-=0.004;if(p.y>=CTF){p.dead=true;let q=null;for(const d of w.pud)if(Math.abs(d.x-p.x)<d.w*0.6+2){q=d;break;}if(q){q.w=Math.min(16,q.w+0.35);q.T=Math.max(q.T,p.T);}else w.pud.push({x:p.x,w:2,T:p.T});}}
+ for(const p of w.ps){if(p.k==='shell'){p.vy+=0.2;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;if(p.y>CTF-0.6){p.y=CTF-0.6;p.vy*=-0.35;p.vx*=0.6;p.vr*=0.6;if(Math.abs(p.vy)>0.6)tone(3200+rnd(0,900),0.04,'triangle',0.012);}if(--p.life<=0)p.dead=true;}
+  else if(p.k==='drop'){p.vy+=0.16;p.x+=p.vx;p.y+=p.vy;p.T-=0.004;if(p.y>=CTF){p.dead=true;let q=null;for(const d of w.pud)if(Math.abs(d.x-p.x)<d.w*0.6+2){q=d;break;}if(q){q.w=Math.min(16,q.w+0.35);q.T=Math.max(q.T,p.T);}else w.pud.push({x:p.x,w:2,T:p.T});}}
   else{p.x+=p.vx;p.y+=p.vy;p.vy-=p.k==='fire'?0.02:0.008;p.r+=p.k==='fire'?-0.03:0.09;if(--p.life<=0||p.r<=0.2)p.dead=true;}}
  w.ps=w.ps.filter(p=>!p.dead);if(w.ps.length>220)w.ps.splice(0,w.ps.length-220);for(const d of w.pud)d.T=Math.max(0,d.T-0.0025);
- ctParts(1);
+ ctParts(1);for(const q of w.tr)q.life--;w.tr=w.tr.filter(q=>q.life>0);if(w.gun&&w.gun.fl>0)w.gun.fl--;
  // leszakadt darabok esése
  for(const p of w.pcs){if(p.rest)continue;p.vy+=0.22;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;{const lo=wkCam()+30+p.w/2,hi=wkCam()+W/(CTS*WK_Z)-p.w/2-2;if(p.x>hi){p.x=hi;p.vx*=-0.35;}if(p.x<lo){p.x=lo;p.vx*=-0.35;}}const e=Math.abs(Math.cos(p.r))*p.h/2+Math.abs(Math.sin(p.r))*p.w/2;
   if(p.y+e>CTF){p.y=CTF-e;if(p.vy>1.2)noise(0.18,Math.min(0.3,p.vy*0.05),0,900);p.vy*=-0.25;p.vx*=0.6;p.vr*=0.5;
@@ -133,8 +142,10 @@ function wkTap(tool,L){const w=WK;
  else if(tool==='ball'){if(!w.act||w.act.k!=='ball')w.act={k:'ball',u:L.u,v:L.v,f:0};}
  else if(tool==='cannon'){if(!w.act||w.act.k!=='cannon'||w.act.f>10){w.act={k:'cannon',u:L.u,v:L.v,f:0};noise(0.5,0.5,0,420);tone(70,0.4,'sawtooth',0.1,0,-40);w.shake=3;}}
  else if(tool==='bomb'){if(!w.act||w.act.k!=='bomb'){if(wkOn(L.u,L.v)||wkWheelAt(L.u,L.v))w.act={k:'bomb',u:L.u,v:L.v,f:0};else WK.msg={s:'A töltetet az autóra tedd!',life:90};}}
+ else if(tool==='pistol'){wkFire(L,1,1);}
+ else if(tool==='shotgun'){wkFire(L,9,0.7);tone(300,0.05,'square',0.04,0.35);tone(220,0.06,'square',0.04,0.5);}
  else if(tool==='press'){if(!w.press)w.press={pv:-36,dir:1};else w.press.dir=-w.press.dir;tone(60,0.3,'sine',0.05);}}
-function wkHold(tool,L,P){const w=WK,wh=wkWheelAt(L.u,L.v),melt=(tool==='torch'||tool==='laser')&&!wkGone(L.u,L.v)&&w.hot.some(h=>h.m>0&&Math.hypot(h.u-L.u,h.v-L.v)<h.m+2.5),on=wkOn(L.u,L.v)||melt;
+function wkHold(tool,L,P){if(tool==='mg'){if(WK.t%5===0)wkFire(L,1,0.9,2.2);return;}const w=WK,wh=wkWheelAt(L.u,L.v),melt=(tool==='torch'||tool==='laser')&&!wkGone(L.u,L.v)&&w.hot.some(h=>h.m>0&&Math.hypot(h.u-L.u,h.v-L.v)<h.m+2.5),on=wkOn(L.u,L.v)||melt;
  if(tool==='flex'){if(wh){wkWheelHurt(wh,0.8);wkSparks(L.wx,L.wy,2,-1);}
   if(on){wkSparks(L.wx,L.wy,3,-1);if(w.t%4===0){noise(0.12,0.07,0,5200);tone(2300+rnd(0,400),0.08,'sawtooth',0.012);}
    if(P&&Math.hypot(L.u-P.u,L.v-P.v)>0.35){const l=Math.hypot(L.u-P.u,L.v-P.v);wkDo({k:'cut',u0:P.u,v0:P.v,u1:L.u,v1:L.v,w:0.8});wkHurt(L.u,L.v,l*6,5);WK.cost+=l*900;}}}
@@ -145,6 +156,16 @@ function wkHold(tool,L,P){const w=WK,wh=wkWheelAt(L.u,L.v),melt=(tool==='torch'|
   if(on){const s=wkHeat(L.u,L.v,0.09,4);s.T=Math.max(s.T,1.25);WK.cost+=80;
    if(P&&Math.hypot(L.u-P.u,L.v-P.v)>0.3){const l=Math.hypot(L.u-P.u,L.v-P.v);wkDo({k:'cut',u0:P.u,v0:P.v,u1:L.u,v1:L.v,w:1,hot:true});wkHurt(L.u,L.v,l*5+1.5,5);}
    if(w.t%3===0)wkSparks(L.wx,L.wy,1,rnd(-1,1));}}}
+/* lövés a néző felől: golyó ütötte lyuk (bullet), üvegen pókhálós repedés, gumin defekt */
+function wkFire(L,n,pow,spr){const w=WK,tool=WK_TOOLS[w.tool].k;w.gun={k:tool,x:L.wx,y:L.wy,life:90,fl:3};
+ noise(n>1?0.45:0.22,n>1?0.6:0.45,0,n>1?1500:2400);noise(0.1,0.3,0,6500);tone(120,0.1,'square',0.05,0,-60);vib(n>1?40:12);w.shake=Math.max(w.shake,n>1?3:tool==='mg'?0.8:1.2);
+ w.ps.push({k:'shell',x:wkCam()+(W-30)/(CTS*WK_Z),y:CTF-10,vx:rnd(0.3,1),vy:-rnd(1.5,2.5),r:0,vr:rnd(-0.5,0.5),life:150});
+ for(let i=0;i<n;i++){const u=L.u+(n>1?rnd(-5,5):rnd(-(spr||0),spr||0)),v=L.v+(n>1?rnd(-4,4):rnd(-(spr||0),spr||0));w.tr.push({x:wkWX(u),y:wkWY(v),life:3});
+  const wh=wkWheelAt(u,v);if(wh){wkWheelHurt(wh,24*pow);continue;}
+  if(wkGlass(u,v)&&!wkGone(u,v)){const key='b'+((u/8)|0)+'_'+((v/7)|0),m=w.hits[key]=(w.hits[key]||0)+1;wkDo({k:'glass',u:u,v:v,r:4.5,br:m>=5});wkDo({k:'bullet',u:u,v:v,r:0.5});
+   if(m>=5)wkDebris(wkWX(u),wkWY(v),6,0,true);noise(0.12,0.12,0,7500);w.cost+=6000;continue;}
+  if(wkOn(u,v)){const r=0.45+pow*0.25;wkDo({k:'bullet',u:u,v:v,r:r});w.holes.push({u:u,v:v,r:r});wkHurt(u,v,3.5*pow,4);wkSparks(wkWX(u),wkWY(v),2,rnd(-1,1));w.cost+=3500;
+   if(Math.random()<0.2)tone(2800,0.18,'sine',0.025,0.03,-900);else tone(1500+rnd(0,500),0.06,'triangle',0.03);}}}
 function wkActs(){const w=WK,a=w.act;if(!a)return;a.f++;
  if(a.k==='hammer'&&a.f===5){const L=a,wh=wkWheelAt(L.u,L.v);
   if(wh){wkWheelHurt(wh,16);tone(180,0.12,'square',0.05);}
@@ -228,12 +249,18 @@ function drawWreck(g){const w=WK,B=ctBG(),k=CTS*WK_Z,cam=wkCam(),cs=cam*CTS,fy=C
   if(p.k==='spark'){const al=clamp(p.life/22,0,1);line(g,'rgba(255,214,120,'+al.toFixed(2)+')',p.x,p.y,p.x-p.vx*1.6,p.y-p.vy*1.6,0.6);continue;}
   const s=p.s||1,c=p.k==='glass'?'rgba(205,235,250,0.9)':p.k==='frag'?CP.m:'#1d2228';g.save();g.translate(p.x,p.y);g.rotate(p.r);
   if(p.k==='glass')poly(g,c,[[-s,-s*0.4],[s,-s*0.7],[s*0.3,s*0.8]],0,0);else if(p.k==='frag')poly(g,c,[[-s*1.4,-s*0.5],[s*1.2,-s*0.8],[s*1.4,s*0.6],[-s,s*0.7]],0,0);else frr(g,c,-s,-s*0.5,s*2,s,0.3);g.restore();}
- for(const p of w.ps){if(p.k==='drop'){disc(g,wkHotCol(p.T,0.95),p.x,p.y,0.9);continue;}
+ for(const p of w.ps){if(p.k==='shell'){g.save();g.translate(p.x,p.y);g.rotate(p.r);R(g,'#d9a933',-1,-0.4,2,0.8);R(g,'#8a6a1c',0.6,-0.4,0.4,0.8);g.restore();continue;}
+  if(p.k==='drop'){disc(g,wkHotCol(p.T,0.95),p.x,p.y,0.9);continue;}
   const al=p.k==='fire'?clamp(p.life/30,0,1):clamp(p.life/120,0,1)*0.45;disc(g,p.k==='fire'?(p.life>14?'rgba(255,210,90,'+al.toFixed(2)+')':'rgba(240,90,30,'+al.toFixed(2)+')'):'rgba(60,62,66,'+al.toFixed(2)+')',p.x,p.y,p.r);}
  g.restore();
+ // lőfegyver a néző oldalán (jobbra lent): cső a célpont felé, torkolattűz, nyomjelző
+ if(w.gun&&w.gun.life-->0){const gx=W-34,gy=H-2,tx=(w.gun.x-cam)*k,ty=(w.gun.y-CTF)*k+fy,an=Math.atan2(ty-gy,tx-gx),L=w.gun.k==='pistol'?30:48;
+  for(const q of w.tr){const qx=(q.x-cam)*k,qy=(q.y-CTF)*k+fy;g.globalCompositeOperation='lighter';line(g,'rgba(255,220,140,'+(q.life*0.2).toFixed(2)+')',gx+Math.cos(an)*L,gy+Math.sin(an)*L,qx,qy,1.2);g.globalCompositeOperation='source-over';}
+  g.save();g.translate(gx,gy);g.rotate(an);frr(g,'#1d2228',-20,-7,L*0.55+20,14,3);R(g,'#2b3037',0,-3,L,6);R(g,'rgba(255,255,255,0.15)',0,-3,L,1.2);if(w.gun.k!=='pistol')frr(g,'#5a3a1e',-34,-6,18,12,3);
+  if(w.gun.fl>0){g.globalCompositeOperation='lighter';disc(g,'rgba(255,200,90,0.85)',L+5,0,7);disc(g,'rgba(255,250,220,0.9)',L+3,0,3.5);g.globalCompositeOperation='source-over';}g.restore();}
  if(w.flash>0.05)R(g,'rgba(255,240,210,'+(w.flash*0.7).toFixed(2)+')',0,0,W,H);
  // felirat: eszköz, tipp, kár
- const T=WK_TOOLS[w.tool],cx=W/2+60,s1='Roncsoló műhely: '+T.n,s2=T.k==='flex'||T.k==='torch'||T.k==='laser'?'Tartsd az ujjad az autón, és húzd':'Koppints az autóra',ww=Math.max(textW(s1,0.9),textW(s2,0.65))+18;
+ const T=WK_TOOLS[w.tool],cx=W/2+60,s1='Roncsoló műhely: '+T.n,s2=WK_HOLDT[T.k]?'Tartsd az ujjad az autón, és húzd':'Koppints az autóra',ww=Math.max(textW(s1,0.9),textW(s2,0.65))+18;
  frr(g,'rgba(10,13,20,0.78)',cx-ww/2,6,ww,28,6);text(g,s1,cx,11,'#ffd84a',0.9,'center',null);text(g,s2,cx,24,'#cfd6df',0.65,'center',null);
  const ng=w.parts.filter(p=>p.gone).length+w.wh.filter(q=>q.gone).length;frr(g,'rgba(10,13,20,0.78)',W-128,40,122,28,6);
  text(g,'Kár: '+fmt(Math.round(w.cost/1000)*1000)+' Ft',W-12,45,'#ff9a7a',0.75,'right',null);text(g,'Leszakadt részek: '+ng,W-12,58,'#cfd6df',0.65,'right',null);

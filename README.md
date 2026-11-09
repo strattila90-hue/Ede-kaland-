@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.37.0
+# 🚐 Családi Vakáció – v2.38.0
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -273,7 +273,7 @@ Minden tranzakció után a pénzkijelző egy pillanatra a levont vagy kapott ös
 
 ## 🔨 Roncsoló műhely (Apa garázsa, v2.37)
 
-Az Apa garázsából (vagy a törésteszt „Roncsolás” gombjával) nyílik. Az üres autó (a bábukat kivették) a csarnokban áll, és nyolc eszközzel lehet szétszedni. Az eszközök a bal oldali gombsorban vannak.
+Az Apa garázsából (vagy a törésteszt „Roncsolás” gombjával) nyílik. Az üres autó (a bábukat kivették) a csarnokban áll, és tizenegy eszközzel lehet szétszedni. Az eszközök a bal oldali gombsorban vannak (v2.38: javítva, hogy a gombsor gombjai, az Új autó és a Vissza is működjenek).
 - **Kalapács:** koppintásra horpadás, sokadik ütésre ugyanott kiszakad a lemez. Az ablak megreped, majd kitörik.
 - **Bontógolyó:** a lengő golyó oda csapódik, ahová koppintasz: nagy horpadás, kitört ablakok, és ha a rész már gyenge, kiszakad.
 - **Ágyú:** az acélgolyó átlyukasztja a lemezt (kifelé hajló, szakadt szélű lyuk), a kereket kidurrantja.
@@ -281,6 +281,7 @@ Az Apa garázsából (vagy a törésteszt „Roncsolás” gombjával) nyílik. 
 - **Lángvágó:** egy helyen tartva a fém felizzik (vörös, narancs, sárga, végül fehéren izzik), **megolvad**, a lyuk nő, az olvadt fém izzó cseppekben a padlóra csöpög, és ott izzó, majd kihűlő tócsa lesz. Kihűlés után kékes-barnás hőszíneződés marad.
 - **Lézer:** húzva izzó vágást hagy, és közben olvasztja a fémet.
 - **Prés:** a hidraulikus prés lenyomja az autót. Közben kitörnek az ablakok, és a fém meggyűrődik. Újabb koppintásra felemelkedik.
+- **Lőfegyverek (v2.38):** **Pisztoly** (koppintás: kerek golyónyom lepattant festékkel, az üvegen pókhálós repedés, sok találatra kitörik, a gumi kidurran), **Sörétes puska** (egy lövés 9 sörét egy csomóban, utána csőretöltés hangja), **Géppuska** (nyomva tartva és húzva sorozatlövés). A fegyver jobbra lent a néző oldalán látszik, a célpont felé fordul, torkolattűz, nyomjelző lövedék, kirepülő és a padlón csilingelve pattogó hüvelyek, időnként golyó-lepattanás hangja.
 - **Robbantás:** a töltet villogva, gyorsuló sípolással 1,5 másodperc múlva felrobban: kormos égésnyom, horpadások, tűz és füst. A közeli részek leszakadnak és elrepülnek.
 
 **Szakadás:** az autó öt részből áll (eleje, hátulja, tető, két ajtó), mindegyiknek van életereje. Ha elfogy, a rész **töredezett széllel leszakad**, leesik, a magas darabok eldőlnek a padlón. A kerék kidurranhat, majd leszakadhat, ilyenkor a karosszéria arra az oldalra lesüllyed. A sarokban látszik a kár forintban és a leszakadt részek száma. Az „Új autó” gomb hoz egy épet.

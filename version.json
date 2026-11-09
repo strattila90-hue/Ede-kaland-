@@ -1,8 +1,8 @@
 {
- "version": "2.37.0",
+ "version": "2.38.0",
  "apk": 3,
  "files": {
-  "index.html": 60929,
+  "index.html": 61109,
   "manifest.webmanifest": 863,
   "sw.js": 1463,
   "js/core.js": 33568,
@@ -16,9 +16,9 @@
   "js/minigames.js": 20198,
   "js/shops.js": 31707,
   "js/crash.js": 37487,
-  "js/wreck.js": 28157,
+  "js/wreck.js": 31909,
   "js/game.js": 154336,
-  "js/app.js": 58486,
+  "js/app.js": 58509,
   "icons/icon-192.png": 27752,
   "icons/icon-512.png": 94753,
   "icons/icon-maskable-512.png": 90587

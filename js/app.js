@@ -258,7 +258,7 @@ function menuAction(a){
  if(a==='crew'){openCrew(false);return;}
  if(a==='wreck'){if(typeof startWreck==='function'){startCrash();startWreck(true);}else toast('A műhely még töltődik, próbáld újra egy pillanat múlva.');MENU_SIG='?';return;}
  if(a==='crash'){if(typeof startCrash==='function')startCrash();else toast('A törésteszt még töltődik, próbáld újra egy pillanat múlva.');MENU_SIG='?';return;}
- if(a&&a.slice(0,2)==='ct'&&typeof ctAction==='function'){ctAction(a);MENU_SIG='?';return;}
+ if(a&&(a.slice(0,2)==='ct'||a.slice(0,2)==='wk')&&typeof ctAction==='function'){ctAction(a);MENU_SIG='?';return;}
  if(a==='new'&&G.state==='title'&&!(G.save&&(G.save.leg>0||G.save.dist>0))&&!G.crewOk){openCrew(true);return;}
  if(a==='new'&&G.state==='title'&&G.save&&(G.save.leg>0||G.save.dist>0)&&!G.confirm){G.confirm='new';MENU_SIG='?';return;}
  if(a==='newyes'){G.confirm=null;try{localStorage.removeItem(saveKey());}catch(e){}G.save=null;G.menu=0;MENU_SIG='?';openCrew(true);return;}
