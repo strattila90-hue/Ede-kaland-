@@ -89,6 +89,7 @@ html,body{margin:0;height:100%;height:100dvh;width:100%;position:fixed;inset:0;b
 /* kezelőszervek */
 
 #touch{position:fixed;inset:0;pointer-events:none;display:none;z-index:10}
+#touch.crashui .ctl:not(#bGas):not(#bBr),#touch.crashui #ctlrow{display:none}
 .ctl{position:absolute;pointer-events:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;color:#e8eef5;
  background:linear-gradient(180deg,#2f3646 0%,#161a23 100%);border:1px solid var(--line);box-shadow:inset 0 1px 0 var(--hi),0 6px 14px rgba(0,0,0,.55);transition:transform .06s,box-shadow .15s}
 .ctl svg{width:58%;height:58%;pointer-events:none}
@@ -193,6 +194,7 @@ html,body{margin:0;height:100%;height:100dvh;width:100%;position:fixed;inset:0;b
 @keyframes bIn{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
 #menu.bottom.anim{animation-name:mInB}@keyframes mInB{from{opacity:0;translate:0 18px}to{opacity:1;translate:0 0}}
 #menu .mb{flex-shrink:0}
+#menu.ctm{gap:6px;padding:6px}#menu.ctm .mb{flex-direction:column;gap:2px;min-height:0;padding:6px 10px}#menu.ctm .mb .ic{font-size:15px}#menu.ctm .mb .lbl{font-size:13px;white-space:nowrap}
 /* v2.32: menőbb főmenü (üveg, fénylő keret, ikoncsipek, rugós belépés) */
 #menu.cine{background:linear-gradient(155deg,rgba(22,26,40,.78),rgba(10,12,20,.62));-webkit-backdrop-filter:blur(12px) saturate(140%);backdrop-filter:blur(12px) saturate(140%);border:1px solid rgba(255,255,255,.12);border-left:1px solid rgba(255,255,255,.12);
  box-shadow:0 30px 80px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.08);isolation:isolate}

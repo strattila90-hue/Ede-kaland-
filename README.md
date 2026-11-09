@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.34.0
+# 🚐 Családi Vakáció – v2.35.0
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -258,8 +258,13 @@ Minden tranzakció után a pénzkijelző egy pillanatra a levont vagy kapott ös
 ## 💥 Törésteszt (Apa garázsa)
 
 Ütközésvizsgáló csarnok a családi autóval, a bevett biztonsági vizsgálatok mintájára: mérőcsíkos fal, nagysebességű kamerák, betontömb méhsejt-alumínium homlokkal. A székekben **törésteszt-bábuk** ülnek (sárga fej, fekete-sárga célkör, biztonsági öv, a gyerekek ülésmagasítóban).
-- **Három teszt:** frontális ütközés részleges átfedéssel (64 km/h), teljes szélességű merev fal (50 km/h), hátulról ütközés mozgó akadállyal (50 km/h). A sebesség 30 és 130 km/h között állítható.
+- **Három teszt:** frontális ütközés részleges átfedéssel (64 km/h), teljes szélességű merev fal (50 km/h), hátulról ütközés mozgó akadállyal (50 km/h). Automata módban a sebesség 30 és 130 km/h között állítható.
 - **Látványos törés:** visszaszámlálás után az autó nekifut, az ütközés **lassított felvételen** látszik (ezredmásodperc-számlálóval, vakuvillanásokkal). Az autó eleje (nagy sebességnél az utastér is) összegyűrődik, a motorháztető felgyűrődik, a szélvédő megreped, kinyílik a légzsák, a bábuk feje előrecsapódik (hátsó ütközésnél hátra: ostorcsapás), üvegszilánkok, fényezés- és műanyagdarabok, szikrák repülnek, leesik a lökhárító, gőzöl a hűtő, folyadékfolt lesz a padlón; nagyon gyorsan a kerék is leszakad és elgurul.
+- **Saját vezetés (v2.35):** az autót te vezeted a falnak egy **300 méteres nekifutópályán** (a kamera követi, 10 méterenként jel, 50 méterenként tábla, rajtvonal). Gáz: jobb nyíl / D, fék: bal nyíl / A, telefonon a GÁZ és FÉK pedál; Esc = megszakítás. Valós menetfizika: 96 kW, 1 450 kg, **6 fokozat** (kapcsoláskor rövid vonóerő-kiesés), légellenállás, motorfék, **ABS-fék** (9,2 m/s²). Gyorsításkor az autó orra megemelkedik, fékezéskor bebólint, a fékezés halvány féknyomot hagy. Teljes gázzal kb. 120 km/h-val éred el a falat. Az ütközési sebességet a fal előtt 1 m-rel álló **fénykapu** méri, és ebből számol az értékelés. Az **Automata** mód (a vontatórendszer pontosan a beállított sebességgel viszi az autót) is megmaradt.
+- **Gyorsulás hangja:** a motor fordulatszáma a sebességből és a fokozatból jön, hallani a felpörgést, a **fokozatváltást** (a fordulat leesik), visszaszámláláskor üresben a gázfröccsöt, fékezéskor a gumik sziszegését. Ütközéskor leáll a motor. A műszer mutatja a sebességet, a fokozatot, a fordulatszámot és a fal távolságát.
+- **Fékpróba:** ha a fal előtt 8 méteren belül megállsz, nem lesz ütközés, hanem fékpróba-értékelés: hány centire álltál meg, milyen sebességről kezdtél fékezni, mekkora lett a fékút, és mennyi utat tettél volna meg 1 másodperc reakcióidő alatt fékezés nélkül. A legközelebbi megállás megmarad.
+- **Öv nélküli teszt:** az „Öv ki” gombbal a bábuk biztonsági öv nélkül ülnek. Ütközéskor nem tartja meg őket semmi: a műszerfalnak és a szélvédőnek csapódnak, a szélvédő betörik, és az értékelés is sokkal rosszabb. Így látható, miért kell mindig bekötni magunkat.
+- **Valósághűbb mérések:** **lassulásgörbe** (g az idő függvényében, lassított felvételnél a görbe az ütközéssel együtt rajzolódik), valós időtartam (kb. 60–80 ms) és gyűrődési út. A csúcslassulás a sebességből és a gyűrődési útból számolódik (64 km/h-nál kb. 37 g). Kiírja az **ütközési energiát**, és hogy ez hány méteres zuhanásnak felel meg (64 km/h ≈ 16 m, kb. ötödik emelet). Kis sebességnél alig van törmelék, gőz és folyadékfolt.
 - **Csillagos értékelés (0–5):** felnőtt és gyermek utasok védelme, biztonsági rendszerek százalékban, bábu-ábra testtájanként színezve (zöld = jó … piros = rossz), lassulás, fejsérülési érték (HIC), utastér-behatolás. A legjobb eredmény tesztenként és sebességenként megmarad.
 
 ## 🚦 Forgalom

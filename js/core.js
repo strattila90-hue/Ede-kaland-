@@ -2,7 +2,7 @@
 /* =========================================================
    CSALÁDI VAKÁCIÓ – alapok: vászon, rajzoló segédek, betűk, hang, bemenet
    ========================================================= */
-const APP_VERSION='2.34.0';
+const APP_VERSION='2.35.0';
 const W=480,H=270,PX=70,ROADT=194,ROADB=262,LANE=[212,232,252];
 const TAU=Math.PI*2;
 let SC=2,LOWQ=false;
@@ -218,7 +218,8 @@ let KEYMAP='a';try{KEYMAP=localStorage.getItem('cv-keys')==='b'?'b':'a';}catch(e
 function setKeymap(m){KEYMAP=m==='b'?'b':'a';try{localStorage.setItem('cv-keys',KEYMAP);}catch(e){}}
 function kRole(e){const c=e.code||'',k=e.key;const inPlay=typeof G!=='undefined'&&G.state==='play'&&!G.paused&&!MG&&!G.gps&&!G.ledger;
  const up=c==='ArrowUp'||c==='KeyW'||c==='Numpad8',dn=c==='ArrowDown'||c==='KeyS'||c==='Numpad2',lf=c==='ArrowLeft'||c==='KeyA'||c==='Numpad4',rt=c==='ArrowRight'||c==='KeyD'||c==='Numpad6';
- if(!inPlay){if(up)return 'up';if(dn)return 'dn';if(rt)return 'gas';if(lf)return 'brake';}
+ if(typeof ctDriving==='function'&&ctDriving()){if(up||rt)return 'gas';if(dn||lf)return 'brake';}
+ else if(!inPlay){if(up)return 'up';if(dn)return 'dn';if(rt)return 'gas';if(lf)return 'brake';}
  else if(KEYMAP==='b'){if(up)return 'gas';if(dn)return 'brake';if(lf)return 'up';if(rt)return 'dn';}
  else{if(rt)return 'gas';if(lf)return 'brake';if(up)return 'up';if(dn)return 'dn';}
  if(k===' '||c==='Numpad0')return 'pump';if(c==='KeyH'||c==='ShiftLeft'||c==='ShiftRight'||c==='NumpadAdd')return 'horn';
@@ -242,7 +243,7 @@ window.addEventListener('keydown',e=>{initAudio();const r=kRole(e);if(!r)return;
   if(typeof G!=='undefined'&&G.state==='play'&&typeof P!=='undefined'&&P&&P.sub==='drive'&&!MG&&!G.paused){const v=[0,50,70,90,110,130][n];if(n===0||v)K.cruiseSet=n===0?0:v;}else if(n>0)K.num=n;}
  if(['pump','gas','brake','up','dn','log','help','perf'].includes(r)||r.startsWith('num'))e.preventDefault();});
 const KHELD=new Set();
-function kPedals(){const A=KEYMAP==='b'?{g:['ArrowUp','KeyW','Numpad8'],b:['ArrowDown','KeyS','Numpad2']}:{g:['ArrowRight','KeyD','Numpad6'],b:['ArrowLeft','KeyA','Numpad4']};
+function kPedals(){const A=typeof ctDriving==='function'&&ctDriving()?{g:['ArrowUp','KeyW','Numpad8','ArrowRight','KeyD','Numpad6'],b:['ArrowDown','KeyS','Numpad2','ArrowLeft','KeyA','Numpad4']}:KEYMAP==='b'?{g:['ArrowUp','KeyW','Numpad8'],b:['ArrowDown','KeyS','Numpad2']}:{g:['ArrowRight','KeyD','Numpad6'],b:['ArrowLeft','KeyA','Numpad4']};
  K.gas=A.g.some(c=>KHELD.has(c));K.brake=A.b.some(c=>KHELD.has(c));}
 window.addEventListener('keyup',e=>{const r=kRole(e);KHELD.delete(e.code);kPedals();
  if(r==='pump')K.pump=false;else if(r==='flash')K.flash=false;else if(r==='horn')K.horn=false;});

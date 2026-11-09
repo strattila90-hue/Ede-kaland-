@@ -20,6 +20,7 @@ python3 -m http.server 8765    # -> http://localhost:8765/index.html
 export PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers
 python3 tests/flash.py     # ~15 mp, elvárt: black 0, ERR []
 python3 tests/devices.py   # ~1 perc, 9 képernyőméret, elvárt: minden "overlap": "" (képek: tests/out/)
+python3 tests/crash.py     # ~2 perc, törésteszt: saját vezetés, fékpróba, öv nélkül, hátsó; elvárt: ERR [] (képek: tests/out/crash_*.png)
 python3 tests/soak.py      # ~20 perc, mind a 22 szakasz; elvárt: "HIBÁK 0", legsDone 22, win 1, pageerrors []
 ```
 
@@ -42,6 +43,7 @@ python3 tools-version.py && git add -A && git commit -m "vX.Y.Z: ..." \
 | `js/app.js` | DOM-menük (`menuDef`, `menuAction`), költségnapló, telepítés, offline/frissítés (`autoOffline`, `doUpdate`), hibanapló- és billentyűzet-ablak, kilépés/vissza-gesztus csapda |
 | `js/shops.js` | boltok, benzinkút, szerviz |
 | `js/minigames.js` | minijátékok |
+| `js/crash.js` | törésteszt (Apa garázsa): 300 m-es pálya követő kamerával, saját vezetés (`ctDrive`: fokozatok, motorhang, ABS) vagy automata, ütközés (`ctImpact`, lassított `hit` fázis), lassulásgörbe (`ctPulse`, `ctChart`), öv nélküli mód, fékpróba (`ctBrakeRes`), értékelés (`ctScore`, `ctPanel`); vezetés közben a `#touch` csak a két pedált mutatja (`crashui` osztály) |
 | `js/map.js`, `js/geo.js` | térképrajz, durva Európa-partvonal (`GEO`) |
 | `js/gps.js`, `js/geohd.js` | teljes képernyős interaktív GPS, részletes partvonal (`GEOHD`, Natural Earth 1:50m) |
 | `sw.js` | service worker, gyorsítótár neve `csaladi-vakacio`, `ASSETS` lista |

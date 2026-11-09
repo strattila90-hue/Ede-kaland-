@@ -1,11 +1,11 @@
 {
- "version": "2.34.0",
+ "version": "2.35.0",
  "apk": 3,
  "files": {
-  "index.html": 60272,
+  "index.html": 60541,
   "manifest.webmanifest": 863,
   "sw.js": 1449,
-  "js/core.js": 33297,
+  "js/core.js": 33568,
   "js/geo.js": 22119,
   "js/radio.js": 10650,
   "js/map.js": 10735,
@@ -15,9 +15,9 @@
   "js/world.js": 61590,
   "js/minigames.js": 20198,
   "js/shops.js": 31707,
-  "js/crash.js": 20613,
-  "js/game.js": 154315,
-  "js/app.js": 58028,
+  "js/crash.js": 33473,
+  "js/game.js": 154336,
+  "js/app.js": 58197,
   "icons/icon-192.png": 27752,
   "icons/icon-512.png": 94753,
   "icons/icon-maskable-512.png": 90587
