@@ -1,7 +1,7 @@
 # version.json előállítása: verzió + fájlméretek a százalékos frissítéshez
 import json,os,re
 v=re.search(r"APP_VERSION='([^']+)'",open('js/core.js',encoding='utf-8').read()).group(1)
-files=['index.html','manifest.webmanifest','sw.js','js/core.js','js/geo.js','js/radio.js','js/map.js','js/gps.js','js/geohd.js','js/car.js','js/world.js','js/minigames.js','js/shops.js','js/crash.js','js/game.js','js/app.js','icons/icon-192.png','icons/icon-512.png','icons/icon-maskable-512.png']
+files=['index.html','manifest.webmanifest','sw.js','js/core.js','js/geo.js','js/radio.js','js/map.js','js/gps.js','js/geohd.js','js/car.js','js/world.js','js/minigames.js','js/shops.js','js/crash.js','js/wreck.js','js/game.js','js/app.js','icons/icon-192.png','icons/icon-512.png','icons/icon-maskable-512.png']
 # apk: az Android-alkalmazás keretének sorszáma (android/NATIVE_REV); ha a telepített kisebb, új APK kell, különben a játék magától frissül
 apk=int(open('android/NATIVE_REV').read().strip()) if os.path.exists('android/NATIVE_REV') else 1
 json.dump({'version':v,'apk':apk,'files':{f:os.path.getsize(f) for f in files if os.path.exists(f)}},open('version.json','w'),indent=1)

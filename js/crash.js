@@ -26,15 +26,15 @@ const ctSev=()=>{const T=CT_TESTS[CT.ti];return Math.pow((CT.vi||CT.v)/64,2)*T.m
 function ctPulse(){const T=CT_TESTS[CT.ti],front=T.z==='f',v=Math.max(0.5,(CT.vi||CT.v)/3.6),dv=front?v:v*0.55,
   D=Math.max(0.04,(front?(T.k==='full'?0.5:0.68):0.32)*Math.pow(v/(front?17.8:13.9),0.85)*(front?Math.sqrt(ctMass()/1450):1));return {D:D,T:2*D/dv,A:Math.PI*dv*dv/(4*D)};}
 const ctKey=()=>{const T=CT_TESTS[CT.ti];return T.k+(CT.own?Math.round((CT.vi||0)/5)*5:CT.v)+(CT.belt?'':'n');};
-function ctMenu(){const T=CT_TESTS[CT.ti];if(CT.ph!=='ready'&&CT.ph!=='result')return null;
+function ctMenu(){if(CT.dest&&typeof wkMenu==='function'&&WK)return wkMenu();const T=CT_TESTS[CT.ti];if(CT.ph!=='ready'&&CT.ph!=='result')return null;
  if(CT.cfg){const it=[{a:'ctmode',l:CT.own?'Saját':'Automata',ic:CT.own?'🎮':'🤖'}];if(!CT.own)it.push({a:'ctspd',l:CT.v+' km/h',ic:'⏱'});
   it.push({a:'ctbelt',l:CT.belt?'Öv be':'Öv ki',ic:CT.belt?'🔒':'⚠'},{a:'ctsurf',l:CT_SURF[CT.surf].n,ic:CT_SURF[CT.surf].ic},{a:'ctload',l:CT.load?'Csomag':'Üres',ic:CT.load?'🧳':'▫'},{a:'ctcfg',l:'Kész',ic:'✓',c:'primary'});
   return {cls:'bottom ctm',items:it};}
  const it=[{a:'ctgo',l:CT.ph==='result'?'Újra':'Indítás',ic:'▶',c:'primary'}];
  if(CT.ph==='result'&&CT.res&&!CT.res.brake&&CT.i0)it.push({a:'ctrep',l:'Ismétlés',ic:'🎥'});
- it.push({a:'cttest',l:T.sh,ic:'🧪'},{a:'ctcfg',l:'Beállítás',ic:'⚙'},{a:'home',l:'Főmenü',ic:'⌂'});
+ it.push({a:'cttest',l:T.sh,ic:'🧪'},{a:'ctcfg',l:'Beállítás',ic:'⚙'},{a:'ctdest',l:'Roncsolás',ic:'🔨'},{a:'home',l:'Főmenü',ic:'⌂'});
  return {cls:'bottom ctm',items:it};}
-function ctAction(a){if(!CT)return;const T=CT_TESTS[CT.ti];
+function ctAction(a){if(!CT)return;if(/^wk/.test(a)&&typeof wkAction==='function'&&WK){wkAction(a);return;}if(a==='ctdest'){if(typeof startWreck==='function')startWreck(false);MENU_SIG='?';return;}const T=CT_TESTS[CT.ti];
  if(a==='ctgo'){CT.cfg=false;if(CT.ph==='result')ctReset();CT.ph='count';CT.t=0;initAudio();}
  else if(a==='cttest'){CT.ti=(CT.ti+1)%CT_TESTS.length;CT.v=CT_TESTS[CT.ti].v;PROF.ctTest=CT.ti;PROF.ctV=CT.v;saveProf();ctReset();toast(CT_TESTS[CT.ti].nm+(CT.own?'':', '+CT.v+' km/h'));}
  else if(a==='ctspd'){const i=CT_SPD.indexOf(CT.v);CT.v=CT_SPD[(i+1)%CT_SPD.length];PROF.ctV=CT.v;saveProf();ctReset();toast(T.sh+': '+CT.v+' km/h'+(CT.v>64?' (a szabványosnál gyorsabb!)':''));}
@@ -80,7 +80,7 @@ function ctBrakeRes(gm,touch){const cm=Math.round(gm*100),stars=touch?2:cm<=30?5
  if(!touch&&(PROF.ctBrake==null||cm<PROF.ctBrake))PROF.ctBrake=cm;saveProf();
  if(touch){noise(0.25,0.25,0,500);vib(40);}
  speak(touch?'Hozzáértél a falhoz, de szerencsére lassan.':'Szép fékezés! '+(cm<100?cm+' centire':(cm/100).toFixed(1).replace('.',',')+' méterre')+' álltál meg.','apa');MENU_SIG='?';}
-function updCrash(){if(!CT)return;const T=CT_TESTS[CT.ti],front=T.z==='f',vv=(CT.vi||CT.v)*0.05;CT.t++;
+function updCrash(){if(!CT)return;if(CT.dest&&typeof updWreck==='function'){updWreck();return;}const T=CT_TESTS[CT.ti],front=T.z==='f',vv=(CT.vi||CT.v)*0.05;CT.t++;
  if(K.enterP&&(CT.ph==='ready'||(CT.ph==='result'&&CT.t>40))){SFX.click();ctAction('ctgo');}
  if(K.pauseP&&ctDriving()){ctReset();toast('Teszt megszakítva');return;}
  if(CT.flash>0)CT.flash*=0.8;if(CT.shake>0)CT.shake*=0.86;
@@ -212,7 +212,7 @@ function ctTrack(g,cam,Z){const ref=ctRef(),v0=cam-30,v1=cam+W/(CTS*(Z||1))+30;
  for(const s of CT.skid)if(s.b>v0&&s.a<v1)R(g,'rgba(18,20,24,0.3)',s.a,CTF-0.3,s.b-s.a,1.5);}
 /* kamera: messze a faltól az autó a kép bal-közepén, a fal közelében (16 → 7 m) átúszik úgy, hogy a fal is látsszon */
 function ctCam(){if(CT_TESTS[CT.ti].z!=='f')return Math.min(0,CT.tx-10);const k=clamp((16-(CTBX-112-Math.min(CT.x,CTBX-112))/CT_MU)/9,0,1);return Math.min(0,lerp(CT.x-140,0,k*k*(3-2*k)));}
-function drawCrash(g){if(!CT)return;const T=CT_TESTS[CT.ti],t=G.t,front=T.z==='f',B=ctBG(),rp=CT.replay,Z=rp?1.8:1,fy=CTF*CTS,
+function drawCrash(g){if(!CT)return;if(CT.dest&&WK&&typeof drawWreck==='function'){drawWreck(g);return;}const T=CT_TESTS[CT.ti],t=G.t,front=T.z==='f',B=ctBG(),rp=CT.replay,Z=rp?1.8:1,fy=CTF*CTS,
   cam=rp?(front?CTBX-10:CT.i0.x+10)-W*0.6/(CTS*Z):ctCam(),cs=cam*CTS;
  const off=((cs%CT_TW)+CT_TW)%CT_TW;for(let x=-off;x<W;x+=CT_TW)g.drawImage(B.c,x,0,CT_TW,H);
  if(!rp){const ex=B.x0-cs;if(ex<W)g.drawImage(B.e,ex,0,W-B.x0,H);}

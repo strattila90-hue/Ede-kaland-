@@ -167,6 +167,7 @@ function menuDef(){const s=G.state;if(G.ledger||G.gps||G.elogOpen||G.keysOpen||G
  if(s==='title'){if(introT()<150)return null;
   if(G.apaOpen){const cn=crewCount();return {cls:'cine apa',title:'',head:'Apa garázsa',items:[
    {a:'crash',l:'Törésteszt',sub:'Ütközés falnak, bábukkal, csillagos értékelés',ic:'💥',c:'hero apa'},
+   {a:'wreck',l:'Roncsoló műhely',sub:'Kalapács, golyó, lézer, prés, robbantás',ic:'🔨',tile:1},
    {a:'specs',l:'Az autó adatai',sub:CAR.hp+' LE, '+CAR.seats+' ülés',ic:'ℹ',tile:1},{a:'color',l:'Autó színe',sub:carColor,ic:'🎨',tile:1},
    {a:'ts',l:'Utazás',sub:(TS_OPTS.find(q=>q[0]===G.ts)||TS_OPTS[0])[1],ic:'⏱',tile:1},{a:'crew',l:'Ki utazik?',sub:cn+' ember (új játéknál)',ic:'👪',tile:1},
    {a:'apaback',l:'Vissza a főmenübe',ic:'◀',c:'back'}],ver:false};}
@@ -255,6 +256,7 @@ function menuAction(a){
  if(a==='apa'){G.apaOpen=true;MENU_SIG='?';return;}
  if(a==='apaback'){G.apaOpen=false;MENU_SIG='?';return;}
  if(a==='crew'){openCrew(false);return;}
+ if(a==='wreck'){if(typeof startWreck==='function'){startCrash();startWreck(true);}else toast('A műhely még töltődik, próbáld újra egy pillanat múlva.');MENU_SIG='?';return;}
  if(a==='crash'){if(typeof startCrash==='function')startCrash();else toast('A törésteszt még töltődik, próbáld újra egy pillanat múlva.');MENU_SIG='?';return;}
  if(a&&a.slice(0,2)==='ct'&&typeof ctAction==='function'){ctAction(a);MENU_SIG='?';return;}
  if(a==='new'&&G.state==='title'&&!(G.save&&(G.save.leg>0||G.save.dist>0))&&!G.crewOk){openCrew(true);return;}

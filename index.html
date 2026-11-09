@@ -194,6 +194,7 @@ html,body{margin:0;height:100%;height:100dvh;width:100%;position:fixed;inset:0;b
 @keyframes bIn{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
 #menu.bottom.anim{animation-name:mInB}@keyframes mInB{from{opacity:0;translate:0 18px}to{opacity:1;translate:0 0}}
 #menu .mb{flex-shrink:0}
+#menu.ctside{display:grid!important;grid-template-columns:repeat(2,auto);gap:4px;padding:5px;width:auto;max-height:calc(100dvh - 16px);border-radius:16px}#menu.ctside .mb{flex-direction:column;justify-content:center;gap:1px;min-height:0;padding:4px 5px;min-width:54px}#menu.ctside .mb .ic{font-size:15px;width:auto}#menu.ctside .mb .lbl{font-size:10.5px;white-space:nowrap}
 #menu.ctm{gap:6px;padding:6px}#menu.ctm .mb{flex-direction:column;gap:2px;min-height:0;padding:6px 10px}#menu.ctm .mb .ic{font-size:15px}#menu.ctm .mb .lbl{font-size:13px;white-space:nowrap}
 /* v2.32: menőbb főmenü (üveg, fénylő keret, ikoncsipek, rugós belépés) */
 #menu.cine{background:linear-gradient(155deg,rgba(22,26,40,.78),rgba(10,12,20,.62));-webkit-backdrop-filter:blur(12px) saturate(140%);backdrop-filter:blur(12px) saturate(140%);border:1px solid rgba(255,255,255,.12);border-left:1px solid rgba(255,255,255,.12);
@@ -437,7 +438,7 @@ body.tab #ctlrow{left:calc(30px + var(--sl) + var(--u)*2.24)!important}
 <div id="splash"><img src="icons/icon-192.png" alt=""><h1>Családi Vakáció</h1><div class="bar"><i id="splbar"></i></div><small id="spltxt">Betöltés... 0%</small></div>
 <script>
 /* betöltő: a játék fájljai sorban, valós százalékkal */
-(function(){const files=['js/core.js','js/radio.js','js/car.js','js/world.js','js/game.js','js/app.js'],later=['js/geo.js','js/map.js','js/gps.js','js/geohd.js','js/minigames.js','js/shops.js','js/crash.js'];let i=0;
+(function(){const files=['js/core.js','js/radio.js','js/car.js','js/world.js','js/game.js','js/app.js'],later=['js/geo.js','js/map.js','js/gps.js','js/geohd.js','js/minigames.js','js/shops.js','js/crash.js','js/wreck.js'];let i=0;
  window.LAZY_DONE=false;function lazy(k){if(k>=later.length){window.LAZY_DONE=true;return;}const sc=document.createElement('script');sc.src=later[k];sc.async=false;sc.onload=()=>lazy(k+1);sc.onerror=()=>setTimeout(()=>lazy(k),1500);document.body.appendChild(sc);}
  const bar=document.getElementById('splbar'),txt=document.getElementById('spltxt');
  function next(){const p=Math.round(i/files.length*100);bar.style.width=p+'%';txt.textContent='Betöltés... '+p+'%';

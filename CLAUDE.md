@@ -21,6 +21,7 @@ export PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers
 python3 tests/flash.py     # ~15 mp, elvárt: black 0, ERR []
 python3 tests/devices.py   # ~1 perc, 9 képernyőméret, elvárt: minden "overlap": "" (képek: tests/out/)
 python3 tests/crash.py     # ~3 perc, törésteszt: saját vezetés, fékpróba, öv nélkül, hátsó, fékút burkolatonként, csomag + ismétlés; elvárt: ERR [] (képek: tests/out/crash_*.png)
+python3 tests/wreck.py     # ~1 perc, roncsoló műhely: mind a 8 eszköz egérrel; elvárt: ERR [], leszakadt részek (képek: tests/out/wreck_*.png)
 python3 tests/soak.py      # ~20 perc, mind a 22 szakasz; elvárt: "HIBÁK 0", legsDone 22, win 1, pageerrors []
 ```
 
@@ -44,13 +45,14 @@ python3 tools-version.py && git add -A && git commit -m "vX.Y.Z: ..." \
 | `js/shops.js` | boltok, benzinkút, szerviz |
 | `js/minigames.js` | minijátékok |
 | `js/crash.js` | törésteszt (Apa garázsa): 300 m-es pálya követő kamerával, saját vezetés (`ctDrive`: fokozatok, motorhang, ABS) vagy automata, ütközés (`ctImpact`, lassított `hit` fázis), lassulásgörbe (`ctPulse`, `ctChart`), öv nélküli mód, útburkolat (`CT_SURF`), csomag (`ctMass`, rögzítetlen bőrönd), visszajátszás közeli kamerával (`ctReplay`, mentett `CT.i0`), beállítás-almenü (`CT.cfg`), fékpróba (`ctBrakeRes`), értékelés (`ctScore`, `ctPanel`); vezetés közben a `#touch` csak a két pedált mutatja (`crashui` osztály) |
+| `js/wreck.js` | roncsoló műhely: 8 eszköz (`WK_TOOLS`), a sérült autó egy képben (`wkDC`) műveletlistából (`WK.ops`: dent/hole/cut/tint/scorch/glass/crease/det, `wkOp`), 5 leszakadó rész + 2 kerék (`wkHurt`, `wkDetach`, `wkWheelHurt`), olvadás izzó foltokkal (`wkHeat`, `WK.hot`, cseppek, tócsák), prés (`WK.sq`); a `crash.js` `CT.dest` jelzővel adja át neki a frissítést, rajzot és menüt (bal oldali `ctside` gombsor) |
 | `js/map.js`, `js/geo.js` | térképrajz, durva Európa-partvonal (`GEO`) |
 | `js/gps.js`, `js/geohd.js` | teljes képernyős interaktív GPS, részletes partvonal (`GEOHD`, Natural Earth 1:50m) |
 | `sw.js` | service worker, gyorsítótár neve `csaladi-vakacio`, `ASSETS` lista |
 | `version.json` | verzió + fájlméretek (a frissítés ellenőrzi velük, hogy minden fájl az új verzióé) |
 | `tests/` | Playwright tesztek (lásd fent), kimenet a `tests/out/` mappába (gitignore) |
 
-Betöltési sorrend (`index.html`): kritikus: core, radio, car, world, game, app; utána lusta: geo, map, gps, geohd, minigames, shops (`window.LAZY_DONE`).
+Betöltési sorrend (`index.html`): kritikus: core, radio, car, world, game, app; utána lusta: geo, map, gps, geohd, minigames, shops, crash, wreck (`window.LAZY_DONE`).
 
 ## Android-alkalmazás (APK)
 
