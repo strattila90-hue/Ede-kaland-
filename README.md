@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.35.0
+# 🚐 Családi Vakáció – v2.36.0
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -265,6 +265,10 @@ Minden tranzakció után a pénzkijelző egy pillanatra a levont vagy kapott ös
 - **Fékpróba:** ha a fal előtt 8 méteren belül megállsz, nem lesz ütközés, hanem fékpróba-értékelés: hány centire álltál meg, milyen sebességről kezdtél fékezni, mekkora lett a fékút, és mennyi utat tettél volna meg 1 másodperc reakcióidő alatt fékezés nélkül. A legközelebbi megállás megmarad.
 - **Öv nélküli teszt:** az „Öv ki” gombbal a bábuk biztonsági öv nélkül ülnek. Ütközéskor nem tartja meg őket semmi: a műszerfalnak és a szélvédőnek csapódnak, a szélvédő betörik, és az értékelés is sokkal rosszabb. Így látható, miért kell mindig bekötni magunkat.
 - **Valósághűbb mérések:** **lassulásgörbe** (g az idő függvényében, lassított felvételnél a görbe az ütközéssel együtt rajzolódik), valós időtartam (kb. 60–80 ms) és gyűrődési út. A csúcslassulás a sebességből és a gyűrődési útból számolódik (64 km/h-nál kb. 37 g). Kiírja az **ütközési energiát**, és hogy ez hány méteres zuhanásnak felel meg (64 km/h ≈ 16 m, kb. ötödik emelet). Kis sebességnél alig van törmelék, gőz és folyadékfolt.
+- **Beállítás menü (v2.36):** a törésteszt alsó sora egyszerűbb lett (Indítás, Ismétlés, teszt, ⚙ Beállítás, Főmenü), a ⚙ Beállításban van a vezetési mód, a sebesség (automatánál), az öv, az útburkolat és a csomag.
+- **Útburkolat:** száraz, vizes vagy jeges-havas. A tapadás a fékutat és a gyorsítást is befolyásolja (ABS-szel kb. 9,2 / 6,6 / 2,9 m/s²): 80 km/h-ról szárazon kb. 25 m, vizesen kb. 33 m, jeges úton kb. 69 m a fékút (ehhez jön még a reakcióidő alatt megtett út). A padló vizesen csillog, jegesen fehér.
+- **Csomag:** +180 kg (tetőbox és bőröndök). Az autó lassabban gyorsul, ütközéskor nagyobb az energia és a gyűrődés, a **rögzítetlen bőrönd** pedig a csomagtartóból előrerepül a gyerekülések háttámlájának, ezért a gyermekvédelem pontszáma csökken.
+- **Visszajátszás közeli kamerával:** az eredmény után az „Ismétlés” gombbal az ütközés újra lejátszódik, még lassabban, 1,8-szoros nagyításban (az értékelés nem változik).
 - **Csillagos értékelés (0–5):** felnőtt és gyermek utasok védelme, biztonsági rendszerek százalékban, bábu-ábra testtájanként színezve (zöld = jó … piros = rossz), lassulás, fejsérülési érték (HIC), utastér-behatolás. A legjobb eredmény tesztenként és sebességenként megmarad.
 
 ## 🚦 Forgalom

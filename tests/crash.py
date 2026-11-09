@@ -1,4 +1,4 @@
-# Törésteszt: saját vezetés 300 m-en (gázzal a falnak), fékpróba, öv nélküli teszt, automata hátsó ütközés. Elvárt: ERR [], minden eset eredményt ad (képek: tests/out/crash_*.png).
+# Törésteszt: saját vezetés 300 m-en (gázzal a falnak), fékpróba, öv nélküli teszt, automata hátsó ütközés, fékút száraz/vizes/jeges úton, csomag + visszajátszás. Elvárt: ERR [], minden eset eredményt ad (képek: tests/out/crash_*.png).
 import os,asyncio
 ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 URL='file://'+ROOT+'/index.html'
@@ -32,6 +32,22 @@ async def main():
         await pg.evaluate("CT.belt=true;CT.ti=2;CT.v=50;ctReset();ctAction('ctgo')")
         await pg.evaluate(WAIT,'result');await pg.wait_for_timeout(2500);await pg.screenshot(path=OUT+'crash_rear.png')
         print('hátsó:',await pg.evaluate("Object.assign({},CT.res,{parts:0})"))
+        # 5) jeges út: fékút összehasonlítás 80 km/h-ról (száraz / vizes / jeges)
+        bd=[]
+        for sf in (0,1,2):
+            await pg.evaluate(f"CT.ti=0;CT.own=true;CT.belt=true;CT.surf={sf};CT.load=false;ctReset();CT.ph='run';CT.x=CTBX-112-120*CT_MU;CT.sp=80/3.6;CT.gear=3;CT.moved=true;K.brake=true")
+            await pg.wait_for_function("CT.sp===0||CT.ph!=='run'",timeout=30000)
+            bd.append(await pg.evaluate("((ctNose()-CT.bk0)/CT_MU).toFixed(1)"));await pg.evaluate("K.brake=false")
+        print('fékút 80 km/h-ról (száraz, vizes, jeges) m:',bd)
+        await pg.screenshot(path=OUT+'crash_ice.png')
+        # 6) csomaggal, automata 64 km/h, majd visszajátszás közeli kamerával
+        await pg.evaluate("CT.surf=0;CT.load=true;CT.own=false;CT.v=64;CT.ti=0;ctReset();ctAction('ctgo')")
+        await pg.evaluate(WAIT,'result');await pg.wait_for_timeout(1500)
+        r1=await pg.evaluate("JSON.stringify(Object.assign({},CT.res,{parts:0}))");print('csomaggal:',r1)
+        await pg.evaluate("ctAction('ctrep')");await pg.wait_for_timeout(2500);await pg.screenshot(path=OUT+'crash_replay.png')
+        await pg.evaluate(WAIT,'result');r2=await pg.evaluate("JSON.stringify(Object.assign({},CT.res,{parts:0}))");print('ismétlés után ugyanaz az értékelés:',r1==r2)
+        await pg.evaluate("ctAction('ctcfg')");await pg.wait_for_timeout(600);await pg.screenshot(path=OUT+'crash_cfg.png')
+        await pg.evaluate("ctAction('ctcfg');CT.load=false;PROF.ctLoad=false;saveProf()")
         await pg.evaluate("menuAction('home')");await pg.wait_for_timeout(300)
         print('ERR',errs[:3]);await b.close()
 asyncio.run(main())
