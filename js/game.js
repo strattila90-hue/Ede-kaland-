@@ -750,22 +750,26 @@ function drawStrip(g){const x0=6,x1=W-6,y0=51,h=26,ly=y0+13,cx=x0+14,ax=cx+12,bx
  const X=d=>ax+(bx-ax)*Math.sqrt(clamp(d/2,0,1));
  // pálya: a már elhagyott rész sárga, előre szaggatott
  R(g,'#ffd84a',x0+5,ly,cx-x0-5,1.4);for(let x=ax;x<bx;x+=6)R(g,'rgba(255,255,255,0.35)',x,ly,3.5,1.2);
- for(const d of [0.1,0.5,1,2]){const x=X(d);R(g,'rgba(255,255,255,0.4)',x,ly-2,0.7,5);}text(g,'2 km',bx-1,y0+2,'rgba(255,255,255,0.4)',0.6,'right',null);
+ for(const d of [0.1,0.5,1,2]){const x=X(d);R(g,'rgba(255,255,255,0.4)',x,ly-2,0.7,5);}
  R(g,'rgba(255,255,255,0.18)',bx+2,y0+3,0.7,h-6);
  // autó
  frr(g,'#3b8bff',cx-6,ly-5,12,4.6,2);frr(g,'#a9d3f5',cx-2.5,ly-4,5,2.2,1);disc(g,'#111',cx-3.4,ly,1.5);disc(g,'#111',cx+3.4,ly,1.5);
  const list=upcoming(),near=[],far=[];for(const o of list)(o.d<=2?near:far).push(o);
  near.sort((a,b)=>a.d-b.d);const occ=[];const free=(a,b)=>{for(const o of occ)if(a<o[1]&&b>o[0])return false;occ.push([a,b]);return true;};
- const items=near.map(o=>({o:o,x:X(o.d)}));G.stripHits=[];for(const it of items)if(it.o.p&&POI_W[it.o.p.type])G.stripHits.push({x:it.x,p:it.o.p});
+ const items=near.map(o=>({o:o,x:X(o.d)}));
+ // a „2 km” jelölés csak akkor, ha nincs alatta ikon
+ if(!items.some(it=>it.x>bx-22))text(g,'2 km',bx-1,y0+2,'rgba(255,255,255,0.4)',0.6,'right',null);
+ // a sávon túli (kút, cél) feliratok helye előre foglalt, a közeli feliratok nem csúsznak rájuk
+ far.sort((a,b)=>a.d-b.d);const fl=far.find(o=>o.k==='flag'),fo=far.find(o=>o.k!=='flag');occ.push([bx+2,x1]);G.stripHits=[];for(const it of items)if(it.o.p&&POI_W[it.o.p.type])G.stripHits.push({x:it.x,p:it.o.p});
  for(let i=items.length-1;i>=0;i--){const it=items[i],o=it.o,x=it.x,warn=o.k==='warn',iy=ly-12;
   if(warn&&(G.t>>3)&1)frr(g,'rgba(255,60,40,0.55)',x-7.5,iy-2.5,15,15,3);
   if(P.auto&&P.auto.type===o.k&&o.d<2.5)frr(g,'rgba(124,217,156,0.55)',x-7.5,iy-2.5,15,15,3);
   R(g,'rgba(255,255,255,0.6)',x-0.3,ly-2.5,0.8,4);g.save();g.translate(x,iy+4.5);g.scale(1.25,1.25);upIcon(g,o.k,-4.5,-4.5,o.st);g.restore();}
  // távolság-feliratok: a közeliek elsőbbséget kapnak, egymást nem takarják
  for(const it of items){const o=it.o,ds=o.d<1?Math.max(10,Math.round(o.d*1000/10)*10)+' m':fmt(o.d,1)+' km',w=textW(ds.toUpperCase())*0.8;
-  if(free(it.x-w/2-1,it.x+w/2+1))text(g,ds,it.x,ly+3,o.k==='warn'?'#ffb3a8':o.d<0.2?'#ffd84a':'#dfe6ee',0.8,'center',null);}
+  const lx=Math.min(it.x,bx-w/2);if(free(lx-w/2-1,lx+w/2+1))text(g,ds,lx,ly+3,o.k==='warn'?'#ffb3a8':o.d<0.2?'#ffd84a':'#dfe6ee',0.8,'center',null);}
  // a sávon túli: következő kút és a cél
- far.sort((a,b)=>a.d-b.d);const fl=far.find(o=>o.k==='flag'),fo=far.find(o=>o.k!=='flag');[fo,fl].forEach((o,i)=>{if(!o)return;const x=bx+15+i*27;if(o.p&&POI_W[o.p.type])G.stripHits.push({x:x,p:o.p});g.save();g.translate(x,ly-7.5);g.scale(1.25,1.25);upIcon(g,o.k,-4.5,-4.5,o.st);g.restore();text(g,(o.d<10?fmt(o.d,1):fmt(o.d))+' km',x,ly+3,'#dfe6ee',0.65,'center',null);});}
+ [fo,fl].forEach((o,i)=>{if(!o)return;const x=bx+15+i*27;if(o.p&&POI_W[o.p.type])G.stripHits.push({x:x,p:o.p});g.save();g.translate(x,ly-7.5);g.scale(1.25,1.25);upIcon(g,o.k,-4.5,-4.5,o.st);g.restore();text(g,(o.d<10?fmt(o.d,1):fmt(o.d))+' km',x,ly+3,'#dfe6ee',0.65,'center',null);});}
 /* ---- település-előjelző: következő város/falu (vagy a vége), távolság, korlát, tanács ---- */
 function nextTown(){const kp=LEG.kmPerPx,front=P.dist+112,segs=LEG.segs;let best=null;
  for(let k=1;k<segs.length;k++){const s=segs[k],pv=segs[k-1];
@@ -976,10 +980,12 @@ function drawPoster(g){const mR=Math.max(0,Math.min(W*0.6,G.menuR||W*0.36)),cx=M
 
  g.drawImage(grainTile(),0,0,W+16,H+16);
  // cím, alcím, szereplők
- const room=W-mR-16,fw=textW('VAKÁCIÓ',1),ts=Math.min(3.6,room/fw);
+ const room=W-mR-16,fw=textW('VAKÁCIÓ',1),ts=Math.min(3.4,room/fw),s1=ts*0.62;
+ // a sorközben az ékezet magassága (3 betűpont) is benne van, így az ékezetek nem lógnak bele a felső sorba
  text(g,'A Komárom - Európa - Komárom kör',cx,10,'#ffd9b0',1,'center');
- text(g,'Családi',cx,22,'#ffd84a',ts*0.62,'center','#5a1d0c');text(g,'Vakáció',cx,22+ts*0.62*8+4,'#ffd84a',ts,'center','#5a1d0c');
- const ty=22+ts*0.62*8+4+ts*8+6;text(g,'Öt ember. Egy autó. '+fmt(Math.round(LEGS.reduce((a,L)=>a+L.km,0)/100)*100)+' kilométer.',cx,ty,'#ffffff',1,'center');
+ const y1=19+s1*3,y2=y1+s1*7+3+ts*3;
+ text(g,'Családi',cx,y1,'#ffd84a',s1,'center','#5a1d0c');text(g,'Vakáció',cx,y2,'#ffd84a',ts,'center','#5a1d0c');
+ const ty=y2+ts*7+7;text(g,'Öt ember. Egy autó. '+fmt(Math.round(LEGS.reduce((a,L)=>a+L.km,0)/100)*100)+' kilométer.',cx,ty,'#ffffff',1,'center');
  g.fillStyle=lg(g,0,250,0,H,[[0,'rgba(0,0,0,0)'],[1,'rgba(0,0,0,0.85)']]);g.fillRect(0,250,W,H-250);
  const cr='Apa · Anya · Anna · Petra · kis Atti';text(g,cr,cx,257,'#cfd6df',Math.min(1,(room+10)/textW(cr.toUpperCase())),'center',null);}
 let POSTER=null;

@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.32.0
+# 🚐 Családi Vakáció – v2.32.2
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -74,6 +74,8 @@ A főmenüben az **Album és rekordok** gomb (a Szünet menüből is elérhető)
 - **Akkukímélő mód:** hosszú autóúton kb. 30 kép/mp és kisebb felbontás, kevésbé melegszik a telefon és tovább bírja az akku.
 
 ## 🎬 Főmenü: filmplakát
+
+**v2.32.2:** a címben az ékezetek nem lógnak bele a felső sorba (a sorköz számol az ékezettel).
 
 **v2.32:** üveghatású menü forgó, fénylő kerettel, ikoncsipekkel, rugós belépő animációval, lüktető fő gombbal.
 
@@ -341,6 +343,7 @@ Mindkét kiosztásban:
 - **Teljesítménymérő:** a Szünet menüben bekapcsolható; a kép tetején mutatja a kijelző frissítését (Hz), a kép/mp-t, a felbontást, a rajzolási időt, a leghosszabb képközt és az akadások számát.
 - **Akadásfigyelés:** csak a valóban késő képkocka számít akadásnak (két kép között több mint 26 ms). A telefonok saját 60/120 Hz-es váltogatása nem, így a játék nem veszi vissza feleslegesen a minőséget. Ritkán és csak egy-egy lépést vált (minden váltás újraépíti a képtárakat); ha egyszer vissza kellett vennie, utána nem próbál feljebb lépni. Nincs többé fél sebességű (30 kép/mp) mód.
 - **Letöltés a főmenüben:** a főmenübe érve a telefon azonnal letölti magának a teljes játékot; a főmenü alján látszik, ha kész („✓ teljes játék letöltve, offline is megy”). Utána internet nélkül is indul és végigjátszható.
+- **Hangok egyetlen zajmintából:** a döccenés, csattanás, mennydörgés és a rádió dobjai (lábcin, pergő) egyetlen, egyszer elkészített zajmintát játszanak le, nem gyártanak minden hangnál új mintát (rádiózás közben ez másodpercenként több tucat volt).
 - **Nincs fölösleges oldalfrissítés:** a gombok feliratai csak akkor íródnak újra, ha tényleg változnak.
 - **Gyenge telefonon:** egyszerűbb díszítés, a kijelző minden 3. képkockán rajzolódik újra, végső esetben 30 kép/mp rajzolás 60-as játéklogikával.
 - **A telefonhoz igazodik:** a processzormagok száma és a memória alapján választ kezdő minőséget (2 GB alatt rögtön takarékos mód); figyeli a hosszú, akadó képkockákat is, és ha ilyen többször előfordul, azonnal visszavesz. Erős telefonon élesebb felbontásban rajzol (a kijelzőnél soha nem többet), gyengébbnél automatikusan visszavesz a felbontásból és az effektekből, és ha újra van tartalék, visszaemeli.

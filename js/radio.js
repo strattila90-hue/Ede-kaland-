@@ -39,8 +39,9 @@ function rv(f,d,type,v,t0,cut,att){const t=AC.currentTime+t0,o=AC.createOscillat
  g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(v,t+(att||0.005));g.gain.exponentialRampToValueAtTime(0.0001,t+d);let node=o;
  if(cut){const lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.setValueAtTime(cut,t);lp.frequency.exponentialRampToValueAtTime(Math.max(200,cut*0.3),t+d);o.connect(lp);node=lp;}
  node.connect(g);g.connect(radio.bus);o.start(t);o.stop(t+d+0.05);}
-function rnoise(d,v,t0,type,freq){const t=AC.currentTime+t0,n=Math.max(1,AC.sampleRate*d|0),b=AC.createBuffer(1,n,AC.sampleRate),a=b.getChannelData(0);for(let i=0;i<n;i++)a[i]=(Math.random()*2-1)*Math.pow(1-i/n,2);
- const s=AC.createBufferSource();s.buffer=b;const f=AC.createBiquadFilter();f.type=type;f.frequency.value=freq;const g=AC.createGain();g.gain.value=v;s.connect(f);f.connect(g);g.connect(radio.bus);s.start(t);}
+/* dob-zaj a közös zajmintából (noiseBuf), gyors lecsengéssel: nem gyárt ütésenként új hangmintát */
+function rnoise(d,v,t0,type,freq){const t=AC.currentTime+t0,s=AC.createBufferSource();s.buffer=noiseBuf();const f=AC.createBiquadFilter();f.type=type;f.frequency.value=freq;const g=AC.createGain();
+ g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(Math.max(0.0005,v*0.01),t+d);s.connect(f);f.connect(g);g.connect(radio.bus);s.start(t,Math.random()*1.5,d+0.01);}
 function kick(t0,v){const t=AC.currentTime+t0,o=AC.createOscillator(),g=AC.createGain();o.frequency.setValueAtTime(130,t);o.frequency.exponentialRampToValueAtTime(42,t+0.12);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.25);o.connect(g);g.connect(radio.bus);o.start(t);o.stop(t+0.3);}
 /* ---- Országút Rádió: lendületes országúti rock (saját szerzemény) ----
    32 ütemes kör: 8 ütem bevezető riff, 8 ütem verze, 8 ütem refrén (gitárdallam + taps), 8 ütem szóló.

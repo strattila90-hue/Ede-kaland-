@@ -2,7 +2,7 @@
 /* =========================================================
    CSALÁDI VAKÁCIÓ – alapok: vászon, rajzoló segédek, betűk, hang, bemenet
    ========================================================= */
-const APP_VERSION='2.32.1';
+const APP_VERSION='2.32.2';
 const W=480,H=270,PX=70,ROADT=194,ROADB=262,LANE=[212,232,252];
 const TAU=Math.PI*2;
 let SC=2,LOWQ=false;
@@ -168,8 +168,12 @@ function initAudio(){if(AC){if(AC.state==='suspended')AC.resume();return;}try{AC
 const sfxOut=()=>BUS?BUS.sfx:master;
 function tone(f,d,type,v,t0,slide,dest){if(!AC)return;const t=AC.currentTime+(t0||0);const o=AC.createOscillator(),g=AC.createGain();o.type=type||'square';o.frequency.setValueAtTime(f,t);if(slide)o.frequency.linearRampToValueAtTime(Math.max(20,f+slide),t+d);
  g.gain.setValueAtTime(v||0.1,t);g.gain.exponentialRampToValueAtTime(0.001,t+d);o.connect(g);g.connect(dest||sfxOut());o.start(t);o.stop(t+d+0.02);}
-function noise(d,v,t0,lp){if(!AC)return;const n=Math.max(1,AC.sampleRate*d|0),b=AC.createBuffer(1,n,AC.sampleRate),a=b.getChannelData(0);for(let i=0;i<n;i++)a[i]=(Math.random()*2-1)*(1-i/n);
- const s=AC.createBufferSource();s.buffer=b;const f=AC.createBiquadFilter();f.type='lowpass';f.frequency.value=lp||1200;const g=AC.createGain();g.gain.value=v||0.3;s.connect(f);f.connect(g);g.connect(sfxOut());s.start(AC.currentTime+(t0||0));}
+/* zaj: egyetlen, egyszer elkészített 2 mp-es zajminta, véletlen kezdőponttal; a lecsengést a hangerő-burkoló adja
+   (korábban minden döccenés/csattanás új hangmintát gyártott, ami telefonon fölösleges memória- és processzormunka) */
+let NOISEBUF=null;
+function noiseBuf(){if(!NOISEBUF||NOISEBUF.sampleRate!==AC.sampleRate){const n=AC.sampleRate*2|0;NOISEBUF=AC.createBuffer(1,n,AC.sampleRate);const a=NOISEBUF.getChannelData(0);for(let i=0;i<n;i++)a[i]=Math.random()*2-1;}return NOISEBUF;}
+function noise(d,v,t0,lp){if(!AC)return;d=Math.min(1.95,Math.max(0.01,d));const t=AC.currentTime+(t0||0),s=AC.createBufferSource();s.buffer=noiseBuf();const f=AC.createBiquadFilter();f.type='lowpass';f.frequency.value=lp||1200;const g=AC.createGain();
+ g.gain.setValueAtTime(v||0.3,t);g.gain.linearRampToValueAtTime(0,t+d);s.connect(f);f.connect(g);g.connect(sfxOut());s.start(t,Math.random()*(1.98-d),d);}
 
 /* valódi autóduda: két tárcsás kürt (kb. 420 és 510 Hz, kis terc), torzítással és sávszűrővel, nyomva tartva szól */
 let HORN=null;
