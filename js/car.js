@@ -616,3 +616,55 @@ function drawTowTruck(g,x,gy,tilt,t,lights){const bedTop=gy-25,c='#ff8f1f',B=tow
  // fényhíd a tetőn
  const on=(t>>3)&1;frr(g,'#1b1f26',cx+6,gy-66,30,4,1.5);for(let k=0;k<4;k++){const lit=(k%2)===on;frr(g,lit?'#ffcc33':'#8a6a14',cx+7+k*7,gy-69,6,3.4,1.2);if(lit){glow(g,cx+10+k*7,gy-68,9,'rgba(255,200,40,0.75)');if(lights&&k<2)lights.push({x:cx+10+k*7,y:gy-68,r:24});}}
  for(const wx of [40,66])wheel(g,x+wx,gy-11,0,false,11);wheel(g,cx+34,gy-11,0,false,11);for(const wx of [53])frr(g,'#1b1f26',x+wx-14,gy-26,28,4,2);}
+
+/* ---------- HAJTÁSLÁNC ÉS BELSŐ SZERKEZET (a karosszéria alatti réteg) ----------
+   Rétegsorrend hátulról előre: utastér (ülések, műszerfal) -> alváz -> hátsó futómű -> benzintank -> kipufogó -> váltó -> féltengely -> motor -> hűtő -> akkumulátor;
+   erre jön rá a karosszéria (a roncsoló műhelyben és a töréstesztben a lyukakon, leszakadt részeken át, vagy röntgennézetben látszik).
+   s: állapot 0..1 (1 = ép, 0 = tönkrement), s.run: jár-e a motor, s.shA: a törött féltengely lengése, s.engDrop: a motor lesüllyedése (törött motortartó).
+   mode: 'static' (csak az álló részek, gyorsítótárba), 'dyn' (forgó szíj, ventilátor, lengő tengely), 'all' (mindkettő). Autó-helyi koordináták. */
+function dtState(){return {eng:1,gb:1,sh:1,ex:1,rad:1,tank:1,bat:1,ax:1,fr:1,run:false,shA:0,engDrop:0,exGone:false,engOut:false};}
+function drawDrivetrain(g,s,t,mode){const st=mode!=='dyn',dy=mode!=='static',run=s.run&&s.eng>0,ed=s.engDrop||0;
+ if(st){
+  // utastér: ülések háttámlával, padló, műszerfal, kormány
+  for(const [u,w] of [[31,9],[45,11],[64,11]]){frr(g,'#3a3f4a',u,20,4,17,1.6);frr(g,'#444a56',u+1,35,w,5,1.5);R(g,'rgba(255,255,255,0.08)',u+0.6,21,1,15);}
+  R(g,'#2e333b',12,43,72,1.6);frr(g,'#2b3038',74,25,10,6,1.5);g.strokeStyle='#1f2329';g.lineWidth=1.1;g.beginPath();g.ellipse(73.2,25.5,1.2,3.2,0.2,0,TAU);g.stroke();
+  // alváz: hossztartó kereszttartókkal (erős ütésnél megtörik)
+  const kink=s.fr<0.5?(0.5-s.fr)*6:0;g.fillStyle='#2a2d32';g.beginPath();g.moveTo(5,44.6);g.lineTo(56,44.6+kink);g.lineTo(108,44.6);g.lineTo(108,47.2);g.lineTo(56,47.2+kink);g.lineTo(5,47.2);g.closePath();g.fill();
+  for(const u of [14,36,58,80])R(g,'#3a3e45',u,43.8,1.6,4.2);
+  // hátsó futómű: csatolt lengőkar, tekercsrugó, lengéscsillapító (eltörve a rugó két darab)
+  frr(g,'#30343a',17,44,14,3.4,1.2);line(g,'#59606a',33.5,36,33.5,44,1.2);g.strokeStyle='#b8392f';g.lineWidth=0.9;g.beginPath();
+  if(s.ax>0){for(let j=0;j<=8;j++)g.lineTo(28+(j%2?1.6:-1.6),36.5+j*1);g.stroke();}else{for(let j=0;j<=3;j++)g.lineTo(28+(j%2?1.6:-1.6),36.5+j*1);g.stroke();g.beginPath();for(let j=0;j<=3;j++)g.lineTo(27.4+(j%2?1.6:-1.6),41.6+j*0.8);g.stroke();}
+  // benzintank (a hátsó ülés alatt)
+  frr(g,'#1e2226',35,39,19,7.4,2);R(g,'#4a4f56',38,38.6,1,8);R(g,'#4a4f56',50,38.6,1,8);if(s.tank<0.6){disc(g,'#0b0c0e',41,42,0.8);disc(g,'#0b0c0e',47,43.4,0.7);}
+  // kipufogó: leömlő, katalizátor, középdob, hátsó dob, kipufogócső (leszakadva hiányzik)
+  if(!s.exGone){g.strokeStyle='#6d6258';g.lineWidth=1.3;g.beginPath();g.moveTo(93,45.5);g.lineTo(78,47.6);g.lineTo(23,47.6);g.stroke();
+   frr(g,'#8b8f94',66,46,8,3.2,1.4);frr(g,'#7c8086',44,46.2,7,2.8,1.2);frr(g,s.ex<0.5?'#6b6056':'#8a8e94',8,44.6,14,4.8,2);line(g,'#6d6258',8,47,1.5,47.6,1.2);
+   if(s.ex<0.5){disc(g,'#121316',12,46,0.8);disc(g,'#121316',17,47.3,0.6);g.strokeStyle='rgba(0,0,0,0.5)';g.lineWidth=0.4;g.beginPath();g.moveTo(10,45);g.lineTo(13,47);g.stroke();}}
+  // váltó: alumínium harangház bordákkal, differenciálmű (eltörve: a házon rés, kilátszanak a fogaskerekek)
+  g.save();g.translate(0,ed*0.6);g.fillStyle='#b4bac2';g.beginPath();g.moveTo(88,32);g.lineTo(80,33.5);g.lineTo(74.5,37);g.lineTo(74.5,43);g.lineTo(80,46);g.lineTo(88,46);g.closePath();g.fill();
+  for(const u of [77,80,83])R(g,'rgba(0,0,0,0.18)',u,35,0.6,10);disc(g,'#9aa1aa',84,43.6,2.6);
+  if(s.gb<0.5){g.strokeStyle='#2a2d32';g.lineWidth=0.5;g.beginPath();g.moveTo(79,34);g.lineTo(80.6,38);g.lineTo(79.4,41);g.stroke();}
+  if(s.gb<=0){R(g,'#1d2025',79.4,34,2.4,11);for(const [cx,cy,r] of [[78,38,2.4],[82.4,41.6,1.8]]){disc(g,'#8a9097',cx,cy,r);g.strokeStyle='#5a5f66';g.lineWidth=0.5;g.beginPath();for(let k=0;k<10;k++){const a=k*TAU/10;g.moveTo(cx+Math.cos(a)*r,cy+Math.sin(a)*r);g.lineTo(cx+Math.cos(a)*(r+0.6),cy+Math.sin(a)*(r+0.6));}g.stroke();}}
+  g.restore();
+  // motor: blokk, hengerfej piros szelepfedéllel, olajteknő, szívócső (sérülve korom, repedés, végül kilyukadt blokk kilógó hajtókarral)
+  if(!s.engOut){g.save();g.translate(0,ed);frr(g,'#6f767f',88.5,30,15,13,1.5);frr(g,'#3a3f47',89,26.5,14,4,1);frr(g,s.eng>0?'#b7322c':'#5a2420',89.6,24.6,12.6,2.6,1.2);
+  for(let k=0;k<4;k++)disc(g,'#d9d4c8',91.6+k*3,25.9,0.45);frr(g,'#2b2f35',90,42.6,12,3.4,1.2);g.strokeStyle='#59606a';g.lineWidth=1;g.beginPath();for(let k=0;k<4;k++){g.moveTo(91+k*3,26.5);g.quadraticCurveTo(87+k*0.5,29,86.5,33);}g.stroke();
+  for(let k=0;k<3;k++)R(g,'rgba(0,0,0,0.15)',89,33+k*3,14,0.6);
+  if(s.eng<0.6){disc(g,'rgba(15,15,15,0.45)',95,34,3.2);disc(g,'rgba(15,15,15,0.35)',99,29,2.4);}
+  if(s.eng<0.3){g.strokeStyle='#15171a';g.lineWidth=0.5;g.beginPath();g.moveTo(92,31);g.lineTo(94,34);g.lineTo(93,37);g.lineTo(95.5,40);g.stroke();}
+  if(s.eng<=0){disc(g,'#121316',96,36,2.4);line(g,'#c9ced4',96,36,100.5,40.5,1);disc(g,'#9aa1aa',101,41,1.1);}
+  g.restore();}
+  // hűtő lamellákkal, csövek a motorhoz (sérülve elgörbült lamellák, összetörve összenyomódik)
+  const rw=s.rad>0?4.6:2.6;frr(g,'#9aa3ad',105,28,rw,14,1);g.strokeStyle='rgba(40,45,52,0.55)';g.lineWidth=0.35;g.beginPath();for(let k=0;k<12;k++){const y=29+k*1.1;g.moveTo(105.2,y);g.lineTo(105+rw-0.2,y+(s.rad<0.5&&k%3===0?0.8:0));}g.stroke();
+  line(g,'#20242a',105,29.5,101.5,27.4,0.9);line(g,'#20242a',105,40.5,102,42,0.9);if(s.rad<0.5){disc(g,'#2a2f35',106.6,33,0.8);disc(g,'#2a2f35',107.4,38,0.6);}
+  // akkumulátor (tönkrement: megrepedt ház, olvadt saruk)
+  frr(g,'#1b1d21',80,25,7.4,5.4,0.8);disc(g,s.bat>0?'#d33a2a':'#5a2a20',81.6,24.7,0.7);disc(g,s.bat>0?'#2b2f35':'#3a3a3a',85.6,24.7,0.7);if(s.bat<=0){line(g,'#3a3e45',82,26,84,29,0.4);}}
+ if(dy){const ph=run?t*0.5:0;if(!s.engOut){g.save();g.translate(0,ed);
+  // ékszíj a főtengely és a generátor tárcsáján, ventilátor (járó motornál forog)
+  g.strokeStyle='#15171a';g.lineWidth=0.8;g.beginPath();g.moveTo(98,43);g.lineTo(100,30.4);g.moveTo(100,30.4);g.lineTo(102.2,32.2);g.lineTo(99.6,42.4);g.stroke();
+  for(const [cx,cy,r] of [[98.6,41,2],[100.6,31.6,1.4]]){disc(g,'#c9ced4',cx,cy,r);line(g,'#59606a',cx,cy,cx+Math.cos(ph)*r*0.9,cy+Math.sin(ph)*r*0.9,0.4);}
+  g.save();g.translate(103.4,35);g.scale(0.35,1);g.rotate(ph*1.6);g.fillStyle='rgba(60,64,70,0.85)';for(let k=0;k<5;k++){g.rotate(TAU/5);g.beginPath();g.ellipse(0,-3.2,1.1,3,0,0,TAU);g.fill();}g.restore();
+  g.restore();}
+  // féltengely a váltótól a kerékagyig, homokóra alakú csuklóvédő gumikkal (törve: a külső fele lóg és leng)
+  const tear=s.sh<0.5;if(s.sh>0){line(g,'#4a4f56',84,44,89,46.1,1.4);for(const [cx,cy] of [[84.6,44.2],[88.4,45.9]])frr(g,tear?'#3a2a2a':'#15171a',cx-1,cy-0.9,2,1.8,0.8);if(tear){disc(g,'#3a3226',86.8,47,0.4);disc(g,'#3a3226',87.6,47.6,0.35);}}
+  else{line(g,'#4a4f56',84,44,85.8,44.8,1.4);g.save();g.translate(89,46.1);g.rotate(0.9+(s.shA||0));line(g,'#4a4f56',0,0,-3.6,0,1.4);frr(g,'#3a2a2a',-1.6,-0.9,2,1.8,0.8);g.restore();}}}

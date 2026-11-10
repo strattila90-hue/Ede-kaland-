@@ -17,8 +17,8 @@ const ctRef=()=>CT_TESTS[CT.ti].z==='f'?CTBX:100;                 // az ütköz�
 const ctNose=()=>CT_TESTS[CT.ti].z==='f'?CT.x+112:CT.tx+70;        // a mozgó jármű eleje
 const ctGap=()=>ctRef()-ctNose();
 function ctDriving(){return !!CT&&G.state==='crash'&&(CT.ph==='run'||CT.ph==='count');}
-function startCrash(){G.state='crash';G.st=0;G.paused=false;const ti=clamp((PROF.ctTest|0),0,CT_TESTS.length-1);CT={ti:ti,v:PROF.ctV||CT_TESTS[ti].v,own:PROF.ctOwn!==false,belt:PROF.ctBelt!==false,surf:clamp(PROF.ctSurf|0,0,2),load:!!PROF.ctLoad,cfg:false};ctReset();elog('info','Törésteszt megnyitva');}
-function ctReset(){const T=CT_TESTS[CT.ti],front=T.z==='f';Object.assign(CT,{ph:'ready',t:0,f:0,x:front?CTBX-112-CT_L*CT_MU:100,vx:0,tx:front?-1e5:100-70-CT_L*CT_MU,tvx:0,cv:0,ang:0,cr:0,hc:0,pitch:0,hd:0,ab:0,parts:[],res:null,flash:0,shake:0,lost:false,slow:1,imp:false,puddle:0,ms:0,fp:[],burst:false,
+function startCrash(){G.state='crash';G.st=0;G.paused=false;const ti=clamp((PROF.ctTest|0),0,CT_TESTS.length-1);CT={ti:ti,v:PROF.ctV||CT_TESTS[ti].v,own:PROF.ctOwn!==false,belt:PROF.ctBelt!==false,surf:clamp(PROF.ctSurf|0,0,2),load:!!PROF.ctLoad,xray:!!PROF.ctXray,cfg:false};ctReset();elog('info','Törésteszt megnyitva');}
+function ctReset(){const T=CT_TESTS[CT.ti],front=T.z==='f';Object.assign(CT,{ph:'ready',t:0,f:0,x:front?CTBX-112-CT_L*CT_MU:100,vx:0,tx:front?-1e5:100-70-CT_L*CT_MU,tvx:0,cv:0,ang:0,cr:0,hc:0,pitch:0,hd:0,ab:0,parts:[],res:null,flash:0,shake:0,lost:false,slow:1,imp:false,puddle:0,ms:0,fp:[],dt:Object.assign(dtState(),{run:true}),shV:0,burst:false,
   sp:0,gear:0,rpm:850,shift:0,still:0,moved:false,vi:0,vmax:0,skid:[],sk:null,bk0:null,bkv:0,brkPrev:false,thud:false,replay:false,box:0,i0:null});
  K.gas=K.brake=false;for(const id of ['bGas','bBr']){const el=document.getElementById(id);if(el)el.classList.remove('on');}MENU_SIG='?';}
 const ctSev=()=>{const T=CT_TESTS[CT.ti];return Math.pow((CT.vi||CT.v)/64,2)*T.m*(T.z==='f'?ctMass()/1450:1);};
@@ -28,7 +28,7 @@ function ctPulse(){const T=CT_TESTS[CT.ti],front=T.z==='f',v=Math.max(0.5,(CT.vi
 const ctKey=()=>{const T=CT_TESTS[CT.ti];return T.k+(CT.own?Math.round((CT.vi||0)/5)*5:CT.v)+(CT.belt?'':'n');};
 function ctMenu(){if(CT.dest&&typeof wkMenu==='function'&&WK)return wkMenu();const T=CT_TESTS[CT.ti];if(CT.ph!=='ready'&&CT.ph!=='result')return null;
  if(CT.cfg){const it=[{a:'ctmode',l:CT.own?'Saját':'Automata',ic:CT.own?'🎮':'🤖'}];if(!CT.own)it.push({a:'ctspd',l:CT.v+' km/h',ic:'⏱'});
-  it.push({a:'ctbelt',l:CT.belt?'Öv be':'Öv ki',ic:CT.belt?'🔒':'⚠'},{a:'ctsurf',l:CT_SURF[CT.surf].n,ic:CT_SURF[CT.surf].ic},{a:'ctload',l:CT.load?'Csomag':'Üres',ic:CT.load?'🧳':'▫'},{a:'ctcfg',l:'Kész',ic:'✓',c:'primary'});
+  it.push({a:'ctbelt',l:CT.belt?'Öv be':'Öv ki',ic:CT.belt?'🔒':'⚠'},{a:'ctsurf',l:CT_SURF[CT.surf].n,ic:CT_SURF[CT.surf].ic},{a:'ctload',l:CT.load?'Csomag':'Üres',ic:CT.load?'🧳':'▫'},{a:'ctxray',l:CT.xray?'Röntgen be':'Röntgen ki',ic:'👁'},{a:'ctcfg',l:'Kész',ic:'✓',c:'primary'});
   return {cls:'bottom ctm',items:it};}
  const it=[{a:'ctgo',l:CT.ph==='result'?'Újra':'Indítás',ic:'▶',c:'primary'}];
  if(CT.ph==='result'&&CT.res&&!CT.res.brake&&CT.i0)it.push({a:'ctrep',l:'Ismétlés',ic:'🎥'});
@@ -43,10 +43,11 @@ function ctAction(a){if(!CT)return;if(/^wk/.test(a)&&typeof wkAction==='function
  else if(a==='ctcfg')CT.cfg=!CT.cfg;
  else if(a==='ctrep')ctReplay();
  else if(a==='ctsurf'){CT.surf=(CT.surf+1)%CT_SURF.length;PROF.ctSurf=CT.surf;saveProf();ctReset();toast(['Száraz beton: a legjobb tapadás, ABS-szel kb. 9 m/s² lassulás.','Vizes beton: kb. 30%-kal hosszabb fékút, gyorsításkor is könnyebben kipörög a kerék.','Jeges, havas út: háromszor hosszabb fékút! Télen sokkal korábban kell fékezni.'][CT.surf],3800);}
+ else if(a==='ctxray'){CT.xray=!CT.xray;PROF.ctXray=CT.xray;saveProf();toast(CT.xray?'Röntgen: átlátszó karosszéria, látszik, hogyan gyűrődik a motortér, és mi sérül a hajtásláncban.':'Röntgen ki.',3600);}
  else if(a==='ctload'){CT.load=!CT.load;PROF.ctLoad=CT.load;saveProf();ctReset();toast(CT.load?'Csomaggal: +180 kg (tetőbox, bőröndök). Lassabban gyorsul, ütközéskor több az energia, és a rögzítetlen bőrönd előrerepül!':'Üres csomagtartó.',4000);}
  MENU_SIG='?';}
 /* visszajátszás közeli kamerával: az ütközés újra, a mentett kiinduló állapotból (az értékelés nem változik) */
-function ctReplay(){const i=CT.i0;if(!i)return;Object.assign(CT,{ph:'hit',f:0,t:0,x:i.x,tx:i.tx,ang:i.ang,tvx:i.tvx,x0:i.x,tvx0:i.tvx,cv:0,cr:0,hc:0,pitch:0,hd:0,ab:0,box:0,parts:[],imp:false,lost:false,puddle:0,fp:[],burst:false,thud:false,slow:0.08,flash:1,shake:0,replay:true,cfg:false});ctBang();MENU_SIG='?';}
+function ctReplay(){const i=CT.i0;if(!i)return;Object.assign(CT,{ph:'hit',f:0,t:0,x:i.x,tx:i.tx,ang:i.ang,tvx:i.tvx,x0:i.x,tvx0:i.tvx,cv:0,cr:0,hc:0,pitch:0,hd:0,ab:0,box:0,parts:[],imp:false,lost:false,puddle:0,fp:[],dt:Object.assign(dtState(),{run:true}),shV:0,burst:false,thud:false,slow:0.08,flash:1,shake:0,replay:true,cfg:false});ctBang();MENU_SIG='?';}
 /* ---- frissítés ---- */
 /* üresben (visszaszámláláskor) a motor felpörgethető */
 function ctIdle(gas){const tg=gas?4300:850;CT.rpm+=(tg-CT.rpm)*(tg>CT.rpm?0.09:0.05);engine(CT.rpm,gas?0.8:0.06);}
@@ -103,6 +104,7 @@ function updCrash(){if(!CT)return;if(CT.dest&&typeof updWreck==='function'){updW
    CT.tvx=f<dur?lerp(CT.tvx0,vC*0.55,u):Math.max(0,CT.tvx-0.08*sl);CT.tx=f<dur?CT.x+CT.cr-70:CT.tx+CT.tvx*sl;
    const pk=0.035*Math.min(1.9,Math.sqrt(sev));CT.pitch=f<dur?-pk*u:-pk*Math.exp(-(f-dur)/8)*Math.cos((f-dur)*0.42);
    const dm=6*Math.min(1.6,Math.pow(sev,0.6))*(CT.belt?1:1.4);CT.hd=f<11?-dm*Math.sin(Math.PI*f/11):f<24?dm*0.45*Math.sin(Math.PI*(f-11)/13):0;CT.ab=0;}
+  ctDT(sev,front,e,f);
   if(!CT.imp&&f>=0.4){CT.imp=true;ctDebris(sev,front);}
   if(sev>1.15&&front&&!CT.lost&&f>5){CT.lost=true;const wx=ctMap(89);CT.parts.push({k:'wheel',x:CT.x+wx,y:CTF-WR,vx:-1.6-sev*0.4,vy:-3,r:0,vr:-0.25,life:1e9});}
   if(f>dur&&f<200&&CT.t%3===0&&front&&sev>0.15){CT.parts.push({k:'steam',x:CT.x+112-CT.cr-6+rnd(-4,4),y:CTF-36+rnd(-4,4),vx:rnd(-0.3,0.2),vy:-rnd(0.3,0.7),r:2,life:70,max:70});}
@@ -114,6 +116,14 @@ function updCrash(){if(!CT)return;if(CT.dest&&typeof updWreck==='function'){updW
   ctParts(sl);if(CT.f>=110){CT.ph='result';if(CT.replay){CT.replay=false;CT.t=100;MENU_SIG='?';}else{CT.t=0;ctScore();}}return;}
  if(CT.ph==='result'){ctParts(1);if(!CT.res.brake&&CT.t<900)ctLeak(ctSev(),front,10+Math.floor(CT.t/60));if(CT.t%3===0&&CT.t<400&&front&&!CT.res.brake&&ctSev()>0.15)CT.parts.push({k:'steam',x:CT.x+112-CT.cr-6+rnd(-4,4),y:CTF-36,vx:rnd(-0.3,0.2),vy:-rnd(0.2,0.5),r:2,life:70,max:70});
   if(CT.res&&CT.t>=34&&CT.t<=34+14*4&&(CT.t-34)%14===0){const k=(CT.t-34)/14;if(k<CT.res.stars)tone(880+k*170,0.12,'square',0.07);}}}
+/* a hajtáslánc sérülése ütközéskor (e: az ütközés előrehaladása 0..1). A motortér a karosszéria szeleteivel együtt gyűrődik;
+   frontálisan: szétreped a hűtő, sérül a motor (nagy sebességnél eltörik a tartója, megsüllyed), eltörik a féltengely és leng, megreped a váltóház, tönkremegy az akku;
+   hátulról: sérül a kipufogó dob, a tank és a hátsó futómű. Az ütközés után a motor leáll. */
+function ctDT(sev,front,e,f){const d=CT.dt,c=v=>clamp(v,0,1);d.run=false;
+ if(front){d.rad=c(1-sev*2.6*e);d.eng=c(1-Math.max(0,sev-0.5)*0.75*e);d.gb=c(1-Math.max(0,sev-1)*1.2*e);d.bat=sev>1.6&&e>0.7?0:1;d.fr=c(1-Math.max(0,sev-1.1)*0.9*e);
+  d.engDrop=sev>1.05?Math.min(3,(sev-1.05)*4)*e:0;if(sev>0.9&&e>0.6&&d.sh>0){d.sh=0;CT.shV=0.25;}d.ex=c(1-Math.max(0,sev-1.3)*e);}
+ else{d.ex=c(1-sev*1.6*e);d.tank=c(1-Math.max(0,sev-0.7)*1.2*e);d.ax=sev>1.1&&e>0.8?0:1;d.fr=c(1-Math.max(0,sev-1.4)*0.8*e);}
+ if(d.sh<=0){CT.shV+=-d.shA*0.05;CT.shV*=0.95;d.shA+=CT.shV*Math.max(0.14,CT.slow);}}
 function ctImpact(){const sev=ctSev();CT.i0={x:CT.x,tx:CT.tx,ang:CT.ang,tvx:CT.tvx};CT.ph='hit';CT.f=0;CT.t=0;CT.x0=CT.x;CT.tvx0=CT.tvx;CT.slow=0.14;CT.shake=Math.min(6,1+sev*3);CT.flash=1;engine(0,0);ctBang();}
 function ctBang(){const sev=ctSev(),k=clamp(0.3+sev,0.3,1);
  if(AC){noise(0.9,Math.min(0.9,0.45+sev*0.2)*k,0,700);noise(0.5,0.35*k,0.02,3200);tone(70,0.5,'sawtooth',0.14*k,0,-40);if(sev>0.5)noise(0.35,0.25,0.12,5000);}
@@ -169,7 +179,8 @@ function ctCar(g,t){const T=CT_TESTS[CT.ti],front=T.z==='f',x=CT.x,by=CTF-55.5,s
  for(const d of CT.fp){ell(g,CT_FLU[d.k],d.x,CTF+0.6,d.w,0.8+d.w*0.06);if(d.k==='oil')ell(g,'rgba(255,255,255,0.18)',d.x-d.w*0.3,CTF+0.3,d.w*0.3,0.3);if(d.k==='fuel'){ell(g,'rgba(255,90,200,0.22)',d.x,CTF+0.4,d.w*0.6,0.4);ell(g,'rgba(80,220,255,0.2)',d.x+d.w*0.15,CTF+0.7,d.w*0.4,0.35);}}
  for(const s of ctSlices()){// a vágás a szelet saját (összenyomás előtti) koordinátáiban
   g.save();g.translate(x+s[4],0);g.scale(s[2],1);g.translate(-(x+s[3]),0);g.beginPath();g.rect(x+s[0],-100,s[1]-s[0],400);g.clip();
-  drawCarSide(g,x,by,by,o,null);
+  if(CT.xray){g.save();g.translate(x,by);drawDrivetrain(g,CT.dt,t,'all');g.restore();g.globalAlpha=0.3;}
+  drawCarSide(g,x,by,by,o,null);g.globalAlpha=1;
   for(const [mx,my] of [[10,34],[37,36],[63,36],[96,35],[50,13.6]])if(mx>=s[0]&&mx<s[1])ctMark(g,x+mx,by+my,1.9);
   if(s[2]<0.995){// gyűrődési redők, felgyűrt motorháztető
    const n=Math.ceil((1-s[2])*10),u0=Math.max(s[0],front?60:2),u1=Math.min(s[1],front?110:52);

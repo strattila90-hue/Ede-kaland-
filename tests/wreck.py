@@ -1,4 +1,4 @@
-# Roncsoló műhely: mind a 11 eszköz (a gombsor valódi kattintásával) egér-koppintással / húzással, Új autó és Vissza gomb. Elvárt: ERR [], leszakadt részek > 0, olvadt tócsa, képek: tests/out/wreck_*.png
+# Roncsoló műhely: hajtáslánc (röntgen, motor/hűtő sérülése, leállás), mind a 11 eszköz (a gombsor valódi kattintásával) egér-koppintással / húzással, Új autó és Vissza gomb. Elvárt: ERR [], leszakadt részek > 0, olvadt tócsa, képek: tests/out/wreck_*.png
 import os,asyncio
 ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 URL='file://'+ROOT+'/index.html'
@@ -60,6 +60,16 @@ async def main():
         await pg.wait_for_timeout(3500);print('szivárgás, defekt, futómű:',await pg.evaluate(st));await pg.screenshot(path=OUT+'wreck_fluids.png')
         await tool(4);await drag([(42,48),(42.2,48)],steps=2,hold=3000);await pg.wait_for_timeout(1500)
         await pg.screenshot(path=OUT+'wreck_fire.png');print('benzintűz:',await pg.evaluate(st))
+        # hajtáslánc: röntgen gomb, lövések a motorra és a hűtőre (a karosszéria alatti réteg sérül, a motor leáll)
+        await pg.click('#menu button[data-a="wknew"]');await pg.wait_for_timeout(300)
+        await pg.click('#menu button[data-a="wkxray"]');await pg.wait_for_timeout(200)
+        assert await pg.evaluate("WK.xray"),"a röntgen gomb nem működik"
+        await tool(8)
+        for uv in [(96,34)]*12+[(107,34)]*5:await tap(*uv,120)
+        await pg.wait_for_timeout(800);await pg.screenshot(path=OUT+'wreck_drivetrain.png')
+        dt=await pg.evaluate("(()=>{const d=WK.dt;return {eng:+d.eng.toFixed(2),rad:+d.rad.toFixed(2),run:d.run};})()");print('hajtáslánc:',dt)
+        assert dt['eng']<0.5 and dt['rad']<0.5 and not dt['run'],"a motor nem sérült / nem állt le"
+        await pg.click('#menu button[data-a="wkxray"]')
         # felbontásváltás: a sérült kép újraépül a műveletlistából
         await pg.evaluate("QT=QT===4?1:4;applyQ(true);window.dispatchEvent(new Event('resize'))");await pg.wait_for_timeout(800);await pg.screenshot(path=OUT+'wreck_rebuild.png')
         await pg.click('#menu button[data-a="wknew"]');await pg.wait_for_timeout(300);print('új autó:',await pg.evaluate(st))
