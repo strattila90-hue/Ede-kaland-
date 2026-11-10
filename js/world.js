@@ -6,7 +6,7 @@
 // path: valós útpontok [szélesség, hosszúság] a térképhez
 const PXKM=14400; // 1 km = 14 400 képpont: 90 km/h-nál 1 km pontosan 40 másodperc, a sebesség arányos az autó méretével
 const KPX=PXKM/216000; // km/h -> képpont/képkocka (60 fps)
-const GEOC={Komárom:[47.743,18.119],Ács:[47.712,17.996],Bábolna:[47.641,17.977],Tatabánya:[47.586,18.394],Budapest:[47.497,19.040],Székesfehérvár:[47.186,18.422],Siófok:[46.904,18.058],
+const GEOC={Kranj:[46.239,14.355],Jesenice:[46.437,14.054],'Kranjska Gora':[46.485,13.785],'Vršič-hágó':[46.433,13.743],Trenta:[46.379,13.751],Bovec:[46.338,13.552],Kobarid:[46.247,13.580],'Cividale del Friuli':[46.093,13.433],Komárom:[47.743,18.119],Ács:[47.712,17.996],Bábolna:[47.641,17.977],Tatabánya:[47.586,18.394],Budapest:[47.497,19.040],Székesfehérvár:[47.186,18.422],Siófok:[46.904,18.058],
  Balatonboglár:[46.776,17.651],Fonyód:[46.744,17.553],Keszthely:[46.765,17.243],Sümeg:[46.977,17.282],Szombathely:[47.231,16.622],Graz:[47.07,15.44],Bécs:[48.208,16.373],Mikulov:[48.806,16.637],Brno:[49.195,16.607],
  Jihlava:[49.396,15.591],Prága:[50.075,14.437],Ústí:[50.66,14.03],Drezda:[51.050,13.737],Berlin:[52.520,13.405],Magdeburg:[52.12,11.63],Hannover:[52.375,9.732],Osnabrück:[52.28,8.05],
  'Bad Bentheim':[52.30,7.16],Amersfoort:[52.156,5.387],Amszterdam:[52.370,4.895],Utrecht:[52.09,5.12],Antwerpen:[51.219,4.402],Brüsszel:[50.850,4.352],Lille:[50.63,3.06],Párizs:[48.857,2.352],
@@ -32,8 +32,11 @@ const LEGS=[
   segs:[['town','Keszthely','medium',3],['country','','medium',14],['village','Sármellék','medium',2],['country','','bad',18],['town','Nagykanizsa','good',5],['motorway','M7','good',22,'HU'],['motorway','A4','good',95,'HR'],['town','Zágráb','cobble',10]]},
  {from:'Zágráb',to:'Ljubljana',region:'alps',weather:'rain',time:'day',price:610,path:['Zágráb','Novo Mesto','Ljubljana'],
   segs:[['town','Zágráb','good',8],['motorway','A3','good',30,'HR'],['motorway','A2','good',85,'SI'],['village','Trebnje','medium',2],['motorway','A2','good',20,'SI'],['town','Ljubljana','cobble',8]]},
- {from:'Ljubljana',to:'Velence',region:'it',weather:'sun',time:'day',price:680,path:['Ljubljana','Postojna','Trieszt','Monfalcone','Latisana','Portogruaro','San Donà di Piave','Mestre','Velence'],
-  segs:[['town','Ljubljana','good',5],['motorway','A1','good',95,'SI'],['motorway','RA13','good',15,'IT'],['town','Trieszt','cobble',6],['motorway','A4','good',130,'IT'],['village','Mestre','bad',4],['town','Velence','cobble',6]]},
+ {from:'Ljubljana',to:'Velence',region:'it',weather:'sun',time:'day',price:680,path:['Ljubljana','Kranj','Jesenice','Kranjska Gora',[46.476,13.773],[46.471,13.790],[46.463,13.768],[46.457,13.786],[46.449,13.760],[46.442,13.773],'Vršič-hágó',[46.425,13.735],[46.417,13.756],[46.408,13.733],[46.400,13.754],[46.391,13.736],'Trenta','Bovec','Kobarid','Cividale del Friuli','Udine','Mestre','Velence'],
+  segs:[['town','Ljubljana','good',5],['motorway','A2','good',55,'SI'],['village','Jesenice','medium',3],['country','','good',20,'',{rg:'alps'}],['village','Kranjska Gora','cobble',2,'',{rg:'alps'}],
+   ['country','Vršič-hágó, északi oldal','medium',12,'',{rg:'alps',serp:1,hp:24}],['village','Vršič-hágó','medium',1,'',{rg:'alps'}],['country','Vršič-hágó, déli oldal','medium',12,'',{rg:'alps',serp:1,hp:26}],
+   ['village','Trenta','medium',2,'',{rg:'alps'}],['country','','medium',18,'',{rg:'alps'}],['village','Bovec','cobble',2,'',{rg:'alps'}],['country','','medium',20,'',{rg:'alps'}],['village','Kobarid','medium',2,'',{rg:'alps'}],
+   ['country','','good',22,'IT'],['village','Cividale del Friuli','cobble',2],['country','','good',15],['town','Udine','good',4],['motorway','A23','good',20,'IT'],['motorway','A4','good',95,'IT'],['village','Mestre','bad',4],['town','Velence','cobble',6]]},
  {from:'Velence',to:'Firenze',region:'tuscany',weather:'cloudy',time:'day',price:690,path:['Velence','Padova','Bologna','Firenze'],
   segs:[['town','Velence','good',5],['motorway','A13','good',120,'IT'],['town','Bologna','cobble',8],['motorway','A1','good',100,'IT'],['town','Firenze','cobble',8]]},
  {from:'Firenze',to:'Róma',region:'tuscany',weather:'sun',time:'sunset',price:690,path:['Firenze','Arezzo','Orvieto','Róma'],
@@ -68,7 +71,7 @@ const LEGS=[
   segs:[['town','Prága','good',8],['motorway','D1','medium',190,'CZ'],['town','Brno','good',8],['country','','medium',15],['village','Rajhrad','cobble',2],['country','','medium',14],['village','Pohořelice','medium',3],['country','','medium',15],['village','Mikulov','cobble',2],['country','','medium',10],['motorway','A5','good',60,'AT'],['town','Bécs','cobble',10]]},
  {from:'Bécs',to:'Komárom (haza)',region:'hu',weather:'sun',time:'sunset',price:612,path:['Bécs','Parndorf','Hegyeshalom','Mosonmagyaróvár','Győr','Ács','Komárom'],
   segs:[['town','Bécs','good',10],['motorway','A4','good',60,'AT'],['motorway','M1','good',55,'HU'],['country','','medium',20],['village','Ács','medium',3],['town','Komárom','cobble',7]]}];
-LEGS.forEach(L=>{L.km=L.segs.reduce((s,q)=>s+q[3],0);L.pts=L.path.map(n=>GEOC[n]);});
+LEGS.forEach(L=>{L.km=L.segs.reduce((s,q)=>s+q[3],0);L.pts=L.path.map(n=>typeof n==='string'?GEOC[n]:n);});
 const LIVE_XY=[GEOC.Komárom].concat(LEGS.map(L=>L.pts[L.pts.length-1]));
 const WNAME={sun:'Napsütés',rain:'Eső',cloudy:'Borult ég',snow:'Havazás',fog:'Köd',clear:'Csillagos éjszaka',storm:'Vihar'};
 const TNAME={day:'',night:', éjszaka',dusk:', alkonyat',sunset:', naplemente'};
@@ -76,18 +79,101 @@ const QNAME={good:'Jó minőségű út',medium:'Közepes út',bad:'Rossz, káty�
 const LIMIT={town:50,village:50,country:90,motorway:130};
 const POI_NAME={wash:'Autómosó',garage:'Autószerviz',burger:'Gyorsétterem',rest:'Pihenő',fuel:'Benzinkút',kis:'Kisbolt',hiper:'Hipermarket',trafik:'Trafik',ujsag:'Újságos',veda:'Sebességmérés'};
 function buildLeg(i,ts){ts=ts||1;const L=LEGS[i],pk=PXKM/ts;let x=0;
- const segs=L.segs.map((q,k)=>{const w=q[3]*pk;const s={type:q[0],name:q[1],q:q[2],km:q[3],cc:q[4]||'',x0:x,x1:x+w,k:k,limit:(L.region!=='hu'&&q[0]==='country')?100:LIMIT[q[0]]};x+=w;return s;});
+ let ctry=CITYCC[L.segs[0][1]]||'HU';const segs=L.segs.map((q,k)=>{const w=q[3]*pk,o=q[5]||{};if(q[4])ctry=q[4];else if(CITYCC[q[1]])ctry=CITYCC[q[1]];const C=CTRY[ctry]||CTRY.HU;
+  const s={type:q[0],name:q[1],q:q[2],km:q[3],cc:q[4]||'',ctry:ctry,rg:o.rg||null,serp:!!o.serp,hpN:o.hp||0,x0:x,x1:x+w,k:k,limit:q[0]==='motorway'?C.mw:q[0]==='country'?(o.serp?50:C.co):LIMIT[q[0]]};x+=w;return s;});
  const len=x;segs[segs.length-1].x1=len+40000;segs[0].x0=-40000;
  const pois=[],lights=[];const add=(type,km,s)=>{const px=s.x0+km*pk;if(px>s.x0+600&&px<Math.min(s.x1,len)-1500)pois.push({type:type,x:px,seg:s});};
  segs.forEach((s,k)=>{const h=(n)=>hsh(i*997+k*131+n);const x0=Math.max(0,s.x0);const sk=(Math.min(s.x1,len)-x0)/pk;const s2={x0:x0,x1:s.x1};
-  if(s.type==='motorway'){for(let d=12+h(1)*10;d<sk-5;d+=38+h(d)*14){add('fuel',d,s2);if(hsh(i*31+d*7)<0.6)add('burger',d+1.6,s2);if(hsh(i*17+d*13)<0.35)add('garage',d+2.6,s2);if(hsh(i*23+d*11)<0.5)add('wash',d+0.6,s2);}for(let d=26+h(6)*8;d<sk-5;d+=34+h(d+3)*12)add('rest',d,s2);for(let d=25+h(2)*10;d<sk-5;d+=45+h(d+7)*20)add('veda',d,s2);}
+  if(s.serp){add('rest',sk*0.55,s2);}/* a hágón csak egy kilátó-pihenő */
+  else if(s.type==='motorway'){for(let d=12+h(1)*10;d<sk-5;d+=38+h(d)*14){add('fuel',d,s2);if(hsh(i*31+d*7)<0.6)add('burger',d+1.6,s2);if(hsh(i*17+d*13)<0.35)add('garage',d+2.6,s2);if(hsh(i*23+d*11)<0.5)add('wash',d+0.6,s2);}for(let d=26+h(6)*8;d<sk-5;d+=34+h(d+3)*12)add('rest',d,s2);for(let d=25+h(2)*10;d<sk-5;d+=45+h(d+7)*20)add('veda',d,s2);}
   else if(s.type==='country'){if(sk>12)add('fuel',sk*(0.4+h(3)*0.2),s2);if(sk>9)add('garage',sk*0.7,s2);if(sk>8)add('rest',sk*(0.15+h(8)*0.1),s2);for(let d=6+h(4)*5;d<sk-3;d+=18+h(d)*10)add('veda',d,s2);}
   else if(s.type==='town'){add('veda',0.25,s2);add('kis',sk*0.22,s2);add('trafik',sk*0.38,s2);add('ujsag',sk*0.5,s2);if(sk>=3)add('fuel',sk*0.64,s2);if(sk>=3)add('hiper',sk*0.82,s2);if(sk>=2)add('burger',sk*0.92,s2);if(sk>=3)add('garage',sk*0.3,s2);if(sk>=3)add('wash',sk*0.72,s2);
    for(let d=0.55;d<sk-0.3;d+=0.7+h(d)*0.4){const px=x0+d*pk;if(!pois.some(p=>Math.abs(p.x-px)<2500))lights.push({x:px,ph:Math.floor(h(d*9)*1980)});}}
   else if(s.type==='village'){if(h(5)<0.6)add('veda',0.2,s2);add('kis',sk*0.45,s2);if(sk>=2)add('trafik',sk*0.7,s2);}});
  pois.sort((a,b)=>a.x-b.x);
- return {len:len,segs:segs,pois:pois,stations:pois.filter(p=>p.type==='fuel').map(p=>p.x),lights:lights,kmPerPx:1/pk,ts:ts};}
+ const leg={len:len,segs:segs,pois:pois,stations:pois.filter(p=>p.type==='fuel').map(p=>p.x),lights:lights,kmPerPx:1/pk,ts:ts};buildTerrain(leg,L,i);return leg;}
 function segAtIn(segs,x){for(const s of segs)if(x<s.x1)return s;return segs[segs.length-1];}
+
+/* ---------- ORSZÁGOK, HELYI NEVEK, DOMBORZAT ----------
+   CTRY: országonként a helyi név (a határtáblán), a magyar név és a sebességhatár (autópálya / országút; lakott területen mindenhol 50).
+   CITYCC: a település országa (a helységnévtábla nyelvéhez és stílusához). LOCN: a helyi nyelvű név (a táblán ez áll, a GPS-en a magyar).
+   ALT: tengerszint feletti magasság méterben; a szakasz domborzata ezek között fut, valós meredekség-korlátokkal. */
+const CTRY={HU:{n:'Magyarország',l:'MAGYARORSZÁG',mw:130,co:90},AT:{n:'Ausztria',l:'ÖSTERREICH',mw:130,co:100},CZ:{n:'Csehország',l:'ČESKO',mw:130,co:90},
+ PL:{n:'Lengyelország',l:'POLSKA',mw:140,co:90},DE:{n:'Németország',l:'DEUTSCHLAND',mw:130,co:100},NL:{n:'Hollandia',l:'NEDERLAND',mw:100,co:80},
+ BE:{n:'Belgium',l:'BELGIË · BELGIQUE',mw:120,co:90},FR:{n:'Franciaország',l:'FRANCE',mw:130,co:80},ES:{n:'Spanyolország',l:'ESPAÑA',mw:120,co:90},
+ PT:{n:'Portugália',l:'PORTUGAL',mw:120,co:90},IT:{n:'Olaszország',l:'ITALIA',mw:130,co:90},SI:{n:'Szlovénia',l:'SLOVENIJA',mw:130,co:90},
+ HR:{n:'Horvátország',l:'HRVATSKA',mw:130,co:90},DK:{n:'Dánia',l:'DANMARK',mw:130,co:80}};
+const CITYCC={Komárom:'HU',Ács:'HU',Bábolna:'HU',Tatabánya:'HU',Budapest:'HU',Székesfehérvár:'HU',Siófok:'HU',Balatonboglár:'HU',Fonyód:'HU',Keszthely:'HU',Sármellék:'HU',Nagykanizsa:'HU',Letenye:'HU',
+ Győr:'HU',Mosonmagyaróvár:'HU',Hegyeshalom:'HU',Varaždin:'HR',Zágráb:'HR',Trebnje:'SI','Novo Mesto':'SI',Ljubljana:'SI',Kranj:'SI',Jesenice:'SI','Kranjska Gora':'SI','Vršič-hágó':'SI',Trenta:'SI',Bovec:'SI',Kobarid:'SI',Postojna:'SI',
+ 'Cividale del Friuli':'IT',Udine:'IT',Trieszt:'IT',Mestre:'IT',Velence:'IT',Padova:'IT',Bologna:'IT',Firenze:'IT',Arezzo:'IT',Orvieto:'IT',Róma:'IT',Civitavecchia:'IT',Grosseto:'IT',Livorno:'IT','La Spezia':'IT',Genova:'IT',Sanremo:'IT',
+ Nizza:'FR','Aix-en-Provence':'FR',Avignon:'FR',Gordes:'FR',Nîmes:'FR',Montpellier:'FR',Perpignan:'FR','Le Perthus':'FR',Bayonne:'FR',Bordeaux:'FR',Poitiers:'FR',Tours:'FR',Orléans:'FR',Párizs:'FR',Lille:'FR',
+ Girona:'ES',Barcelona:'ES',Lleida:'ES',Zaragoza:'ES',Medinaceli:'ES',Madrid:'ES',Talavera:'ES',Mérida:'ES',Badajoz:'ES',Salamanca:'ES',Burgos:'ES','San Sebastián':'ES',
+ Évora:'PT',Lisszabon:'PT',Coimbra:'PT',Guarda:'PT','Vilar Formoso':'PT',Brüsszel:'BE',Antwerpen:'BE',Utrecht:'NL',Amszterdam:'NL',Amersfoort:'NL',
+ 'Bad Bentheim':'DE',Osnabrück:'DE',Bremen:'DE',Hamburg:'DE',Flensburg:'DE',Schwerin:'DE',Berlin:'DE','Frankfurt (Oder)':'DE',Drezda:'DE',Kolding:'DK',Odense:'DK',Koppenhága:'DK',Middelfart:'DK',Nyborg:'DK',Korsør:'DK',Ringsted:'DK',
+ Poznań:'PL',Łódź:'PL',Varsó:'PL',Radom:'PL',Kielce:'PL',Krakkó:'PL',Katowice:'PL',Ostrava:'CZ',Olomouc:'CZ',Brno:'CZ',Jihlava:'CZ',Prága:'CZ',Mikulov:'CZ',Pohořelice:'CZ',Rajhrad:'CZ',Bécs:'AT',Parndorf:'AT',Graz:'AT'};
+const LOCN={Bécs:'Wien',Prága:'Praha',Varsó:'Warszawa',Krakkó:'Kraków',Zágráb:'Zagreb',Velence:'Venezia',Trieszt:'Trieste',Róma:'Roma',Nizza:'Nice',Párizs:'Paris',Amszterdam:'Amsterdam',
+ Brüsszel:'Bruxelles / Brussel',Lisszabon:'Lisboa',Koppenhága:'København',Drezda:'Dresden','San Sebastián':'Donostia / San Sebastián',Talavera:'Talavera de la Reina','Vršič-hágó':'Vršič 1611 m'};
+const locName=n=>LOCN[n]||n;
+const ALT={Komárom:110,Ács:115,Bábolna:140,Tatabánya:160,Budapest:105,Székesfehérvár:115,Siófok:110,Balatonboglár:110,Fonyód:110,Keszthely:115,Sármellék:110,Nagykanizsa:160,Letenye:150,Győr:110,Mosonmagyaróvár:120,Hegyeshalom:130,
+ Varaždin:170,Zágráb:125,Trebnje:300,'Novo Mesto':200,Ljubljana:295,Kranj:385,Jesenice:585,'Kranjska Gora':810,'Vršič-hágó':1611,Trenta:620,Bovec:450,Kobarid:235,Postojna:555,
+ 'Cividale del Friuli':135,Udine:113,Trieszt:5,Mestre:3,Velence:2,Padova:12,Bologna:54,Firenze:50,Arezzo:296,Orvieto:325,Róma:21,Civitavecchia:5,Grosseto:10,Livorno:3,'La Spezia':10,Genova:20,Sanremo:15,
+ Nizza:10,'Aix-en-Provence':173,Avignon:23,Gordes:370,Nîmes:39,Montpellier:27,Perpignan:30,'Le Perthus':290,Girona:70,Barcelona:12,Lleida:155,Zaragoza:200,Medinaceli:1200,Madrid:650,Talavera:371,Mérida:217,Badajoz:186,
+ Évora:300,Lisszabon:50,Coimbra:75,Guarda:1056,'Vilar Formoso':770,Salamanca:802,Burgos:856,'San Sebastián':10,Bayonne:10,Bordeaux:10,Poitiers:116,Tours:60,Orléans:100,Párizs:35,Lille:20,Brüsszel:76,Antwerpen:10,
+ Utrecht:5,Amszterdam:2,Amersfoort:5,'Bad Bentheim':50,Osnabrück:63,Bremen:12,Hamburg:15,Flensburg:20,Kolding:10,Odense:15,Koppenhága:10,Schwerin:40,Berlin:34,'Frankfurt (Oder)':40,Poznań:60,Łódź:200,Varsó:100,
+ Radom:170,Kielce:260,Krakkó:220,Katowice:270,Ostrava:220,Olomouc:220,Brno:210,Jihlava:525,Prága:235,Mikulov:240,Pohořelice:180,Rajhrad:190,Bécs:170,Parndorf:180};
+const EL_STEP=0.05,EL_AMP={hu:0.03,alps:0.07,tuscany:0.065,it:0.045,provence:0.055,es:0.05,fr:0.04,nordic:0.025};
+/* domborzat: 50 m-es mintákban meredekség (gr) és magasság (el). A meredekség a következő ismert magasság felé húz,
+   rajta szelíd dombok; országúton legfeljebb 7% (Alpokban 9%), autópályán 5%, lakott területen 4%, szerpentinen 12%.
+   Lassú simítás (kb. 250 m), így a lejtő fokozatosan kezdődik és ér véget. Emellett: emelkedő/lejtő táblák, hajtűkanyarok, országhatárok. */
+function buildTerrain(leg,L,li){const kp=leg.kmPerPx,k0=leg.segs[0].x0*kp,k1=leg.segs[leg.segs.length-1].x1*kp,n=Math.ceil((k1-k0)/EL_STEP)+2;
+ const gr=new Float32Array(n),el=new Float32Array(n),anc=[];let acc=0;
+ for(const q of L.segs){const a=ALT[q[1]];if(a!==undefined&&(q[0]==='town'||q[0]==='village'))anc.push([acc+q[3]/2,a]);acc+=q[3];}
+ if(!anc.length)anc.push([0,100]);let h=anc[0][1],gs=0,ai=0;const ph=li*1.7;
+ for(let i=0;i<n;i++){const km=k0+i*EL_STEP,s=segAtIn(leg.segs,km/kp),rg=s.rg||L.region;
+  while(ai<anc.length&&anc[ai][0]<=km+EL_STEP)ai++;
+  const need=ai<anc.length?(anc[ai][1]-h)/Math.max(0.4,(anc[ai][0]-km))/1000:(km<0?0:-gs*0.5);
+  const tm=s.type==='motorway'?0.6:s.type==='town'?0.35:s.type==='village'?0.6:1,amp=s.serp?0.03:(EL_AMP[rg]||0.035)*tm;
+  const mx=s.serp?0.12:s.type==='motorway'?0.05:s.type==='town'?0.04:s.type==='village'?0.05:rg==='alps'?0.09:0.07;
+  const nz=amp*(0.6*Math.sin(km*2.33+ph)+0.4*Math.sin(km*5.56+ph*2.1));
+  const gt=clamp(need+nz,-mx,mx);gs+=(gt-gs)*0.2;h+=gs*EL_STEP*1000;gr[i]=gs;el[i]=h;}
+ leg.el=el;leg.gr=gr;leg.ek0=k0;
+ // emelkedő / lejtő tábla az 5%-nál meredekebb szakaszok előtt (250 m-rel), legfeljebb 2 km-enként
+ leg.slopes=[];let lastK=-99,on=false;for(let i=0;i<n;i++){const g=gr[i],km=k0+i*EL_STEP;if(segAtIn(leg.segs,km/kp).serp){on=true;continue;}if(!on&&Math.abs(g)>=0.05){on=true;if(km-lastK>2&&km>0.4){let pk=0;for(let j=i;j<Math.min(n,i+40);j++)pk=Math.max(pk,Math.abs(gr[j]));
+    leg.slopes.push({x:(km-0.25)/kp,pct:Math.round(pk*100),up:g>0});lastK=km;}}else if(on&&Math.abs(g)<0.03)on=false;}
+ // a szerpentin elején egy tábla a legnagyobb meredekséggel (a hajtű-tábla mellett)
+ for(const sg of leg.segs){if(!sg.serp)continue;let pk=0,sgn=0;for(let x=sg.x0;x<sg.x1;x+=(sg.x1-sg.x0)/40){const g=gradeAt(leg,x);if(Math.abs(g)>pk){pk=Math.abs(g);sgn=g;}}leg.slopes.push({x:sg.x0-0.1/kp,pct:Math.round(pk*100),up:sgn>0});}
+ // hajtűkanyarok (szerpentin): egyenletesen, folytatólagos számozással; a hágó két oldala külön sorszámtartomány (1-24, 25-50)
+ leg.hps=[];let hn=0;for(const sg of leg.segs){if(!sg.serp||!sg.hpN)continue;for(let j=0;j<sg.hpN;j++){const x=sg.x0+(sg.x1-sg.x0)*(j+0.5)/sg.hpN;hn++;leg.hps.push({x:x,n:hn,alt:Math.round(elevAt(leg,x)),warned:false});}}
+ // országhatárok
+ leg.borders=[];for(let k=1;k<leg.segs.length;k++)if(leg.segs[k].ctry!==leg.segs[k-1].ctry)leg.borders.push({x:leg.segs[k].x0,cc:leg.segs[k].ctry,from:leg.segs[k-1].ctry,done:false});}
+function terrIdx(leg,x){return (x*leg.kmPerPx-leg.ek0)/EL_STEP;}
+function gradeAt(leg,x){if(!leg||!leg.gr)return 0;const f=terrIdx(leg,x),i=Math.floor(f);if(i<0)return leg.gr[0];if(i>=leg.gr.length-1)return leg.gr[leg.gr.length-1];return leg.gr[i]+(leg.gr[i+1]-leg.gr[i])*(f-i);}
+function elevAt(leg,x){if(!leg||!leg.el)return 0;const f=terrIdx(leg,x),i=Math.floor(f);if(i<0)return leg.el[0];if(i>=leg.el.length-1)return leg.el[leg.el.length-1];return leg.el[i]+(leg.el[i+1]-leg.el[i])*(f-i);}
+/* ---- útszéli táblák a domborzathoz és a határokhoz ---- */
+function signTri(g,x,b,draw){line(g,'#7d858d',x,b,x,b-30,1.4);poly(g,'#ffffff',[[x,b-48],[x+10,b-31],[x-10,b-31]]);g.strokeStyle='#d32f2f';g.lineWidth=2;g.lineJoin='round';g.beginPath();g.moveTo(x,b-46);g.lineTo(x+8.4,b-32);g.lineTo(x-8.4,b-32);g.closePath();g.stroke();draw();}
+function signSlope(g,x,b,pct,up){signTri(g,x,b,()=>{poly(g,'#1a1a1a',up?[[x-6,b-33.5],[x+6,b-33.5],[x+6,b-40]]:[[x-6,b-33.5],[x+6,b-33.5],[x-6,b-40]]);});
+ const t=pct+'%';frr(g,'#ffffff',x-9,b-30,18,8,1);g.strokeStyle='#1a1a1a';g.lineWidth=0.6;rrect(g,x-9,b-30,18,8,1);g.stroke();text(g,t,x,b-28.4,'#1a1a1a',0.7,'center',null);}
+function signCurves(g,x,b,n){signTri(g,x,b,()=>{g.strokeStyle='#1a1a1a';g.lineWidth=1.3;g.beginPath();g.moveTo(x-2,b-33);g.lineTo(x+2,b-36);g.lineTo(x-2,b-39);g.lineTo(x+2,b-42);g.stroke();});
+ const t=n+' HAJTŰ';const w=textW(t,0.55)+6;frr(g,'#ffffff',x-w/2,b-30,w,7,1);text(g,t,x,b-28.6,'#1a1a1a',0.55,'center',null);}
+function signHairpin(g,x,b,n,alt){line(g,'#6b4a2b',x,b,x,b-22,1.4);frr(g,'#ffffff',x-11,b-38,22,16,1.5);g.strokeStyle='#1a1a1a';g.lineWidth=0.7;rrect(g,x-11,b-38,22,16,1.5);g.stroke();
+ text(g,String(n),x,b-36,'#c62a35',0.9,'center',null);text(g,alt+' M',x,b-28,'#1a1a1a',0.5,'center',null);}
+function signBorder(g,x,b,cc){const C=CTRY[cc]||CTRY.HU,t=C.l,w=Math.max(44,textW(t,0.6)+10);line(g,'#7d858d',x,b,x,b-26,1.6);
+ frr(g,'#1f4fa8',x-w/2,b-60,w,34,2);for(let i=0;i<12;i++){const a=i*TAU/12;disc(g,'#ffd84a',x+Math.cos(a)*8,b-48+Math.sin(a)*8,0.9);}
+ text(g,t,x,b-35,'#ffffff',0.6,'center',null);
+ const s='50 · '+C.co+' · '+C.mw;const w2=textW(s,0.55)+8;frr(g,'#ffffff',x-w2/2,b-25,w2,8,1);g.strokeStyle='#1a1a1a';g.lineWidth=0.5;rrect(g,x-w2/2,b-25,w2,8,1);g.stroke();text(g,s,x,b-23.4,'#1a1a1a',0.55,'center',null);}
+function drawTerrainSigns(g,leg,dist){const vis=x=>x>-60&&x<W+60,y=ROADT-2;
+ if(leg.slopes)for(const s of leg.slopes){const x=s.x-dist+PX;if(vis(x))signSlope(g,x,y,s.pct,s.up);}
+ if(leg.hps&&leg.hps.length){for(const h of leg.hps){const x=h.x-dist+PX;if(vis(x))signHairpin(g,x,y,h.n,h.alt);}
+  for(const sg of leg.segs){if(!sg.serp)continue;const x=sg.x0-dist+PX-40;if(vis(x))signCurves(g,x,y,sg.hpN);}}
+ if(leg.borders)for(const bd of leg.borders){const x=bd.x-dist+PX;if(vis(x))signBorder(g,x,y,bd.cc);}}
+/* a szerpentin a hegyoldalon (távoli réteg): cikcakkos út, rajta a családi autó helye (felfelé a hágóig, utána lefelé) */
+function drawSerpBG(g,leg,dist){const sg=segAtIn(leg.segs,dist+PX+56);if(!sg.serp)return;const u=clamp((dist+PX+56-sg.x0)/(sg.x1-sg.x0),0,1),up=sg.hpN<=24;
+ const bx=W*0.62-u*W*0.18,by=ROADT-22,n=9,top=ROADT-128,pts=[];for(let i=0;i<=n;i++){const k=i/n,wd=(1-k*0.55)*70;pts.push([bx+(i%2?wd*0.5:-wd*0.5)+(up?k*30:-k*30),by+(top-by)*k]);}
+ g.lineJoin='round';g.strokeStyle='rgba(90,84,74,0.55)';g.lineWidth=3.2;g.beginPath();pts.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.stroke();
+ g.strokeStyle='rgba(225,220,205,0.8)';g.lineWidth=1.4;g.stroke();
+ const t=up?u:1-u,f=t*n,i=Math.min(n-1,Math.floor(f)),a=pts[i],b2=pts[i+1],q=f-i,cx=a[0]+(b2[0]-a[0])*q,cy=a[1]+(b2[1]-a[1])*q;
+ disc(g,'rgba(255,255,255,0.9)',cx,cy,2.4);disc(g,CP.m,cx,cy,1.6);
+ const p0=pts[n];frr(g,'#6b4a2b',p0[0]-5,p0[1]-6,10,6,1);poly(g,'#a23b2a',[[p0[0]-6,p0[1]-6],[p0[0]+6,p0[1]-6],[p0[0],p0[1]-10]]);}
 
 /* ---- ég, felhők, nap ---- */
 function skyCols(L){if(L.time==='night')return ['#060a24','#22325f'];if(L.weather==='storm')return ['#2f3744','#6f7987'];
@@ -218,10 +304,11 @@ function building(g,x,b,w,h,i,night,lights){const bc=BCOL[(hsh(i*3)*BCOL.length)
  frr(g,night?'#ffe9a8':'#5f6f7f',x+4,b-15,w/2-6,10,1);frr(g,'#5a3d22',x+w-18,b-17,10,17,1);if(night&&lights)lights.push({x:x+w/4,y:b-10,r:14});}
 function palm(g,x,b){g.strokeStyle='#8a6a3e';g.lineWidth=3;g.beginPath();g.moveTo(x+8,b);g.quadraticCurveTo(x+4,b-28,x+10,b-50);g.stroke();
  for(const [dx,dy] of [[-16,6],[16,6],[-12,-6],[12,-6],[0,-10]]){g.strokeStyle='#2f8a3e';g.lineWidth=2;g.beginPath();g.moveTo(x+10,b-50);g.quadraticCurveTo(x+10+dx*0.6,b-56+dy*0.3,x+10+dx,b-50+dy);g.stroke();}}
-function roadSign(g,x,b,txt,kind){const t=txt.toUpperCase(),w=textW(t)+10;
+const SIGNST={DE:['#f5c400','#1a1a1a','#1a1a1a'],NL:['#1d4f9c','#ffffff','#ffffff'],PL:['#1f7a3a','#ffffff','#ffffff'],FR:['#ffffff','#d32f2f','#1a1a1a']};
+function roadSign(g,x,b,txt,kind,cc){const t=txt.toUpperCase(),w=textW(t)+10,st=SIGNST[cc]||['#ffffff','#1a1a1a','#1a1a1a'];
  if(kind==='motorway'){line(g,'#7d858d',x+w/2,b,x+w/2,b-34,1.6);frr(g,'#ffffff',x,b-52,w,18,2);frr(g,'#1d5fb8',x+1,b-51,w-2,16,1.6);text(g,t,x+5,b-46,'#ffffff',1,'left',null);}
- else if(kind==='exit'){line(g,'#7d858d',x+w/2,b,x+w/2,b-22,1.4);frr(g,'#ffffff',x,b-36,w,14,1);g.strokeStyle='#1a1a1a';g.lineWidth=1;rrect(g,x+1,b-35,w-2,12,1);g.stroke();text(g,t,x+5,b-32,'#1a1a1a',1,'left',null);line(g,'#d32f2f',x+2,b-23,x+w-2,b-35,1.6);}
- else{line(g,'#7d858d',x+w/2,b,x+w/2,b-22,1.4);frr(g,'#ffffff',x,b-36,w,14,1);g.strokeStyle='#1a1a1a';g.lineWidth=1;rrect(g,x+1,b-35,w-2,12,1);g.stroke();text(g,t,x+5,b-32,'#1a1a1a',1,'left',null);}}
+ else{line(g,'#7d858d',x+w/2,b,x+w/2,b-22,1.4);frr(g,st[0],x,b-36,w,14,1);g.strokeStyle=st[1];g.lineWidth=1;rrect(g,x+1,b-35,w-2,12,1);g.stroke();text(g,t,x+5,b-32,st[2],1,'left',null);
+  if(kind==='exit')line(g,'#d32f2f',x+2,b-23,x+w-2,b-35,1.6);}}
 function limitSign(g,x,b,v){line(g,'#7d858d',x,b,x,b-24,1.6);disc(g,'#d32f2f',x,b-33,9.6);disc(g,'#ffffff',x,b-33,7.2);const sc=v>=100?0.68:0.9;text(g,String(v),x+0.3,b-33-3.5*sc,'#111',sc,'center',null);}
 function midItem(g,i,x,b,s,h,reg,night,snow,lights){
   if(s.type==='town'){if(reg==='it'&&h<0.25){palm(g,x+10,b);return;}building(g,x,b,78,60+hsh(i*7)*70,i,night,lights);}
@@ -257,8 +344,8 @@ function drawNear(g,L,leg,dist,lights,t){const snow=L.weather==='snow',night=L.t
  // helységnév-, autópálya- és sebességtáblák a szakaszhatárokon
  for(let k=0;k<leg.segs.length;k++){const s=leg.segs[k],sx=s.x0-dist+PX+30;if(sx<-90||sx>W+20)continue;const prev=leg.segs[k-1];
   if(s.type==='motorway'&&(!prev||prev.name!==s.name))roadSign(g,sx,y0+8,s.name,'motorway');
-  else if((s.type==='town'||s.type==='village')&&s.name&&(!prev||prev.name!==s.name))roadSign(g,sx,y0+8,s.name,'town');
-  if(prev&&(prev.type==='town'||prev.type==='village')&&prev.name!==s.name&&prev.name)roadSign(g,sx-70,y0+8,prev.name,'exit');
+  else if((s.type==='town'||s.type==='village')&&s.name&&(!prev||prev.name!==s.name))roadSign(g,sx,y0+8,locName(s.name),'town',s.ctry);
+  if(prev&&(prev.type==='town'||prev.type==='village')&&prev.name!==s.name&&prev.name)roadSign(g,sx-70,y0+8,locName(prev.name),'exit',prev.ctry);
   if(!prev||prev.limit!==s.limit)limitSign(g,sx+(s.type==='motorway'||s.name?-14:6),y0+8,s.limit);}}
 
 /* ---- út: minőség szerinti felület ---- */
@@ -285,7 +372,7 @@ function drawRoad(g,L,leg,dist,t){const snow=L.weather==='snow',wet=L.weather===
  if(snow)for(let i=Math.floor(dist/6);i<Math.floor(dist/6)+W/6+2;i++){const h=hsh(i*3);frr(g,'#f4f8fb',i*6-dist,ROADT-1,7,2+h*5,2);frr(g,'#f4f8fb',i*6-dist,ROADB-3-h*4,7,4+h*4,2);}
  if(wet)for(let i=Math.floor(dist/30);i<Math.floor(dist/30)+20;i++){const h=hsh(i*11);if(h>0.5)R(g,'rgba(180,210,240,0.22)',i*30-dist,ROADT+10+h*48,14,0.8);}
  const sgc=segAtIn(leg.segs,dist+PX);const gc=sgc.type==='town'?'#b6b0a6':L.region==='it'&&sgc.type!=='country'?'#e8d3a2':snow?'#eef3f7':'#5d9a4e';
- R(g,gc,0,ROADB,W,H-ROADB);R(g,'rgba(0,0,0,0.2)',0,ROADB,W,1);}
+ R(g,gc,0,ROADB,W,H-ROADB+64);R(g,'rgba(0,0,0,0.2)',0,ROADB,W,1);}
 /* ---- közlekedési lámpa ---- */
 /* jelzőlámpa ciklus (képkocka, 60/mp): zöld 20 mp, sárga 3 mp, piros 10 mp */
 const LG_G=1200,LG_Y=180,LG_R=600,LG_C=LG_G+LG_Y+LG_R;

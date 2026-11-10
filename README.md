@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.39.0
+# 🚐 Családi Vakáció – v2.40.0
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -31,11 +31,31 @@ A játék valós léptékű: 90 km/h-val 1 km pontosan 40 másodperc, így Komá
 
 A játék 10 másodpercenként (és háttérbe kerüléskor) automatikusan menti az állást, így az út több napon át is folytatható. A főmenüben választható **Gyorsított (5x)** utazás is (ennél gyorsabb nincs), de alapból valós idővel megy. A megtett utat a mentés kilométerben tárolja, így egy elkezdett utazásban a km és a méter sosem vész el és nem ugrik, akkor sem, ha közben átállítod a gyorsítást. Valós időben a kijelzett megtett út méterre pontos: 90 km/h-val pontosan 25 métert teszel meg másodpercenként (1 km = 40 mp), és a kijelző a métereket is mutatja (pl. 10,305 / 167 km). Gyorsított és turbó módban a táv rövidebbre van sűrítve, ezért ilyenkor a kijelző mellett ott a szorzó (5x, 20x).
 
-## 🌍 Európa körút (22 szakasz, kb. 9 600 km, 14 ország)
+## 🌍 Európa körút (22 szakasz, kb. 9 700 km, 14 ország)
 
-Komárom → Siófok → Keszthely → Zágráb → Ljubljana → Velence → Firenze → Róma → Nizza (a Ligur-tenger partján) → Barcelona → Madrid → Lisszabon → Bordeaux → Párizs → Amszterdam → Hamburg → Koppenhága (a dán hidakon át) → Berlin → Varsó → Krakkó → Prága → Bécs → haza, Komárom.
+Komárom → Siófok → Keszthely → Zágráb → Ljubljana → (a Vršič-hágón át, 1611 m) → Velence → Firenze → Róma → Nizza (a Ligur-tenger partján) → Barcelona → Madrid → Lisszabon → Bordeaux → Párizs → Amszterdam → Hamburg → Koppenhága (a dán hidakon át) → Berlin → Varsó → Krakkó → Prága → Bécs → haza, Komárom.
 
 Országok: Magyarország, Horvátország, Szlovénia, Olaszország, Franciaország, Spanyolország, Portugália, Belgium, Hollandia, Németország, Dánia, Lengyelország, Csehország, Ausztria. Az útdíjak és matricák országonként valósághűek (pl. szlovén e-matrica, horvát, olasz, francia, spanyol, portugál és lengyel autópályadíj). Minden nagyvárosnak saját képeslapja van (Zágráb tornyai, Colosseum, Duomo, madridi palota, lisszaboni híd és villamos, bordeaux-i kastély, hamburgi daruk, Nyhavn, varsói Kultúrpalota, Wawel).
+
+## ⛰️ Domborzat, hegymenet, szerpentin (v2.40)
+
+**Emelkedők és lejtők:** minden szakasznak valódi magasságprofilja van: a városok tengerszint feletti magasságai között fut (pl. Komárom 110 m, Madrid 650 m, Medinaceli 1200 m, Vršič-hágó 1611 m), rajta szelíd dombokkal. Valós meredekség-korlátok: autópályán legfeljebb 5%, országúton 7% (az Alpokban 9%), lakott területen 4%, szerpentinen 12%. A dombok tájegységenként mások: az Alföldön és Hollandiában szinte sík, Toszkánában és Provence-ban hullámos.
+- **Látvány akadás nélkül:** egy képernyőn kb. 33 m út látszik, ezen belül a lejtő egyenes. A talaj (közeli táj, út, forgalom, autó) külön képre rajzolódik, és 8 képpontos függőleges csíkokban, egész képpontnyi eltolással kerül a képernyőre. Ez csak egyszerű képmásolás (nincs ferdítés, újramintavételezés), ezért gyenge telefonon is gyors. Az épületek, fák, oszlopok függőlegesek maradnak, az égbolt és a látóhatár vízszintes. A kép 1% alatt nem dől, takarékos minőségben pedig kikapcsol (a menetfizika marad).
+- **Menetfizika:** emelkedőn az autó lassul (a gravitáció valós ereje), és többet fogyaszt (5%-on kb. +9 l/100 km), a motor hangja terheltebb. Lejtőn gyorsul és alig fogyaszt (motorfék). A tempomat lejtőn visszafogja az autót, az autopilóta is.
+- **Táblák:** „Emelkedő / Lejtő X%” háromszögtábla az 5%-nál meredekebb szakaszok előtt.
+
+**Szerpentin: a Vršič-hágó** (Szlovénia, 1611 m). A Ljubljana–Velence szakasz most Kranjska Gorán, a hágón, a Soča völgyén (Trenta, Bovec, Kobarid) és Cividale del Friulin át vezet (322 km).
+- A hágó két oldalán **50 számozott hajtűkanyar** (északon 1–24, délen 25–50), mindegyiknél tábla a sorszámmal és a magassággal (ahogy a valóságban). Előtte „Veszélyes kanyarok – 24 / 26 hajtű” és meredekségtábla.
+- **35 km/h fölött a hajtűkanyarban megcsúszik az autó**: csikorgás, nekicsúszik a szalagkorlátnak, oldalsérülés. Előtte figyelmeztetés: „lassíts 30 km/h-ra”. Kanyarodáskor az autó elfordul (rövid kanyarodó mozdulat). Az autopilóta magától lelassít. A hágón 50 km/h a határ, kamion és busz nem jár.
+- A háttérben, a hegyoldalon látszik a **cikcakkos szerpentin**, rajta egy pont mutatja, hol tart a család (felfelé a hágó tetején álló menedékházig, utána lefelé). A hágó környékén alpesi táj van, a tájváltás lágyan átúszik.
+- A **GPS-en** a szerpentin valódi cikcakkos vonal, és a család helye is ezen halad.
+
+## 🛂 Külföldi táblák, határok, sebességhatárok (v2.40)
+
+- **Helyi nevek a helységnévtáblán:** a táblán a helyi nyelvű név áll, a GPS-en és a feliratokon a magyar is: WIEN (Bécs), PRAHA (Prága), WARSZAWA (Varsó), KRAKÓW, ŁÓDŹ, ZAGREB, VENEZIA, TRIESTE, ROMA, NICE, PARIS, BRUXELLES / BRUSSEL, LISBOA, KØBENHAVN, DONOSTIA / SAN SEBASTIÁN stb. A betűkészlet megkapta a szükséges ékezeteket (ř, č, š, ž, ł, ń, ż, ø, å, ñ, ã, ç, ê, ë…).
+- **Országonkénti táblastílus:** német sárga, holland kék, lengyel zöld, francia piros keretes, a többi fehér fekete kerettel. A városvégi tábla ugyanilyen, piros áthúzással.
+- **Határtábla:** kék, csillagkörös tábla az ország helyi nevével (ÖSTERREICH, ČESKO, POLSKA, NEDERLAND, BELGIË · BELGIQUE, ESPAÑA…), alatta a sebességhatárok. Határátlépéskor üzenet az ország nevével és a határokkal.
+- **Valós sebességhatárok:** lakott területen 50, országúton / autópályán: Magyarország 90/130, Ausztria 100/130, Csehország 90/130, Lengyelország 90/140, Németország 100/130 (ajánlott), Hollandia 80/100 (napközben), Belgium 90/120, Franciaország 80/130, Spanyolország és Portugália 90/120, Olaszország, Szlovénia, Horvátország 90/130, Dánia 80/130.
 
 A régi (12 szakaszos) mentések automatikusan átállnak: a játék a legközelebbi új szakasztól folytatja.
 

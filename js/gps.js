@@ -113,7 +113,7 @@ function gpsEta(rem){const v=gpsLive()?Math.abs(P.kmh||0):0,sp=v>=15?v:85,m=rem/
 function gpsInfo(){const L=LEGS[G.leg],km=gpsKm(),rem=Math.max(0,L.km-km),tot=LEGS.reduce((a,l)=>a+l.km,0),done=LEGS.slice(0,G.leg).reduce((a,l)=>a+l.km,0)+km,esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]);
  const from=L.from.split(',')[0],to=L.to.split(' (')[0],cc=gpsCountry(G.leg,km),sn=gpsSegName(G.leg,km);
  const it=[];if(gpsLive()){const seen={},front=P.dist+112;for(const p of LEG.pois){if(p.type==='veda'||seen[p.type]||!GPS_ICON[p.type])continue;const d=(p.x-front)*LEG.kmPerPx;if(d<0.05)continue;seen[p.type]=1;it.push({i:GPS_ICON[p.type],n:POI_NAME[p.type],d:d,k:p.x*LEG.kmPerPx});}}
- const a=gpsAnchors(G.leg);let nt=0;for(let k=1;k<L.path.length-1&&nt<2;k++)if(a[k]>km+0.2){it.push({i:GPS_ICON.town,n:L.path[k],d:a[k]-km,k:a[k]});nt++;}
+ const a=gpsAnchors(G.leg);let nt=0;for(let k=1;k<L.path.length-1&&nt<2;k++)if(a[k]>km+0.2&&typeof L.path[k]==='string'){it.push({i:GPS_ICON.town,n:L.path[k],d:a[k]-km,k:a[k]});nt++;}
  it.sort((x,y)=>x.d-y.d);const li=it.slice(0,6);li.push({i:GPS_ICON.flag,n:to,d:rem,k:L.km});
  const fd=d=>d<1?fmt(Math.round(d*1000/10)*10)+' m':fmt(d,d<10?1:0)+' km';
  $('gpsInfo').innerHTML='<div class="rt">'+esc(from)+' → '+esc(to)+'</div><div class="mut">'+esc((sn?sn+' · ':'')+(GPS_CC[cc]||cc))+'</div>'

@@ -2,7 +2,7 @@
 /* =========================================================
    CSALÁDI VAKÁCIÓ – alapok: vászon, rajzoló segédek, betűk, hang, bemenet
    ========================================================= */
-const APP_VERSION='2.39.0';
+const APP_VERSION='2.40.0';
 const W=480,H=270,PX=70,ROADT=194,ROADB=262,LANE=[212,232,252];
 const TAU=Math.PI*2;
 let SC=2,LOWQ=false;
@@ -89,12 +89,26 @@ U:[17,17,17,17,17,17,14],V:[17,17,17,17,17,10,4],W:[17,17,17,21,21,21,10],X:[17,
 '?':[14,17,1,2,4,0,4],':':[0,12,12,0,12,12,0],'-':[0,0,0,31,0,0,0],'/':[1,1,2,4,8,16,16],'+':[0,4,4,31,4,4,0],'>':[8,4,2,1,2,4,8],'<':[2,4,8,16,8,4,2],
 '(':[2,4,8,8,8,4,2],')':[8,4,2,2,2,4,8],"'":[4,4,8,0,0,0,0],'♥':[0,10,31,31,14,4,0],'*':[0,21,14,31,14,21,0],'%':[24,25,2,4,8,19,3],'Ø':[1,14,19,21,25,14,16],
 '=':[0,0,31,0,31,0,0],'"':[10,10,0,0,0,0,0]};
-const ACC={'Á':['A',1],'É':['E',1],'Í':['I',1],'Ó':['O',1],'Ú':['U',1],'Ö':['O',2],'Ü':['U',2],'Ő':['O',3],'Ű':['U',3]};
+/* ékezetek: 1 vessző, 2 kettőspont, 3 hosszú, 4 hacsek (ˇ), 5 alsó horog/cédille, 6 karika, 7 hullám (~), 8 tompa (`), 9 kalap (^), 10 pont, 11 áthúzott Ł, 12 áthúzott Ø */
+const ACC={'Á':['A',1],'É':['E',1],'Í':['I',1],'Ó':['O',1],'Ú':['U',1],'Ö':['O',2],'Ü':['U',2],'Ő':['O',3],'Ű':['U',3],
+ 'Ń':['N',1],'Ś':['S',1],'Ź':['Z',1],'Ć':['C',1],'Ý':['Y',1],'Ä':['A',2],'Ë':['E',2],'Ï':['I',2],
+ 'Ř':['R',4],'Č':['C',4],'Š':['S',4],'Ž':['Z',4],'Ě':['E',4],'Ň':['N',4],'Ť':['T',4],'Ď':['D',4],
+ 'Ç':['C',5],'Ę':['E',5],'Ą':['A',5],'Å':['A',6],'Ů':['U',6],'Ã':['A',7],'Ñ':['N',7],'Õ':['O',7],
+ 'À':['A',8],'È':['E',8],'Ò':['O',8],'Ù':['U',8],'Â':['A',9],'Ê':['E',9],'Î':['I',9],'Ô':['O',9],'Û':['U',9],'Ż':['Z',10],'Ł':['L',11]};
 function glyph(g,ch,x,y,s){let a=0;if(ACC[ch]){a=ACC[ch][1];ch=ACC[ch][0];}const d=FONT[ch];if(!d)return;
  for(let r=0;r<7;r++){const row=d[r];if(!row)continue;for(let c=0;c<5;c++)if(row&(16>>c))g.fillRect(x+c*s,y+r*s,s,s);}
  if(a===1){g.fillRect(x+3*s,y-3*s,s,s);g.fillRect(x+2*s,y-2*s,s,s);}
  else if(a===2){g.fillRect(x+s,y-2*s,s,s);g.fillRect(x+3*s,y-2*s,s,s);}
- else if(a===3){g.fillRect(x+2*s,y-3*s,s,s);g.fillRect(x+s,y-2*s,s,s);g.fillRect(x+4*s,y-3*s,s,s);g.fillRect(x+3*s,y-2*s,s,s);}}
+ else if(a===3){g.fillRect(x+2*s,y-3*s,s,s);g.fillRect(x+s,y-2*s,s,s);g.fillRect(x+4*s,y-3*s,s,s);g.fillRect(x+3*s,y-2*s,s,s);}
+ else if(a===4){g.fillRect(x+s,y-3*s,s,s);g.fillRect(x+3*s,y-3*s,s,s);g.fillRect(x+2*s,y-2*s,s,s);}
+ else if(a===5){g.fillRect(x+2*s,y+7*s,s,s);g.fillRect(x+3*s,y+8*s,s,s);}
+ else if(a===6){g.fillRect(x+s,y-3*s,3*s,s);g.fillRect(x+s,y-2*s,s,s);g.fillRect(x+3*s,y-2*s,s,s);}
+ else if(a===7){g.fillRect(x+s,y-2*s,s,s);g.fillRect(x+2*s,y-3*s,s,s);g.fillRect(x+3*s,y-2*s,s,s);g.fillRect(x+4*s,y-3*s,s,s);}
+ else if(a===8){g.fillRect(x+s,y-3*s,s,s);g.fillRect(x+2*s,y-2*s,s,s);}
+ else if(a===9){g.fillRect(x+2*s,y-3*s,s,s);g.fillRect(x+s,y-2*s,s,s);g.fillRect(x+3*s,y-2*s,s,s);}
+ else if(a===10){g.fillRect(x+2*s,y-2*s,s,s);}
+ else if(a===11){g.fillRect(x+s,y+3*s,s,s);g.fillRect(x+2*s,y+2*s,s,s);}
+ else if(a===12){g.fillRect(x+3*s,y+2*s,s,s);g.fillRect(x+2*s,y+3*s,s,s);g.fillRect(x+s,y+4*s,s,s);}}
 function textW(str,s){s=s||1;return String(str).length*6*s-s;}
 /* betűk gyorsítótára ATLASZBAN: színenként és méretenként EGY kép, benne a betűk rácsban (nem betűnként külön vászon).
    Telefonon minden külön vászon külön grafikus memóriát foglal; ezer fölötti kis vászon miatt a rendszer leállíthatja a játékot. */

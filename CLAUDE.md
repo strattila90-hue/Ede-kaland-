@@ -22,6 +22,7 @@ python3 tests/flash.py     # ~15 mp, elvárt: black 0, ERR []
 python3 tests/devices.py   # ~1 perc, 9 képernyőméret, elvárt: minden "overlap": "" (képek: tests/out/)
 python3 tests/crash.py     # ~3 perc, törésteszt: saját vezetés, fékpróba, öv nélkül, hátsó, fékút burkolatonként, csomag + ismétlés; elvárt: ERR [] (képek: tests/out/crash_*.png)
 python3 tests/wreck.py     # ~1 perc, roncsoló műhely: mind a 11 eszköz a gombsor kattintásával és egérrel; elvárt: ERR [], leszakadt részek (képek: tests/out/wreck_*.png)
+python3 tests/terrain.py   # ~1 perc, domborzat minden szakaszon, Vršič-hágó (50 hajtű, csúszás, autopilóta), lejtős rajz éjjel, határ, helyi nevek; elvárt: HIBÁK 0, ERR []
 python3 tests/soak.py      # ~20 perc, mind a 22 szakasz; elvárt: "HIBÁK 0", legsDone 22, win 1, pageerrors []
 ```
 
@@ -39,8 +40,8 @@ python3 tools-version.py && git add -A && git commit -m "vX.Y.Z: ..." \
 | `js/core.js` | `APP_VERSION`, vászon (logikai 480×270, `SC` skála), hibanapló (`elog`), szövegrajzolás (betű- és szövegtár: `GLC`, `STC`), hangok, billentyűzet (`kRole`, két kiosztás: `KEYMAP` a/b), `resize()` |
 | `js/radio.js` | rádió, motorhang (`engine`), zene |
 | `js/car.js` | családi autó oldalnézet (`drawCarSide`, sérülés: `drawDamage` – ráncok, ajtórés, csöpögő olaj/hűtőfolyadék/benzin; `wheel(…,flat,r,bent)` – defekt és elgörbült futómű), utasok (`person`), forgalom (`drawTraffic`), tréler (`drawTowTruck`, `towBed`) |
-| `js/world.js` | útvonal: `GEOC` (városok koordinátái), `LEGS` (22 szakasz, ~9600 km), szakaszgenerálás, tájrajz (`drawFar`/`drawMid`/`drawNear`), megállók (`drawPOI`), lámpák (`lightState`: zöld 20 / sárga 3 / piros 10 mp), előre megrajzolt képtárak (`layerTiles`, `sprite`) |
-| `js/game.js` | játékállapot (`G`, `P`, `LEG`), `update`/`updPlay`, autopilóta (`startAuto`, `autoDrive`, `tapPOI`), sérülés/totálkár, autómosó, HUD (`drawHUD`, `drawStrip` haladási sáv, `drawLightAdvisor`), plakát (`drawPoster`), mentés (`save`/`loadSave`), képkocka-ciklus (`frame`, interpoláció `renderI`), minőségszabályzó (`qualityStep`) |
+| `js/world.js` | útvonal: `GEOC` (városok koordinátái), `LEGS` (22 szakasz, ~9700 km; a `path` elemei lehetnek koordináták is: a szerpentin cikcakkja a GPS-en; szakasz 6. eleme opciók: `{rg,serp,hp}`), országok és helyi nevek (`CTRY` sebességhatárokkal, `CITYCC`, `LOCN`/`locName`), domborzat (`ALT` magasságok, `buildTerrain`: `leg.gr`/`leg.el` 50 m-es mintákban, `gradeAt`, `elevAt`, `leg.slopes`, `leg.hps` hajtűk, `leg.borders`), útszéli táblák (`drawTerrainSigns`, `roadSign(…,cc)` országonkénti stílussal), szerpentin a háttérben (`drawSerpBG`), szakaszgenerálás, tájrajz (`drawFar`/`drawMid`/`drawNear`), megállók (`drawPOI`), lámpák (`lightState`: zöld 20 / sárga 3 / piros 10 mp), előre megrajzolt képtárak (`layerTiles`, `sprite`) |
+| `js/game.js` | játékállapot (`G`, `P`, `LEG`), lejtő: `P.gr` meredekség, `P.tilt`; csíkos rajz (`GRC`, `scrDy`, `tiltOn`: a talaj külön képre, 8 px-es csíkokban függőlegesen eltolva, ne alakítsd ferdítésre/forgatásra, az szoftveres rajzolásnál 25%-kal lassabb), hajtűkanyar (`hairpins`, `nextHp`), határ (`borders`), szakaszonkénti tájegység (`legRg`), `update`/`updPlay`, autopilóta (`startAuto`, `autoDrive`, `tapPOI`), sérülés/totálkár, autómosó, HUD (`drawHUD`, `drawStrip` haladási sáv, `drawLightAdvisor`), plakát (`drawPoster`), mentés (`save`/`loadSave`), képkocka-ciklus (`frame`, interpoláció `renderI`), minőségszabályzó (`qualityStep`) |
 | `js/app.js` | DOM-menük (`menuDef`, `menuAction`), költségnapló, telepítés, offline/frissítés (`autoOffline`, `doUpdate`), hibanapló- és billentyűzet-ablak, kilépés/vissza-gesztus csapda |
 | `js/shops.js` | boltok, benzinkút, szerviz |
 | `js/minigames.js` | minijátékok |
