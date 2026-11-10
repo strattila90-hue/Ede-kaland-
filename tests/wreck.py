@@ -1,4 +1,4 @@
-# Roncsoló műhely: hajtáslánc (röntgen, motor/hűtő sérülése, leállás), mind a 11 eszköz (a gombsor valódi kattintásával) egér-koppintással / húzással, Új autó és Vissza gomb. Elvárt: ERR [], leszakadt részek > 0, olvadt tócsa, képek: tests/out/wreck_*.png
+# Roncsoló műhely: hő- és fagykamra (fagyás, rideg törés, olvadás, hő), hajtáslánc (röntgen, motor/hűtő sérülése, leállás), mind a 11 eszköz (a gombsor valódi kattintásával) egér-koppintással / húzással, Új autó és Vissza gomb. Elvárt: ERR [], leszakadt részek > 0, olvadt tócsa, képek: tests/out/wreck_*.png
 import os,asyncio
 ROOT=os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 URL='file://'+ROOT+'/index.html'
@@ -70,6 +70,23 @@ async def main():
         dt=await pg.evaluate("(()=>{const d=WK.dt;return {eng:+d.eng.toFixed(2),rad:+d.rad.toFixed(2),run:d.run};})()");print('hajtáslánc:',dt)
         assert dt['eng']<0.5 and dt['rad']<0.5 and not dt['run'],"a motor nem sérült / nem állt le"
         await pg.click('#menu button[data-a="wkxray"]')
+        # hő- és fagykamra: fagyasztás -> rideg törés (repedés), majd hevítés -> olvadás, égő fényezés, olvadó műanyag
+        await pg.click('#menu button[data-a="wknew"]');await pg.wait_for_timeout(300)
+        await pg.click('#menu button[data-a="wkcham"]');await pg.wait_for_timeout(200)
+        S2C="""([x,y])=>{const r=cv.getBoundingClientRect();return [r.left+x/W*r.width,r.top+y/H*r.height];}"""
+        async def cbtn(i):
+            x,y=await pg.evaluate(S2C,[480-128+4+i*29.5+13,72+30+6]);await pg.mouse.click(x,y);await pg.wait_for_timeout(150)
+        await cbtn(2);await pg.wait_for_timeout(15000)
+        fz=await pg.evaluate("({tc:Math.round(WK.tc),ice:WK.ice,brit:WK.brit})");print('fagyasztva:',fz)
+        assert fz['brit']>0.5 and fz['ice']>0.5,"nem fagyott meg"
+        await tool(0)
+        for _ in range(3):await tap(60,38,300)
+        cr=await pg.evaluate("WK.ops.filter(o=>o.k==='crack').length");print('repedések:',cr);await pg.screenshot(path=OUT+'wreck_frozen.png')
+        assert cr>0,"fagyott fémen nem reped"
+        await cbtn(3);await pg.wait_for_timeout(18000)
+        ht=await pg.evaluate("({tc:Math.round(WK.tc),ice:WK.ice,paint:WK.paint,plast:WK.plast})");print('hevítve:',ht);await pg.screenshot(path=OUT+'wreck_oven.png')
+        assert ht['ice']==0 and ht['paint']>0 and ht['plast']>0,"a hő nem hatott"
+        await pg.click('#menu button[data-a="wkcham"]')
         # felbontásváltás: a sérült kép újraépül a műveletlistából
         await pg.evaluate("QT=QT===4?1:4;applyQ(true);window.dispatchEvent(new Event('resize'))");await pg.wait_for_timeout(800);await pg.screenshot(path=OUT+'wreck_rebuild.png')
         await pg.click('#menu button[data-a="wknew"]');await pg.wait_for_timeout(300);print('új autó:',await pg.evaluate(st))

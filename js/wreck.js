@@ -21,8 +21,8 @@ const WK_TOOLS=[
  {k:'shotgun',n:'Sörétes',ic:'💥',tip:'Koppints: a sörétek egy csomóban sok kis lyukat ütnek.'},
  {k:'mg',n:'Géppuska',ic:'⚡',tip:'Tartsd az ujjad az autón és húzd: sorozatlövés.'}];
 /* tartályok (autó-helyi u,v): sérüléskor szivárognak, a cseppekből tócsa lesz; a benzin meggyulladhat */
-const WK_RES=[['oil','a motorolaj',100,44,1],['cool','a hűtőfolyadék',108,36,1],['brake','a fékfolyadék',90,30,0.5],['wash','az ablakmosó-folyadék',104,32,0.7],['gear','a váltóolaj',84,46,0.7],['fuel','a benzin',42,45,1.6]];
-const WK_FLC={oil:'rgba(38,26,14,0.92)',cool:'rgba(60,200,90,0.8)',brake:'rgba(200,170,60,0.8)',wash:'rgba(70,140,240,0.75)',gear:'rgba(130,45,30,0.85)',fuel:'rgba(215,205,130,0.55)'};
+const WK_RES=[['oil','a motorolaj',99.6,45.6,1],['cool','a hűtőfolyadék',108,40,1],['brake','a fékfolyadék',94,33,0.5],['wash','az ablakmosó-folyadék',105,33,0.7],['gear','a váltóolaj',92,45,0.7],['fuel','a benzin',42,45,1.6]];
+const WK_FLC={water:'rgba(150,200,240,0.45)',oil:'rgba(38,26,14,0.92)',cool:'rgba(60,200,90,0.8)',brake:'rgba(200,170,60,0.8)',wash:'rgba(70,140,240,0.75)',gear:'rgba(130,45,30,0.85)',fuel:'rgba(215,205,130,0.55)'};
 const WK_HOLDT={flex:1,torch:1,laser:1,mg:1};
 const WK_Z=1.6,WK_OX=8,WK_OY=10,WK_DW=128,WK_DH=66,WK_CX=0;
 let WK=null;
@@ -38,10 +38,11 @@ function wkPartsNew(){const P=[['front','az autó eleje',130,[[92,-4],[118,-4],[
  return P.map((q,i)=>({k:q[0],n:q[1],hp:q[2],h:q[2],gone:false,r:q[3],p:wkJag(q[3],31+i*7,1.7)}));}
 function startWreck(home){if(!CT)startCrash();CT.dest=true;CT.wkHome=!!home;CT.cfg=false;CT.parts=[];
  WK={tool:clamp(PROF.wkTool|0,0,WK_TOOLS.length-1),ops:[],parts:wkPartsNew(),wh:[{x:WHEELS[0],h:60,flat:false,gone:false,air:1,leak:0,susp:0},{x:WHEELS[1],h:60,flat:false,gone:false,air:1,leak:0,susp:0}],res:WK_RES.map(r=>({k:r[0],n:r[1],u:r[2],v:r[3],amt:r[4],leak:0})),fp:[],
-  hot:[],pud:[],pcs:[],holes:[],ps:[],tr:[],gun:null,dt:Object.assign(dtState(),{run:PROF.wkEng!==false}),dtp:null,dl:null,xray:false,eSmoke:0,shV:0,heat:0,hits:{},sq:0,press:null,act:null,cost:0,shake:0,flash:0,prev:null,t:0,sag:0,tilt:0,msg:null,dc:null,lost:0,sfx:0};
+  hot:[],pud:[],pcs:[],holes:[],ps:[],tr:[],gun:null,dt:Object.assign(dtState(),{run:PROF.wkEng!==false}),cham:false,ct:-40,ta:20,tc:20,ice:0,brit:0,heat2:{},paint:0,plast:0,frost:null,glow:null,dtp:null,dl:null,xray:false,eSmoke:0,shV:0,heat:0,hits:{},sq:0,press:null,act:null,cost:0,shake:0,flash:0,prev:null,t:0,sag:0,tilt:0,msg:null,dc:null,lost:0,sfx:0};
  engine(0,0);MENU_SIG='?';elog('info','Roncsoló műhely');}
-function wkMenu(){const it=WK_TOOLS.map((t,i)=>({a:'wk'+i,l:t.n,ic:t.ic,c:i===WK.tool?'primary':''}));it.push({a:'wkeng',l:WK.dt.run?'Motor jár':'Motor áll',ic:'🔑',c:WK.dt.run?'primary':''},{a:'wkxray',l:'Röntgen',ic:'👁',c:WK.xray?'primary':''},{a:'wknew',l:'Új autó',ic:'🚗'},{a:'wkback',l:'Vissza',ic:'◀'});return {cls:'ctside',items:it};}
-function wkAction(a){if(a==='wkeng'){const d=WK.dt;if(!d.run){if(d.engOut||d.eng<=0)toast('A motor tönkrement, nem indul.');else if(d.bat<=0)toast('Az akkumulátor tönkrement, nem indul a motor.');else{d.run=true;tone(120,0.5,'sawtooth',0.05,0,60);}}else d.run=false;PROF.wkEng=d.run;saveProf();MENU_SIG='?';return;}
+function wkMenu(){const it=WK_TOOLS.map((t,i)=>({a:'wk'+i,l:t.n,ic:t.ic,c:i===WK.tool?'primary':''}));it.push({a:'wkcham',l:'Klímakamra',ic:'🌡',c:WK.cham?'primary':''},{a:'wkeng',l:WK.dt.run?'Motor jár':'Motor áll',ic:'🔑',c:WK.dt.run?'primary':''},{a:'wkxray',l:'Röntgen',ic:'👁',c:WK.xray?'primary':''},{a:'wknew',l:'Új autó',ic:'🚗'},{a:'wkback',l:'Vissza',ic:'◀'});return {cls:'ctside',items:it};}
+function wkAction(a){if(a==='wkcham'){WK.cham=!WK.cham;toast(WK.cham?'Hő- és fagykamra: a jobb felső panelen állítsd a hőmérsékletet (-80 ... +800 °C). Fagyott autó ütésre reped, szilánkosan törik; melegítve elolvad a jég, nagy hőn megolvad a műanyag, majd az alumínium.':'Kamra kikapcsolva: az autó lassan visszamelegszik / lehűl szobahőmérsékletre.',4200);MENU_SIG='?';return;}
+ if(a==='wkeng'){const d=WK.dt;if(!d.run&&WK.tc<-30){toast('Túl hideg van: lemerült az akku, nem indul a motor.');MENU_SIG='?';return;}if(!d.run){if(d.engOut||d.eng<=0)toast('A motor tönkrement, nem indul.');else if(d.bat<=0)toast('Az akkumulátor tönkrement, nem indul a motor.');else{d.run=true;tone(120,0.5,'sawtooth',0.05,0,60);}}else d.run=false;PROF.wkEng=d.run;saveProf();MENU_SIG='?';return;}
  if(a==='wkxray'){WK.xray=!WK.xray;toast(WK.xray?'Röntgen: átlátszó karosszéria, látszik a motor, a váltó, a hajtáslánc.':'Röntgen ki.');MENU_SIG='?';return;}
  if(a==='wknew'){const t=WK.tool;startWreck(CT.wkHome);WK.tool=t;toast('Új autó a műhelyben.');}
  else if(a==='wkback'){CT.dest=false;WK=null;CT.parts=[];ctReset();if(CT.wkHome){G.state='title';G.st=0;}}
@@ -63,7 +64,7 @@ function wkPath(g,pts){g.beginPath();pts.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.
 function wkDC(){if(WK.dc&&WK.dc.sc===SC)return WK.dc;const [c,g]=mk(WK_DW,WK_DH,CTS*WK_Z*SC);g.translate(WK_OX,WK_OY);
  drawCarSide(g,0,0,0,{t:0,live:true,noWheels:true,hide:{apa:1,anya:1,anna:1,petra:1,atti:1},inner:()=>{},spd:0},null);
  for(const op of WK.ops)wkOp(g,op);WK.dc={c:c,g:g,sc:SC};return WK.dc;}
-function wkDo(op){op.s=op.s||((Math.random()*1e9)|0);WK.ops.push(op);if(WK.dc&&WK.dc.sc===SC)wkOp(WK.dc.g,op);}
+function wkDo(op){if(WK.brit>0.3&&op.k==='dent'){op={k:'crack',u:op.u,v:op.v,r:op.r*1.3,a:op.a};wkDebris(wkWX(op.u),wkWY(op.v),6+((op.r)|0),0,false);noise(0.15,0.2,0,6500);}op.s=op.s||((Math.random()*1e9)|0);WK.ops.push(op);if(WK.dc&&WK.dc.sc===SC)wkOp(WK.dc.g,op);}
 function wkOp(g,o){const R=wkRand(o.s);g.save();
  if(o.k==='dent'){g.globalCompositeOperation='source-atop';const gr=g.createRadialGradient(o.u-o.r*0.25,o.v-o.r*0.2,0,o.u,o.v,o.r);
   gr.addColorStop(0,'rgba(0,0,0,'+(0.5*o.a).toFixed(2)+')');gr.addColorStop(0.5,'rgba(0,0,0,'+(0.2*o.a).toFixed(2)+')');gr.addColorStop(0.78,'rgba(255,255,255,'+(0.25*o.a).toFixed(2)+')');gr.addColorStop(1,'rgba(255,255,255,0)');
@@ -95,6 +96,18 @@ function wkOp(g,o){const R=wkRand(o.s);g.save();
   g.strokeStyle='rgba(205,210,218,0.85)';g.lineWidth=r*0.7;g.beginPath();g.arc(o.u,o.v,r*1.6,0,TAU);g.stroke();
   g.strokeStyle='rgba(20,22,26,0.6)';g.lineWidth=0.25;g.beginPath();for(let i=0;i<5;i++){const a=R()*TAU,l=r*(2.4+R()*2);g.moveTo(o.u+Math.cos(a)*r*1.8,o.v+Math.sin(a)*r*1.8);g.lineTo(o.u+Math.cos(a)*l,o.v+Math.sin(a)*l);}g.stroke();
   g.globalCompositeOperation='destination-out';g.fillStyle='#000';g.beginPath();g.arc(o.u,o.v,r,0,TAU);g.fill();}
+ else if(o.k==='crack'){/* rideg (fagyott) fém: pókhálós repedés, kipattant forgácsok, középen áttörés */
+  g.globalCompositeOperation='source-atop';g.strokeStyle='rgba(12,14,18,0.85)';g.lineWidth=0.45;g.beginPath();
+  for(let i=0;i<9;i++){let a=R()*TAU,x=o.u,y=o.v;g.moveTo(x,y);for(let j=0;j<4;j++){a+=(R()-0.5)*0.7;const l=o.r*(0.25+R()*0.35);x+=Math.cos(a)*l;y+=Math.sin(a)*l;g.lineTo(x,y);}}g.stroke();
+  g.strokeStyle='rgba(255,255,255,0.35)';g.lineWidth=0.25;g.beginPath();for(let k=1;k<3;k++){const rr=o.r*0.35*k;for(let i=0;i<4;i++){const a=R()*TAU;g.moveTo(o.u+Math.cos(a)*rr,o.v+Math.sin(a)*rr);g.arc(o.u,o.v,rr,a,a+0.4+R()*0.5);}}g.stroke();
+  g.globalCompositeOperation='destination-out';g.fillStyle='#000';const n=8,pts=[];for(let i=0;i<n;i++){const a=i/n*TAU,rr=o.r*(0.12+R()*0.22);pts.push([o.u+Math.cos(a)*rr,o.v+Math.sin(a)*rr]);}wkPath(g,pts);g.fill();
+  for(let i=0;i<5;i++){const a=R()*TAU,d=o.r*(0.3+R()*0.5);g.beginPath();g.arc(o.u+Math.cos(a)*d,o.v+Math.sin(a)*d,0.25+R()*0.45,0,TAU);g.fill();}}
+ else if(o.k==='burn'){/* hő: megbarnult, felhólyagzott fényezés */g.globalCompositeOperation='source-atop';g.fillStyle='rgba('+(o.l>2?60:110)+','+(o.l>2?40:72)+',30,'+(0.12+o.l*0.07).toFixed(2)+')';g.fillRect(-20,-20,160,90);
+  for(let i=0;i<10+o.l*8;i++){const x=2+R()*108,y=10+R()*38,r=0.4+R()*0.8;g.fillStyle='rgba(255,240,210,0.35)';g.beginPath();g.arc(x-0.2,y-0.2,r,0,TAU);g.fill();g.fillStyle='rgba(30,20,10,0.4)';g.beginPath();g.arc(x+0.2,y+0.3,r*0.8,0,TAU);g.fill();}}
+ else if(o.k==='sag'){/* hő: megolvadt, lecsöpögő műanyag (lökhárítók, lámpák) */
+  const drip=(x,y,w,l,c)=>{g.fillStyle=c;g.beginPath();g.moveTo(x-w,y);g.quadraticCurveTo(x-w*0.6,y+l*0.6,x,y+l);g.quadraticCurveTo(x+w*0.6,y+l*0.6,x+w,y);g.closePath();g.fill();};
+  for(let i=0;i<3+o.l*2;i++){drip(100+R()*11,43.5+R()*2,0.8+R()*0.8,2+R()*3*o.l,'rgba(24,26,30,0.95)');drip(1.2+R()*9,43.5+R()*2,0.7+R()*0.7,1.5+R()*2.5*o.l,'rgba(24,26,30,0.95)');}
+  for(let i=0;i<o.l+1;i++){drip(2.4+R()*2,24+R()*6,0.6,1.5+R()*2*o.l,'rgba(190,30,40,0.9)');drip(103+R()*4,31.6+R()*1,0.6,1.2+R()*1.8*o.l,'rgba(235,235,215,0.85)');}}
  else if(o.k==='crease'){g.globalCompositeOperation='source-atop';g.strokeStyle='rgba(12,14,18,0.7)';g.lineWidth=0.7;g.beginPath();
   for(let j=0;j<=6;j++){const y=o.v0+(o.v1-o.v0)*j/6;g.lineTo(o.u+(j%2?1.6:-1.6),y);}g.stroke();g.strokeStyle='rgba(255,255,255,0.35)';g.lineWidth=0.4;g.beginPath();
   for(let j=0;j<=6;j++){const y=o.v0+(o.v1-o.v0)*j/6;g.lineTo(o.u+0.8+(j%2?1.6:-1.6),y);}g.stroke();}
@@ -103,12 +116,12 @@ function wkOp(g,o){const R=wkRand(o.s);g.save();
 /* ---- sérülés, leszakadás ---- */
 function wkLeakHit(u,v,force,rad){for(const r of WK.res){if(r.amt<=0)continue;const d=Math.hypot(r.u-u,r.v-v);if(d<rad){const nl=force*(1-d/rad);if(nl>0.04&&r.leak<0.04)WK.msg={s:'Folyik '+r.n+'!',life:110};r.leak=Math.min(1,Math.max(r.leak,nl));}}}
 /* alkatrészek (autó-helyi téglalapok, életerő-osztó): motor, váltó, féltengely, kipufogó (dob és katalizátor), hűtő, tank, akku, hátsó futómű, alváz */
-const WK_COMP=[['eng',[86,23,106,46],90],['gb',[74,31,89,47],70],['sh',[82,42,91,48],30],['ex',[6,43,24,50],45],['ex',[64,45,76,50],45],['rad',[104,27,111,43],35],['tank',[34,38,55,47],40],['bat',[79,24,88,31],25],['ax',[16,35,35,48],55],['fr',[4,43,110,48],160]];
+const WK_COMP=[['eng',[93,30,106,47],90],['gb',[87,36,96,47],70],['sh',[88,43,93,48],30],['ex',[6,43,24,50],45],['ex',[68,45,80,50],45],['rad',[106,33,110,46],35],['tank',[34,38,55,47],40],['bat',[92.5,27.5,98.5,32.5],25],['ax',[16,35,35,48],55],['fr',[4,43,110,48],160]];
 function wkDT(u,v,dmg,rad){const d=WK.dt,sh=wkOn(u,v)?0.35:1;for(const [k,r,hp] of WK_COMP){if(k==='eng'&&d.engOut)continue;if(k==='ex'&&d.exGone)continue;
   const dx=Math.max(r[0]-u,0,u-r[2]),dy=Math.max(r[1]-v,0,v-r[3]),dd=Math.hypot(dx,dy);if(dd<rad){d[k]=Math.max(0,d[k]-dmg*(1-dd/rad)*sh/hp);}}}
-function wkHurt(u,v,dmg,rad,vx,vy){wkLeakHit(u,v,dmg/28,rad+5);wkDT(u,v,dmg,rad);for(const p of WK.parts){if(p.gone)continue;const r=p.r,dx=Math.max(r[0][0]-u,0,u-r[1][0]),dy=Math.max(r[0][1]-v,0,v-r[2][1]),d=Math.hypot(dx,dy);
+function wkHurt(u,v,dmg,rad,vx,vy){wkLeakHit(u,v,dmg/28,rad+5);wkDT(u,v,dmg,rad);dmg*=1+2*WK.brit;for(const p of WK.parts){if(p.gone)continue;const r=p.r,dx=Math.max(r[0][0]-u,0,u-r[1][0]),dy=Math.max(r[0][1]-v,0,v-r[2][1]),d=Math.hypot(dx,dy);
   if(d<rad){const k=1-d/rad;p.h-=dmg*k;WK.cost+=dmg*k*2600;if(p.h<=0)wkDetach(p,(vx||0)+((r[0][0]+r[1][0])/2-u)*0.04,(vy||-1)+((r[0][1]+r[2][1])/2-v)*0.03);}}}
-function wkDetach(p,vx,vy){if(p.gone)return;const dc=wkDC();p.gone=true;let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(const q of p.p){x0=Math.min(x0,q[0]);y0=Math.min(y0,q[1]);x1=Math.max(x1,q[0]);y1=Math.max(y1,q[1]);}
+function wkDetach(p,vx,vy){if(p.gone)return;const dc=wkDC();p.gone=true;if(WK.brit>0.5){/* rideg fém: a darab nem egyben esik le, hanem szilánkosra törik */wkDo({k:'det',p:p.p});const c=p.r;for(let i=0;i<40;i++)wkDebris(wkWX(c[0][0]+Math.random()*(c[1][0]-c[0][0])),wkWY(c[0][1]+Math.random()*(c[2][1]-c[0][1])),1,(vx||0)+rnd(-1,1),i%3===0);noise(0.5,0.4,0,7000);noise(0.3,0.3,0.05,3000);WK.msg={s:'Szilánkosra tört '+p.n+'!',life:140};WK.cost+=180000;return;}let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;for(const q of p.p){x0=Math.min(x0,q[0]);y0=Math.min(y0,q[1]);x1=Math.max(x1,q[0]);y1=Math.max(y1,q[1]);}
  x0=Math.max(x0,-WK_OX);y0=Math.max(y0,-WK_OY);x1=Math.min(x1,WK_DW-WK_OX);y1=Math.min(y1,WK_DH-WK_OY);const w=x1-x0,h=y1-y0,[c,g]=mk(w,h,CTS*WK_Z*SC);
  g.translate(-x0,-y0);wkPath(g,p.p);g.clip();g.drawImage(dc.c,-WK_OX,-WK_OY,WK_DW,WK_DH);
  // a darab ellökődik az autótól (eleje előre, hátulja hátra, tető felfelé), megbillen és felborul
@@ -142,7 +155,9 @@ function wkHeat(u,v,dT,mr){let s=null,bd=2.6;for(const h of WK.hot){const d=Math
 function updWreck(){const w=WK;if(!w)return;w.t++;if(K.pauseP){wkAction('wkback');return;}
  if(w.shake>0)w.shake*=0.85;if(w.flash>0)w.flash*=0.8;if(w.msg&&--w.msg.life<=0)w.msg=null;
  const tool=WK_TOOLS[w.tool].k;
+ if(TAPD&&w.cham){const b=wkChamBtn(TAPD);if(b!==null){w.ct=clamp(b==='m'?w.ct-20:b==='p'?w.ct+20:b==='c'?-80:800,-80,800);SFX.click();TAPD=null;}}
  if(TAPD)wkTap(tool,wkLoc(TAPD));
+ wkClimate();
  if(HOLD&&WK_HOLDT[tool]){const L=wkLoc(HOLD);wkHold(tool,L,w.prev);w.prev=L;w.hp=L;}else{w.prev=null;w.hp=null;}
  wkActs();wkPressUpd();
  for(const h of w.hot){if(h.on>0)h.on--;else h.T-=0.007;}
@@ -205,6 +220,46 @@ function wkFire(L,n,pow,spr){const w=WK,tool=WK_TOOLS[w.tool].k;w.gun={k:tool,x:
    if(Math.random()<0.2)tone(2800,0.18,'sine',0.025,0.03,-900);else tone(1500+rnd(0,500),0.06,'triangle',0.03);}}}
 /* a hajtáslánc életre kel: járó motor (hang, ékszíj, kipufogófüst), sérülésre füst, gőz, olaj, leállás, kieső motor, lengő törött féltengely */
 const WK_RESOF={eng:'oil',gb:'gear',rad:'cool',tank:'fuel'};
+/* ---- HŐ- ÉS FAGYKAMRA ----
+   ta: a kamra levegője (gyorsan követi a beállítást), tc: az autó (lassabban követi). Fagyás: dér, jégcsapok, jeges üveg; rideg fém (-35 °C alatt);
+   olvadás: a jég elolvad, a jégcsapok csöpögnek, víztócsa. Hő: forr a hűtőfolyadék, olvad a műanyag, ég a fényezés, gumitűz, benzingőz-robbanás, üvegrepedés,
+   izzó acél, 660 °C fölött olvad az alumínium (motorblokk, váltóház). */
+const CHAM_R=[W-128,72,122,46];
+function wkChamBtn(p){const x0=CHAM_R[0]+4,y=CHAM_R[1]+30;for(const [k,i] of [['m',0],['p',1],['c',2],['h',3]])if(inRect(p,[x0+i*29.5,y,27,13]))return k;return null;}
+function wkClimate(){const w=WK,d=w.dt,tg=w.cham?w.ct:20,h=w.heat2,once=(k,f)=>{if(!h[k]){h[k]=1;f();}},msg=(s2,l)=>{w.msg={s:s2,life:l||130};},res=k=>w.res.find(r=>r.k===k);
+ w.ta+=clamp(tg-w.ta,-1.4,1.4);w.tc+=(w.ta-w.tc)*0.006;const T=w.tc;
+ // jég: fagyásnál nő, olvadásnál csöpög
+ if(T<0)w.ice=Math.min(1,w.ice+0.0012*Math.min(1,-T/30));
+ else if(w.ice>0){const m=0.0016*Math.min(1.5,T/25+0.25);w.ice=Math.max(0,w.ice-m);if(Math.random()<w.ice*0.7+0.1){const u=6+Math.random()*100;if(!(u>11&&u<37)&&!(u>76&&u<102))w.ps.push({k:'fl',c:'water',x:wkWX(u),y:wkWY(48.6+w.ice*3),vx:0,vy:0.1});}}
+ w.brit=clamp((-35-T)/40,0,1);
+ if(T<-35)once('brit',()=>msg('Rideg lett a fém: ütésre nem horpad, hanem reped és törik!'));
+ if(T<-30&&d.run){d.run=false;MENU_SIG='?';msg('A hidegben lemerült az akkumulátor: leállt a motor.');}
+ if(T<-40)once('frzcool',()=>{d.rad=Math.min(d.rad,0.3);const r=res('cool');if(r)r.leak=Math.max(r.leak,0.15);msg('Megfagyott a hűtőfolyadék, és szétrepesztette a hűtőt!');});
+ if(T>-5&&h.brit&&w.ice<0.05)once('thaw',()=>msg('Felolvadt a jég, megszűnt a ridegség.'));
+ // hő
+ if(T>110)once('boil',()=>{const r=res('cool');if(r)r.leak=Math.max(r.leak,0.3);msg('Felforrt a hűtőfolyadék!');});
+ if(T>110&&w.t%8===0&&d.rad>0)w.ps.push({k:'steam',x:wkWX(108),y:wkWY(34),vx:rnd(-0.2,0.4),vy:-rnd(0.4,0.9),r:rnd(2,3),life:rnd(50,80)});
+ if(T>120){w.plast=Math.min(1,w.plast+0.0009*(T-120)/100);for(const [th,l] of [[0.3,1],[0.6,2],[0.95,3]])if(w.plast>=th)once('sag'+l,()=>{wkDo({k:'sag',l:l});if(l===1)msg('Olvad a műanyag: lecsöpögnek a lökhárítók és a lámpák!');});}
+ if(T>150){w.paint=Math.min(1,w.paint+0.0008*(T-150)/100);for(const [th,l] of [[0.25,1],[0.5,2],[0.75,3],[1,4]])if(w.paint>=th)once('burn'+l,()=>{wkDo({k:'burn',l:l});if(l===1)msg('Ég a fényezés: megbarnul, felhólyagzik.');});
+  d.bat=Math.max(0,d.bat-0.0015);once('bat',()=>msg('Felfúvódott az akkumulátor a melegben.'));}
+ if(T>130&&d.run){d.eng=Math.max(0,d.eng-0.002);if(w.t%240===0)msg('Túlmelegszik a motor!');}
+ if(T>200&&w.t%6===0)for(const wh of w.wh)if(!wh.gone)w.ps.push({k:'smoke',x:WK_CX+wh.x+rnd(-5,5),y:CTF-rnd(4,14),vx:rnd(-0.2,0.2),vy:-rnd(0.3,0.7),r:rnd(2,3.5),life:rnd(60,100),dk:1});
+ if(T>320){once('tire',()=>{for(const wh of w.wh)if(!wh.gone){wh.air=0;wh.flat=true;}noise(0.6,0.3,0,6000);msg('Meggyulladtak a gumik!');});
+  if(w.t%3===0)for(const wh of w.wh)if(!wh.gone)w.ps.push({k:'fire',x:WK_CX+wh.x+rnd(-7,7),y:CTF-rnd(1,12),vx:rnd(-0.2,0.2),vy:-rnd(0.4,1.1),r:rnd(1.5,3),life:rnd(16,30)});}
+ if(T>280)once('fuel',()=>{const r=res('fuel');if(r&&r.amt>0){r.leak=1;w.flash=1;w.shake=8;noise(1.4,0.8,0,500);tone(50,0.8,'sawtooth',0.15,0,-25);vib([100,40,160]);wkDo({k:'scorch',u:44,v:42,r:24});
+   for(let i=0;i<30;i++)w.ps.push({k:'fire',x:wkWX(44+rnd(-12,12)),y:wkWY(44+rnd(-6,3)),vx:rnd(-1.2,1.2),vy:-rnd(0.4,1.6),r:rnd(2.5,5),life:rnd(20,40)});msg('Berobbant a benzingőz a tankban!',150);}});
+ if(T>300&&w.t%50===0&&Math.random()<0.5){const u=rnd(12,88),v=rnd(15,25);if(wkGlass(u,v)&&!wkGone(u,v))wkDo({k:'glass',u:u,v:v,r:6,br:T>450});}
+ if(T>300)once('glass',()=>msg('A hőtől megrepedtek az ablakok.'));
+ if(T>500)once('glow',()=>msg('Vörösen izzik az acél karosszéria!'));
+ if(T>660){once('alu',()=>msg('Olvad az alumínium: a motorblokk és a váltóház lecsöpög!',150));if(!d.engOut)d.eng=Math.max(0,d.eng-0.003);d.gb=Math.max(0,d.gb-0.003);
+  if(w.t%4===0)w.ps.push({k:'drop',x:wkWX(rnd(90,104)),y:wkWY(46),vx:rnd(-0.1,0.1),vy:0.2,T:1.2});}
+ // dér- és izzás-réteg a karosszéria képéből (ritkán frissítve)
+ const need=(w.ice>0.02)||(T>480);if(need&&(w.t%30===0||!w.frost&&w.ice>0.02||!w.glow&&T>480))wkTints();}
+function wkTints(){const w=WK,dc=wkDC(),sc=CTS*WK_Z*SC,key=w.ops.length+'|'+SC,cv=o=>{if(o&&o.sc===SC){o.g.setTransform(1,0,0,1,0,0);o.g.globalCompositeOperation='source-over';o.g.clearRect(0,0,o.c.width,o.c.height);o.g.setTransform(sc,0,0,sc,0,0);return [o.c,o.g];}return mk(WK_DW,WK_DH,sc);};
+ if(w.ice>0.02&&(!w.frost||w.frost.key!==key)){const [c,g]=cv(w.frost);g.drawImage(dc.c,0,0,WK_DW,WK_DH);g.globalCompositeOperation='source-atop';g.fillStyle='rgba(225,240,255,0.78)';g.fillRect(0,0,WK_DW,WK_DH);
+  const R2=wkRand(7);g.fillStyle='rgba(255,255,255,0.9)';for(let i=0;i<260;i++){const x=R2()*WK_DW,y=R2()*WK_DH,r=0.25+R2()*0.5;g.fillRect(x,y,r,r);}g.strokeStyle='rgba(170,200,235,0.6)';g.lineWidth=0.3;g.beginPath();
+  for(let i=0;i<40;i++){const x=R2()*WK_DW,y=R2()*WK_DH;for(let k=0;k<3;k++){const a=k*Math.PI/3;g.moveTo(x-Math.cos(a)*1.2,y-Math.sin(a)*1.2);g.lineTo(x+Math.cos(a)*1.2,y+Math.sin(a)*1.2);}}g.stroke();w.frost={c:c,g:g,sc:SC,key:key};}
+ if(w.tc>480&&(!w.glow||w.glow.key!==key)){const [c,g]=cv(w.glow);g.drawImage(dc.c,0,0,WK_DW,WK_DH);g.globalCompositeOperation='source-atop';g.fillStyle=lg(g,0,0,0,WK_DH,[[0,'rgba(255,170,60,0.9)'],[1,'rgba(255,60,20,0.95)']]);g.fillRect(0,0,WK_DW,WK_DH);w.glow={c:c,g:g,sc:SC,key:key};}}
 function wkDTUpd(){const w=WK,d=w.dt,p=w.dtp||(w.dtp=Object.assign({},d)),res=k=>w.res.find(r=>r.k===k),msg=(s,l)=>{w.msg={s:s,life:l||120};};
  // küszöbök átlépése (egyszer)
  const down=(k,th)=>p[k]>th&&d[k]<=th;
@@ -216,7 +271,7 @@ function wkDTUpd(){const w=WK,d=w.dt,p=w.dtp||(w.dtp=Object.assign({},d)),res=k=
  if(down('sh',0)){w.shV=0.12;tone(300,0.3,'square',0.05,0,-200);msg('Eltört a féltengely!');}
  if(down('rad',0.5)){const r=res('cool');if(r)r.leak=Math.max(r.leak,0.5);msg('Lyukas a hűtő: gőzölög, folyik a hűtőfolyadék!');}
  if(down('tank',0.7)){const r=res('fuel');if(r)r.leak=Math.max(r.leak,0.3);msg('Lyukas a benzintank!');}
- if(down('bat',0)){for(let i=0;i<14;i++)CT.parts.push({k:'spark',x:wkWX(84),y:wkWY(27),vx:rnd(-1.5,1.5),vy:-rnd(0.5,2.5),r:0,life:rnd(10,24),max:30});noise(0.3,0.25,0,5000);
+ if(down('bat',0)){for(let i=0;i<14;i++)CT.parts.push({k:'spark',x:wkWX(95),y:wkWY(30),vx:rnd(-1.5,1.5),vy:-rnd(0.5,2.5),r:0,life:rnd(10,24),max:30});noise(0.3,0.25,0,5000);
   if(d.run){d.run=false;MENU_SIG='?';}msg('Tönkrement az akkumulátor: leállt a motor!');}
  if(down('ax',0)){if(WK.wh[0]&&!WK.wh[0].gone)WK.wh[0].susp=1;noise(0.3,0.2,0,1800);msg('Eltört a hátsó rugó, megroggyant az autó!');}
  if(down('ex',0)&&!d.exGone){d.exGone=true;const [c,g]=mk(30,8,CTS*WK_Z*SC);g.strokeStyle='#6d6258';g.lineWidth=1.3;g.beginPath();g.moveTo(2,4);g.lineTo(28,4);g.stroke();frr(g,'#6b6056',4,1.4,12,5,2);
@@ -226,16 +281,16 @@ function wkDTUpd(){const w=WK,d=w.dt,p=w.dtp||(w.dtp=Object.assign({},d)),res=k=
  // kifogyott a benzin
  const fu=res('fuel');if(d.run&&fu&&fu.amt<=0){d.run=false;MENU_SIG='?';msg('Elfogyott a benzin, leállt a motor.');}
  // a motor kiesik, ha az autó eleje leszakadt és a motor tönkrement
- const front=WK.parts.find(q=>q.k==='front');if(!d.engOut&&d.eng<=0&&front&&front.gone){d.engOut=true;d.run=false;const sc=CTS*WK_Z*SC,[c,g]=mk(24,26,sc);g.translate(-86,-22);
-  const s2=Object.assign({},d,{engOut:false});g.beginPath();g.rect(86,22,19.6,24);g.clip();drawDrivetrain(g,s2,0,'static');
-  WK.pcs.push({c:c,w:24,h:26,x:wkWX(97),y:wkWY(35),vx:1.2,vy:-1,r:0,vr:0.04,tr:0,rest:false});noise(0.9,0.6,0,350);w.shake=6;vib([80,40,120]);msg('Kiesett a motor!',150);}
+ const front=WK.parts.find(q=>q.k==='front');if(!d.engOut&&d.eng<=0&&front&&front.gone){d.engOut=true;d.run=false;const sc=CTS*WK_Z*SC,[c,g]=mk(14,18,sc);g.translate(-93,-30);
+  const s2=Object.assign({},d,{engOut:false});g.beginPath();g.rect(93,30,13.2,17.4);g.clip();drawDrivetrain(g,s2,0,'static','rigid');
+  WK.pcs.push({c:c,w:14,h:18,x:wkWX(99.5),y:wkWY(38.5),vx:1.2,vy:-1,r:0,vr:0.04,tr:0,rest:false});noise(0.9,0.6,0,350);w.shake=6;vib([80,40,120]);msg('Kiesett a motor!',150);}
  // törött féltengely lengése (csillapított inga)
  if(d.sh<=0){w.shV+=-d.shA*0.05;w.shV*=0.96;d.shA+=w.shV;}
  // füst a sérült motorból, gőz a hűtőből, kipufogófüst
- if(!d.engOut&&((d.run&&d.eng<0.6)||w.eSmoke>0)&&w.t%10===0){const dk=d.eng<=0||w.eSmoke>0;w.ps.push({k:'smoke',x:wkWX(96+rnd(-4,4)),y:wkWY(25),vx:rnd(-0.2,0.2),vy:-rnd(0.3,0.7),r:rnd(2,3.5),life:rnd(70,120),dk:dk});}
+ if(!d.engOut&&((d.run&&d.eng<0.6)||w.eSmoke>0)&&w.t%10===0){const dk=d.eng<=0||w.eSmoke>0;w.ps.push({k:'smoke',x:wkWX(99+rnd(-3,3)),y:wkWY(30),vx:rnd(-0.2,0.2),vy:-rnd(0.3,0.7),r:rnd(2,3.5),life:rnd(70,120),dk:dk});}
  if(w.eSmoke>0)w.eSmoke--;
- if(d.rad<0.5&&(d.run||w.heat>0.1)&&w.t%7===0)w.ps.push({k:'steam',x:wkWX(107),y:wkWY(30),vx:rnd(-0.2,0.4),vy:-rnd(0.4,0.9),r:rnd(2,3),life:rnd(50,80)});
- if(d.run&&w.t%18===0){const gx=d.exGone?wkWX(93):wkWX(1.5),gy=d.exGone?wkWY(46):wkWY(47.6);w.ps.push({k:'smoke',x:gx,y:gy,vx:-rnd(0.3,0.7),vy:-rnd(0.05,0.2),r:rnd(1,1.8),life:rnd(40,70),lt:1});}
+ if(d.rad<0.5&&(d.run||w.heat>0.1)&&w.t%7===0)w.ps.push({k:'steam',x:wkWX(108),y:wkWY(34),vx:rnd(-0.2,0.4),vy:-rnd(0.4,0.9),r:rnd(2,3),life:rnd(50,80)});
+ if(d.run&&w.t%18===0){const gx=d.exGone?wkWX(101):wkWX(1.5),gy=d.exGone?wkWY(46):wkWY(47.6);w.ps.push({k:'smoke',x:gx,y:gy,vx:-rnd(0.3,0.7),vy:-rnd(0.05,0.2),r:rnd(1,1.8),life:rnd(40,70),lt:1});}
  // motorhang: alapjárat, sérülten akadozva, kipufogó nélkül hangosan és érdesen
  if(d.run){let rpm=820+Math.sin(w.t*0.11)*15;if(d.eng<0.6)rpm+=Math.random()<0.08?-260:rnd(-60,60);if(d.eng<0.3&&Math.random()<0.04)rpm=300;
   engine(rpm,d.exGone?0.95:d.ex<0.5?0.55:0.12);}else engine(0,0);
@@ -302,6 +357,9 @@ function drawWreck(g){const w=WK,B=ctBG(),k=CTS*WK_Z,cam=wkCam(),cs=cam*CTS,fy=C
  {const dl=wkDL(),jit=w.dt.run?(Math.sin(w.t*1.7)*0.12):0;g.drawImage(dl.c,-WK_OX,-WK_OY+WK_DH*w.sq+jit,WK_DW,WK_DH*(1-w.sq));
   g.save();g.translate(0,-WK_OY+WK_DH*w.sq+jit);g.scale(1,1-w.sq);g.translate(0,WK_OY);drawDrivetrain(g,w.dt,w.t,'dyn');g.restore();}
  const dc=wkDC();if(w.xray)g.globalAlpha=0.32;g.drawImage(dc.c,-WK_OX,-WK_OY+WK_DH*w.sq,WK_DW,WK_DH*(1-w.sq));g.globalAlpha=1;
+ if(w.frost&&w.ice>0.02){g.globalAlpha=Math.min(0.9,w.ice*0.95)*(w.xray?0.4:1);g.drawImage(w.frost.c,-WK_OX,-WK_OY+WK_DH*w.sq,WK_DW,WK_DH*(1-w.sq));g.globalAlpha=1;}
+ if(w.glow&&w.tc>480){g.globalAlpha=clamp((w.tc-480)/450,0,0.85)*(0.92+Math.sin(w.t*0.13)*0.08);g.drawImage(w.glow.c,-WK_OX,-WK_OY+WK_DH*w.sq,WK_DW,WK_DH*(1-w.sq));g.globalAlpha=1;}
+ if(w.ice>0.08){g.fillStyle='rgba(225,242,255,0.85)';g.beginPath();for(let u=5;u<108;u+=4.5){if((u>11&&u<37)||(u>76&&u<102)||wkGone(u,47))continue;const l=w.ice*(2.5+hsh(u*7)*4),y=wkV(48.4);g.moveTo(u-0.9,y);g.lineTo(u+0.9,y);g.lineTo(u+0.1,y+l);g.closePath();}g.fill();}
  if(w.hot.length){g.globalCompositeOperation='lighter';for(const h of w.hot){const a=clamp(h.T,0,1),r=2.2+h.m*1.3+h.T*2.2,y=wkV(h.v),gr=g.createRadialGradient(h.u,y,0,h.u,y,r);
    gr.addColorStop(0,wkHotCol(h.T,(0.95*a).toFixed(2)));gr.addColorStop(0.45,wkHotCol(h.T-0.3,(0.55*a).toFixed(2)));gr.addColorStop(1,wkHotCol(0.3,0));g.fillStyle=gr;g.beginPath();g.arc(h.u,y,r,0,TAU);g.fill();}
   g.globalCompositeOperation='source-over';}
@@ -343,10 +401,21 @@ function drawWreck(g){const w=WK,B=ctBG(),k=CTS*WK_Z,cam=wkCam(),cs=cam*CTS,fy=C
   g.save();g.translate(gx,gy);g.rotate(an);frr(g,'#1d2228',-20,-7,L*0.55+20,14,3);R(g,'#2b3037',0,-3,L,6);R(g,'rgba(255,255,255,0.15)',0,-3,L,1.2);if(w.gun.k!=='pistol')frr(g,'#5a3a1e',-34,-6,18,12,3);
   if(w.gun.fl>0){g.globalCompositeOperation='lighter';disc(g,'rgba(255,200,90,0.85)',L+5,0,7);disc(g,'rgba(255,250,220,0.9)',L+3,0,3.5);g.globalCompositeOperation='source-over';}g.restore();}
  if(w.flash>0.05)R(g,'rgba(255,240,210,'+(w.flash*0.7).toFixed(2)+')',0,0,W,H);
+ // hő- és fagykamra: színezés, falak, fűtőszálak vagy dér, kezelőpanel
+ {const ta=w.ta;if(ta<15)R(g,'rgba(140,190,255,'+clamp((15-ta)/250,0,0.3).toFixed(2)+')',0,0,W,H);else if(ta>30)R(g,'rgba(255,120,40,'+clamp((ta-30)/2200,0,0.32).toFixed(2)+')',0,0,W,H);
+  if(w.cham){const x0=150,y0=58,x1=W-6,y1=H-4;g.strokeStyle='#59616a';g.lineWidth=4;g.strokeRect(x0,y0,x1-x0,y1-y0);g.strokeStyle='rgba(255,255,255,0.25)';g.lineWidth=1;g.strokeRect(x0+3,y0+3,x1-x0-6,y1-y0-6);
+   const hot=clamp((ta-40)/400,0,1),cold=clamp(-ta/60,0,1);g.lineWidth=1.6;g.strokeStyle=hot>0.02?'rgba(255,'+Math.round(140-hot*80)+',40,'+(0.4+hot*0.6).toFixed(2)+')':'#3a4048';g.beginPath();
+   for(let x=x0+8;x<x1-8;x+=10){g.moveTo(x,y0+6);g.lineTo(x+5,y0+10);g.lineTo(x+10,y0+6);}g.stroke();
+   for(let x=x0+20;x<x1-10;x+=46){frr(g,'#2b3037',x,y0+12,10,5,1.5);if(cold>0.05)for(let k=0;k<3;k++)disc(g,'rgba(220,240,255,'+(cold*0.4).toFixed(2)+')',x+5+rnd(-3,3),y0+20+k*5+rnd(-1,1),1.2+k*0.5);}
+   if(cold>0.05){g.fillStyle='rgba(235,245,255,'+(cold*0.7).toFixed(2)+')';for(let i=0;i<14;i++){const yy=y0+8+i*14;g.fillRect(x0+3,yy,3,6);g.fillRect(x1-6,yy+5,3,6);}}
+   const [px,py,pw,ph]=CHAM_R;frr(g,'rgba(10,13,20,0.85)',px,py,pw,ph,6);const tcol=t2=>t2<0?'#9fd8ff':t2>100?'#ff9a5a':'#ffffff';
+   text(g,'Kamra '+Math.round(ta)+'°C',px+6,py+5,tcol(ta),0.65,'left',null);text(g,'Cél '+w.ct+'°C',px+pw-6,py+5,'#ffd84a',0.65,'right',null);
+   text(g,'Autó '+Math.round(w.tc)+'°C',px+6,py+17,tcol(w.tc),0.65,'left',null);if(w.brit>0.3)text(g,'RIDEG',px+pw-6,py+17,'#9fd8ff',0.65,'right',null);else if(w.ice>0.05)text(g,'JEGES',px+pw-6,py+17,'#cfe8ff',0.65,'right',null);
+   const lb=['-20','+20','-80','+800'],cl=['#2b6fd0','#c0392b','#1d4f9c','#a3281c'];for(let i=0;i<4;i++){const bx=px+4+i*29.5,by2=py+30;frr(g,cl[i],bx,by2,27,13,3);text(g,lb[i],bx+13.5,by2+3.5,'#ffffff',0.6,'center',null);}}}
  // felirat: eszköz, tipp, kár
  const T=WK_TOOLS[w.tool],cx=W/2+60,s1='Roncsoló műhely: '+T.n,s2=WK_HOLDT[T.k]?'Tartsd az ujjad az autón, és húzd':'Koppints az autóra',ww=Math.max(textW(s1,0.9),textW(s2,0.65))+18;
  frr(g,'rgba(10,13,20,0.78)',cx-ww/2,6,ww,28,6);text(g,s1,cx,11,'#ffd84a',0.9,'center',null);text(g,s2,cx,24,'#cfd6df',0.65,'center',null);
  const ng=w.parts.filter(p=>p.gone).length+w.wh.filter(q=>q.gone).length;frr(g,'rgba(10,13,20,0.78)',W-128,40,122,28,6);
  text(g,'Kár: '+fmt(Math.round(w.cost/1000)*1000)+' Ft',W-12,45,'#ff9a7a',0.75,'right',null);text(g,'Leszakadt részek: '+ng,W-12,58,'#cfd6df',0.65,'right',null);
- if(w.msg){const al=clamp(w.msg.life/30,0,1),mw=textW(w.msg.s,1.1)+20;frr(g,'rgba(120,20,10,'+(0.85*al).toFixed(2)+')',cx-mw/2,H/2-70,mw,20,7);text(g,w.msg.s,cx,H/2-64,'rgba(255,255,255,'+al.toFixed(2)+')',1.1,'center',null);}}
+ if(w.msg){const al=clamp(w.msg.life/30,0,1),mw=textW(w.msg.s,1.1)+20;frr(g,'rgba(120,20,10,'+(0.85*al).toFixed(2)+')',cx-mw/2,(w.cham?H-30:H/2-70),mw,20,7);text(g,w.msg.s,cx,(w.cham?H-24:H/2-64),'rgba(255,255,255,'+al.toFixed(2)+')',1.1,'center',null);}}
 function wkPiece(g,p){g.save();g.translate(p.x,p.y);g.rotate(p.r);g.drawImage(p.c,-p.w/2,-p.h/2,p.w,p.h);g.restore();}

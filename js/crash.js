@@ -177,9 +177,11 @@ function ctCar(g,t){const T=CT_TESTS[CT.ti],front=T.z==='f',x=CT.x,by=CTF-55.5,s
  g.save();g.translate(x+56,by+45);g.rotate(CT.pitch);g.translate(-(x+56),-(by+45));
  // olajfolt / hűtőfolyadék a padlón
  for(const d of CT.fp){ell(g,CT_FLU[d.k],d.x,CTF+0.6,d.w,0.8+d.w*0.06);if(d.k==='oil')ell(g,'rgba(255,255,255,0.18)',d.x-d.w*0.3,CTF+0.3,d.w*0.3,0.3);if(d.k==='fuel'){ell(g,'rgba(255,90,200,0.22)',d.x,CTF+0.4,d.w*0.6,0.4);ell(g,'rgba(80,220,255,0.2)',d.x+d.w*0.15,CTF+0.7,d.w*0.4,0.35);}}
+ // röntgenben a motor és a váltó merev: nem gyűrődik, hanem egyben tolódik hátra (akár a tűzfalon át); a többi a szeletekkel együtt gyűrődik
+ if(CT.xray){g.save();g.translate(x+ctMap(99.5)-99.5,by);drawDrivetrain(g,CT.dt,t,'all','rigid');g.restore();}
  for(const s of ctSlices()){// a vágás a szelet saját (összenyomás előtti) koordinátáiban
   g.save();g.translate(x+s[4],0);g.scale(s[2],1);g.translate(-(x+s[3]),0);g.beginPath();g.rect(x+s[0],-100,s[1]-s[0],400);g.clip();
-  if(CT.xray){g.save();g.translate(x,by);drawDrivetrain(g,CT.dt,t,'all');g.restore();g.globalAlpha=0.3;}
+  if(CT.xray){g.save();g.translate(x,by);drawDrivetrain(g,CT.dt,t,'all','soft');g.restore();g.globalAlpha=0.3;}
   drawCarSide(g,x,by,by,o,null);g.globalAlpha=1;
   for(const [mx,my] of [[10,34],[37,36],[63,36],[96,35],[50,13.6]])if(mx>=s[0]&&mx<s[1])ctMark(g,x+mx,by+my,1.9);
   if(s[2]<0.995){// gyűrődési redők, felgyűrt motorháztető
