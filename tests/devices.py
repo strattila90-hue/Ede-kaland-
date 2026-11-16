@@ -10,7 +10,7 @@ O=OUT
 DEV=[('iphone_se',667,375,2,True),('iphone_15',852,393,3,True),('galaxy_s',915,412,3.5,True),('pixel_fold',1080,840,2.6,True),('ipad_mini',1133,744,2,True),('ipad_air',1180,820,2,True),('ipad_pro12',1366,1024,2,True),('laptop',1366,768,1,False),('desktop_4k',1920,1080,2,False)]
 async def main():
     async with async_playwright() as p:
-        b=await p.chromium.launch();errs=[]
+        b=await p.chromium.launch(**({'executable_path':'/opt/pw-browsers/chromium'} if os.path.exists('/opt/pw-browsers/chromium') else {}));errs=[]
         for name,w,h,dpr,touch in DEV:
             ctx=await b.new_context(viewport={'width':w,'height':h},device_scale_factor=dpr,has_touch=touch,is_mobile=touch);pg=await ctx.new_page();pg.on('pageerror',lambda e,n=name:errs.append(n+': '+str(e)))
             await pg.goto(URL);await pg.wait_for_timeout(2600)

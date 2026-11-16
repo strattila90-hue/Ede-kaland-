@@ -1,4 +1,4 @@
-# 🚐 Családi Vakáció – v2.42.0
+# 🚐 Családi Vakáció – v2.43.0
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -27,9 +27,17 @@ A fogyasztás a sebességtől, a gyorsítástól, az út típusától, a hótól
 
 ## ⏱️ Valós távolság és idő
 
-A játék valós léptékű: 90 km/h-val 1 km pontosan 40 másodperc, így Komáromtól Bábolnáig kb. negyedóra, Komáromtól Siófokig közel két óra. A teljes út kb. 9 600 km.
+A játékbeli kilométer **kétszer olyan gyorsan telik** (v2.43), mint a valóságban: 90 km/h-val 1 km 20 másodperc, így Komáromtól Bábolnáig kb. 8 perc, Komáromtól Siófokig kb. egy óra. A teljes út kb. 9 700 km, így sokkal messzebbre el lehet jutni.
 
-A játék 10 másodpercenként (és háttérbe kerüléskor) automatikusan menti az állást, így az út több napon át is folytatható. A főmenüben választható **Gyorsított (5x)** utazás is (ennél gyorsabb nincs), de alapból valós idővel megy. A megtett utat a mentés kilométerben tárolja, így egy elkezdett utazásban a km és a méter sosem vész el és nem ugrik, akkor sem, ha közben átállítod a gyorsítást. Valós időben a kijelzett megtett út méterre pontos: 90 km/h-val pontosan 25 métert teszel meg másodpercenként (1 km = 40 mp), és a kijelző a métereket is mutatja (pl. 10,305 / 167 km). Gyorsított és turbó módban a táv rövidebbre van sűrítve, ezért ilyenkor a kijelző mellett ott a szorzó (5x, 20x).
+A játék 10 másodpercenként (és háttérbe kerüléskor) automatikusan menti az állást, így az út több napon át is folytatható. A főmenüben választható **Gyorsított (5x)** utazás is (ennél gyorsabb nincs), de alapból valós idővel megy. A megtett utat a mentés kilométerben tárolja, így egy elkezdett utazásban a km és a méter sosem vész el és nem ugrik, akkor sem, ha közben átállítod a gyorsítást. A kijelzett megtett út méterre pontos: 90 km/h-val 50 métert teszel meg másodpercenként (1 km = 20 mp), és a kijelző a métereket is mutatja (pl. 10,305 / 167 km). Gyorsított és turbó módban a táv rövidebbre van sűrítve, ezért ilyenkor a kijelző mellett ott a szorzó (5x, 20x).
+
+## 🆕 Újdonságok (v2.43)
+
+- **Rendőri traffipax az út szélén:** a rendőr a padkán / járdán áll (nem a sávban), mellette **háromlábú traffipax** és láthatósági mellényes rendőr. Kb. **600 méterrel előre jelez** a játék (hangjelzés, felirat, a család is szól), a kijelzőn végig látszik a távolság és a sebességhatár; ha 200 méterrel előtte még gyorsan mész, újra figyelmeztet. Gyorshajtásnál villan a traffipax.
+- **Élethűbb balesetek:** két összetört autó (gyűrött orr / oldal, felnyílt motorháztető, pókhálósra tört szélvédő, vészvillogó), az egyik **ég** és sűrű fekete füstöt ereget; a **tűzoltóautóból** (létra, redőnyös szertár, kék villogó) tűzoltó tömlővel **olt**, a láng lassan kialszik, a füstből fehér gőz lesz. A mentőnél **sérültek**: hordágyon fekvő, takaróval, és egy fóliatakaróba bugyolált, akit mentős lát el. Törmelék (üvegszilánk, lökhárító-darabok, olajfolt) az úton, a forgalmat rendőr irányítja, előtte **dugó**: a nyitott sávokban araszolnak az autók. Ha nekimész egy autónak, az is összetörik, megáll vészvillogóval, füstölhet, és törmelék marad utána.
+- **Élethűbb buszok és kamionok:** féklámpa lassításkor, irányjelző sávváltáskor, dízelfüst (induláskor sötétebb), rugózó felépítmény, emelkedőn lelassulnak, és autópályán a lassú (külső) sávot tartják.
+- **Minden település más:** az épületek országonként a helyi stílusban épülnek (magyar, osztrák, cseh, lengyel, német favázas, dán színes, holland lépcsős oromzatú, francia manzárdtetős, olasz, spanyol, portugál csempés...), a színek és a magasságok a település nevéből számolódnak, így **nincs két egyforma falu**. Minden városnak saját **nevezetessége** van (pl. Komárom: Monostori erőd és az Erzsébet híd, Siófok: víztorony, Keszthely: Festetics-kastély, Velence: Szent Márk-harangtorony és Rialto, Róma: Colosseum, Párizs: Eiffel-torony és Diadalív, Brüsszel: Atomium, Berlin: Brandenburgi kapu és tévétorony, Prága: Týn-templom és Károly híd, Bécs: Stephansdom és óriáskerék, Barcelona: Sagrada Família, Lisszabon: Belém-torony és a 28-as villamos...). A falvaknak saját templomuk van (országonként más toronnyal) és egy egyedi látnivalójuk (víztorony a falu nevével, szobor, szökőkút, szélmalom, kereszt, emlékmű, májusfa, buszmegálló), az ismert falvakban a valódi nevezetesség (Bábolna: ménes, Balatonboglár: gömbkilátó, Kranjska Gora: síugrósánc, Vršič: orosz kápolna, Mikulov: vár, Medinaceli: római diadalív...).
+- **Segítség kézfogással:** a bajba jutott autós mellett nincs többé minijáték: elég megállni **mögötte vagy előtte** a szélső sávban, és megnyomni a **SEGÍTEK** gombot (vagy Entert). Apa kiszáll, kezet fog vele, kapsz egy kis jutalmat és +1 kedvet.
 
 ## 🌍 Európa körút (22 szakasz, kb. 9 700 km, 14 ország)
 
@@ -257,8 +265,7 @@ Minden tranzakció után a pénzkijelző egy pillanatra a levont vagy kapott ös
 
 **Pénzszerzés minijátékokkal:**
 - 🎟️ **Kaparós sorsjegy:** ujjal vagy egérrel kell lekaparni. Ha nyer, igazi ünneplés jön: konfettiágyúk lőnek a kártya két oldaláról, felhangzik az ujjongás és a tapsvihar, a telefon rezeg, és a család felkiált („Hurrá! Nyertünk!”, „Juhú!”). A nagy nyereménynél (20 000 Ft-tól) több a konfetti, hosszabb a taps, és Apa is megszólal.
-- 🔋 **Bikázás:** egy lerobbant autósnak segítesz a kábelek helyes sorrendjével.
-- 📦 **Kamionos:** elkapod a leeső dobozokat, és visszapakolod a rakományt.
+- 🤝 **Segítség az út szélén:** a lerobbant autósnak vagy a bajba jutott kamionosnak elég megállni mögötte vagy előtte és megnyomni a SEGÍTEK gombot (kézfogás), ezért jutalom jár.
 - 🥕 **Zöldséges:** a kútnál lévő boltban szín szerint válogatod a zöldséget és a gyümölcsöt.
 
 ## ⛽ Tankolás és bolt
@@ -331,7 +338,7 @@ A sérült autó egyetlen képbe van rajzolva, minden sérülés egy rajzművele
 
 Minden jármű valós méretarányban, részletesen kidolgozva látszik (v2.34: új, szebb távolsági busz panorámaablakokkal, utasokkal, lendületes festéssel, csomagtérajtókkal és ívelt szélvédővel; háromféle nyerges kamion: ponyvás, hűtős és tartályos, terelős fülkével, kipufogókéménnyel, oldalsó aláfutásgátlóval, jelzőfényekkel; a nagy járművek előre megrajzolt képből rajzolódnak, így gyorsabbak. A mellettünk haladó hosszú kamion előzéskor sem tűnik el, és takaráskor is csak kicsit lesz áttetsző; a motoros bukósisakban, idomos géppel; a tréler fényhíddal és lebillenő platóval) a családi autóhoz képest: kisautó, rendőrautó, mentő, furgon, lakóautó, busz (12 m), kamion (16,5 m), traktor és motor.
 
-Előfordulhat **baleset** az úton (rendőr, mentő, lezárt sáv). Nagyon ritkán pedig **helyi rendőr** ér utol szirénával: le kell húzódni és megállni, ilyenkor jön az igazoltatás.
+Előfordulhat **baleset** az úton (rendőr, tűzoltóság, mentő, sérültek, égő roncs, dugó, lezárt sáv; lásd fent). Nagyon ritkán pedig **helyi rendőr** ér utol szirénával: le kell húzódni és megállni, ilyenkor jön az igazoltatás.
 
 ## 🦌 Vadállatok
 
@@ -471,6 +478,7 @@ Utána a játék itt érhető el: `https://strattila90-hue.github.io/Ede-kaland-
 | `js/radio.js` | motorhang, autórádió |
 | `js/car.js` | az autó minden nézetből, a család, a forgalom |
 | `js/world.js` | útvonal, útszakaszok, táj, utak, benzinkút |
+| `js/towns.js` | települések: országonkénti építészeti stílus, városonként saját nevezetességek, falvanként egyedi templom és látnivaló |
 | `js/minigames.js` | minijátékok |
 | `js/shops.js` | boltok és tankolás |
 | `js/map.js`, `js/geo.js` | térképrajzolás, alap partvonalak |
