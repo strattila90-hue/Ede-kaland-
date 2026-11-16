@@ -439,7 +439,7 @@ body.tab #ctlrow{left:calc(30px + var(--sl) + var(--u)*2.24)!important}
 <div id="splash"><img src="icons/icon-192.png" alt=""><h1>Családi Vakáció</h1><div class="bar"><i id="splbar"></i></div><small id="spltxt">Betöltés... 0%</small></div>
 <script>
 /* betöltő: a játék fájljai sorban, valós százalékkal */
-(function(){const files=['js/core.js','js/radio.js','js/car.js','js/world.js','js/game.js','js/app.js'],later=['js/geo.js','js/map.js','js/gps.js','js/geohd.js','js/minigames.js','js/shops.js','js/crash.js','js/wreck.js'];let i=0;
+(function(){const files=['js/core.js','js/radio.js','js/car.js','js/world.js','js/game.js','js/app.js'],later=['js/towns.js','js/geo.js','js/map.js','js/gps.js','js/geohd.js','js/minigames.js','js/shops.js','js/crash.js','js/wreck.js'];let i=0;
  window.LAZY_DONE=false;function lazy(k){if(k>=later.length){window.LAZY_DONE=true;return;}const sc=document.createElement('script');sc.src=later[k];sc.async=false;sc.onload=()=>lazy(k+1);sc.onerror=()=>setTimeout(()=>lazy(k),1500);document.body.appendChild(sc);}
  const bar=document.getElementById('splbar'),txt=document.getElementById('spltxt');
  function next(){const p=Math.round(i/files.length*100);bar.style.width=p+'%';txt.textContent='Betöltés... '+p+'%';

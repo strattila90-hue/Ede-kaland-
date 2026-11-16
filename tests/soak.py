@@ -42,7 +42,7 @@ SOAK=r"""
 """
 async def main():
     async with async_playwright() as p:
-        b=await p.chromium.launch();pg=await b.new_page(viewport={'width':960,'height':540});pe=[];pg.on('pageerror',lambda e:pe.append(str(e)))
+        b=await p.chromium.launch(**({'executable_path':'/opt/pw-browsers/chromium'} if os.path.exists('/opt/pw-browsers/chromium') else {}));pg=await b.new_page(viewport={'width':960,'height':540});pe=[];pg.on('pageerror',lambda e:pe.append(str(e)))
         await pg.goto(URL);await pg.wait_for_timeout(3000)
         await pg.evaluate("window.requestAnimationFrame=()=>0")
         r=await pg.evaluate(SOAK)
