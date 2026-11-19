@@ -180,6 +180,7 @@ function menuDef(){const s=G.state;if(G.ledger||G.gps||G.elogOpen||G.keysOpen||G
   if(!isStandalone())it.push({a:'install',l:'Telepítés',ic:'⬇',tile:1,c:deferredPrompt?'new':''});
   if(typeof FINE!=='undefined'&&FINE)it.push({a:'keys',l:'Billentyűzet',sub:KEYMAP==='b'?'Autós':'Klasszikus',ic:'⌨',tile:1});
   it.push({a:'elog',l:'Hibanapló',sub:String(ELOG.list.filter(e=>e.k!=='info').length||'nincs hiba'),ic:'🩺',tile:1});
+  it.push({a:'star',l:'⭐ Csillag a GitHubon',sub:'ha tetszik a játék',ic:'',tile:1});
   it.push({a:'exit',l:'Kilépés',sub:'mentés és bezárás',ic:'⏻',c:'danger',tile:1});
   return {cls:'cine',title:'',items:it,ver:true};}
  if(s==='map')return {cls:'bottom',items:[{a:'go',l:'Indulás',ic:'▶',c:'primary'},{a:'gps',l:'GPS',ic:'🧭'},{a:'log',l:'Napló',ic:'📒'},{a:'home',l:'Főmenü',ic:'⌂'}]};
@@ -265,6 +266,7 @@ function menuAction(a){
  if(a==='cancel'){G.confirm=null;MENU_SIG='?';return;}
  if(a==='exit'){G.confirm='exit';if(G.state==='play')G.paused=true;MENU_SIG='?';return;}
  if(a==='exityes'){G.confirm=null;exitGame();return;}
+ if(a==='star'){const u='https://github.com/strattila90-hue/Ede-kaland-';try{if(NTV&&typeof NTV.openUrl==='function')NTV.openUrl(u);else window.open(u,'_blank','noopener');}catch(e){try{window.open(u,'_blank');}catch(e2){}}return;}
  if(a==='elog'){openElog();return;}
  if(a==='keys'){openKeys();return;}
  if(a==='album'){openAlbum();return;}
