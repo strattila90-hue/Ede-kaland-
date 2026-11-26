@@ -5,7 +5,7 @@
    ========================================================= */
 const CAR={name:'Családi egyterű 1.8 16V benzin',hp:125,torque:170,tank:60,urban:11.3,extra:6.1,comb:8.0,top:185,acc100:13.4,mass:1510,seats:7,len:4.59,wheelbase:2.728,tyre:'205/65 R15'};
 const CP={hl:'#d6e0ea',l:'#adbccb',m:'#8a9bad',d:'#68798c',dd:'#47535f',tl:'#c62a35',amb:'#ffaa22',hd:'#fff3c4',led:'#ffffff',proj:'#cfeeff'};
-const PALETTES={'Grafitszürke':['#c9cdd3','#9ba1a9','#707680','#4e545d','#30353c'],'Kékesszürke':['#dbe4ee','#aebdcc','#8a9bad','#66778a','#44505c'],'Pezsgőarany':['#f4ead0','#dccb98','#bfa972','#9a8553','#6c5c39'],
+const PALETTES={'Grafitszürke':['#d0d1d4','#a3a5a9','#76787c','#54565b','#35373b'],'Kékesszürke':['#dbe4ee','#aebdcc','#8a9bad','#66778a','#44505c'],'Pezsgőarany':['#f4ead0','#dccb98','#bfa972','#9a8553','#6c5c39'],
  'Piros':['#f6a59b','#dc5a4f','#b83a32','#8e2a25','#5f1c19'],'Fehér':['#ffffff','#eef1f4','#d6dce2','#b3bcc5','#7d8792'],
  'Éjkék':['#9fb6e0','#5a79b2','#3f5c92','#2d4570','#1d2c4b'],'Fekete':['#8a929c','#4a525c','#363c45','#262b32','#16191e']};
 let carColor='Grafitszürke';setColor0();
@@ -123,10 +123,10 @@ function wheel(g,cx,cy,ang,flat,r,bent){r=r||WR;g.save();g.translate(cx,cy);
 function tailPath(g,ox,oy){ox=ox||0;oy=oy||0;g.beginPath();g.moveTo(ox+2.35,oy+31.2);g.lineTo(ox+2.25,oy+24.5);g.bezierCurveTo(ox+2.4,oy+20,ox+3.6,oy+16.9,ox+6.1,oy+15.0);
  g.quadraticCurveTo(ox+7.1,oy+14.5,ox+7.0,oy+15.8);g.bezierCurveTo(ox+6.3,oy+18.4,ox+6.0,oy+21.5,ox+6.0,oy+24.6);g.lineTo(ox+6.0,oy+29.6);g.quadraticCurveTo(ox+6.0,oy+31.6,ox+4.4,oy+31.7);g.closePath();}
 function bodyPath(g){g.beginPath();g.moveTo(9,48.6);g.bezierCurveTo(4,48.6,2.2,46.4,2.1,42.5);g.lineTo(2,30.5);g.bezierCurveTo(2,21.5,4.5,15.6,9.5,12.6);
- g.bezierCurveTo(13.5,10.3,19.5,9.7,27.5,9.6);g.lineTo(61,9.8);g.bezierCurveTo(71,10.2,78,12,84,16.4);g.lineTo(96.4,27);
- g.bezierCurveTo(99.6,28.6,104.6,29.8,108.2,32.4);g.bezierCurveTo(111.4,35,112.3,39.4,111.6,43.6);g.bezierCurveTo(111.1,47.2,109.2,48.6,105,48.6);g.closePath();}
+ g.bezierCurveTo(13.5,10.3,19.5,9.7,27.5,9.6);g.lineTo(61,9.8);g.bezierCurveTo(71,10.2,77.5,12.6,83,21.4);
+ g.bezierCurveTo(90,23.2,100,25.2,107.2,29.0);g.bezierCurveTo(110.9,31.2,112.4,35,111.9,39.6);g.bezierCurveTo(111.4,45,109.2,48.6,105,48.6);g.closePath();}
 function glassPath(g){g.beginPath();g.moveTo(7.2,26.3);g.bezierCurveTo(6.9,19.4,8.7,15.2,13,13.3);g.bezierCurveTo(15.2,12.7,18.2,12.5,22,12.5);g.lineTo(61,12.7);
- g.bezierCurveTo(69.5,12.9,75.5,14.3,80.2,17.8);g.lineTo(93.6,27.6);g.lineTo(62,27.1);g.lineTo(7.4,26.6);g.closePath();}
+ g.bezierCurveTo(69.5,12.9,75,14.6,78.6,19.2);g.lineTo(82.2,25);g.lineTo(62,26.2);g.lineTo(7.4,26.6);g.closePath();}
 const SEATS=[['apa',68,17.7],['anya',63.4,18.5],['anna',42.6,19.8],['petra',33.4,20.6]];
 /* ---- a családi autó állandó részei képként (telefonon kevesebb rajzolási művelet) ---- */
 const CARC=new Map();
@@ -163,13 +163,14 @@ function carBodyBase(g,dirt){
 function carBodyFront(g){
  g.strokeStyle='#e6edf2';g.lineWidth=0.75;glassPath(g);g.stroke();
  // tükör
- g.fillStyle=lg(g,0,22,0,26.6,[[0,CP.hl],[1,CP.d]]);g.beginPath();g.ellipse(76.5,24.2,3.4,2.1,-0.15,0,TAU);g.fill();frr(g,'#1a1e24',73.6,25.3,2.2,2.3,0.5);
+ g.fillStyle=lg(g,0,22,0,26.6,[[0,CP.hl],[1,CP.d]]);g.beginPath();g.ellipse(79.5,24.6,3.2,2.0,-0.15,0,TAU);g.fill();frr(g,'#1a1e24',76.8,25.6,2.2,2.1,0.5);
  // hátsó lámpa (vízszintes, körbeérő LED-sáv)
  tailPath(g);g.fillStyle=lg(g,2,0,7,0,[[0,'#7a1018'],[0.45,'#c9283a'],[1,'#e85a64']]);g.fill();g.strokeStyle='rgba(235,240,245,0.85)';g.lineWidth=0.35;g.stroke();
  for(const ly of [18.6,22.6,26.6])frr(g,'rgba(255,190,190,0.55)',2.9,ly,2.8,0.7,0.35);frr(g,'rgba(255,255,255,0.35)',5.2,17.2,0.5,11,0.25);frr(g,CP.tl,2.2,40.6,3,1.2,0.5);
- // fényszóró (karcsú LED)
+ // fényszóró (karcsú LED, borostyán nappali fénnyel)
+ g.save();g.translate(0,-1.4);
  g.fillStyle=lg(g,96,29,108,34,[[0,'#f6f9fb'],[1,'#a3aeb8']]);g.beginPath();g.moveTo(96.6,28.9);g.bezierCurveTo(100.6,29.4,104.8,30.7,108.4,33.1);g.lineTo(107.5,34.7);g.bezierCurveTo(104,33.6,100,32.5,96.2,31.2);g.closePath();g.fill();
- g.strokeStyle='#ffffff';g.lineWidth=0.6;g.beginPath();g.moveTo(97,31.3);g.bezierCurveTo(100.4,32.4,104,33.4,107.4,34.6);g.stroke();disc(g,CP.proj,104.4,32.4,0.9);
+ g.strokeStyle='#ffffff';g.lineWidth=0.6;g.beginPath();g.moveTo(97,31.3);g.bezierCurveTo(100.4,32.4,104,33.4,107.4,34.6);g.stroke();disc(g,CP.proj,104.4,32.4,0.9);frr(g,'#ff9d2e',98.2,31.6,5,0.7,0.3);g.restore();
  // első alsó légbeömlő és ködlámpa
  frr(g,'#191d22',103.4,39.6,8,4.4,2);frr(g,'#4a525b',104.4,40.8,6,0.5,0.25);}
 function drawCarSide(g,x,by,wy,o,lights){
@@ -195,8 +196,8 @@ function drawCarSide(g,x,by,wy,o,lights){
   g.fillStyle='rgba(16,34,52,0.3)';g.fillRect(0,0,120,30);
   g.fillStyle='rgba(255,255,255,0.15)';for(let k=0;k<6;k++){g.beginPath();g.moveTo(4+k*17,28);g.lineTo(12+k*17,12);g.lineTo(16+k*17,12);g.lineTo(8+k*17,28);g.closePath();g.fill();}
   g.fillStyle='#13171c';rrect(g,20.8,11,2.8,17,1.2);g.fill();rrect(g,48.7,11,3.2,17,1.2);g.fill();
-  g.strokeStyle='#13171c';g.lineWidth=2.7;g.beginPath();g.moveTo(74.6,27.4);g.lineTo(78.4,16.8);g.stroke();
-  g.fillStyle='rgba(255,255,255,0.13)';g.beginPath();g.moveTo(76,27.4);g.lineTo(79.8,17.6);g.lineTo(93.6,27.6);g.closePath();g.fill();
+  g.strokeStyle='#13171c';g.lineWidth=2.7;g.beginPath();g.moveTo(73.4,26.2);g.lineTo(76.6,15.6);g.stroke();
+  g.fillStyle='rgba(255,255,255,0.13)';g.beginPath();g.moveTo(77.5,25.6);g.lineTo(78.6,19.2);g.lineTo(82.2,25);g.closePath();g.fill();
  g.restore();
  if(useC)carLayer(g,'f|'+CP.m,xg=>carBodyFront(xg));else carBodyFront(g);
  disc(g,o.fog?'#ffffff':'#e8e2c4',108.6,42.2,0.95);
@@ -215,7 +216,7 @@ function drawCarSide(g,x,by,wy,o,lights){
  if(o.door>0)drawDoors(g,x,by-lift,o.door,t,hide);
  if(o.flap){frr(g,'#16191d',x+11.6,by+29,4,4,2);frr(g,lg(g,0,28,0,34,[[0,CP.hl],[1,CP.d]]),x+7,by+28.6,4.4,4.8,1.8);}
  const L=(dx,dy)=>[x+dx,by+dy];
- if(o.wiping){const a=(Math.sin(t*0.14)+1)/2;line(g,'#14171c',x+86,by+25,x+86-6-a*4,by+25-6-a*6,0.8);}
+ if(o.wiping){const a=(Math.sin(t*0.14)+1)/2;line(g,'#14171c',x+84,by+22.6,x+84-6-a*4,by+22.6-5-a*5,0.8);}
  const fogF=o.fogF||o.fog,fogR=o.fogR,pos=o.pos||o.lightsOn||o.high;
  if(pos){glow(g,x+106,by+31.6,4,'rgba(255,250,230,0.85)');for(const ly of [18.6,22.6,26.6])frr(g,'rgba(255,80,80,0.98)',x+2.9,by+ly,2.8,0.9,0.45);glow(g,x+3.6,by+22.6,6,'rgba(255,40,40,0.5)');if(lights)lights.push({x:x+3,y:by+23,r:9});}
  if(fogF){disc(g,'#ffffff',x+108.6,by+42.2,1);glow(g,x+108.6,by+42.2,6,'rgba(255,255,230,0.9)');if(lights)lights.push({x:x+112,y:by+44,r:16});}

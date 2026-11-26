@@ -1,5 +1,5 @@
 {
- "version": "2.42.4",
+ "version": "2.42.5",
  "apk": 3,
  "files": {
   "index.html": 61259,
@@ -11,7 +11,7 @@
   "js/map.js": 10735,
   "js/gps.js": 21972,
   "js/geohd.js": 121325,
-  "js/car.js": 78484,
+  "js/car.js": 78573,
   "js/world.js": 74715,
   "js/minigames.js": 20198,
   "js/shops.js": 31707,
