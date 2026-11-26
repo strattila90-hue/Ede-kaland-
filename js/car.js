@@ -207,6 +207,7 @@ function drawCarSide(g,x,by,wy,o,lights){
  if(o.dmg)drawDamage(g,o.dmg,t,o.spd||0,o.dz);
  g.restore();
  if(o.dmg)drawSmoke(g,x+100,by+28,o.dmg,t);
+ if(o.fire>0)drawFire(g,x,by,o.fire,t);
  // kerekek (a felfüggesztés miatt külön mozognak)
  for(const [k,cx] of [['r',WHEELS[0]],['f',WHEELS[1]]]){if(o.noWheels)break;const dy=k==='f'?wyF:wyR,wx=x+cx,wcy=wy+WCY+dy;
   if(o.noWheel===k){frr(g,'#7d858d',wx-1.2,wcy-2,2.4,11,0.8);continue;}
@@ -281,6 +282,15 @@ function drawDamage(g,d,t,spd,dz){if(d<0.05)return;const F=dz?dz.f||0:d,S=dz?dz.
  // ha a lökhárító majdnem leesik, szikrázik az úton
  if(spd>15&&((t>>1)&1)){if(F>0.75){for(let k=0;k<3;k++)disc(g,'#ffd27a',110+hsh(t*3+k)*4,48+hsh(t*7+k)*3,0.5);glow(g,111,49,4,'rgba(255,200,120,0.8)');}
   if(Rr>0.75){for(let k=0;k<3;k++)disc(g,'#ffd27a',-2+hsh(t*5+k)*4,48+hsh(t*9+k)*3,0.5);glow(g,0,49,4,'rgba(255,200,120,0.8)');}}}
+/* lángok az autón (k: 0..1 – a motortértől az egész utastérig terjed) */
+function drawFire(g,x,y,k,t){if(k<=0.02)return;g.save();g.translate(x,y);
+ for(let i=0;i<6;i++){const ph=((t*0.5+i*19)%50)/50;g.fillStyle='rgba(28,24,22,'+(0.5*(1-ph))+')';g.beginPath();g.ellipse(86-i*9+Math.sin(t*0.1+i)*3,8-ph*30,3+ph*7,2.5+ph*5,0,0,TAU);g.fill();}
+ const spots=[[98,27],[86,22],[68,15],[48,15],[28,15],[10,19]],n=Math.max(1,Math.ceil(k*spots.length));
+ for(let i=0;i<n;i++){const [fx,fy]=spots[i],h=(5+k*8)*(0.72+0.28*Math.sin(t*0.45+i*2.1)),w=2.6+k*1.6;
+  glow(g,fx,fy-h*0.4,w*2.4,'rgba(255,120,30,0.35)');
+  g.fillStyle='#ff6a14';g.beginPath();g.moveTo(fx-w,fy);g.quadraticCurveTo(fx-w*0.9,fy-h*0.6,fx+Math.sin(t*0.3+i)*1.2,fy-h);g.quadraticCurveTo(fx+w*0.9,fy-h*0.5,fx+w,fy);g.closePath();g.fill();
+  g.fillStyle='#ffc93c';g.beginPath();g.moveTo(fx-w*0.5,fy);g.quadraticCurveTo(fx-w*0.45,fy-h*0.45,fx,fy-h*0.62);g.quadraticCurveTo(fx+w*0.45,fy-h*0.4,fx+w*0.5,fy);g.closePath();g.fill();}
+ g.restore();}
 function drawSmoke(g,x,y,d,t){if(d<0.45)return;const n=d>0.75?7:4,dark=d>0.75;for(let k=0;k<n;k++){const ph=((t*0.6+k*23)%60)/60;
  disc(g,dark?'rgba(40,40,44,'+(0.45*(1-ph))+')':'rgba(220,224,228,'+(0.4*(1-ph))+')',x+ph*10+Math.sin(k+t*0.05)*2,y-ph*26,2+ph*6);}}
 function drawAirbag(g,ab){// ab: 0..1 felfúvódás, 2 = leeresztett, lelógó

@@ -698,7 +698,7 @@ function drawPlayer(g,t){const fp=P.sub==='fix'?fixPose():null,fl=P.flat&&!(fp&&
  g.fillStyle=rg(g,PX+57,gy,4,60,[[0,'rgba(0,0,0,0.38)'],[1,'rgba(0,0,0,0)']]);g.save();g.translate(PX+57,gy);g.scale(1,0.07);g.beginPath();g.arc(0,0,60,0,TAU);g.fill();g.restore();
  if(P.inv>0&&((t>>2)&1))g.globalAlpha=0.55;
  const blinkOn=(t%40)<20;
- drawCarSide(g,PX,body,gy-55.5,{dirt:G.trip.dirt||0,dmg:1-hpOf(G.trip)/100,dz:G.trip.dz,lostW:lw,spd:Math.abs(P.kmh),airbag:G.trip.airbag===1?Math.min(1,(P.abT||0)/6):G.trip.airbag===2?2:0,scare:P.scare,lean:P.lean,t:t,ang:P.ang,pitch:pitch,wF:P.wF,wR:P.wR,hide:P.hide,door:P.door,brake:P.brake||P.sub!=='drive'||Math.abs(P.kmh)<0.5&&!P.arriving&&P.boarding<0,blink:(P.blink>0||P.haz||P.flat||P.sub==='fix')&&blinkOn,
+ drawCarSide(g,PX,body,gy-55.5,{dirt:G.trip.dirt||0,dmg:1-hpOf(G.trip)/100,fire:hpOf(G.trip)<=2?0.75:0,dz:G.trip.dz,lostW:lw,spd:Math.abs(P.kmh),airbag:G.trip.airbag===1?Math.min(1,(P.abT||0)/6):G.trip.airbag===2?2:0,scare:P.scare,lean:P.lean,t:t,ang:P.ang,pitch:pitch,wF:P.wF,wR:P.wR,hide:P.hide,door:P.door,brake:P.brake||P.sub!=='drive'||Math.abs(P.kmh)<0.5&&!P.arriving&&P.boarding<0,blink:(P.blink>0||P.haz||P.flat||P.sub==='fix')&&blinkOn,
   pos:P.lightMode>=1,lightsOn:P.lightMode>=2,high:P.lightMode===3||P.flashOn,fogF:P.fogF,fogR:P.fogR,rev:P.rev,flat:fl,noWheel:fp?fp.noWheel:null,jack:fp&&fp.jack?P.flat:null,lift:fp?fp.lift:0,
   flap:P.sub==='pump'||(P.sub==='shop'&&P.shop&&P.shop.type==='fuel'),wiping:['rain','storm','snow'].includes(LEGS[G.leg].weather),bounce:P.kmh>1},lights);
  g.globalAlpha=1;
