@@ -500,10 +500,10 @@ function drawTraffic(g,e,sx,lights,lightsOn,t){const gy=e.y,c=e.col,ang=e.x/8,L=
   line(g,jc,rx+22,wy-28,fx-10,wy-22,2.4);disc(g,'#1b1f26',fx-10,wy-22,1.3);
   disc(g,'#f4f6f8',rx+25,wy-34,5);g.fillStyle='#1b1f26';g.beginPath();g.arc(rx+26.5,wy-33.5,3.6,-0.6,0.9);g.closePath();g.fill();R(g,shade(c,1),rx+20.5,wy-36,8,1.4);
   frr(g,'#fff3c4',fx-5,wy-19,3,2.4,1);wheel(g,rx,wy,ang,false,r);wheel(g,fx,wy,ang,false,r);disc(g,'#9aa3ad',fx,wy,3);}
- if(e.wreck||e.hurt)drawTrafDmg(g,e,L,t);
+ if(e.wreck||e.hurt)drawTrafDmg(g,e,L,t);if(e.fire>0.02&&lights)lights.push({x:sx+L*0.8,y:gy-30,r:30+e.fire*30});
  {const ry=TRL[e.tp]||-24;/* féklámpa és irányjelző (sávváltáskor) */
   if(e.brk&&!e.parked){frr(g,'#ff3b30',0.5,ry-1,2.6,4,1);glow(g,1,ry+1,9,'rgba(255,40,30,0.55)');if(e.tp==='bus'||e.tp==='truck')glow(g,1,ry+12,7,'rgba(255,40,30,0.45)');}
-  if(Math.abs((e.ty||e.y)-e.y)>0.8&&((t>>4)&1)){glow(g,1.5,ry+4,6,'rgba(255,170,30,0.95)');glow(g,L-1.5,ry+3,6,'rgba(255,170,30,0.95)');}}
+  if((e.jam||e.hurt>0.3||Math.abs((e.ty||e.y)-e.y)>0.8)&&((t>>4)&1)){/* irányjelző sávváltáskor; vészvillogó a dugóban és sérülten */glow(g,1.5,ry+4,6,'rgba(255,170,30,0.95)');glow(g,L-1.5,ry+3,6,'rgba(255,170,30,0.95)');}}
  g.restore();if(lightsOn&&lights)lights.push({x:sx+e.w,y:gy-18,r:20});}
 /* tűzoltóautó (előre megrajzolt kép): piros felépítmény, legénységi fülke, redőnyös szertárak, tetőn létra, tömlődob */
 function drawFireBody(g,L){const T=-90,B=-14,cab=58,cx=L-cab;
@@ -540,10 +540,13 @@ function drawTrafDmg(g,e,L,t){const z=e.hz||(e.wreck===2?'r':'f'),k=Math.min(1,e
  // vészvillogó
  if((t>>4)&1){glow(g,2,-h*0.5,6,'rgba(255,170,30,0.9)');glow(g,L-2,-h*0.45,6,'rgba(255,170,30,0.9)');}
  // tűz (égő roncs): lobogó lángnyelvek a motortér fölött
- if(e.fire>0.02){const f=e.fire,fx=z==='r'?L*0.15:L*0.82,fy=-h*0.55;for(let i=0;i<4;i++){const ph=t*0.25+i*1.7,hh=(16+i*4)*f*(0.8+0.25*Math.sin(ph)),w=(7+i*1.5)*f;
-   g.fillStyle=i===0?'rgba(255,90,20,0.85)':i===1?'rgba(255,150,30,0.85)':i===2?'rgba(255,210,70,0.8)':'rgba(255,245,180,0.75)';const ox=fx+(i-1.5)*3*f+Math.sin(ph*1.3)*1.5;
-   g.beginPath();g.moveTo(ox-w,fy);g.quadraticCurveTo(ox-w*0.6,fy-hh*0.6,ox+Math.sin(ph)*2,fy-hh);g.quadraticCurveTo(ox+w*0.6,fy-hh*0.6,ox+w,fy);g.closePath();g.fill();}
-  glow(g,fx,fy-6,22*f,'rgba(255,140,40,0.35)');}}
+ if(e.fire>0.02){/* lángnyelvek: több, egymástól függetlenül lobogó, S-alakban hajló nyelv, mindegyik három rétegben (vörös szél, narancs, sárgásfehér mag) */
+  const f=Math.max(0.3,e.fire),fx=z==='r'?L*0.15:L*0.8,fy=-h*0.55,C=['rgba(214,48,14,0.78)','rgba(255,122,26,0.88)','rgba(255,214,96,0.92)'];
+  glow(g,fx,fy-12,34*f+10,'rgba(255,140,40,0.38)');
+  for(let k=0;k<5;k++){const ox=fx+(k-2)*5.2*f,ph=t*0.21+k*2.1,hh=(26+((k*37)%3)*8-Math.abs(k-2)*5)*f*(0.85+0.2*Math.sin(ph*1.7)),sw=Math.sin(ph)*5*f;
+   for(let l=0;l<3;l++){const sc=1-l*0.3,w=(6.5-Math.abs(k-2))*f*sc+1,hl=hh*sc,by=fy+1-l*1.5;g.fillStyle=C[l];g.beginPath();g.moveTo(ox-w,by);
+    g.bezierCurveTo(ox-w*1.1,by-hl*0.45,ox+sw*0.4-w*0.5,by-hl*0.7,ox+sw,by-hl);g.bezierCurveTo(ox+sw*0.4+w*0.6,by-hl*0.62,ox+w*1.1,by-hl*0.4,ox+w,by);g.closePath();g.fill();}}
+  ell(g,'rgba(255,240,190,0.7)',fx,fy-1,8*f,2.2);}}
 /* nagy jármű kereke (acélfelni, kevés rajzolási művelet) */
 function twheel(g,cx,cy,r,ang){disc(g,'#15181c',cx,cy,r);disc(g,'#2a2f36',cx,cy,r*0.86);disc(g,'#a9b2bb',cx,cy,r*0.6);disc(g,'#6a737c',cx,cy,r*0.44);
  const a=ang*0.8,c=Math.cos(a)*r*0.44,s=Math.sin(a)*r*0.44;line(g,'#d3dae1',cx-c,cy-s,cx+c,cy+s,r*0.11);line(g,'#d3dae1',cx+s,cy-c,cx-s,cy+c,r*0.11);disc(g,'#e4e9ee',cx,cy,r*0.17);}

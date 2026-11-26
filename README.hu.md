@@ -10,7 +10,7 @@
 
 ---
 
-# 🚐 Családi Vakáció – v2.43.0
+# 🚐 Családi Vakáció – v2.44.0
 
 Családi autós kalandjáték. A család **Komáromból, a Táncsics Mihály utcából** indul, és bejárja Európát, valós távolságokon és valós fogyasztással, **forintban** számolva.
 
@@ -42,6 +42,15 @@ A fogyasztás a sebességtől, a gyorsítástól, az út típusától, a hótól
 A játékbeli kilométer **kétszer olyan gyorsan telik** (v2.43), mint a valóságban: 90 km/h-val 1 km 20 másodperc, így Komáromtól Bábolnáig kb. 8 perc, Komáromtól Siófokig kb. egy óra. A teljes út kb. 9 700 km, így sokkal messzebbre el lehet jutni.
 
 A játék 10 másodpercenként (és háttérbe kerüléskor) automatikusan menti az állást, így az út több napon át is folytatható. A főmenüben választható **Gyorsított (5x)** utazás is (ennél gyorsabb nincs), de alapból valós idővel megy. A megtett utat a mentés kilométerben tárolja, így egy elkezdett utazásban a km és a méter sosem vész el és nem ugrik, akkor sem, ha közben átállítod a gyorsítást. A kijelzett megtett út méterre pontos: 90 km/h-val 50 métert teszel meg másodpercenként (1 km = 20 mp), és a kijelző a métereket is mutatja (pl. 10,305 / 167 km). Gyorsított és turbó módban a táv rövidebbre van sűrítve, ezért ilyenkor a kijelző mellett ott a szorzó (5x, 20x).
+
+## 🆕 Újdonságok (v2.44)
+
+- **Háromféle rendőr:** háromlábú traffipax, **kézi lézeres sebességmérő** (a rendőr a közeledő autókra céloz), vagy **igazoltatás**: a rendőr STOP-táblával int, meg kell állni mellette a szélső sávban. Ilyenkor odasétál a vezetőhöz, elkéri a jogosítványt és a forgalmit, szondáztat, és csak utána enged tovább (gyorshajtásért bírság jár). Aki nem áll meg, 50 000 Ft bírságot kap.
+- **Még élethűbb baleset:** lobogó, több nyelvű láng szikrákkal, ami csak akkor kezd kialudni, amikor odaérsz és a tűzoltó eléri a vízsugárral; éjjel a tűz bevilágítja a környéket. A helyszín mögött **mentőhelikopter** száll le a rétre (forgó fő- és farokrotor, villogó, felvert por). A dugóban álló autók **vészvillogóval** araszolnak.
+- **Díszkivilágítás éjjel:** a nevezetességeket alulról meleg fény világítja meg (Eiffel-torony, Kultúrpalota, Stephansdom...).
+- **Igényesebb rajzok:** újrarajzolva a siófoki víztorony (gomba alakú kilátószinttel), a Kranjska Gora-i síugrósánc, a cividalei Ördöghíd, a méridai római színház, a brémai városháza a Roland-szoborral és a muzsikusokkal, a bécsi Stephansdom, a civitavecchiai erőd és a genovai Lanterna.
+- **Falvak:** országonként a helyi jellegű látnivalók: magyar falvakban gémeskút, kálvária, nádtetős tájház fűzött paprikával, kopjafák, fa haranglábas, emlékmű; osztrák és német falvakban májusfa és útszéli kápolna, olaszban ciprussor, spanyolban szélmalom és bika, hollandban szélmalom. A gémeskút csak magyar falvakban áll, az Alpokban fahasábrakás.
+- **Telefonon is gyors:** az új rajzok előre megrajzolt képekből jönnek, mérve ugyanannyi idő egy képkocka, mint előtte.
 
 ## 🆕 Újdonságok (v2.43)
 

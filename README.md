@@ -22,6 +22,7 @@ The game is in Hungarian. It runs in the browser, can be installed as a PWA, and
 - **Damage, total loss, tow truck and repair shop**, plus "Dad's garage": a **crash-test lab** (walls, dummies, braking tests, replay, X-ray of the drivetrain) and a **wrecking workshop** with 11 tools (hammer, bullets, laser, press, explosives, heat and frost chamber).
 - **Every town looks different** (v2.43): buildings in each country's own style, and every city has its own landmarks (Eiffel Tower, Colosseum, Brandenburg Gate, Atomium, Sagrada Família, Komárom's Monostor fortress...); every village has its own church and a unique sight.
 - **Lifelike roads** (v2.43): roadside police with a tripod speed camera announced 600 m ahead, accident scenes with a burning wreck, firefighters putting it out, paramedics with injured people, debris and a traffic jam; buses and trucks with brake lights, turn signals and diesel smoke; help stranded drivers with a handshake button. Game kilometres pass twice as fast as before.
+- **v2.44**: three kinds of police (tripod speed camera, handheld laser gun, roadside check where you must stop), a rescue helicopter landing at accident scenes, flickering fire, hazard lights in jams, floodlit landmarks at night, village sights by country (sweep wells and thatched cottages in Hungary, maypoles in Austria, windmills in the Netherlands).
 - **Car radio**, synthesized engine sound, day and night, weather, wildlife, traffic.
 - **Android app (APK)** with background updates, plus keyboard, touch and gamepad-style controls for any screen size.
 
