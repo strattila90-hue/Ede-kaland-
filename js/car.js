@@ -123,10 +123,10 @@ function wheel(g,cx,cy,ang,flat,r,bent){r=r||WR;g.save();g.translate(cx,cy);
 function tailPath(g,ox,oy){ox=ox||0;oy=oy||0;g.beginPath();g.moveTo(ox+2.35,oy+31.2);g.lineTo(ox+2.25,oy+24.5);g.bezierCurveTo(ox+2.4,oy+20,ox+3.6,oy+16.9,ox+6.1,oy+15.0);
  g.quadraticCurveTo(ox+7.1,oy+14.5,ox+7.0,oy+15.8);g.bezierCurveTo(ox+6.3,oy+18.4,ox+6.0,oy+21.5,ox+6.0,oy+24.6);g.lineTo(ox+6.0,oy+29.6);g.quadraticCurveTo(ox+6.0,oy+31.6,ox+4.4,oy+31.7);g.closePath();}
 function bodyPath(g){g.beginPath();g.moveTo(9,48.6);g.bezierCurveTo(4,48.6,2.2,46.4,2.1,42.5);g.lineTo(2,30.5);g.bezierCurveTo(2,21.5,4.5,15.6,9.5,12.6);
- g.bezierCurveTo(13.5,10.3,19.5,9.7,27.5,9.6);g.lineTo(61,9.8);g.bezierCurveTo(70,10.1,76.5,12.4,83,16.8);g.lineTo(95.6,26.4);
+ g.bezierCurveTo(13.5,10.3,19.5,9.7,27.5,9.6);g.lineTo(61,9.8);g.bezierCurveTo(71,10.2,78,12,84,16.4);g.lineTo(96.4,27);
  g.bezierCurveTo(99.6,28.6,104.6,29.8,108.2,32.4);g.bezierCurveTo(111.4,35,112.3,39.4,111.6,43.6);g.bezierCurveTo(111.1,47.2,109.2,48.6,105,48.6);g.closePath();}
 function glassPath(g){g.beginPath();g.moveTo(7.2,26.3);g.bezierCurveTo(6.9,19.4,8.7,15.2,13,13.3);g.bezierCurveTo(15.2,12.7,18.2,12.5,22,12.5);g.lineTo(61,12.7);
- g.bezierCurveTo(68.5,12.9,74,14.7,79.2,18.1);g.lineTo(92.6,27.6);g.lineTo(62,27.1);g.lineTo(7.4,26.6);g.closePath();}
+ g.bezierCurveTo(69.5,12.9,75.5,14.3,80.2,17.8);g.lineTo(93.6,27.6);g.lineTo(62,27.1);g.lineTo(7.4,26.6);g.closePath();}
 const SEATS=[['apa',68,17.7],['anya',63.4,18.5],['anna',42.6,19.8],['petra',33.4,20.6]];
 /* ---- a családi autó állandó részei képként (telefonon kevesebb rajzolási művelet) ---- */
 const CARC=new Map();
@@ -136,9 +136,8 @@ function carLayer(g,key,draw){const tr=g.getTransform(),zs=Math.max(1,Math.round
  g.drawImage(c,-4,-3,128,56);}
 function carBodyBase(g,dirt){
  // tetőbox és tetősín
- frr(g,lg(g,0,2.6,0,9,[[0,'#4c5664'],[1,'#1b2027']]),20,2.8,41,6.4,3.2);frr(g,'rgba(255,255,255,0.22)',25,3.4,26,0.9,0.45);
- g.strokeStyle='#e3e9ee';g.lineWidth=0.9;g.beginPath();g.moveTo(14,9.3);g.bezierCurveTo(30,8.7,50,8.7,67,9.6);g.stroke();
- for(const fx of [15,40,65])frr(g,'#222830',fx-1.3,8.6,2.6,1.7,0.6);
+ g.strokeStyle='#cfd6dd';g.lineWidth=0.8;g.beginPath();g.moveTo(14,8.9);g.bezierCurveTo(30,8.3,50,8.3,67,9.2);g.stroke();
+ for(const fx of [15,40,65])frr(g,'#222830',fx-1,8.2,2,1.8,0.5);
  // karosszéria
  bodyPath(g);g.fillStyle=lg(g,0,10,0,49,[[0,CP.hl],[0.22,CP.l],[0.52,CP.m],[0.8,CP.d],[1,CP.dd]]);g.fill();
  g.save();bodyPath(g);g.clip();
@@ -197,7 +196,7 @@ function drawCarSide(g,x,by,wy,o,lights){
   g.fillStyle='rgba(255,255,255,0.15)';for(let k=0;k<6;k++){g.beginPath();g.moveTo(4+k*17,28);g.lineTo(12+k*17,12);g.lineTo(16+k*17,12);g.lineTo(8+k*17,28);g.closePath();g.fill();}
   g.fillStyle='#13171c';rrect(g,20.8,11,2.8,17,1.2);g.fill();rrect(g,48.7,11,3.2,17,1.2);g.fill();
   g.strokeStyle='#13171c';g.lineWidth=2.7;g.beginPath();g.moveTo(74.6,27.4);g.lineTo(78.4,16.8);g.stroke();
-  g.fillStyle='rgba(255,255,255,0.13)';g.beginPath();g.moveTo(76,27.4);g.lineTo(79.8,17.6);g.lineTo(92.6,27.6);g.closePath();g.fill();
+  g.fillStyle='rgba(255,255,255,0.13)';g.beginPath();g.moveTo(76,27.4);g.lineTo(79.8,17.6);g.lineTo(93.6,27.6);g.closePath();g.fill();
  g.restore();
  if(useC)carLayer(g,'f|'+CP.m,xg=>carBodyFront(xg));else carBodyFront(g);
  disc(g,o.fog?'#ffffff':'#e8e2c4',108.6,42.2,0.95);
