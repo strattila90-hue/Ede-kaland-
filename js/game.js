@@ -1103,13 +1103,39 @@ function drawPostcard(g){const L=LEGS[G.leg],T=G.trip;g.fillStyle=lg(g,0,0,0,H,[
  if(G.st>40&&((G.t>>4)&1))text(g,isTouch?'Érintsd meg: tovább':'Enter: tovább',W/2,252,'#ffffff',1,'center');}
 function drawOver(g){drawPlay(g);R(g,'rgba(10,13,22,0.78)',0,0,W,H);text(g,'Elfogyott a jókedv...',W/2,96,'#ff8a8a',2,'center');text(g,'A család pihen egyet a szálláson, aztán újra nekivág.',W/2,128,'#ffffff',1,'center');
  if(G.st>50&&((G.t>>4)&1))text(g,isTouch?'Érintsd meg: újra':'Enter: újrakezdés',W/2,156,'#ffd84a',1,'center');}
-function drawWin(g){const t=G.t,T=G.trip;drawSky(g,LEGS[LEGS.length-1],t);drawClouds(g,LEGS[LEGS.length-1],t*0.4,t);drawFar(g,LEGS[LEGS.length-1],TITLE_LEG.segs[0],t*0.4,null);drawRoad(g,LEGS[LEGS.length-1],TITLE_LEG,0,t);
- house(g,150,ROADT-8,'#f2e2b8','#b5452b',false,null,false,'12');drawCarSide(g,W/2-30,232-55.5,232-55.5,{t:t,ang:0,door:1,hide:{apa:1,anya:1,anna:1,petra:1,atti:1}},null);
- ['apa','anya','anna','petra'].forEach((w,k)=>person(g,100+k*22,240,w,t,'wave'));
- for(let k=0;k<50;k++)frr(g,['#ff5a7a','#ffd54f','#4fc3f7','#81c784','#ba68c8'][k%5],hsh(k)*W+Math.sin(t*0.02+k)*20,(hsh(k+50)*H+t*(0.5+hsh(k)))%H,3,3,1);
- frr(g,'rgba(10,13,22,0.65)',40,20,400,130,6);text(g,'Hazaértünk Komáromba!',W/2,30,'#ffd84a',2,'center','#7a3b12');
- const r=['Megtett út: '+fmt(T.km,0)+' km','Elfogyott benzin: '+fmt(T.fuelUsed,1)+' l  (átlag '+(T.km>1?fmt(T.fuelUsed/T.km*100,1):'-')+' l/100 km)','Benzinre költve: '+fmt(T.spentFuel)+' Ft','Boltban, szálláson: '+fmt(T.spentShop)+' Ft','Bírságok: '+fmt(T.fines)+' Ft','Mellékesen keresett: '+fmt(T.earned||0)+' Ft','Maradt: '+fmt(T.money)+' Ft'];
- r.forEach((s,k)=>text(g,s,W/2,56+k*12,'#ffffff',1,'center'));if(G.st>60&&((t>>4)&1))text(g,isTouch?'Érintsd meg: főmenü':'Enter: főmenü',W/2,134,'#cfd6df',1,'center');}
+function drawWin(g){const t=G.t,T=G.trip,GY=190,FH=196;
+ g.fillStyle='#000';g.fillRect(0,0,W,H);
+ g.save();g.beginPath();g.rect(8,8,W-16,FH-12);g.clip();
+ // éjszakai ég, csillagok, hold
+ g.fillStyle='#04060a';g.fillRect(8,8,W-16,FH);for(let k=0;k<26;k++){const tw=((t>>4)+k)%9===0;frr(g,tw?'#ffffff':'#7f8794',12+hsh(k*3)*(W-24),12+hsh(k*7+1)*70,1,1,0);}
+ disc(g,'#efe6cf',W-26,32,13);disc(g,'rgba(160,150,130,0.45)',W-30,28,3);disc(g,'rgba(160,150,130,0.4)',W-22,38,2.4);
+ // tank-sziluett az erdő mögött
+ g.fillStyle='#12151a';g.beginPath();g.moveTo(120,134);g.lineTo(128,116);g.lineTo(300,116);g.lineTo(312,134);g.closePath();g.fill();g.beginPath();g.moveTo(170,116);g.lineTo(184,96);g.lineTo(262,96);g.lineTo(276,116);g.closePath();g.fill();g.fillRect(40,100,150,4);g.fillRect(36,98,8,8);g.fillRect(228,88,18,8);
+ // fenyők
+ for(let k=0;k<30;k++){const x=6+k*16+hsh(k)*6,h=34+hsh(k*5)*22,w=15;for(let l=0;l<3;l++){const yy=150-h+l*h*0.3,ww=w*(0.45+l*0.3);g.fillStyle=l%2?'#1d4a2a':'#235a33';g.beginPath();g.moveTo(x,yy);g.lineTo(x+ww,yy+h*0.42);g.lineTo(x-ww,yy+h*0.42);g.closePath();g.fill();}frr(g,'#2a1c10',x-1,148,2,6,0);}
+ // fű, útpadka, út
+ g.fillStyle='#1b3a22';g.fillRect(8,155,W-16,16);g.fillStyle='#34353a';g.fillRect(8,171,W-16,FH-171);for(let k=0;k<160;k++)frr(g,'rgba(255,255,255,0.10)',8+hsh(k*2)*(W-16),172+hsh(k*9)*22,1,1,0);
+ frr(g,'#d9dde2',8,176,W-16,1,0);frr(g,'#d9dde2',8,FH-6,W-16,1,0);for(let x=20;x<W;x+=60)frr(g,'#cfd3d8',x,FH-16,24,1,0);
+ // a két lány a szalagkorlát mögött, integetve
+ person(g,36,172,'anna',t,'wave');person(g,64,172,'petra',t+9,'wave');
+ // szalagkorlát
+ frr(g,'#a9afb7',8,150,W-16,7,1);frr(g,'#6d737b',8,155,W-16,1.5,0);for(let x=14;x<W;x+=34)frr(g,'#3a3f46',x,152,3,20,0);
+ // az autó és a család
+ drawCarSide(g,238,GY-55.5,GY-55.5,{t:t,ang:0,hide:{apa:1,anya:1,anna:1,petra:1,atti:1}},null);
+ person(g,300,GY-1,'apa',t,'stand');person(g,319,GY-1,'anya',t,'stand',{noBaby:true});
+ frr(g,'#8cb8ea',344,GY-10,8,8,3);frr(g,'#f6d0ae',351,GY-4,5,2,1);frr(g,'#6a8cc0',343,GY-3,6,3,1);headSide(g,349,GY-13,'atti',t,1.4);
+ // „Élet” jelző: zöld pixelszív
+ text(g,'Élet',12,128,'#ffffff',1,'left','#000');
+ ['0110110','1111111','1111111','0111110','0011100','0001000'].forEach((row,y)=>{for(let x=0;x<7;x++)if(row[x]==='1')frr(g,y<2&&x<3?'#7dff8a':'#22a63a',12+x*3,134+y*3,3,3,0);});
+ text(g,fmt(T.km,0)+' km',W-18,150-110+0,'#8f98a6',1,'right');
+ g.restore();
+ // díszkeret
+ g.strokeStyle='#d6d9de';g.lineWidth=1;g.strokeRect(4.5,4.5,W-9,FH+1);g.strokeStyle='#6b7078';g.strokeRect(7.5,7.5,W-15,FH-5);for(const [x,y] of [[6,6],[W-6,6],[6,FH+4],[W-6,FH+4]])disc(g,'#d6d9de',x,y,2.2);
+ // felirat
+ text(g,'Túléltük, és megérkeztünk!',W/2,206,'#ffffff',2,'center','#000');
+ text(g,'A család örökre összetart.',W/2,224,'#ffffff',2,'center','#000');
+ frr(g,'#d6d9de',14,241,W-28,1,0);disc(g,'#d6d9de',W/2,241,3.2);disc(g,'#000',W/2,241,1.6);
+ if(G.st>60&&((t>>4)&1))text(g,isTouch?'Érintsd meg a folytatáshoz':'Nyomj szóközt a folytatáshoz',W/2,254,'#cfd6df',1,'center');}
 
 /* ---------- fő frissítés ---------- */
 /* a szünet (és a háttérben töltött) valós ideje pihenésnek számít; közben semmi nem számol tovább */
