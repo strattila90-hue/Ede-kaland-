@@ -5,17 +5,18 @@
    ========================================================= */
 const CAR={name:'Családi egyterű 1.8 16V benzin',hp:125,torque:170,tank:60,urban:11.3,extra:6.1,comb:8.0,top:185,acc100:13.4,mass:1510,seats:7,len:4.59,wheelbase:2.728,tyre:'205/65 R15'};
 const CP={hl:'#d6e0ea',l:'#adbccb',m:'#8a9bad',d:'#68798c',dd:'#47535f',tl:'#c62a35',amb:'#ffaa22',hd:'#fff3c4',led:'#ffffff',proj:'#cfeeff'};
-const PALETTES={'Kékesszürke':['#dbe4ee','#aebdcc','#8a9bad','#66778a','#44505c'],'Pezsgőarany':['#f4ead0','#dccb98','#bfa972','#9a8553','#6c5c39'],
+const PALETTES={'Grafitszürke':['#c9cdd3','#9ba1a9','#707680','#4e545d','#30353c'],'Kékesszürke':['#dbe4ee','#aebdcc','#8a9bad','#66778a','#44505c'],'Pezsgőarany':['#f4ead0','#dccb98','#bfa972','#9a8553','#6c5c39'],
  'Piros':['#f6a59b','#dc5a4f','#b83a32','#8e2a25','#5f1c19'],'Fehér':['#ffffff','#eef1f4','#d6dce2','#b3bcc5','#7d8792'],
  'Éjkék':['#9fb6e0','#5a79b2','#3f5c92','#2d4570','#1d2c4b'],'Fekete':['#8a929c','#4a525c','#363c45','#262b32','#16191e']};
-let carColor='Kékesszürke';
+let carColor='Grafitszürke';setColor0();
+function setColor0(){const p=PALETTES[carColor];CP.hl=p[0];CP.l=p[1];CP.m=p[2];CP.d=p[3];CP.dd=p[4];}
 function setColor(name){if(!PALETTES[name])return;carColor=name;const p=PALETTES[name];CP.hl=p[0];CP.l=p[1];CP.m=p[2];CP.d=p[3];CP.dd=p[4];try{localStorage.setItem('csaladi-vakacio-szin',name);}catch(e){}}
 try{const s=localStorage.getItem('csaladi-vakacio-szin');if(s&&PALETTES[s])setColor(s);}catch(e){}
 
 /* ---- a család ---- */
-const FAM={apa:{skin:'#efc29a',hair:'#5a3b22',shirt:'#3f7fd9',pants:'#2c3e50',name:'Apa'},anya:{skin:'#f3caa5',hair:'#a5522a',shirt:'#e05a8a',pants:'#4a4a7a',name:'Anya'},
- anna:{skin:'#f6d0ae',hair:'#6b4423',shirt:'#9c6bff',pants:'#35507a',name:'Anna'},petra:{skin:'#f8d6b6',hair:'#f2d16b',shirt:'#ffb13b',pants:'#d8433b',name:'Petra'},
- atti:{skin:'#fbdcc2',hair:'#d9b47a',shirt:'#7fd1ff',pants:'#7fd1ff',name:'kis Atti'}};
+const FAM={apa:{skin:'#e8b88f',hair:'#4a3320',shirt:'#6f7a49',pants:'#5f6b3e',name:'Apa'},anya:{skin:'#f3caa5',hair:'#8a5a38',shirt:'#b0436f',pants:'#3d5f8f',name:'Anya'},
+ anna:{skin:'#f6d0ae',hair:'#7a4a30',shirt:'#9a96b4',pants:'#f6d0ae',name:'Anna'},petra:{skin:'#f8d6b6',hair:'#f0cf70',shirt:'#5b8fd9',pants:'#f8d6b6',name:'Petra'},
+ atti:{skin:'#fbdcc2',hair:'#e0c090',shirt:'#8cb8ea',pants:'#8cb8ea',name:'kis Atti'}};
 function crewHas(w){if(w==='apa'||!w)return true;const c=typeof G!=='undefined'&&G.trip&&G.trip.crew;return !c||!!c[w];}
 const EYEC={apa:'#6b4a2b',anya:'#3e8a5a',anna:'#3b74c4',petra:'#4f8fd8',atti:'#5a9be0'};
 /* szem oldalnézetből: mandulavágású fehér, színes írisz, pupilla, csillanás, szempilla */
@@ -27,7 +28,7 @@ function eyeSide(g,ex,ey,r,col,big,lash){const w=r*(0.2+big*0.12),h=r*(0.17+big*
 const WHEELS=[24,89],WR=9.4,WCY=55.5-9.4,ARCH=12.4;
 /* fej oldalnézetből (jobbra néz) – cx,cy a fej közepe */
 function headSide(g,cx,cy,who,t,s,sc){s=s||1;sc=sc||0;const f=FAM[who];const r=(who==='anna'?2.7:who==='petra'?2.4:who==='atti'?2.1:3.2)*s;
- if(who==='anya'){g.fillStyle=f.hair;g.beginPath();g.ellipse(cx-r*0.5,cy+r*0.4,r*0.9,r*1.4,0,0,TAU);g.fill();}
+ if(who==='anya'){g.fillStyle=f.hair;g.beginPath();g.ellipse(cx-r*0.55,cy+r*0.8,r*0.9,r*1.9,0,0,TAU);g.fill();}
  // nyak és fej, finom árnyékkal
  R(g,shade(f.skin,0.85),cx-r*0.3,cy+r*0.7,r*0.6,r*0.6);
  g.fillStyle=lg(g,cx-r,cy,cx+r,cy,[[0,shade(f.skin,0.88)],[0.6,f.skin],[1,shade(f.skin,1.04)]]);g.beginPath();g.arc(cx,cy,r,0,TAU);g.fill();
@@ -45,7 +46,8 @@ function headSide(g,cx,cy,who,t,s,sc){s=s||1;sc=sc||0;const f=FAM[who];const r=(
  else eyeSide(g,ex,ey,r,EYEC[who]||'#5a3b22',Math.max(0,sc-0.15),who==='anya'||who==='anna'||who==='petra');
  // szemöldök (Apánál vastagabb), Apa napszemüvege a feje búbján
  if(who!=='atti')line(g,shade(f.hair,0.75),ex-r*0.22,ey-r*(0.34+sc*0.22),ex+r*0.2,ey-r*(0.4+sc*0.24),r*(who==='apa'?0.13:0.09));
- if(who==='apa'){g.fillStyle='#14171c';rrect(g,cx-r*0.05,cy-r*0.98,r*0.85,r*0.3,r*0.12);g.fill();R(g,'rgba(255,255,255,0.4)',cx+r*0.08,cy-r*0.94,r*0.28,r*0.07);}
+ if(who==='apa'){g.fillStyle=shade(f.hair,0.9);g.beginPath();g.ellipse(cx+r*0.3,cy+r*0.62,r*0.62,r*0.42,0,0,Math.PI);g.fill();g.beginPath();g.ellipse(cx+r*0.78,cy+r*0.45,r*0.22,r*0.18,0,0,TAU);g.fill();
+  g.fillStyle='#a3202a';g.beginPath();g.ellipse(cx+r*0.05,cy-r*0.82,r*1.12,r*0.42,-0.12,0,TAU);g.fill();g.fillStyle='#7d151d';g.fillRect(cx-r*0.95,cy-r*0.62,r*1.9,r*0.14);disc(g,'#d8d8d8',cx+r*0.55,cy-r*0.78,r*0.16);}
  // száj: semleges vonal, ijedten nyitott „O”
  const mx=cx+r*0.7,my=cy+r*0.48;
  if(sc>0.3){g.fillStyle='#5a1f1f';g.beginPath();g.ellipse(mx,my+r*0.05,r*(0.13+sc*0.08),r*(0.14+sc*0.16),0,0,TAU);g.fill();}
@@ -62,7 +64,7 @@ function headFront(g,cx,cy,who,s){s=s||1;const f=FAM[who];const r=(who==='apa'||
   disc(g,EYEC[who]||'#5a3b22',ex,ey+r*0.02,r*0.13);disc(g,'#121212',ex,ey+r*0.02,r*0.07);disc(g,'#ffffff',ex-r*0.04,ey-r*0.04,r*0.04);
   g.strokeStyle='#2a1d14';g.lineWidth=r*0.06;g.beginPath();g.ellipse(ex,ey,r*0.2,r*0.17,0,Math.PI*1.1,Math.PI*1.9);g.stroke();
   if(who!=='atti')line(g,shade(f.hair,0.75),ex-r*0.17,ey-r*0.3,ex+r*0.17,ey-r*(0.33+(sx>0?0.03:0)),r*(who==='apa'?0.11:0.07));}
- if(who==='apa'){g.fillStyle='#14171c';rrect(g,cx-r*0.6,cy-r*1.0,r*1.2,r*0.28,r*0.12);g.fill();}
+ if(who==='apa'){g.fillStyle=shade(f.hair,0.9);g.beginPath();g.ellipse(cx,cy+r*0.5,r*0.7,r*0.5,0,0,Math.PI);g.fill();g.fillStyle='#a3202a';g.beginPath();g.ellipse(cx-r*0.1,cy-r*0.88,r*1.15,r*0.42,-0.1,0,TAU);g.fill();g.fillStyle='#7d151d';g.fillRect(cx-r*1.0,cy-r*0.66,r*2,r*0.14);}
  if(who!=='apa')disc(g,'rgba(255,120,120,0.25)',cx-r*0.55,cy+r*0.3,r*0.16),disc(g,'rgba(255,120,120,0.25)',cx+r*0.55,cy+r*0.3,r*0.16);
  g.strokeStyle='#a0524a';g.lineWidth=0.45*s;g.beginPath();g.arc(cx,cy+r*0.3,r*0.3,0.2,Math.PI-0.2);g.stroke();}
 /* gyalogos családtag (kiszállás, tankolás, kerékcsere) */
@@ -87,7 +89,10 @@ function person(g,x,gy,who,t,mode,o){o=o||{};const f=FAM[who],H=(HCM[who]||170)/
    limb(g,k?pants:shade(pants,0.85),hipX,hipY,kx+kb*0,ky,fx,fy,legW);frr(g,shoe,fx-H*0.03,fy-H*0.025,H*0.11,H*0.045,1);}}
  // törzs (kissé dőlve térdelésnél)
  const tl=H*(kid?0.3:0.33),shX=hipX+Math.sin(lean)*tl,shY=hipY-Math.cos(lean)*tl;
- g.save();g.translate(hipX,hipY);g.rotate(lean);frr(g,lg(g,-H*0.08,0,H*0.08,0,[[0,shade(shirt,0.8)],[0.6,shirt],[1,shade(shirt,1.1)]]),-H*0.075,-tl-H*0.02,H*0.15,tl+H*0.05,H*0.05);g.restore();
+ g.save();g.translate(hipX,hipY);g.rotate(lean);frr(g,lg(g,-H*0.08,0,H*0.08,0,[[0,shade(shirt,0.8)],[0.6,shirt],[1,shade(shirt,1.1)]]),-H*0.075,-tl-H*0.02,H*0.15,tl+H*0.05,H*0.05);
+  if(who==='apa'){g.save();g.beginPath();g.rect(-H*0.075,-tl-H*0.02,H*0.15,tl+H*0.05);g.clip();g.fillStyle='rgba(50,55,30,0.55)';for(const [bx,by,bw] of [[-0.05,-0.3,0.05],[0.02,-0.25,0.045],[-0.01,-0.16,0.05],[0.04,-0.08,0.04],[-0.05,-0.06,0.04],[0.0,-0.34,0.035]])g.fillRect(bx*H,by*H,bw*H,bw*H*0.7);g.fillStyle='rgba(190,170,110,0.45)';g.fillRect(-0.03*H,-0.21*H,0.04*H,0.03*H);g.fillRect(0.03*H,-0.14*H,0.03*H,0.03*H);g.restore();}
+  if(kid){g.fillStyle=lg(g,-H*0.1,0,H*0.1,0,[[0,shade(shirt,0.8)],[0.6,shirt],[1,shade(shirt,1.1)]]);g.beginPath();g.moveTo(-H*0.07,-H*0.04);g.lineTo(H*0.07,-H*0.04);g.lineTo(H*0.12,H*0.17);g.lineTo(-H*0.12,H*0.17);g.closePath();g.fill();}
+ g.restore();
  // fej
  const r0=who==='anna'?2.7:who==='petra'?2.4:3.2;headSide(g,shX+H*0.01,shY-hr*1.15,who,t,hr/r0);
  // karok
@@ -176,7 +181,7 @@ function drawCarSide(g,x,by,wy,o,lights){
  const useC=!o.live,dq=o.dirt>0.05?Math.round(o.dirt*10)/10:0;
  if(useC)carLayer(g,'b|'+CP.m+'|'+dq,xg=>carBodyBase(xg,dq));else carBodyBase(g,o.dirt||0);
  // üvegfelület az utasokkal
- glassPath(g);g.fillStyle=lg(g,0,12.5,0,27,[[0,'#b4d6e8'],[0.45,'#628aa3'],[1,'#21384a']]);g.fill();
+ glassPath(g);g.fillStyle=lg(g,0,12.5,0,27,[[0,'#8fa9b8'],[0.45,'#40596a'],[1,'#141f28']]);g.fill();
  g.save();glassPath(g);g.clip();
   const bob=o.bounce?Math.sin(t*0.3)*0.3:0;
   // csomagok a 3. sorban
