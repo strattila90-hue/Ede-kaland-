@@ -179,6 +179,7 @@ function carBodyFront(g){
 function drawCarSide(g,x,by,wy,o,lights){
  const t=o.t||0,hide=o.hide||{},ang=o.ang||0,pitch=o.pitch||0,lift=o.lift||0;
  const wyF=(o.wF||0),wyR=(o.wR||0);
+ ell(g,'rgba(0,0,0,0.28)',x+57,wy+56.2,57,2.8);ell(g,'rgba(0,0,0,0.2)',x+57,wy+56,45,1.8);
  g.save();g.translate(x,by-lift);g.translate(56,45);g.rotate(pitch);g.translate(-56,-45);
  // a karosszéria és az eleje előre megrajzolt kép (színenként, koszosság szerint); az utasok, kerekek, fények élőben
  const useC=!o.live,dq=o.dirt>0.05?Math.round(o.dirt*10)/10:0;
@@ -222,7 +223,7 @@ function drawCarSide(g,x,by,wy,o,lights){
  const L=(dx,dy)=>[x+dx,by+dy];
  if(o.wiping){const a=(Math.sin(t*0.14)+1)/2;line(g,'#14171c',x+86,by+25,x+86-6-a*4,by+25-6-a*6,0.8);}
  const fogF=o.fogF||o.fog,fogR=o.fogR,pos=o.pos||o.lightsOn||o.high;
- if(pos){glow(g,x+106,by+31.6,4,'rgba(255,250,230,0.85)');for(const ly of [18.6,22.6,26.6])frr(g,'rgba(255,80,80,0.98)',x+2.9,by+ly,2.8,0.9,0.45);glow(g,x+3.6,by+22.6,6,'rgba(255,40,40,0.5)');if(lights)lights.push({x:x+3,y:by+23,r:9});}
+ if(pos){glow(g,x+104,wy+58.4,7,'rgba(255,240,200,0.28)');glow(g,x+4,wy+58.4,6,'rgba(255,40,40,0.34)');glow(g,x+106,by+31.6,4,'rgba(255,250,230,0.85)');for(const ly of [18.6,22.6,26.6])frr(g,'rgba(255,80,80,0.98)',x+2.9,by+ly,2.8,0.9,0.45);glow(g,x+3.6,by+22.6,6,'rgba(255,40,40,0.5)');if(lights)lights.push({x:x+3,y:by+23,r:9});}
  if(fogF){disc(g,'#ffffff',x+108.6,by+42.2,1);glow(g,x+108.6,by+42.2,6,'rgba(255,255,230,0.9)');if(lights)lights.push({x:x+112,y:by+44,r:16});}
  if(fogR){frr(g,'#ff2a2a',x+2,by+38.8,3,1.8,0.8);glow(g,x+3,by+39.6,7,'rgba(255,30,30,0.85)');if(lights)lights.push({x:x+2,y:by+40,r:12});}
  if(o.rev){frr(g,'#ffffff',x+2,by+35.6,3,1.6,0.8);glow(g,x+3,by+36.4,9,'rgba(255,255,255,0.95)');if(lights)lights.push({x:x,y:by+40,r:26});}
